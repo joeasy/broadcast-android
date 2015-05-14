@@ -8,7 +8,7 @@
 마을방송 전용단말에 대해 필요한 어플리케이션을 설치하고 사용자 환경설정을 수행한다. <br>
 설치 후 Phase 4.의 과정까지 완료되면 어플리케이션을 삭제한다. 
 
-<center>![마을방송 단말 SW 구성](images/0_전용단말_설치.png)</center>
+<center>![마을방송 단말 SW 구성](document/images/sw_architecture.png)</center>
 
 > <span style='color:navy'>**위의 그림에서 phase 과정은 웹뷰로 구현**  
 > > 필요한 인터페이스 - 상세는 [Native-웹뷰 간 인터페이스 정리](Native_webview_interface.html)   
