@@ -1,1 +1,1 @@
-include ':launcher'
+include ':launcher', ':push_agent', ':media_player', ':common_library', ':iot_gateway'
