@@ -42,11 +42,11 @@
 ### 2. 소프트웨어 구성과 프로젝트 Gradle 모듈 
 소프트웨어 구성 | 프로젝트 모듈명 | 비고 |   
 :----:|:----:|----|   
-WebView & Native Interface | common_library | 인터페이스와 공통 기능 및 permission등 포함 |   
-마을방송 홈 런처 & 마을방송 서비스 | launcher | - |   
+WebViewNative Interface | common_library | 인터페이스와 공통 기능 및 permission등 포함 |   
+마을방송 홈 런처마을방송 서비스 | launcher | ㅇㅇ |   
 미디어 플레이어 | media_player | media playback service |    
 Push Agent | push_agent | push service, interface stack |    
-IoT Gateway | iot_gateway | - |    
+IoT Gateway | iot_gateway | ㅇㅇ |    
 
  
  
