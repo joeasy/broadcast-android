@@ -1,3 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">" VbroadLauncher"</string>
+
+    <string name="app_name">Location API</string>
+    <string name="lbl_you_are_at">YOU ARE AT</string>
+    <string name="btn_get_location">GET MY LOCATION</string>
+    <string name="btn_check_location_settings">CHECK LOCATION SETTINGS</string>
+    <string name="btn_start_location_updates">START LOCATION UPDATES</string>
+    <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
+
+    <string name="alert_phone_finish_ok">OK</string>
+    <string name="alert_phone_message">Your device is mobile phone. You can\'t execute this application !!</string>
+
+    <string name="empty_value">Data is empty !!</string>
+    <string name="parse_error">Data parse error !! Check it.</string>
+    <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
+
+    <!-- main launcher -->
+    <string name="btn_show_map">Service Map</string>
+    <string name="btn_show_apps">Applications</string>
+    <string name="alert_calendar_not_found">Can\'t find Calendar Application. Check your application settings?</string>
+
+    <!--shortcut-->
+    <string name="shortcut_btn_emergency_call">Emergency Call</string>
+    <string name="shortcut_btn_new_broadcast">New Broadcast</string>
+    <string name="shortcut_btn_new_participation">New Participation</string>
+    <string name="shortcut_btn_my_settings">My Settings</string>
+    <string name="shortcut_btn_additional_function">Additional Function</string>
+    <string name="shortcut_btn_radio">Internet Radio</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="test_register_url">http://121.135.162.163:8001/test/test.html</string>
+    <string name="test_register_url_load">불러오기</string>
+    <string name="title_activity_show_application">ShowApplicationActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_calendar">CalendarActivity</string>
+
+
 </resources>

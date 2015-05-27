@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.nbplus.vbroadlauncher"
-        minSdkVersion 11
-        targetSdkVersion 22
+        minSdkVersion 17
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -20,6 +20,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.google.android.gms:play-services-location:6.5.+'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile project(':iot_gateway')
+    compile project(':media_player')
+    compile project(':push_agent')
+    compile project(':common_library')
+    compile project(':viewpager_indicator')
+    compile project(':calendar_library')
 }

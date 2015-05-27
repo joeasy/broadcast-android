@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Location API</string>
+    <string name="lbl_you_are_at">YOU ARE AT</string>
+    <string name="btn_get_location">GET MY LOCATION</string>
+    <string name="btn_check_location_settings">CHECK LOCATION SETTINGS</string>
+    <string name="btn_start_location_updates">START LOCATION UPDATES</string>
+    <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
+
+    <string name="alert_phone_finish_ok">OK</string>
+    <string name="alert_phone_message">Your device is mobile phone. You can\'t execute this application !!</string>
+
+    <string name="empty_value">Data is empty !!</string>
+    <string name="parse_error">Data parse error !! Check it.</string>
+    <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
+
+    <!-- main launcher -->
+    <string name="btn_show_map">서비스맵</string>
+    <string name="btn_show_apps">어플리케이션</string>
+    <string name="alert_calendar_not_found">캘린더 어플리케이션 실행에 실패했습니다. 어플리케이션 설정이 정상적인지 확인하시기 바랍니다.</string>
+
+    <!--shortcut-->
+    <string name="shortcut_btn_emergency_call">긴급호출 하기</string>
+    <string name="shortcut_btn_new_broadcast">방송제작</string>
+    <string name="shortcut_btn_new_participation">참여마당 제작</string>
+    <string name="shortcut_btn_my_settings">나의정보 관리</string>
+    <string name="shortcut_btn_additional_function">부가기능</string>
+    <string name="shortcut_btn_radio">인터넷 라디오</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_land_fragment">Landscape fragment</string>
+    <string name="hello_blank_port_fragment">Portrait fragment</string>
+
+    <string name="test_register_url">http://121.135.162.163:8001/test/test.html</string>
+    <string name="test_register_url_load">불러오기</string>
+
+</resources>
