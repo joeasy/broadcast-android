@@ -13,11 +13,12 @@ public class ShortcutData implements Parcelable {
     private Integer type;
     @SerializedName("name")
     private String name;
+
+    @SerializedName("domain")
+    private String domain;
+
     @SerializedName("path")
     private String path;
-
-    @SerializedName("btn_res")
-    private int btnResId;
 
     @SerializedName("icon")
     private int iconResId;
@@ -25,12 +26,12 @@ public class ShortcutData implements Parcelable {
     @SerializedName("background")
     private int iconBackResId;
 
-    public int getBtnResId() {
-        return btnResId;
+    public String getDomain() {
+        return domain;
     }
 
-    public void setBtnResId(int btnResId) {
-        this.btnResId = btnResId;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public int getIconBackResId() {
@@ -73,8 +74,7 @@ public class ShortcutData implements Parcelable {
         this.iconResId = iconResId;
     }
 
-    public ShortcutData(int btnResId, int type, String name, String path, int iconRes, int backgroundRes) {
-        this.btnResId = btnResId;
+    public ShortcutData(int type, String name, String path, int iconRes, int backgroundRes) {
         this.type = type;
         this.name = name;
         this.path = path;
@@ -92,21 +92,21 @@ public class ShortcutData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(this.type);
-        dest.writeString(this.name);
-        dest.writeString(this.path);
-        dest.writeInt(this.btnResId);
-        dest.writeInt(this.iconResId);
         dest.writeInt(this.iconBackResId);
+        dest.writeString(this.name);
+        dest.writeString(this.domain);
+        dest.writeString(this.path);
+        dest.writeInt(this.iconResId);
+        dest.writeValue(this.type);
     }
 
     private ShortcutData(Parcel in) {
-        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.name = in.readString();
-        this.path = in.readString();
-        this.btnResId = in.readInt();
-        this.iconResId = in.readInt();
         this.iconBackResId = in.readInt();
+        this.name = in.readString();
+        this.domain = in.readString();
+        this.path = in.readString();
+        this.iconResId = in.readInt();
+        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 
     public static final Creator<ShortcutData> CREATOR = new Creator<ShortcutData>() {

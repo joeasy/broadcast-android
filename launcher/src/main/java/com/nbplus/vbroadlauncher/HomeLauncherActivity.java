@@ -5,6 +5,7 @@ package com.nbplus.vbroadlauncher;
  */
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -137,17 +138,18 @@ public class HomeLauncherActivity extends AppCompatActivity
         } else {
             //is phone
             Log.d("Device", "Phone");
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            alert.setMessage(R.string.alert_phone_message);
-            alert.show();
-            return;
+//            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    finish();
+//                }
+//            });
+//            alert.setMessage(R.string.alert_phone_message);
+//            alert.show();
+//            return;
         }
+
         new LoadApplications(this).execute();
 
         // set wallpaper
@@ -194,6 +196,7 @@ public class HomeLauncherActivity extends AppCompatActivity
         Bundle bundle;
 
         if (LauncherSettings.getInstance(this).isCompletedSetup() == false) {
+
             // open user register fragment
             RegisterFragment registerFragment = new RegisterFragment();
             bundle = new Bundle();
@@ -348,6 +351,7 @@ public class HomeLauncherActivity extends AppCompatActivity
     @Override
     public void onConnectionSuspended(int i) {
         this.canGetLocation = false;
+        Log.i(TAG, "Connection Suspended");
         mGoogleApiClient.connect();
     }
 
@@ -377,10 +381,6 @@ public class HomeLauncherActivity extends AppCompatActivity
             LauncherSettings.getInstance(this).setPreferredUserLocation(
                     new PreferredLocation(location.getLatitude(), location.getLongitude())
             );
-
-            PreferredLocation preferredUserLocation = (PreferredLocation)LauncherSettings.getInstance(this).getPrefsJsonObject(LauncherSettings.KEY_VBROADCAST_PREFERRED_LOCATION, PreferredLocation.class);
-            Log.d(TAG, ">>> saved latitude = " + preferredUserLocation.getLatitude());
-            Log.d(TAG, ">>> saved Longitude = " + preferredUserLocation.getLongitude());
         }
 
         // 한번만 받으면 되니.. 업데이트를 계속 받지말자.

@@ -18,6 +18,7 @@ import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
+import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.hybrid.RegisterWebViewClient;
 
 
@@ -44,7 +45,6 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
      * @param param2 Parameter 2.
      * @return A new instance of fragment RegisterFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static RegisterFragment newInstance(String param1, String param2) {
         RegisterFragment fragment = new RegisterFragment();
         Bundle args = new Bundle();
@@ -74,8 +74,9 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
 
         WebView webView = (WebView)v.findViewById(R.id.webview);
         mWebViewClient = new RegisterWebViewClient(getActivity(), webView);
+        mWebViewClient.setBackgroundTransparent();
 
-        mWebViewClient.loadUrl(getString(R.string.test_register_url));
+        mWebViewClient.loadUrl(LauncherSettings.getInstance(getActivity()).getRegisterAddress());
 
         // test view
         final EditText editText = (EditText)v.findViewById(R.id.et_test_url);
@@ -88,13 +89,6 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
             }
         });
         return v;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override

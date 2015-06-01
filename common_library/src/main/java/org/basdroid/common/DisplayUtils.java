@@ -177,8 +177,16 @@ public class DisplayUtils {
         try {
             myWallpaperManager.setResource(resId);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    private float dpFromPx(Context context, float px) {
+        return px / context.getResources().getDisplayMetrics().density;
+    }
+
+
+    private float pxFromDp(Context context, float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
     }
 }

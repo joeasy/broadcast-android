@@ -3,6 +3,8 @@ package com.nbplus.hybrid;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -15,7 +17,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
+import org.basdroid.common.R;
 import org.basdroid.common.StringUtils;
 
 
@@ -64,6 +68,10 @@ public class BasicWebViewClient extends WebViewClient {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
 
+        // TODO : clear cache ????
+        mWebView.clearCache(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // Sets whether the WebView should allow third party cookies to be set.
             // Allowing third party cookies is a per WebView policy and can be set differently on different WebView instances.
@@ -75,6 +83,24 @@ public class BasicWebViewClient extends WebViewClient {
             cookieManager.setAcceptThirdPartyCookies(mWebView, true);
         }
 
+    }
+
+    public void setBackgroundResource(int resId) {
+        mWebView.setBackgroundColor(Color.TRANSPARENT);
+        mWebView.setBackgroundResource(resId);
+    }
+
+    public void setBackgroundTransparent() {
+        mWebView.setBackgroundColor(Color.TRANSPARENT);
+    }
+
+    public void setBackground(Drawable drawable) {
+        mWebView.setBackgroundColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            mWebView.setBackgroundDrawable(drawable);
+        } else {
+            mWebView.setBackground(drawable);
+        }
     }
 
     /**
@@ -126,7 +152,9 @@ public class BasicWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-        CookieSyncManager.getInstance().sync();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            CookieSyncManager.getInstance().sync();
+        }
     }
 
     ////////////////////////////////
@@ -134,6 +162,14 @@ public class BasicWebViewClient extends WebViewClient {
      * 아래의 함수들은 자바스크립트에서 Native를 호출할 필요가 있을때 사용한다.
      * window.nbplus.{methodName}  형식으로 사용하면 된다.
      */
+    /**
+     * 디바이스가 콜 호출이 가능한지 체크한다.
+     */
+    @JavascriptInterface
+    public String getDeviceId() {
+        return DeviceUtils.getDeviceIdByMacAddress(mContext);
+    }
+
     /**
      * 디바이스가 콜 호출이 가능한지 체크한다.
      */

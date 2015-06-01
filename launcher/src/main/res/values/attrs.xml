@@ -3,6 +3,9 @@
     <declare-styleable name="ImageButtonStyle">
         <attr name="button_text" />
         <attr name="button_icon" format="integer" />
+        <attr name="button_textAppearance" format="reference"/>
+        <attr name="button_textColor" format="reference"/>
+        <attr name="button_textSize" format="reference"/>
     </declare-styleable>
 
     <attr name="button_text" />

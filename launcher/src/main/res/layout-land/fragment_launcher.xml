@@ -53,6 +53,7 @@
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="0dip"
+        android:layout_marginTop="@dimen/launcher_top_layer_margin"
         android:layout_weight="1">
         <!-- left : clock, weather and calendar etc -->
         <LinearLayout
@@ -74,124 +75,21 @@
 
         </LinearLayout>
         <!-- right : service shortcuts... etc -->
-        <LinearLayout
-            android:orientation="vertical"
+        <android.support.v7.widget.GridLayout
+            xmlns:grid="http://schemas.android.com/apk/res-auto"
+
+            android:id="@+id/shortcut_grid"
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
 
-            <LinearLayout
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            grid:alignmentMode="alignBounds"
+            grid:columnCount="3"
+            grid:rowOrderPreserved="false"
+            grid:useDefaultMargins="true">
 
-                <com.nbplus.vbroadlauncher.widget.IButton
-                    xmlns:imagebutton="http://schemas.android.com/apk/res-auto"
-                    android:clickable="true"
-                    android:id="@+id/shortcut_btn_emergency_call"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_blue"
-                    imagebutton:button_text="@string/shortcut_btn_emergency_call"
-                    imagebutton:button_icon="@drawable/ic_launcher"
-                    />
-                <Button
-                    android:id="@+id/shortcut_btn_emergency_call1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_blue"
-                    android:drawableTop="@drawable/ic_launcher"
-                    android:text="@string/shortcut_btn_emergency_call"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/launcher_shortcut_font_size" />
-
-                <Button
-                    android:id="@+id/shortcut_btn_new_broadcast"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_black"
-                    android:drawableTop="@drawable/ic_launcher"
-                    android:textStyle="bold"
-                    android:text="@string/shortcut_btn_new_broadcast"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/launcher_shortcut_font_size" />
-                <Button
-                    android:id="@+id/shortcut_btn_new_participation"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_blue"
-                    android:drawableTop="@drawable/ic_launcher"
-                    android:text="@string/shortcut_btn_new_participation"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/launcher_shortcut_font_size" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <Button
-                    android:id="@+id/shortcut_btn_my_settings"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_black"
-                    android:drawableTop="@drawable/ic_launcher"
-                    android:text="@string/shortcut_btn_my_settings"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/launcher_shortcut_font_size" />
-
-                <Button
-                    android:id="@+id/shortcut_btn_additional_function"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_blue"
-                    android:drawableTop="@drawable/ic_launcher"
-                    android:text="@string/shortcut_btn_additional_function"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/launcher_shortcut_font_size" />
-                <Button
-                    android:id="@+id/shortcut_btn_radio"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:background="@drawable/launcher_shortcut_background_black"
-                    android:drawableTop="@drawable/ic_launcher"
-                    android:text="@string/shortcut_btn_radio"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/launcher_shortcut_font_size" />
-            </LinearLayout>
-        </LinearLayout>
+        </android.support.v7.widget.GridLayout>
     </LinearLayout>
 
 </LinearLayout>

@@ -4,17 +4,12 @@
 
     <application
         android:allowBackup="true"
-        android:clearTaskOnLaunch="true"
-        android:excludeFromRecents="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:launchMode="singleTask"
-        android:stateNotNeeded="true"
         android:theme="@style/NBPlusTheme.NoActionBar" >
         <activity
             android:name=".HomeLauncherActivity"
             android:clearTaskOnLaunch="true"
-            android:excludeFromRecents="true"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
@@ -65,6 +60,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
+            android:noHistory="true"
             android:name=".ShowApplicationActivity"
             android:label="@string/title_activity_show_application"
              >
@@ -73,6 +69,14 @@
             android:name=".CalendarActivity"
             android:label="@string/title_activity_calendar"
             android:theme="@style/NBPlusTheme.WallPager.NoActionBar.TranslucentDecor" >
+        </activity>
+        <activity
+            android:name=".BroadcastWebViewActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:noHistory="false"
+            android:label="@string/title_activity_broadcast_webview"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/NBPlusTheme" >
         </activity>
     </application>
 

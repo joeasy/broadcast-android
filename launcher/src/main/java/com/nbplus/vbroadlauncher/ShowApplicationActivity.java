@@ -142,9 +142,10 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
             mViewPager.setSwipeable(true);
 
             mIndicator.setViewPager(mViewPager);
+        } else {
+            mAppPagerAdapter.notifyDataSetChanged();
+            mIndicator.notifyDataSetChanged();
         }
-        mAppPagerAdapter.notifyDataSetChanged();
-        mIndicator.notifyDataSetChanged();
 
         if (mActivityInteractionListener != null) {
             for (OnActivityInteractionListener listener : mActivityInteractionListener) {

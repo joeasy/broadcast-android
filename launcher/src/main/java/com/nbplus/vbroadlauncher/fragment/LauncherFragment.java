@@ -2,6 +2,7 @@ package com.nbplus.vbroadlauncher.fragment;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -9,20 +10,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
+import com.nbplus.vbroadlauncher.data.ShortcutData;
+import com.nbplus.vbroadlauncher.data.Types;
+import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.widget.IButton;
 
 import org.basdroid.widget.TextClock;
+
+import java.util.ArrayList;
 
 
 /**
@@ -117,24 +126,57 @@ public class LauncherFragment extends Fragment {
             });
         }
 
-        /**
-         * right shortcut panel
-         */
-        final IButton btn = (IButton)v.findViewById(R.id.shortcut_btn_emergency_call);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, ">>> Clicked ....");
-                btn.setBackgroundColor(getResources().getColor(R.color.red));
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        btn.setBackgroundColor(getResources().getColor(R.color.blue));
-                    }
-                }, 200);
+        GridLayout gridLayout = (GridLayout)v.findViewById(R.id.shortcut_grid);
+        ArrayList<ShortcutData> shortcutDatas = LauncherSettings.getInstance(getActivity()).getLauncherShortcuts();
+        int columnNum = gridLayout.getColumnCount();
+        final int MAX_ROW_NUM = 3;
 
-            }
-        });
+        int shortcutNum = shortcutDatas.size() > (columnNum * MAX_ROW_NUM) ? (columnNum * MAX_ROW_NUM) : shortcutDatas.size();
+        // draw shortcut button
+        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for (int i = 0; i < shortcutNum; i++) {
+            /**
+             * right shortcut panel
+             */
+            final IButton btn = (IButton)layoutInflater.inflate(R.layout.ibutton, gridLayout, false);
+            gridLayout.addView(btn);
+
+            ShortcutData data = shortcutDatas.get(i);
+            btn.setText(data.getName());
+            btn.setDrawable(data.getIconResId());
+            btn.setBackground(data.getIconBackResId());
+            btn.setTag(data);
+
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ShortcutData data = (ShortcutData)view.getTag();
+                    VBroadcastServer serverData = LauncherSettings.getInstance(getActivity()).getServerInformation();
+
+                    String docServer = serverData.getDocServer();
+
+                    Log.d(TAG, ">>> Clicked = " + data.getName());
+                    Log.d(TAG, ">>> Open URL = " + docServer + data.getPath());
+
+                    switch (data.getType()) {
+                        case Types.SHORTCUT_TYPE_WEB_INTERFACE_SERVER :
+                            data.setDomain(serverData.getApiServer());
+                            break;
+                        case Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER :
+                            Intent intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
+                            data.setDomain(serverData.getDocServer());
+                            intent.putExtra(Types.EXTRA_NAME_SHORTCUT_DATA, data);
+                            startActivity(intent);
+                            break;
+                        case Types.SHORTCUT_TYPE_NATIVE_INTERFACE :
+                            break;
+                        default :
+                            Log.d(TAG, "Unknown shortcut type !!!");
+                    }
+                }
+            });
+        }
+
         return v;
     }
 

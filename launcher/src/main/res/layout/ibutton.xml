@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nbplus.vbroadlauncher.widget.IButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ibutton="http://schemas.android.com/apk/res-auto"
+    xmlns:grid="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="@dimen/launcher_shortcut_default_height"
+    grid:layout_columnWeight="1"
+    grid:layout_gravity="fill_horizontal"
+    android:gravity="center"
+    android:background="#FF33B5E5"
+    ibutton:button_icon="@drawable/ic_launcher"
+    ibutton:button_textColor="@color/white"
+    ibutton:button_textSize="@dimen/launcher_shortcut_font_size"
+    ibutton:button_text="Tile4" />

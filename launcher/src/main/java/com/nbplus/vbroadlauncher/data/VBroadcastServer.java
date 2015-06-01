@@ -13,8 +13,8 @@ public class VBroadcastServer implements Parcelable {
     private String apiServer;
     @SerializedName("doc_server")
     private String docServer;
-    @SerializedName("push_gw_server")
-    private String pushGateway;
+    @SerializedName("push_if_server")
+    private String pushInterfaceServer;
 
     // 접속할 때마다 달라진다. push gateway server 에서 받아온다.
     private String pushConnServer;
@@ -35,12 +35,12 @@ public class VBroadcastServer implements Parcelable {
         this.docServer = docServer;
     }
 
-    public String getPushGateway() {
-        return pushGateway;
+    public String getPushInterfaceServer() {
+        return pushInterfaceServer;
     }
 
-    public void setPushGateway(String pushGateway) {
-        this.pushGateway = pushGateway;
+    public void setPushInterfaceServer(String pushGateway) {
+        this.pushInterfaceServer = pushGateway;
     }
 
     public String getPushConnServer() {
@@ -61,7 +61,7 @@ public class VBroadcastServer implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.apiServer);
         dest.writeString(this.docServer);
-        dest.writeString(this.pushGateway);
+        dest.writeString(this.pushInterfaceServer);
         dest.writeString(this.pushConnServer);
     }
 
@@ -71,7 +71,7 @@ public class VBroadcastServer implements Parcelable {
     private VBroadcastServer(Parcel in) {
         this.apiServer = in.readString();
         this.docServer = in.readString();
-        this.pushGateway = in.readString();
+        this.pushInterfaceServer = in.readString();
         this.pushConnServer = in.readString();
     }
 

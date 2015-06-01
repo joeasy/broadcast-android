@@ -41,6 +41,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     int mViewPagePosition = -1;
 
     int mMaxIconView;
+    boolean mCreated = false;
 
     /**
      * Use this factory method to create a new instance of
@@ -76,6 +77,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_app_grid, container, false);
         mGridLayout = (GridView)v.findViewById(R.id.grid_layout);
+        mCreated = true;
         return v;
     }
 
@@ -130,7 +132,9 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onResume() {
         super.onResume();
-        updateGridLayout();
+        if (mCreated) {
+            updateGridLayout();
+        }
     }
 
     @Override
@@ -140,6 +144,8 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onDataChanged() {
         Log.d(TAG, "onDataChanged() update grid layout");
-        updateGridLayout();
+        if (mCreated) {
+            updateGridLayout();
+        }
     }
 }

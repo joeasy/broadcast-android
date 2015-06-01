@@ -45,8 +45,11 @@ public class LauncherSettings implements Parcelable {
      * 미리 고정된 값으로넣는다.
      */
     // 숏컷정보
-//    @SerializedName("app_shortcuts")
-//    ArrayList<ShortcutData> launcherShortcuts = new ArrayList<ShortcutData>();;
+    @SerializedName("app_shortcuts")
+    ArrayList<ShortcutData> launcherShortcuts = new ArrayList<ShortcutData>();;
+
+    @SerializedName("register_address")
+    String registerAddress = "http://121.135.162.163:8001/test/test.html";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;
@@ -92,7 +95,7 @@ public class LauncherSettings implements Parcelable {
          * 숏컷은 단말에서 유지하기로해서..
          * 미리 고정된 값으로넣는다.
          */
-        //(ArrayList<ShortcutData>)getPrefsJsonObject(KEY_VBROADCAST_SHORTCUT, new TypeToken<ArrayList<ShortcutData>>(){}.getType());
+        setupLauncherShortcuts(context);//(ArrayList<ShortcutData>)getPrefsJsonObject(KEY_VBROADCAST_SHORTCUT, new TypeToken<ArrayList<ShortcutData>>(){}.getType());
         this.preferredUserLocation = (PreferredLocation)getPrefsJsonObject(KEY_VBROADCAST_PREFERRED_LOCATION, new TypeToken<PreferredLocation>(){}.getType());
         this.serverInformation = (VBroadcastServer)getPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, new TypeToken<VBroadcastServer>(){}.getType());
     }
@@ -133,24 +136,94 @@ public class LauncherSettings implements Parcelable {
         prefs.edit().putString(KEY_VBROADCAST_VILLAGE_CODE, this.villageCode).commit();
     }
 
+    public String getRegisterAddress() {
+        return registerAddress;
+    }
+
+    public void setRegisterAddress(String registerAddress) {
+        this.registerAddress = registerAddress;
+    }
+
     /**
      * 숏컷은 단말에서 유지하기로해서..
      * 미리 고정된 값으로넣는다.
      */
-//    public ArrayList<ShortcutData> getLauncherShortcuts() {
-//        return launcherShortcuts;
-//    }
-//
-//    public void setLauncherShortcuts(ArrayList<ShortcutData> launcherShortcuts) {
-//        this.launcherShortcuts = launcherShortcuts;
-//        setPrefsJsonObject(KEY_VBROADCAST_SHORTCUT, this.launcherShortcuts);
-//    }
+    public ArrayList<ShortcutData> getLauncherShortcuts() {
+        return launcherShortcuts;
+    }
+
+    public void setupLauncherShortcuts(Context context) {
+        /**
+        <!--shortcut-->
+        <string name="shortcut_btn_emergency_call">Emergency Call</string>
+        <string name="shortcut_btn_new_broadcast">New Broadcast</string>
+        <string name="shortcut_btn_new_participation">New Participation</string>
+        <string name="shortcut_btn_my_settings">My Settings</string>
+        <string name="shortcut_btn_additional_function">Additional Function</string>
+        <string name="shortcut_btn_radio">Internet Radio</string>
+        <string name="shortcut_addr_emergency_call">/test/test.html</string>
+        <string name="shortcut_addr_new_broadcast">/test/test.html</string>
+        <string name="shortcut_addr_new_participation">/test/test.html</string>
+        <string name="shortcut_addr_my_settings">/test/test.html</string>
+        <string name="shortcut_addr_additional_function">/test/test.html</string>
+        <string name="shortcut_addr_radio">/test/test.html</string>
+        */
+        launcherShortcuts.clear();
+        ShortcutData data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_INTERFACE_SERVER,
+                context.getResources().getString(R.string.shortcut_btn_emergency_call),
+                context.getResources().getString(R.string.shortcut_addr_emergency_call),
+                R.drawable.ic_launcher,
+                R.drawable.launcher_shortcut_background_blue);
+        launcherShortcuts.add(data);
+        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+                context.getResources().getString(R.string.shortcut_btn_new_broadcast),
+                context.getResources().getString(R.string.shortcut_addr_new_broadcast),
+                R.drawable.ic_launcher,
+                R.drawable.launcher_shortcut_background_black);
+        launcherShortcuts.add(data);
+        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+                context.getResources().getString(R.string.shortcut_btn_new_participation),
+                context.getResources().getString(R.string.shortcut_addr_new_participation),
+                R.drawable.ic_launcher,
+                R.drawable.launcher_shortcut_background_blue);
+        launcherShortcuts.add(data);
+        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+                context.getResources().getString(R.string.shortcut_btn_my_settings),
+                context.getResources().getString(R.string.shortcut_addr_my_settings),
+                R.drawable.ic_launcher,
+                R.drawable.launcher_shortcut_background_black);
+        launcherShortcuts.add(data);
+        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+                context.getResources().getString(R.string.shortcut_btn_additional_function),
+                context.getResources().getString(R.string.shortcut_addr_additional_function),
+                R.drawable.ic_launcher,
+                R.drawable.launcher_shortcut_background_blue);
+        launcherShortcuts.add(data);
+        data = new ShortcutData(Types.SHORTCUT_TYPE_NATIVE_INTERFACE,
+                context.getResources().getString(R.string.shortcut_btn_radio),
+                context.getResources().getString(R.string.shortcut_addr_radio),
+                R.drawable.ic_launcher,
+                R.drawable.launcher_shortcut_background_black);
+        launcherShortcuts.add(data);
+    }
 
     public VBroadcastServer getServerInformation() {
         return serverInformation;
     }
 
     public void setServerInformation(VBroadcastServer serverInformation) {
+        String addr = serverInformation.getApiServer();
+        if (addr.endsWith("/")) {
+            addr = addr.substring(0, addr.length() - 2);
+        }
+        addr = serverInformation.getDocServer();
+        if (addr.endsWith("/")) {
+            addr = addr.substring(0, addr.length() - 2);
+        }
+        addr = serverInformation.getPushInterfaceServer();
+        if (addr.endsWith("/")) {
+            addr = addr.substring(0, addr.length() - 2);
+        }
         this.serverInformation = serverInformation;
         setPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, this.serverInformation);
     }
@@ -213,11 +286,7 @@ public class LauncherSettings implements Parcelable {
         dest.writeByte(isExclusive ? (byte) 1 : (byte) 0);
         dest.writeByte(isCompletedSetup ? (byte) 1 : (byte) 0);
         dest.writeParcelable(this.serverInformation, 0);
-        /**
-         * 숏컷은 단말에서 유지하기로해서..
-         * 미리 고정된 값으로넣는다.
-         */
-//        dest.writeSerializable(this.launcherShortcuts);
+        dest.writeSerializable(this.launcherShortcuts);
     }
 
     private LauncherSettings(Parcel in) {
@@ -228,11 +297,7 @@ public class LauncherSettings implements Parcelable {
         this.isExclusive = in.readByte() != 0;
         this.isCompletedSetup = in.readByte() != 0;
         this.serverInformation = in.readParcelable(VBroadcastServer.class.getClassLoader());
-        /**
-         * 숏컷은 단말에서 유지하기로해서..
-         * 미리 고정된 값으로넣는다.
-         */
-//        this.launcherShortcuts = (ArrayList<ShortcutData>) in.readSerializable();
+        this.launcherShortcuts = (ArrayList<ShortcutData>) in.readSerializable();
     }
 
     public static final Creator<LauncherSettings> CREATOR = new Creator<LauncherSettings>() {

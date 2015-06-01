@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Location API</string>
+    <string name="app_name">Village Broadcast</string>
     <string name="lbl_you_are_at">YOU ARE AT</string>
     <string name="btn_get_location">GET MY LOCATION</string>
     <string name="btn_check_location_settings">CHECK LOCATION SETTINGS</string>
@@ -27,16 +27,21 @@
     <string name="shortcut_btn_my_settings">My Settings</string>
     <string name="shortcut_btn_additional_function">Additional Function</string>
     <string name="shortcut_btn_radio">Internet Radio</string>
+    <string name="shortcut_addr_emergency_call">/test/test.html</string>
+    <string name="shortcut_addr_new_broadcast">/test/test.html</string>
+    <string name="shortcut_addr_new_participation">/test/test.html</string>
+    <string name="shortcut_addr_my_settings">/test/test.html</string>
+    <string name="shortcut_addr_additional_function">/test/test.html</string>
+    <string name="shortcut_addr_radio">/test/test.html</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="test_register_url">http://121.135.162.163:8001/test/test.html</string>
     <string name="test_register_url_load">불러오기</string>
     <string name="title_activity_show_application">ShowApplicationActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_calendar">CalendarActivity</string>
+    <string name="title_activity_broadcast_webview">Village Broadcast</string>
 
 
 </resources>
