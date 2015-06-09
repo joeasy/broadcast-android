@@ -49,76 +49,25 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
 
     description = "Generate Jacoco coverage reports"
 
-    classDirectories = fileTree(
-            dir: '../launcher/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
-    classDirectories += fileTree(
-            dir: '../calendar_library/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
-    classDirectories += fileTree(
-            dir: '../common_library/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
-    classDirectories += fileTree(
-            dir: '../iot_gateway/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
-    classDirectories += fileTree(
-            dir: '../push_agent/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
-    classDirectories += fileTree(
-            dir: '../media_player/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
-    classDirectories += fileTree(
-            dir: '../viewpager_indicator/build/intermediates/classes/debug',
-            excludes: ['**/R.class',
-                       '**/R$*.class',
-                       '**/*$ViewInjector*.*',
-                       '**/BuildConfig.*',
-                       '**/BuildConfig.class',
-                       '**/Manifest*.*']
-    )
+    // exclude auto-generated classes and tests
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*',
+                      'android/**/*.*']
+    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
 
-    additionalSourceDirs = files(coverageSourceDirs)
-    sourceDirectories = files(coverageSourceDirs)
-    executionData = files('../launcher/build/jacoco/testDebug.exec')
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.projectDir, includes: ['**/*.exec', '**/*.ec'])
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml {
+            enabled = true
+            destination = "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        }
+        csv.enabled false
+        html {
+            enabled = true
+            destination = "${project.buildDir}/reports/jacoco"
+        }
     }
 }
