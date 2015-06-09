@@ -40,34 +40,31 @@ jacoco {
     toolVersion = "0.7.1.201405082137"
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['test']) {
-    description = "Generates Jacoco coverage reports: XML and HTML"
+def coverageSourceDirs = [
+        '../launcher/src/main/java'
+]
+
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
     group = "Reporting"
-//                outputs.upToDateWhen { false }
 
-    // use hidden configuration, for details look into JacocoPlugin.groovy
-    jacocoClasspath = project.configurations['androidJacocoAnt']
+    description = "Generate Jacoco coverage reports"
 
-    // exclude auto-generated classes and tests
-    //def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*',
-    //                  'android/**/*.*']
-    def fileFilter = ['com/toast/android/mobill/core/BuildConfig.class']
-    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/classes/debug", excludes: fileFilter)
-    def mainSrc = "${project.projectDir}/src/main/java"
+    classDirectories = fileTree(
+            dir: '../launcher/build/intermediates/classes/debug',
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/*$ViewInjector*.*',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*']
+    )
 
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = fileTree(dir: project.projectDir, includes: ['**/*.exec', '**/*.ec'])
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('../launcher/build/jacoco/testDebug.exec')
 
     reports {
-        xml {
-            enabled = true
-            destination = "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        }
-        csv.enabled false
-        html {
-            enabled = true
-            destination = "${project.buildDir}/reports/jacoco"
-        }
+        xml.enabled = true
+        html.enabled = true
     }
+
 }
