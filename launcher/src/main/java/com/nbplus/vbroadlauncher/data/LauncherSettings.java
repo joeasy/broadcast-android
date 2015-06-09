@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,7 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlauncher.R;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -25,7 +23,7 @@ public class LauncherSettings implements Parcelable {
     // 맥어드레스 기반 40바이트 디바이스 UUID
     String deviceID;
     // 날씨정보에 사용할 로케이션정보
-    PreferredLocation preferredUserLocation;
+    Location preferredUserLocation;
 
     // 마을정보
     @SerializedName("vill_code")
@@ -36,6 +34,8 @@ public class LauncherSettings implements Parcelable {
     boolean isExclusive;
 
     boolean isCompletedSetup;
+
+    int wallpagerResource;
 
     // 서버정보
     @SerializedName("svc_domain")
@@ -49,7 +49,7 @@ public class LauncherSettings implements Parcelable {
     ArrayList<ShortcutData> launcherShortcuts = new ArrayList<ShortcutData>();;
 
     @SerializedName("register_address")
-    String registerAddress = "http://121.135.162.163:8001/test/test.html";
+    String registerAddress = "http://175.207.46.128:8001/test/test.html";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;
@@ -96,7 +96,7 @@ public class LauncherSettings implements Parcelable {
          * 미리 고정된 값으로넣는다.
          */
         setupLauncherShortcuts(context);//(ArrayList<ShortcutData>)getPrefsJsonObject(KEY_VBROADCAST_SHORTCUT, new TypeToken<ArrayList<ShortcutData>>(){}.getType());
-        this.preferredUserLocation = (PreferredLocation)getPrefsJsonObject(KEY_VBROADCAST_PREFERRED_LOCATION, new TypeToken<PreferredLocation>(){}.getType());
+        this.preferredUserLocation = (Location)getPrefsJsonObject(KEY_VBROADCAST_PREFERRED_LOCATION, new TypeToken<Location>(){}.getType());
         this.serverInformation = (VBroadcastServer)getPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, new TypeToken<VBroadcastServer>(){}.getType());
     }
 
@@ -144,6 +144,14 @@ public class LauncherSettings implements Parcelable {
         this.registerAddress = registerAddress;
     }
 
+    public int getWallpagerResource() {
+        return wallpagerResource;
+    }
+
+    public void setWallpagerResource(int wallpagerResource) {
+        this.wallpagerResource = wallpagerResource;
+    }
+
     /**
      * 숏컷은 단말에서 유지하기로해서..
      * 미리 고정된 값으로넣는다.
@@ -169,37 +177,37 @@ public class LauncherSettings implements Parcelable {
         <string name="shortcut_addr_radio">/test/test.html</string>
         */
         launcherShortcuts.clear();
-        ShortcutData data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_INTERFACE_SERVER,
+        ShortcutData data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_emergency_call),
                 context.getResources().getString(R.string.shortcut_addr_emergency_call),
                 R.drawable.ic_launcher,
                 R.drawable.launcher_shortcut_background_blue);
         launcherShortcuts.add(data);
-        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+        data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_new_broadcast),
                 context.getResources().getString(R.string.shortcut_addr_new_broadcast),
                 R.drawable.ic_launcher,
                 R.drawable.launcher_shortcut_background_black);
         launcherShortcuts.add(data);
-        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+        data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_new_participation),
                 context.getResources().getString(R.string.shortcut_addr_new_participation),
                 R.drawable.ic_launcher,
                 R.drawable.launcher_shortcut_background_blue);
         launcherShortcuts.add(data);
-        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+        data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_my_settings),
                 context.getResources().getString(R.string.shortcut_addr_my_settings),
                 R.drawable.ic_launcher,
                 R.drawable.launcher_shortcut_background_black);
         launcherShortcuts.add(data);
-        data = new ShortcutData(Types.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+        data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_additional_function),
                 context.getResources().getString(R.string.shortcut_addr_additional_function),
                 R.drawable.ic_launcher,
                 R.drawable.launcher_shortcut_background_blue);
         launcherShortcuts.add(data);
-        data = new ShortcutData(Types.SHORTCUT_TYPE_NATIVE_INTERFACE,
+        data = new ShortcutData(Constants.SHORTCUT_TYPE_NATIVE_INTERFACE,
                 context.getResources().getString(R.string.shortcut_btn_radio),
                 context.getResources().getString(R.string.shortcut_addr_radio),
                 R.drawable.ic_launcher,
@@ -237,11 +245,11 @@ public class LauncherSettings implements Parcelable {
         prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).commit();
     }
 
-    public PreferredLocation getPreferredUserLocation() {
+    public Location getPreferredUserLocation() {
         return preferredUserLocation;
     }
 
-    public void setPreferredUserLocation(PreferredLocation preferredUserLocation) {
+    public void setPreferredUserLocation(Location preferredUserLocation) {
         this.preferredUserLocation = preferredUserLocation;
         setPrefsJsonObject(KEY_VBROADCAST_PREFERRED_LOCATION, this.preferredUserLocation);
     }
@@ -285,19 +293,23 @@ public class LauncherSettings implements Parcelable {
         dest.writeString(this.villageName);
         dest.writeByte(isExclusive ? (byte) 1 : (byte) 0);
         dest.writeByte(isCompletedSetup ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.wallpagerResource);
         dest.writeParcelable(this.serverInformation, 0);
         dest.writeSerializable(this.launcherShortcuts);
+        dest.writeString(this.registerAddress);
     }
 
     private LauncherSettings(Parcel in) {
         this.deviceID = in.readString();
-        this.preferredUserLocation = in.readParcelable(PreferredLocation.class.getClassLoader());
+        this.preferredUserLocation = in.readParcelable(Location.class.getClassLoader());
         this.villageCode = in.readString();
         this.villageName = in.readString();
         this.isExclusive = in.readByte() != 0;
         this.isCompletedSetup = in.readByte() != 0;
+        this.wallpagerResource = in.readInt();
         this.serverInformation = in.readParcelable(VBroadcastServer.class.getClassLoader());
         this.launcherShortcuts = (ArrayList<ShortcutData>) in.readSerializable();
+        this.registerAddress = in.readString();
     }
 
     public static final Creator<LauncherSettings> CREATOR = new Creator<LauncherSettings>() {

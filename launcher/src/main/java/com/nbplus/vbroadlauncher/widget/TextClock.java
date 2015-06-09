@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.basdroid.widget;
+package com.nbplus.vbroadlauncher.widget;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -39,7 +39,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
 
-import org.basdroid.common.R;
+import com.nbplus.vbroadlauncher.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -621,17 +621,18 @@ public class TextClock extends TextView {
         Locale locale = getContext().getResources().getConfiguration().locale;
         SimpleDateFormat sdf;
         if (Locale.KOREA.toString().equals(locale.toString())) {
-            sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
+            sdf = new SimpleDateFormat("yyyy년 MM월 dd일 E요일");
         } else {
             sdf = new SimpleDateFormat("EEE, MMM d, ''yy");
         }
         Date date = new Date(currTimems);
         String dateStr = sdf.format(date);
 
-        Spannable span = new SpannableString(dateStr + "\n" +  DateFormat.format(mFormat, mTime));
-        span.setSpan(new RelativeSizeSpan(0.35f), 0, dateStr.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        span.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
-                            0, span.length() - 1,
+        CharSequence timeString = DateFormat.format(mFormat, mTime);
+        Spannable span = new SpannableString(timeString + "\n" +  dateStr);
+        span.setSpan(new RelativeSizeSpan(0.35f), timeString.length(), span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                            0, span.length(),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         setText(span);
     }

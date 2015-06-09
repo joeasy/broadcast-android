@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -15,9 +16,10 @@ import android.view.MenuItem;
 
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
-import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
 import com.nbplus.vbroadlauncher.adapter.AppPagerAdapter;
 import com.nbplus.vbroadlauncher.adapter.AppViewPager;
+import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.service.LoadInstalledApplication;
 import com.viewpagerindicator.LinePageIndicator;
 import com.viewpagerindicator.PageIndicator;
 
@@ -27,11 +29,33 @@ import java.util.ArrayList;
 public class ShowApplicationActivity extends AppCompatActivity implements OnFragmentInteractionListener {
     private static final String TAG = ShowApplicationActivity.class.getSimpleName();
 
-    Handler mHandler = new Handler();
     private AppViewPager mViewPager;
     AppPagerAdapter mAppPagerAdapter;
     PageIndicator mIndicator;
+    LoadInstalledApplication mLoadAsyncTask;
+
     private ArrayList<OnActivityInteractionListener> mActivityInteractionListener = new ArrayList<OnActivityInteractionListener>();
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg == null) {
+                return;
+            }
+            switch (msg.what) {
+                case Constants.HANDLER_MESSAGE_FINISH_TASK :
+                    Log.d(TAG, "HANDLER_MESSAGE_FINISH_TASK received !!!");
+                    mAppPagerAdapter.notifyDataSetChanged();
+                    mIndicator.notifyDataSetChanged();
+
+                    if (mActivityInteractionListener != null) {
+                        for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+                            listener.onDataChanged();
+                        }
+                    }
+                    break;
+            }
+        }
+    };
 
     private BroadcastReceiver mPackageInstallReceiver = new BroadcastReceiver() {
 
@@ -40,7 +64,16 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
             final String action = intent.getAction();
             final String packageName = intent.getData().getSchemeSpecificPart();
             Log.d(TAG, packageName + " application install/uninstall");
-            new LoadApplications(ShowApplicationActivity.this).execute();
+
+            if (mLoadAsyncTask != null) {
+                if (mLoadAsyncTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    mLoadAsyncTask.cancel(true);
+                }
+                mLoadAsyncTask = new LoadInstalledApplication(ShowApplicationActivity.this, mHandler);
+            } else {
+                mLoadAsyncTask = new LoadInstalledApplication(ShowApplicationActivity.this, mHandler);
+            }
+            mLoadAsyncTask.execute();
         }
 
     };
@@ -64,7 +97,14 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
         mViewPager = (AppViewPager) findViewById(R.id.viewPager);
         mIndicator = (LinePageIndicator)findViewById(R.id.indicator);
 
-        updateApplicationList();
+        mAppPagerAdapter = new AppPagerAdapter(this, getSupportFragmentManager());
+        mViewPager.setAdapter(mAppPagerAdapter);
+        mViewPager.setSwipeable(true);
+
+        mIndicator.setViewPager(mViewPager);
+
+        mLoadAsyncTask = new LoadInstalledApplication(this, mHandler);
+        mLoadAsyncTask.execute();
     }
 
     /**
@@ -116,7 +156,6 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
     @Override
     protected void onResume() {
         super.onResume();
-        new LoadApplications(this).execute();
 
         if (mAppPagerAdapter != null) {
             mAppPagerAdapter.notifyDataSetChanged();
@@ -133,26 +172,6 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
-    public void updateApplicationList() {
-        Log.d(TAG, ">> supdateApplicationList() called....");
-        if (mAppPagerAdapter == null) {
-            Log.d(TAG, ">> set Adapter....");
-            mAppPagerAdapter = new AppPagerAdapter(this, getSupportFragmentManager());
-            mViewPager.setAdapter(mAppPagerAdapter);
-            mViewPager.setSwipeable(true);
-
-            mIndicator.setViewPager(mViewPager);
-        } else {
-            mAppPagerAdapter.notifyDataSetChanged();
-            mIndicator.notifyDataSetChanged();
-        }
-
-        if (mActivityInteractionListener != null) {
-            for (OnActivityInteractionListener listener : mActivityInteractionListener) {
-                listener.onDataChanged();
-            }
-        }
-    }
     /**
      * Activity에서 일어나는 Interaction lister 이다.
      * 여러개의 프래그먼트에서 동시에 처리하지 않도록 하나만 유지된다.
@@ -165,49 +184,4 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
         this.mActivityInteractionListener.remove(listener);
     }
 
-    private class LoadApplications extends AsyncTask<Void, Void, Void> {
-        //private ProgressDialog progress = null;
-        private Context mContext;
-
-        public LoadApplications(Context context) {
-            this.mContext = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            ShowAllLaunchAppsInfo.getInstance().updateApplicationList(mContext);
-
-            return null;
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    updateApplicationList();
-                }
-            });
-            //progress.dismiss();
-            super.onPostExecute(result);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            //progress = ProgressDialog.show(AllAppsActivity.this, null,
-            //        "Loading application info...");
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-    }
 }

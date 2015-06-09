@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class GridViewAdapter extends BaseAdapter {
     private Context context;
-    private final ArrayList<ApplicationInfo> mAppList;
+    private ArrayList<ApplicationInfo> mAppList;
 
     public static class AppViewHolder {
         public ImageView icon;
@@ -31,6 +31,11 @@ public class GridViewAdapter extends BaseAdapter {
     public GridViewAdapter(Context context, ArrayList<ApplicationInfo> appList) {
         this.context = context;
         this.mAppList = appList;
+    }
+
+    public void setApplicationList(ArrayList<ApplicationInfo> appList) {
+        this.mAppList = appList;
+        this.notifyDataSetChanged();
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {

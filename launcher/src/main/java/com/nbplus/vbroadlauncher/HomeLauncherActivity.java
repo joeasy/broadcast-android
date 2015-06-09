@@ -22,6 +22,7 @@ import android.os.ResultReceiver;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -57,7 +58,6 @@ public class HomeLauncherActivity extends AppCompatActivity
         LocationListener, ResultCallback<LocationSettingsResult>, OnFragmentInteractionListener {
 
     // LogCat tag
-    Handler mHandler = new Handler();
     private static final String TAG = HomeLauncherActivity.class.getSimpleName();
 
     protected Handler mActivityHandler = new Handler();
@@ -81,16 +81,13 @@ public class HomeLauncherActivity extends AppCompatActivity
      */
     private AddressResultReceiver mResultReceiver;
 
-    // flag for GPS status
-    protected boolean canGetLocation = false;
-
     // Google client to interact with Google API
     protected GoogleApiClient mGoogleApiClient;
 
     // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 10000; // 10 sec
     private static int FATEST_INTERVAL = 5000; // 5 sec
-    private static int DISPLACEMENT = 10; // 10 meters
+    private static int DISPLACEMENT = 1000; // 10 meters
     // boolean flag to toggle periodic location updates
     protected boolean mRequestingLocationUpdates = true;
     protected boolean mAddressRequested = false;
@@ -108,23 +105,6 @@ public class HomeLauncherActivity extends AppCompatActivity
     //
     protected static final String REQUESTING_LOCATION_UPDATES_KEY = "RequestLocationUpdates";
     protected static final String LOCATION_KEY = "Location";
-    protected static final String ADDRESS_REQUESTED_KEY = "AddressRequested";
-    protected static final String LAST_UPDATED_TIME_STRING_KEY = "LastUpdatedTime";
-    protected static final String LOCATION_ADDRESS_KEY = "LocationAddress";
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        savedInstanceState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates);
-        Log.d(TAG, "onSaveInstanceState....mRequestingLocationUpdates = " + mRequestingLocationUpdates);
-        savedInstanceState.putParcelable(LOCATION_KEY, mLastLocation);
-        //savedInstanceState.putString(LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
-        // Save whether the address has been requested.
-        savedInstanceState.putBoolean(ADDRESS_REQUESTED_KEY, mAddressRequested);
-        // Save the address string.
-        savedInstanceState.putParcelable(LOCATION_ADDRESS_KEY, mAddressOutput);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,11 +130,15 @@ public class HomeLauncherActivity extends AppCompatActivity
 //            return;
         }
 
-        new LoadApplications(this).execute();
+        Point p = DisplayUtils.getScreenSize(this);
 
-        // set wallpaper
-        if (LauncherSettings.getInstance(this).isCompletedSetup() == false) {
-            DisplayUtils.setWallPaperResource(this, R.drawable.wallpaper);
+        // set background image
+        View mainLayout = findViewById(R.id.main_layout);
+        int wallpagerResource = LauncherSettings.getInstance(this).getWallpagerResource();
+        if (wallpagerResource <= 0) {
+            getWindow().setBackgroundDrawableResource(R.drawable.wallpaper);
+        } else {
+            getWindow().setBackgroundDrawableResource(wallpagerResource);
         }
 
         if (StringUtils.isEmptyString(LauncherSettings.getInstance(this).getDeviceID())) {
@@ -183,6 +167,10 @@ public class HomeLauncherActivity extends AppCompatActivity
             //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
                 checkLocationSettings();
             //}
+            Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
+            if (mGoogleApiClient != null) {
+                mGoogleApiClient.connect();
+            }
         } else {
             Log.e(TAG, "Google Play Service is not available !!!!!");
         }
@@ -303,25 +291,17 @@ public class HomeLauncherActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-//        if (checkPlayServices()) {
-//            if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-//                startLocationUpdates();
-//            }
-//        }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "HomeLauncherActivity onDestroy() call mGoogleApiClient.disconnect()");
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -350,20 +330,14 @@ public class HomeLauncherActivity extends AppCompatActivity
 
     @Override
     public void onConnectionSuspended(int i) {
-        this.canGetLocation = false;
         Log.i(TAG, "Connection Suspended");
         mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        this.canGetLocation = false;
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
                 + connectionResult.getErrorCode());
-    }
-
-    boolean canGetLocation() {
-        return this.canGetLocation;
     }
 
     @Override
@@ -377,17 +351,12 @@ public class HomeLauncherActivity extends AppCompatActivity
             Log.d(TAG, ">>> Longitude = " + location.getLongitude());
         }
 
-        if (location != null && LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
-            LauncherSettings.getInstance(this).setPreferredUserLocation(
-                    new PreferredLocation(location.getLatitude(), location.getLongitude())
-            );
+        //if (location != null && LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
+            LauncherSettings.getInstance(this).setPreferredUserLocation(location);
+        //}
+        if (this.mActivityInteractionListener != null) {
+            this.mActivityInteractionListener.onLocationDataChanged(location);
         }
-
-        // 한번만 받으면 되니.. 업데이트를 계속 받지말자.
-//        if (mRequestingLocationUpdates == true && LauncherSettings.getInstance(this).getPreferredUserLocation() != null) {
-//            mRequestingLocationUpdates = false;
-//            this.stopLocationUpdates();
-//        }
 
     }
 
@@ -488,7 +457,6 @@ public class HomeLauncherActivity extends AppCompatActivity
         switch (mCheckLocationSettingStatus.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
                 Log.i(TAG, "All location settings are satisfied.");
-                this.canGetLocation = true;
                 // Once connected with google api, get the location
                 updateLocaton();
                 break;
@@ -568,48 +536,6 @@ public class HomeLauncherActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
         Log.d(TAG, "onFragmentInteraction()");
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
-
-    private class LoadApplications extends AsyncTask<Void, Void, Void> {
-        //private ProgressDialog progress = null;
-        private Context mContext;
-
-        public LoadApplications(Context context) {
-            this.mContext = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            ShowAllLaunchAppsInfo.getInstance().updateApplicationList(mContext);
-
-            return null;
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-        }
-
-        @Override
-        protected void onPreExecute() {
-            //progress = ProgressDialog.show(AllAppsActivity.this, null,
-            //        "Loading application info...");
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
     }
 
 }

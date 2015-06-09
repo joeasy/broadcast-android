@@ -16,11 +16,25 @@ import java.lang.reflect.Method;
 public class AppPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = AppPagerAdapter.class.getSimpleName();
     private Context mContext;
-    private int mLastPageCount;
+
+    // for page count calculate
+    private int mAppSize;
+    private int mAppPerPage;
+    private int mQuotient;
+    private int mRemainder;
+    private int mPageCount;
 
     public AppPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
+
+        int appSize = ShowAllLaunchAppsInfo.getInstance().getCount();
+        int appPerPage = ShowAllLaunchAppsInfo.getMaxPageItemSize(mContext);
+
+        int quotient = appSize / appPerPage;
+        int remainder = appSize % appPerPage;
+
+        mPageCount = remainder > 0 ? quotient + 1 : quotient;
     }
 
     @Override
@@ -45,15 +59,26 @@ public class AppPagerAdapter extends FragmentPagerAdapter {
         return fragment;
     }
 
+    /**
+     * This method should be called by the application if the data backing this adapter has changed
+     * and associated views should update.
+     */
     @Override
-    public int getCount() {
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
         int appSize = ShowAllLaunchAppsInfo.getInstance().getCount();
         int appPerPage = ShowAllLaunchAppsInfo.getMaxPageItemSize(mContext);
 
         int quotient = appSize / appPerPage;
         int remainder = appSize % appPerPage;
 
-        return remainder > 0 ? quotient + 1 : quotient;
+        mPageCount = remainder > 0 ? quotient + 1 : quotient;
+    }
+
+    @Override
+    public int getCount() {
+        return mPageCount;
     }
 
 }

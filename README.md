@@ -1,3 +1,5 @@
+[![Build Status](http://175.207.46.132:8010/jenkins/buildStatus/icon?job=전용단말_마을방송)](http://175.207.46.132:8010/jenkins/job/%EC%A0%84%EC%9A%A9%EB%8B%A8%EB%A7%90_%EB%A7%88%EC%9D%84%EB%B0%A9%EC%86%A1/)
+
 ># 마을방송 전용단말 어플리케이션
 
 ## Overview

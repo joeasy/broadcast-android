@@ -3,6 +3,7 @@ package com.nbplus.vbroadlauncher.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     private OnFragmentInteractionListener mListener;
 
     private GridView mGridLayout;
+    GridViewAdapter mAdapter;
     ArrayList<ApplicationInfo> mAppsList;
     int mViewPagePosition = -1;
 
@@ -78,6 +80,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
         View v = inflater.inflate(R.layout.fragment_app_grid, container, false);
         mGridLayout = (GridView)v.findViewById(R.id.grid_layout);
         mCreated = true;
+        updateGridLayout();
         return v;
     }
 
@@ -87,9 +90,13 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
             mAppsList = ShowAllLaunchAppsInfo.getInstance().getSubList(mViewPagePosition * mMaxIconView, (mViewPagePosition * mMaxIconView) + mMaxIconView);
         }
 
-        GridViewAdapter adapter = new GridViewAdapter(getActivity(), mAppsList);
-        mGridLayout.setAdapter(adapter);
-        mGridLayout.setOnItemClickListener(this);
+        if (mAdapter == null) {
+            mAdapter = new GridViewAdapter(getActivity(), mAppsList);
+            mGridLayout.setAdapter(mAdapter);
+            mGridLayout.setOnItemClickListener(this);
+        } else {
+            mAdapter.setApplicationList(mAppsList);
+        }
     }
 
     @Override
@@ -147,5 +154,10 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
         if (mCreated) {
             updateGridLayout();
         }
+    }
+
+    @Override
+    public void onLocationDataChanged(Location location) {
+
     }
 }

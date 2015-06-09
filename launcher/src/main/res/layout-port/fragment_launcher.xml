@@ -48,27 +48,48 @@
 
     <!-- launcher main layer -->
     <LinearLayout
+        android:id="@+id/main_view_layout"
         android:orientation="vertical"
         android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/launcher_top_layer_margin"
         android:layout_weight="1">
+        <!-- left : clock, weather and calendar etc -->
         <LinearLayout
             android:layout_gravity="center"
             android:gravity="center"
+            android:orientation="vertical"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <org.basdroid.widget.TextClock
-                android:id="@+id/text_clock"
+            <!-- TODO : for test -->
+            <TextView
+                android:id="@+id/location_update"
+                android:textStyle="bold"
+                android:textColor="@color/white"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="wrap_content"/>
+            <!-- end of TODO -->
+
+            <com.nbplus.vbroadlauncher.widget.TextClock
+                android:id="@+id/text_clock"
+                android:layout_weight=".6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textColor="@color/white"
                 android:textSize="@dimen/launcher_clock_size" />
+
+            <com.nbplus.vbroadlauncher.widget.WeatherView
+                android:layout_weight=".4"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
         <!-- right : service shortcuts... etc -->
@@ -78,7 +99,7 @@
             android:id="@+id/shortcut_grid"
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
 
             grid:alignmentMode="alignBounds"

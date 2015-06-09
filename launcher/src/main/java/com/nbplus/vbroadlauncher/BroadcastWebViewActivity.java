@@ -5,24 +5,21 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.nbplus.vbroadlauncher.data.ShortcutData;
-import com.nbplus.vbroadlauncher.data.Types;
+import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
-import com.nbplus.vbroadlauncher.hybrid.RegisterWebViewClient;
 
 
 /**
  * Created by basagee on 2015. 5. 28..
  */
 public class BroadcastWebViewActivity extends AppCompatActivity {
-    private static final String TAG = CalendarActivity.class.getSimpleName();
+    private static final String TAG = BroadcastWebViewActivity.class.getSimpleName();
 
     BroadcastWebViewClient mWebViewClient;
     ShortcutData mShortcutData;
@@ -38,7 +35,7 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
         mWebViewClient = new BroadcastWebViewClient(this, webView);
 
         Intent i = getIntent();
-        mShortcutData = i.getParcelableExtra(Types.EXTRA_NAME_SHORTCUT_DATA);
+        mShortcutData = i.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
         mWebViewClient.loadUrl(mShortcutData.getDomain() + mShortcutData.getPath());
 
         // test view
@@ -74,7 +71,7 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
         if (mWebViewClient != null) {
             Log.d(TAG, "Prev url is = " + mWebViewClient.getWebView().getUrl());
         }
-        mShortcutData = intent.getParcelableExtra(Types.EXTRA_NAME_SHORTCUT_DATA);
+        mShortcutData = intent.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
         mWebViewClient.loadUrl(mShortcutData.getDomain() + mShortcutData.getPath());
 
         // test view
@@ -90,7 +87,7 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        //super.onBackPressed();
         mWebViewClient.onBackPressed();
     }
 

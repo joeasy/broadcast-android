@@ -4,8 +4,12 @@
 
     <application
         android:allowBackup="true"
+        android:clearTaskOnLaunch="true"
+        android:launchMode="singleTask"
+        android:stateNotNeeded="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".HomeLauncherApplication"
         android:theme="@style/NBPlusTheme.NoActionBar" >
         <activity
             android:name=".HomeLauncherActivity"
@@ -14,7 +18,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
-            android:theme="@style/NBPlusTheme.WallPager.NoActionBar.TranslucentDecor"
+            android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,23 +64,24 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:noHistory="true"
             android:name=".ShowApplicationActivity"
             android:label="@string/title_activity_show_application"
              >
         </activity>
+        <!--
         <activity
             android:name=".CalendarActivity"
             android:label="@string/title_activity_calendar"
             android:theme="@style/NBPlusTheme.WallPager.NoActionBar.TranslucentDecor" >
         </activity>
+        -->
         <activity
             android:name=".BroadcastWebViewActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:noHistory="false"
-            android:label="@string/title_activity_broadcast_webview"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/NBPlusTheme" >
+            android:label="@string/title_activity_broadcast_webview"
+            >
         </activity>
     </application>
 
