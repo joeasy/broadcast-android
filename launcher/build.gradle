@@ -49,14 +49,14 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['test']) {
     jacocoClasspath = project.configurations['androidJacocoAnt']
 
     // exclude auto-generated classes and tests
-    //def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*',
-    //                  'android/**/*.*']
-    def fileFilter = ['com/toast/android/mobill/core/BuildConfig.class']
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*',
+                      'android/**/*.*']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def releaseTree = fileTree(dir: "${project.buildDir}/intermediates/classes/release", excludes: fileFilter)
     def mainSrc = "${project.projectDir}/src/main/java"
 
     sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
+    classDirectories = files([debugTree, releaseTree])
     executionData = fileTree(dir: project.projectDir, includes: ['**/*.exec', '**/*.ec'])
 
     reports {
