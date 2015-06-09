@@ -10,6 +10,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
@@ -40,6 +41,7 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
 
         // test view
         final EditText editText = (EditText)findViewById(R.id.et_test_url);
+        editText.setText(LauncherSettings.getInstance(this).getRegisterAddress());
         editText.setText(mShortcutData.getDomain() + mShortcutData.getPath());
         Button button = (Button)findViewById(R.id.btn_test_load);
         button.setOnClickListener(new View.OnClickListener() {

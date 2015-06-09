@@ -12,7 +12,6 @@
 
         <EditText
             android:id="@+id/et_test_url"
-            android:text="@string/test_register_url"
             android:maxLines="1"
             android:ellipsize="end"
             android:focusable="true"

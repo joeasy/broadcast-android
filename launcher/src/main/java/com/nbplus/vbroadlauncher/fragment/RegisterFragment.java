@@ -81,6 +81,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
 
         // test view
         final EditText editText = (EditText)v.findViewById(R.id.et_test_url);
+        editText.setText(LauncherSettings.getInstance(getActivity()).getRegisterAddress());
         Button button = (Button)v.findViewById(R.id.btn_test_load);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
