@@ -35,11 +35,8 @@
     <string name="shortcut_addr_radio">/test/test.html</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_land_fragment">Landscape fragment</string>
-    <string name="hello_blank_port_fragment">Portrait fragment</string>
-
-    <string name="test_register_url">http://121.135.162.163:8001/test/test.html</string>
     <string name="test_register_url_load">불러오기</string>
+    <string name="title_activity_show_application">ShowApplicationActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

@@ -35,7 +35,7 @@
     <string name="shortcut_addr_radio">/test/test.html</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="test_register_url_load">불러오기</string>
+    <string name="test_register_url_load">Load</string>
     <string name="title_activity_show_application">ShowApplicationActivity</string>
 
     <string name="hello_world">Hello world!</string>
