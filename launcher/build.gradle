@@ -36,22 +36,38 @@ dependencies {
     //compile project(':calendar_library')
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports after running tests."
-    reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
-    }
-    classDirectories = fileTree(
-            dir: 'build/intermediates/classes/debug',
-            excludes: ['com/toast/android/mobill/core/BuildConfig.class'
-            ])
-    sourceDirectories = files(coverageSourceDirs)
-    executionData = files('build/jacoco/testDebug.exec')
+jacoco {
+    toolVersion = "0.7.1.201405082137"
+}
 
-    afterEvaluate {
-        // just clean up coveralls dashboard, following reports are not of interest
-        testDebug.reports.junitXml.enabled = false
+task jacocoTestReport(type: JacocoReport, dependsOn: ['test']) {
+    description = "Generates Jacoco coverage reports: XML and HTML"
+    group = "Reporting"
+//                outputs.upToDateWhen { false }
+
+    // use hidden configuration, for details look into JacocoPlugin.groovy
+    jacocoClasspath = project.configurations['androidJacocoAnt']
+
+    // exclude auto-generated classes and tests
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*',
+                      'android/**/*.*']
+    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.projectDir, includes: ['**/*.exec', '**/*.ec'])
+
+    reports {
+        xml {
+            enabled = true
+            destination = "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        }
+        csv.enabled false
+        html {
+            enabled = true
+            destination = "${project.buildDir}/reports/jacoco"
+        }
     }
 }
+
