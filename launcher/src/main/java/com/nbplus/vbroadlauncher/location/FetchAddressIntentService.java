@@ -13,6 +13,8 @@ import android.os.Parcelable;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.nbplus.vbroadlauncher.data.Constants;
+
 import org.basdroid.common.R;
 
 import java.io.IOException;

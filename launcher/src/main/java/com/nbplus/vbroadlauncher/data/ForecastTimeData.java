@@ -9,7 +9,7 @@ import java.util.ArrayList;
  *
  * 단기예보
  */
-public class ForecastSpaceData {
+public class ForecastTimeData {
     @SerializedName("response")
     protected Response response;
 
@@ -65,5 +65,4 @@ public class ForecastSpaceData {
         @SerializedName("item")
         public ArrayList<ForecastItem> items;
     }
-
 }

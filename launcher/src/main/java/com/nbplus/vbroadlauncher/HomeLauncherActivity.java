@@ -38,13 +38,13 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
+import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PreferredLocation;
 
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.fragment.RegisterFragment;
-import com.nbplus.vbroadlauncher.location.Constants;
 import com.nbplus.vbroadlauncher.location.FetchAddressIntentService;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 
@@ -139,6 +139,15 @@ public class HomeLauncherActivity extends AppCompatActivity
             getWindow().setBackgroundDrawableResource(R.drawable.wallpaper);
         } else {
             getWindow().setBackgroundDrawableResource(wallpagerResource);
+        }
+
+        if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
+            Location defaultLocation = new Location("stub");
+
+            defaultLocation.setLongitude(126.929810);
+            defaultLocation.setLatitude(37.488201);
+
+            LauncherSettings.getInstance(this).setPreferredUserLocation(defaultLocation);
         }
 
         if (StringUtils.isEmptyString(LauncherSettings.getInstance(this).getDeviceID())) {
@@ -322,9 +331,10 @@ public class HomeLauncherActivity extends AppCompatActivity
 
         // Once connected with google api, get the location
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        onLocationChanged(location);
         if (location == null) {
             Log.d(TAG, "Connected: Can't get location !!!");
+        } else {
+            onLocationChanged(location);
         }
     }
 
@@ -342,22 +352,26 @@ public class HomeLauncherActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, ">>> onLocationChanged().. Update location");
-        // Assign the new location
-        mLastLocation = location;
-
         if (location != null) {
+            Log.d(TAG, ">>> onLocationChanged().. Update location");
+            // Assign the new location
+            mLastLocation = location;
+
             Log.d(TAG, ">>> latitude = " + location.getLatitude());
             Log.d(TAG, ">>> Longitude = " + location.getLongitude());
-        }
-
-        //if (location != null && LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
             LauncherSettings.getInstance(this).setPreferredUserLocation(location);
-        //}
-        if (this.mActivityInteractionListener != null) {
-            this.mActivityInteractionListener.onLocationDataChanged(location);
-        }
 
+            // sned to weatherview
+            Intent intent=new Intent(Constants.LOCATION_CHANGED_ACTION);
+            sendBroadcast(intent);
+
+            // TODO : remove later
+            if (this.mActivityInteractionListener != null) {
+                this.mActivityInteractionListener.onLocationDataChanged(location);
+            }
+        } else {
+            Log.d(TAG, ">>> onLocationChanged().. but location is null");
+        }
     }
 
     public void onAddressResultReceived(boolean isSucceeded, Address address, String errorMessage) {

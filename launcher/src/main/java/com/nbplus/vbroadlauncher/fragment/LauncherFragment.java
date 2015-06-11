@@ -199,8 +199,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             });
         }
 
-        updateWeather();
-
         return v;
     }
 
@@ -245,6 +243,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
     @Override
     public void onLocationDataChanged(Location location) {
+        if (location == null) {
+            Log.d(TAG, "is invalid location data > location is null");
+            return;
+        }
         long currTimems = System.currentTimeMillis();
 
         SimpleDateFormat sdf;
@@ -252,161 +254,5 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         Date date = new Date(currTimems);
         String dateStr = sdf.format(date);
         mLocationData.setText(dateStr + " updated : lat = " + location.getLatitude() + ", lon = " + location.getLongitude());
-    }
-
-
-
-    ///////////////////////////////////
-    // for weather
-    ///////////////////////////////////
-    public void updateWeather() {
-        RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_SPACEDATA + "?";
-        url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
-
-        Location currLoc = LauncherSettings.getInstance(getActivity()).getPreferredUserLocation();
-        currLoc.setLongitude(126.929810);
-        currLoc.setLatitude(37.488201);
-        Location gridLoc = convertLocation2Grid(currLoc);
-        Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
-
-        url += "&" + "nx=" + (int)gridLoc.getLongitude();
-        url += "&" + "ny=" + (int)gridLoc.getLatitude();
-
-        Date date = new Date(System.currentTimeMillis());
-
-        SimpleDateFormat sdf;
-        sdf = new SimpleDateFormat("yyyyMMdd");
-        url += "&" + "base_date=" + sdf.format(date);
-        sdf = new SimpleDateFormat("HHmm");
-
-        // 동네예보 단기는 3시간간격으로 해당시간 + 3일치의 데이터가 내려온다. (02, 05, 08, 11, 14, 17, 20, 23)
-        if (date.getTime() > 14) {
-            url += "&" + "base_time=" + "1400";//sdf.format(date);
-        } else {
-            int remain = (int)date.getTime() % 3;
-            if (remain % 3 == 2) {
-                url += "&" + "base_time=" + date.getTime() + "00";//sdf.format(date);
-            } else {
-                url += "&" + "base_time=" + (date.getTime() - (remain + 1)) + "00";//sdf.format(date);
-            }
-        }
-        url += "&" + "pageNo=" + 9;//sdf.format(date);
-
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastSpaceData.class, new Response.Listener<ForecastSpaceData>() {
-
-            @Override
-            public void onResponse(ForecastSpaceData response) {
-                Log.d(TAG, ">>> volley success resultCode = " + response.getResultCode() + ", resultMessage = " + response.getResultMessage());
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> volley error");
-            }
-        });
-
-        queue.add(jsRequest);
-    }
-
-    private class LamcParameter {
-        public double mapRadius = Constants.DEFAULT_MAP_RADIUS;
-        public double gridDistance = Constants.DEFAULT_GRID_DISTANCE;
-        public double startLatitude = Constants.DEFAULT_STANDARD_LATITUDE_1;
-        public double endLatitude = Constants.DEFAULT_STANDARD_LATITUDE_2;
-        public double datumLatitude = Constants.DEFAULT_LATITUDE;
-        public double datumLongitude = Constants.DEFAULT_LONGITITUDE;
-        public double datumGridX = Constants.DEFAULT_GRID_X;
-        public double datumGridY = Constants.DEFAULT_GRID_Y;
-    }
-    private final LamcParameter mLamcParameter = new LamcParameter();
-
-    private Location convertLocation2Grid(Location location) {
-        //  위경도 -> (X, Y)
-        Location resLoc = lamcProjection(location, 0, mLamcParameter);
-        resLoc.setLongitude(resLoc.getLongitude() + 1.5);
-        resLoc.setLatitude(resLoc.getLatitude() + 1.5);
-        return resLoc;
-    }
-
-    /**
-     * Lambert Conformal Conic Projection
-     * @param location 위경도 또는 격자값
-     * @param convertType 0 : (위경도 -> 격자), 1 : (격자 -> 위경도)
-     * @param mapParam
-     * @return
-     */
-    private Location lamcProjection(Location location, int convertType, LamcParameter mapParam) {
-        Location resLocation = new Location(location);
-
-        double pi = Math.asin(1.0) * 2.0;
-        double degrad = pi / 180.0;
-        double raddeg = 180.0 / pi;
-
-        double re = mapParam.mapRadius / mapParam.gridDistance;
-        double slat1 = mapParam.startLatitude * degrad;
-        double slat2 = mapParam.endLatitude * degrad;
-        double olat = mapParam.datumLatitude * degrad;
-        double olon = mapParam.datumLongitude * degrad;
-
-        double sn = Math.tan(pi * 0.25 + slat2 * 0.5) / Math.tan(pi * 0.25 + slat1 * 0.5);
-        Log.d(TAG, ">>> sn = " + sn);
-        Log.d(TAG, ">>> Math.log(Math.cos(slat1) / Math.cos(slat2)) = " + Math.log(Math.cos(slat1) / Math.cos(slat2)));
-        Log.d(TAG, ">>> Math.log(sn) = " + Math.log(sn));
-        sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
-        double sf = Math.tan(pi * 0.25 + slat1 * 0.5);
-        sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
-        double ro = Math.tan(pi * 0.25 + olat * 0.5);
-        ro = re * sf / Math.pow(ro, sn);
-
-        double ra = 0;
-        double theta = 0;
-        double xn = 0, yn = 0, alat = 0, alon = 0;
-        if (convertType == 0) {
-            ra = Math.tan(pi * 0.25 + location.getLatitude() * degrad * 0.5);
-            ra = re * sf / Math.pow(ra, sn);
-
-            theta = location.getLongitude() * degrad - olon;
-            if (theta > pi) {
-                theta -= 2.0 * pi;
-            }
-            if (theta < -pi) {
-                theta += 2.0 * pi;
-            }
-
-            theta *= sn;
-            resLocation.setLongitude(ra * Math.sin(theta) + mapParam.datumGridX);
-            resLocation.setLatitude(ro - ra * Math.cos(theta) + mapParam.datumGridY);
-        } else {
-            xn = location.getLongitude() - mapParam.datumGridX;
-            yn = ro - location.getLatitude() + mapParam.datumGridY;
-
-            ra = Math.sqrt(xn * xn + yn * yn);
-            if (sn < 0.0) {
-                ra = -ra;
-            }
-
-            alat = Math.pow(re * sf / ra, 1.0 / sn);
-            alat = 2.0 * Math.atan(alat) - pi * 0.5;
-            if (Math.abs(xn) <= 0.0) {
-                theta = 0.0;
-            } else {
-                if (Math.abs(yn) <= 0.0) {
-                    theta = pi * 0.5;
-                    if (xn < 0.0) {
-                        theta = -theta;
-                    } else {
-                        theta = Math.atan2(xn, yn);
-                    }
-
-                    alon = theta / sn + olon;
-                    resLocation.setLatitude(alat * raddeg);
-                    resLocation.setLongitude(alon * raddeg);
-                }
-            }
-        }
-
-        return resLocation;
     }
 }

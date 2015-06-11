@@ -4,6 +4,23 @@ package com.nbplus.vbroadlauncher.data;
  * Created by basagee on 2015. 6. 1..
  */
 public class Constants {
+    public static final int SUCCESS_RESULT = 0;
+
+    public static final int FAILURE_RESULT = 1;
+
+    public static final String PACKAGE_NAME =
+            "com.google.android.gms.location.sample.locationaddress";
+
+    public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
+
+    public static final String RESULT_DATA_KEY = PACKAGE_NAME + ".RESULT_DATA_KEY";
+    public static final String RESULT_MESSAGE = PACKAGE_NAME + ".RESULT_MESSAGE";
+
+    public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_DATA_EXTRA";
+
+    public static final String WEATHER_SERVICE_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate";
+    public static final String LOCATION_CHANGED_ACTION = "com.nbplus.vbroadlauncher.intent.action.locationchanged";
+
     // shortcut excution types
     public static final int SHORTCUT_TYPE_WEB_INTERFACE_SERVER = 0;
     public static final int SHORTCUT_TYPE_WEB_DOCUMENT_SERVER = 1;
