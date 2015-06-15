@@ -63,16 +63,16 @@ public class WeatherView extends LinearLayout {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                if (intent.getAction() == Constants.WEATHER_SERVICE_UPDATE_ACTION) {
+                if (Constants.WEATHER_SERVICE_UPDATE_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "Weather service action received !!!");
                     releaseAlarm();
 
                     // update weather and set next alarm
                     //updateWeather();
                     setNextAlarm();
-                } else if (intent.getAction() == Constants.LOCATION_CHANGED_ACTION) {
+                } else if (Constants.LOCATION_CHANGED_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "LOCATION_CHANGED_ACTION received !!!");
-                    if (mLocationChangedReceived == false) {
+                    if (!mLocationChangedReceived) {
                         mLocationChangedReceived = true;
                         releaseAlarm();
 

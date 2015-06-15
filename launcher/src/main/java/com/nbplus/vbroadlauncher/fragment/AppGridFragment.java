@@ -84,19 +84,19 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
         return v;
     }
 
-    private void updateGridLayout() {
+    public void updateGridLayout() {
         mMaxIconView = ShowAllLaunchAppsInfo.getMaxPageItemSize(getActivity());
         if (mViewPagePosition >= 0) {
             mAppsList = ShowAllLaunchAppsInfo.getInstance().getSubList(mViewPagePosition * mMaxIconView, (mViewPagePosition * mMaxIconView) + mMaxIconView);
         }
 
-        if (mAdapter == null) {
+        //if (mAdapter == null) {
             mAdapter = new GridViewAdapter(getActivity(), mAppsList);
             mGridLayout.setAdapter(mAdapter);
             mGridLayout.setOnItemClickListener(this);
-        } else {
-            mAdapter.setApplicationList(mAppsList);
-        }
+        //} else {
+        //    mAdapter.setApplicationList(mAppsList);
+        //}
     }
 
     @Override

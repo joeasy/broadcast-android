@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.adapter.AppPagerAdapter;
 import com.nbplus.vbroadlauncher.adapter.AppViewPager;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.fragment.AppGridFragment;
 import com.nbplus.vbroadlauncher.service.LoadInstalledApplication;
 import com.viewpagerindicator.LinePageIndicator;
 import com.viewpagerindicator.PageIndicator;
@@ -91,6 +93,8 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
         filter.addDataScheme("package");
 
         registerReceiver(mPackageInstallReceiver, filter);
+        mLoadAsyncTask = new LoadInstalledApplication(this, mHandler);
+        mLoadAsyncTask.execute();
 
         // ViewPager 화면.
         // 사용자등록이나 어플리케이션 설치등을수행하는 프래그먼트들이 불린다.
@@ -100,11 +104,27 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
         mAppPagerAdapter = new AppPagerAdapter(this, getSupportFragmentManager());
         mViewPager.setAdapter(mAppPagerAdapter);
         mViewPager.setSwipeable(true);
-
         mIndicator.setViewPager(mViewPager);
+        mIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        mLoadAsyncTask = new LoadInstalledApplication(this, mHandler);
-        mLoadAsyncTask.execute();
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.d(TAG, ">> page selected position = " + position);
+//                AppGridFragment fragment = (AppGridFragment)mViewPager.getActiveFragment(getSupportFragmentManager(), position);
+//                if (fragment != null) {
+//                    fragment.updateGridLayout();
+//                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     /**

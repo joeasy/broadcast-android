@@ -2,6 +2,7 @@ package com.nbplus.vbroadlauncher.adapter;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
  * Created by basagee on 2015. 5. 21..
  */
 public class GridViewAdapter extends BaseAdapter {
+    private static final String TAG = GridViewAdapter.class.getSimpleName();
+
     private Context context;
     private ArrayList<ApplicationInfo> mAppList;
 
@@ -69,6 +72,8 @@ public class GridViewAdapter extends BaseAdapter {
             }
             viewHolder.icon.setImageDrawable(appInfo.loadIcon(context.getPackageManager()));
             viewHolder.appInfo = appInfo;
+        } else {
+            Log.d(TAG, ">> invalid appInfo...");
         }
 
         return convertView;
