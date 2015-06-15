@@ -27,12 +27,12 @@
     <string name="shortcut_btn_my_settings">My Settings</string>
     <string name="shortcut_btn_additional_function">Additional Function</string>
     <string name="shortcut_btn_radio">Internet Radio</string>
-    <string name="shortcut_addr_emergency_call">/test/test.html</string>
-    <string name="shortcut_addr_new_broadcast">/test/test.html</string>
-    <string name="shortcut_addr_new_participation">/test/test.html</string>
-    <string name="shortcut_addr_my_settings">/test/test.html</string>
-    <string name="shortcut_addr_additional_function">/test/test.html</string>
-    <string name="shortcut_addr_radio">/test/test.html</string>
+    <string name="shortcut_addr_emergency_call">/web_test/test.html</string>
+    <string name="shortcut_addr_new_broadcast">/web_test/test.html</string>
+    <string name="shortcut_addr_new_participation">/web_test/test.html</string>
+    <string name="shortcut_addr_my_settings">/web_test/test.html</string>
+    <string name="shortcut_addr_additional_function">/web_test/test.html</string>
+    <string name="shortcut_addr_radio">/web_test/test.html</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">Load</string>

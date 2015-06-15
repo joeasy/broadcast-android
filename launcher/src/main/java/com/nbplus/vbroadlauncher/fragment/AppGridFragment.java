@@ -90,6 +90,11 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
             mAppsList = ShowAllLaunchAppsInfo.getInstance().getSubList(mViewPagePosition * mMaxIconView, (mViewPagePosition * mMaxIconView) + mMaxIconView);
         }
 
+        /**
+         * 새롭게 갱신해주지 않으면 swipe 시에 화면이 제대로 갱신되지 않는다.
+         * mAdapter.setApplicationList(mAppsList)에서 notifyDataSetChanged()를 호출해주지만..
+         * 제대로 되지 않는듯하다.
+         */
         //if (mAdapter == null) {
             mAdapter = new GridViewAdapter(getActivity(), mAppsList);
             mGridLayout.setAdapter(mAdapter);

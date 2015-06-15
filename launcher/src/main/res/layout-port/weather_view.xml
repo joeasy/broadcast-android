@@ -50,14 +50,16 @@
 
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/ll_three_days"
         android:layout_weight="1"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/ll_todays"
             android:layout_weight="1"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -97,8 +99,9 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_tomorrow"
             android:layout_weight="1"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -137,8 +140,9 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/ll_day_after_tomorrow"
             android:layout_weight="1"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

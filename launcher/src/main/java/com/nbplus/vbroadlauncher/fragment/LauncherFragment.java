@@ -41,6 +41,7 @@ import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.widget.IButton;
 
 import com.nbplus.vbroadlauncher.widget.TextClock;
+import com.nbplus.vbroadlauncher.widget.WeatherView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private Button mApplicationsView;
     private TextView mVillageName;
     private TextClock mTextClock;
+    private WeatherView mWeatherView;
     private LinearLayout mMainViewLayout;
     private Handler mHandler = new Handler();
 
@@ -147,6 +149,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
             });
         }
+        mWeatherView = (WeatherView)v.findViewById(R.id.weather_view);
 
         GridLayout gridLayout = (GridLayout)v.findViewById(R.id.shortcut_grid);
         ArrayList<ShortcutData> shortcutDatas = LauncherSettings.getInstance(getActivity()).getLauncherShortcuts();
@@ -239,6 +242,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         } else {
             mMainViewLayout.setOrientation(LinearLayout.VERTICAL);
         }
+        mWeatherView.onConfigurationChanged(newConfig);
     }
 
     @Override

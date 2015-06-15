@@ -49,7 +49,7 @@ public class LauncherSettings implements Parcelable {
     ArrayList<ShortcutData> launcherShortcuts = new ArrayList<ShortcutData>();;
 
     @SerializedName("register_address")
-    String registerAddress = "http://175.207.46.132:8001/test/test.html";
+    String registerAddress = "http://175.207.46.132:8010/web_test/test.html";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;

@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -59,6 +60,12 @@ public class WeatherView extends LinearLayout {
     private ArrayList<ForecastItem> mForecastSpaceDataItems;
     private ArrayList<ForecastItem> mForecastTimeDataItems;
 
+    // layout
+    private LinearLayout mThreeDaysLayout;
+    private LinearLayout mTodayLayout;
+    private LinearLayout mTomorrowLayout;
+    private LinearLayout mDayAfterTomorrowLayout;
+
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -110,6 +117,11 @@ public class WeatherView extends LinearLayout {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = li.inflate(R.layout.weather_view, this, false);
         addView(v);
+
+        mThreeDaysLayout = (LinearLayout) v.findViewById(R.id.ll_three_days);
+        mTodayLayout = (LinearLayout) v.findViewById(R.id.ll_todays);
+        mTomorrowLayout = (LinearLayout) v.findViewById(R.id.ll_tomorrow);
+        mDayAfterTomorrowLayout = (LinearLayout) v.findViewById(R.id.ll_day_after_tomorrow);
     }
 
     @Override
@@ -419,5 +431,19 @@ public class WeatherView extends LinearLayout {
         });
 
         mWeatherRequestQueue.add(jsRequest);
+    }
+
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mThreeDaysLayout.setOrientation(LinearLayout.VERTICAL);
+            mTodayLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mDayAfterTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
+        } else {
+            mThreeDaysLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mTodayLayout.setOrientation(LinearLayout.VERTICAL);
+            mTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
+            mDayAfterTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
+        }
     }
 }

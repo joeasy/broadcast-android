@@ -41,7 +41,6 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
 
         // test view
         final EditText editText = (EditText)findViewById(R.id.et_test_url);
-        editText.setText(LauncherSettings.getInstance(this).getRegisterAddress());
         editText.setText(mShortcutData.getDomain() + mShortcutData.getPath());
         Button button = (Button)findViewById(R.id.btn_test_load);
         button.setOnClickListener(new View.OnClickListener() {
