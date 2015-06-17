@@ -18,7 +18,10 @@ public class Constants {
 
     public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_DATA_EXTRA";
 
-    public static final String WEATHER_SERVICE_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate";
+    public static final String WEATHER_SERVICE_DEFAULT_TIMER = "com.nbplus.vbroadlauncher.intent.action.weaterupdate_default";
+    public static final String WEATHER_SERVICE_GRIB_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate_grib";
+    public static final String WEATHER_SERVICE_TIME_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate_time";
+    public static final String WEATHER_SERVICE_SPACE_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate_space";
     public static final String LOCATION_CHANGED_ACTION = "com.nbplus.vbroadlauncher.intent.action.locationchanged";
 
     // shortcut excution types
@@ -30,7 +33,9 @@ public class Constants {
     public static final String EXTRA_NAME_SHORTCUT_DATA = "extra_shortcut_data";
 
     // installed application list retrieve message
-    public static final int HANDLER_MESSAGE_FINISH_TASK = 0x1001;
+    public static final int HANDLER_MESSAGE_INSTALLED_APPLIST_TASK = 0x1001;
+    public static final int HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK = 0x2001;
+    public static final int HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK = 0x3001;
 
     // weather open api key
     public static final String WEATHER_OPEN_API_KEY = "2GjUf7yXsE0w7ayKJ2jGnYctDTSyZYu1IoPphFuLaBq6Ij0as1Bks1KTLcVE7pqt9E76kdfLxtGc4ocQ9Lxpdg%3D%3D";
@@ -58,5 +63,15 @@ public class Constants {
     public static final double DEFAULT_GRID_X = 210 / DEFAULT_GRID_DISTANCE;
     public static final double DEFAULT_GRID_Y = 675 / DEFAULT_GRID_DISTANCE;
 
-    public static final String WEATHER_RESULT_OK = "0000";
+    public static final String RESULT_OK = "0000";
+
+    // for yahoo weather
+//    public static final String YAHOO_APP_ID = "e1szeL7k";
+//    public static final String GEO_API = "http://where.yahooapis.com/geocode?location=%f,%f&flags=J&gflags=R&appid=" + YAHOO_APP_ID;
+    public static final String YAHOO_WEATHER_API = "http://query.yahooapis.com/v1/public/yql?q=%s&format=json&callback=?";
+    public static final String YAHOO_WEOID_QUERY = "select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"";
+    public static final String YAHOO_WEATHER_QUERY = "select * from weather.forecast where woeid=%s and u=\"c\"";
+
+    //public static final String WEEK_WEATHER_YQL = "select item from weather.forecast where woeid=%s&d=7&format=json";
+    public static final String WEATHER_SERVICE_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate";
 }

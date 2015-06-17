@@ -11,16 +11,16 @@ import com.nbplus.vbroadlauncher.data.Constants;
 /**
  * Created by basagee on 2015. 6. 2..
  */
-public class LoadInstalledApplication extends AsyncTask<Void, Void, Void> {
+public class InstalledApplicationTask extends AsyncTask<Void, Void, Void> {
     //private ProgressDialog progress = null;
     private Context mContext;
     private Handler mHandler;
 
-    public LoadInstalledApplication(Context context) {
+    public InstalledApplicationTask(Context context) {
         this.mContext = context;
     }
 
-    public LoadInstalledApplication(Context context, Handler handler) {
+    public InstalledApplicationTask(Context context, Handler handler) {
         this.mContext = context;
         this.mHandler = handler;
     }
@@ -41,7 +41,7 @@ public class LoadInstalledApplication extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void result) {
         if (mHandler != null) {
             Message message = new Message();
-            message.what = Constants.HANDLER_MESSAGE_FINISH_TASK;
+            message.what = Constants.HANDLER_MESSAGE_INSTALLED_APPLIST_TASK;
             mHandler.sendMessage(message);
         }
     }

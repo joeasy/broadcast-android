@@ -27,12 +27,17 @@
     <string name="shortcut_btn_my_settings">나의정보 관리</string>
     <string name="shortcut_btn_additional_function">부가기능</string>
     <string name="shortcut_btn_radio">인터넷 라디오</string>
-    <string name="shortcut_addr_emergency_call">/web_test/test.html</string>
+    <string name="shortcut_addr_emergency_call">/is/api/Service/RegistEmergencyCall</string>
     <string name="shortcut_addr_new_broadcast">/web_test/test.html</string>
     <string name="shortcut_addr_new_participation">/web_test/test.html</string>
     <string name="shortcut_addr_my_settings">/web_test/test.html</string>
     <string name="shortcut_addr_additional_function">/web_test/test.html</string>
-    <string name="shortcut_addr_radio">/web_test/test.html</string>
+    <string name="shortcut_addr_radio">/is/api/Service/GetRadioList</string>
+
+    <string name="weather_title">%1$s 현재날씨</string>
+    <string name="celsius">%1$s°C</string>
+    <string name="sky_status">%1$s | %2$s</string>
+    <string name="weather_day">%1$02d일(%2$s)</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">불러오기</string>

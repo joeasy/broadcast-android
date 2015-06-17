@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nbplus.vbroadlauncher.R;
+import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 
 import org.basdroid.common.StringUtils;
 
@@ -19,25 +20,25 @@ import java.util.ArrayList;
 /**
  * Created by basagee on 2015. 5. 21..
  */
-public class GridViewAdapter extends BaseAdapter {
-    private static final String TAG = GridViewAdapter.class.getSimpleName();
+public class RadioGridViewAdapter extends BaseAdapter {
+    private static final String TAG = RadioGridViewAdapter.class.getSimpleName();
 
     private Context context;
-    private ArrayList<ApplicationInfo> mAppList;
+    private ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelList;
 
-    public static class AppViewHolder {
+    public static class RadioViewHolder {
         public ImageView icon;
         public TextView name;
-        public ApplicationInfo appInfo;
+        public String url;
     }
 
-    public GridViewAdapter(Context context, ArrayList<ApplicationInfo> appList) {
+    public RadioGridViewAdapter(Context context, ArrayList<RadioChannelInfo.RadioChannel> channelList) {
         this.context = context;
-        this.mAppList = appList;
+        this.mRadioChannelList = channelList;
     }
 
-    public void setApplicationList(ArrayList<ApplicationInfo> appList) {
-        this.mAppList = appList;
+    public void setApplicationList(ArrayList<RadioChannelInfo.RadioChannel> appList) {
+        this.mRadioChannelList = appList;
         this.notifyDataSetChanged();
     }
 
@@ -46,41 +47,40 @@ public class GridViewAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        AppViewHolder viewHolder;
+        RadioViewHolder viewHolder;
 
         if (convertView == null) {
             // get layout from mobile.xml
             convertView = inflater.inflate(R.layout.gridview, null);
-            viewHolder = new AppViewHolder();
+            viewHolder = new RadioViewHolder();
             // set value into textview
             viewHolder.name = (TextView) convertView.findViewById(R.id.grid_item_label);
             // set image based on selected text
-            viewHolder.icon = (ImageView) convertView.findViewById(R.id.grid_item_image);
+            //viewHolder.icon = (ImageView) convertView.findViewById(R.id.grid_item_image);
 
             convertView.setTag(viewHolder);
         } else {
-            viewHolder = (AppViewHolder) convertView.getTag();
+            viewHolder = (RadioViewHolder) convertView.getTag();
         }
 
-        ApplicationInfo appInfo = mAppList.get(position);
-        if (appInfo != null) {
-            String label = appInfo.loadLabel(context.getPackageManager()).toString();
-            if (StringUtils.isEmptyString(label)) {
+        RadioChannelInfo.RadioChannel radioChannel = mRadioChannelList.get(position);
+        if (radioChannel != null) {
+            if (StringUtils.isEmptyString(radioChannel.channelName)) {
                 viewHolder.name.setText("xxxxx");
             } else {
-                viewHolder.name.setText(label);
+                viewHolder.name.setText(radioChannel.channelName);
             }
-            viewHolder.icon.setImageDrawable(appInfo.loadIcon(context.getPackageManager()));
-            viewHolder.appInfo = appInfo;
+            //viewHolder.icon.setImageDrawable(appInfo.loadIcon(context.getPackageManager()));
+            viewHolder.url = radioChannel.channelUrl;
         } else {
-            Log.d(TAG, ">> invalid appInfo...");
+            Log.d(TAG, ">> invalid radioChannel...");
         }
 
         return convertView;
     }
     @Override
     public int getCount() {
-        return mAppList.size();
+        return mRadioChannelList.size();
     }
 
     @Override

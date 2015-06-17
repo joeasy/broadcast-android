@@ -15,7 +15,7 @@ import android.widget.GridView;
 
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
-import com.nbplus.vbroadlauncher.adapter.GridViewAdapter;
+import com.nbplus.vbroadlauncher.adapter.AppGridViewAdapter;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
@@ -38,7 +38,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     private OnFragmentInteractionListener mListener;
 
     private GridView mGridLayout;
-    GridViewAdapter mAdapter;
+    AppGridViewAdapter mAdapter;
     ArrayList<ApplicationInfo> mAppsList;
     int mViewPagePosition = -1;
 
@@ -96,7 +96,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
          * 제대로 되지 않는듯하다.
          */
         //if (mAdapter == null) {
-            mAdapter = new GridViewAdapter(getActivity(), mAppsList);
+            mAdapter = new AppGridViewAdapter(getActivity(), mAppsList);
             mGridLayout.setAdapter(mAdapter);
             mGridLayout.setOnItemClickListener(this);
         //} else {
@@ -125,7 +125,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        GridViewAdapter.AppViewHolder viewHolder = (GridViewAdapter.AppViewHolder)view.getTag();
+        AppGridViewAdapter.AppViewHolder viewHolder = (AppGridViewAdapter.AppViewHolder)view.getTag();
 
         String packageName = viewHolder.appInfo.packageName;
         Intent startIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);

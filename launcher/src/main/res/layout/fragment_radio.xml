@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/black"
+              android:paddingLeft="15dp"
+              android:paddingRight="15dp"
+              android:orientation="vertical">
+
+
+    <GridView
+        android:id="@+id/grid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:verticalSpacing="@dimen/gridview_vertical_cellspacing"
+        android:horizontalSpacing="@dimen/gridview_horizontal_cellspacing"
+        android:stretchMode="columnWidth"
+        android:numColumns="@integer/app_grid_numcolumns"
+        />
+
+</LinearLayout>

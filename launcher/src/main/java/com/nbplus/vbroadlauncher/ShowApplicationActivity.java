@@ -20,11 +20,11 @@ import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.adapter.AppPagerAdapter;
 import com.nbplus.vbroadlauncher.adapter.AppViewPager;
 import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.fragment.AppGridFragment;
-import com.nbplus.vbroadlauncher.service.LoadInstalledApplication;
+import com.nbplus.vbroadlauncher.service.InstalledApplicationTask;
 import com.viewpagerindicator.LinePageIndicator;
 import com.viewpagerindicator.PageIndicator;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 
@@ -34,30 +34,47 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
     private AppViewPager mViewPager;
     AppPagerAdapter mAppPagerAdapter;
     PageIndicator mIndicator;
-    LoadInstalledApplication mLoadAsyncTask;
+    InstalledApplicationTask mLoadAsyncTask;
 
     private ArrayList<OnActivityInteractionListener> mActivityInteractionListener = new ArrayList<OnActivityInteractionListener>();
-    Handler mHandler = new Handler() {
+
+    private final InstalledListHandler mHandler = new InstalledListHandler(this);
+
+    // 핸들러 객체 만들기
+    private static class InstalledListHandler extends Handler {
+        private final WeakReference<ShowApplicationActivity> mActivity;
+
+        public InstalledListHandler(ShowApplicationActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
         @Override
         public void handleMessage(Message msg) {
-            if (msg == null) {
-                return;
-            }
-            switch (msg.what) {
-                case Constants.HANDLER_MESSAGE_FINISH_TASK :
-                    Log.d(TAG, "HANDLER_MESSAGE_FINISH_TASK received !!!");
-                    mAppPagerAdapter.notifyDataSetChanged();
-                    mIndicator.notifyDataSetChanged();
-
-                    if (mActivityInteractionListener != null) {
-                        for (OnActivityInteractionListener listener : mActivityInteractionListener) {
-                            listener.onDataChanged();
-                        }
-                    }
-                    break;
+            ShowApplicationActivity activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
             }
         }
-    };
+    }
+
+    public void handleMessage(Message msg) {
+        if (msg == null) {
+            return;
+        }
+        switch (msg.what) {
+            case Constants.HANDLER_MESSAGE_INSTALLED_APPLIST_TASK :
+                Log.d(TAG, "HANDLER_MESSAGE_INSTALLED_APPLIST_TASK received !!!");
+                mAppPagerAdapter.notifyDataSetChanged();
+                mIndicator.notifyDataSetChanged();
+
+                if (mActivityInteractionListener != null) {
+                    for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+                        listener.onDataChanged();
+                    }
+                }
+                break;
+        }
+    }
 
     private BroadcastReceiver mPackageInstallReceiver = new BroadcastReceiver() {
 
@@ -71,9 +88,9 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
                 if (mLoadAsyncTask.getStatus() == AsyncTask.Status.RUNNING) {
                     mLoadAsyncTask.cancel(true);
                 }
-                mLoadAsyncTask = new LoadInstalledApplication(ShowApplicationActivity.this, mHandler);
+                mLoadAsyncTask = new InstalledApplicationTask(ShowApplicationActivity.this, mHandler);
             } else {
-                mLoadAsyncTask = new LoadInstalledApplication(ShowApplicationActivity.this, mHandler);
+                mLoadAsyncTask = new InstalledApplicationTask(ShowApplicationActivity.this, mHandler);
             }
             mLoadAsyncTask.execute();
         }
@@ -93,7 +110,7 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
         filter.addDataScheme("package");
 
         registerReceiver(mPackageInstallReceiver, filter);
-        mLoadAsyncTask = new LoadInstalledApplication(this, mHandler);
+        mLoadAsyncTask = new InstalledApplicationTask(this, mHandler);
         mLoadAsyncTask.execute();
 
         // ViewPager 화면.

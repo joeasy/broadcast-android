@@ -25,8 +25,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.api.GsonRequest;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -39,13 +37,24 @@ import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by basagee on 2015. 6. 3..
  */
-public class WeatherView extends LinearLayout {
-    private static final String TAG = WeatherView.class.getSimpleName();
+public class WeatherViewBackup extends LinearLayout {
+    private static final String TAG = WeatherViewBackup.class.getSimpleName();
+
+    private class LamcParameter {
+        public double mapRadius = Constants.DEFAULT_MAP_RADIUS;
+        public double gridDistance = Constants.DEFAULT_GRID_DISTANCE;
+        public double startLatitude = Constants.DEFAULT_STANDARD_LATITUDE_1;
+        public double endLatitude = Constants.DEFAULT_STANDARD_LATITUDE_2;
+        public double datumLatitude = Constants.DEFAULT_LATITUDE;
+        public double datumLongitude = Constants.DEFAULT_LONGITITUDE;
+        public double datumGridX = Constants.DEFAULT_GRID_X;
+        public double datumGridY = Constants.DEFAULT_GRID_Y;
+    }
+    private final LamcParameter mLamcParameter = new LamcParameter();
 
     private boolean mAttached;
     private boolean mLocationChangedReceived = false;
@@ -53,7 +62,12 @@ public class WeatherView extends LinearLayout {
     private ArrayList<ForecastItem> mForecastSpaceDataItems = new ArrayList<ForecastItem>();
     private ArrayList<ForecastItem> mForecastTimeDataItems = new ArrayList<ForecastItem>();
     private ArrayList<ForecastItem> mForecastGribItems = new ArrayList<ForecastItem>();
-    private int mForecastRetry = 0;
+    private int mForecastSpaceDataNumRowsPerPage = 0;
+    private int mForecastSpaceDataTotalCount = 0;
+    private int mForecastSpaceDataRequestPage = 0;
+    private int mForecastSpaceDataRetry = 0;
+    private int mForecastTimeDataRetry = 0;
+    private int mForecastGribRetry = 0;
 
     // layout
     private LinearLayout mThreeDaysLayout;
@@ -88,58 +102,56 @@ public class WeatherView extends LinearLayout {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                if (Constants.WEATHER_SERVICE_UPDATE_ACTION.equals(intent.getAction())) {
+                if (Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "Weather service action received !!!");
                     releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
 
                     // update weather and set next alarm
-                    updateForecast();
-                    setNextAlarm();
+                    updateForecastGrib(1);
+                    setNextForecastGribAlarm();
+                } else if (Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION.equals(intent.getAction())) {
+                    Log.d(TAG, "Weather service action received !!!");
+                    releaseAlarm(Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION);
+
+                    // update weather and set next alarm
+                    updateForecastSpaceData(1);
+                    setNextForecastSpaceDataAlarm();
                 } else if (Constants.LOCATION_CHANGED_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "LOCATION_CHANGED_ACTION received !!!");
                     if (!mLocationChangedReceived) {
                         mLocationChangedReceived = true;
                         releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
 
-                        // update geocode
-                        updateGeocode();
-                    }
-                } else if (Constants.WEATHER_SERVICE_DEFAULT_TIMER.equals(intent.getAction())) {
-                    Log.d(TAG, "LOCATION_CHANGED_ACTION received !!!");
-                    if (!mLocationChangedReceived) {
-                        mLocationChangedReceived = false;
-                        releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
-
                         // update weather and set next alarm
-                        if (LauncherSettings.getInstance(getContext()).getGeocode() == null) {
-                            updateGeocode();
-                        } else {
-                            updateForecast();
-                        }
-                        setNextAlarm();
+                        // 실황예보
+                        updateForecastGrib(1);
+                        // 단기예보
+                        updateForecastSpaceData(1);
+                        setNextForecastGribAlarm();
+                        setNextForecastSpaceDataAlarm();
                     }
                 }
             }
         }
     };
 
-    public WeatherView(Context context) {
+    public WeatherViewBackup(Context context) {
         super(context);
         initializeWeatherView(context);
     }
 
-    public WeatherView(Context context, AttributeSet attrs) {
+    public WeatherViewBackup(Context context, AttributeSet attrs) {
         super(context, attrs);
         initializeWeatherView(context);
     }
 
-    public WeatherView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WeatherViewBackup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initializeWeatherView(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public WeatherView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WeatherViewBackup(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initializeWeatherView(context);
     }
@@ -221,7 +233,9 @@ public class WeatherView extends LinearLayout {
         final IntentFilter filter = new IntentFilter();
 
         filter.addAction(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
-        filter.addAction(Constants.WEATHER_SERVICE_UPDATE_ACTION);
+        filter.addAction(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
+        filter.addAction(Constants.WEATHER_SERVICE_TIME_UPDATE_ACTION);
+        filter.addAction(Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION);
         filter.addAction(Constants.LOCATION_CHANGED_ACTION);
         getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
     }
@@ -231,19 +245,41 @@ public class WeatherView extends LinearLayout {
     }
 
     // 알람 등록
-    private void setNextForecastAlarm() {
+    private void setNextForecastGribAlarm() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minutes = calendar.get(Calendar.MINUTE);
 
-        // 1시간 간격으로
-        calendar.set(Calendar.HOUR_OF_DAY, hour + 1);
-        calendar.set(Calendar.MINUTE, 00);
-        Log.d(TAG, ">> setNextForecastAlarm = " + calendar.get(Calendar.HOUR_OF_DAY) + ", minutes = " + calendar.get(Calendar.MINUTE));
+        // 실황예보는 1시간 간격으로
+        if (minutes >= 30) {
+            calendar.set(Calendar.HOUR_OF_DAY, hour + 1);
+        } else {
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+        }
+        calendar.set(Calendar.MINUTE, 35);
+        Log.d(TAG, ">> setNextForecastGribAlarm = " + calendar.get(Calendar.HOUR_OF_DAY) + ", minutes = " + calendar.get(Calendar.MINUTE));
 
-        setAlarm(calendar.getTimeInMillis(), Constants.WEATHER_SERVICE_UPDATE_ACTION);
+        calendar.getTimeInMillis();
+        setAlarm(calendar.getTimeInMillis(), Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
     }
+    private void setNextForecastSpaceDataAlarm() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
 
+        // 동네예보 단기는 3시간간격으로 해당시간 + 3일치의 데이터가 내려온다. (02, 05, 08, 11, 14, 17, 20, 23)
+        int remain = hour % 3;
+        if (remain == 2) {
+            calendar.set(Calendar.HOUR_OF_DAY, hour + 3);
+        } else {
+            calendar.set(Calendar.HOUR_OF_DAY, hour + (2 - remain));
+        }
+        calendar.set(Calendar.MINUTE, 35);
+        Log.d(TAG, ">> setNextForecastSpaceDataAlarm = " + calendar.get(Calendar.HOUR_OF_DAY) + ", minutes = " + calendar.get(Calendar.MINUTE));
+
+        calendar.getTimeInMillis();
+        setAlarm(calendar.getTimeInMillis(), Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION);
+    }
     private void setAlarm(long milliseconds, String action){
         Log.i(TAG, "setAlarm() = " + milliseconds);
         AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
@@ -271,6 +307,93 @@ public class WeatherView extends LinearLayout {
 //      alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 3000, pIntent);
     }
 
+    private Location convertLocation2Grid(Location location) {
+        //  위경도 -> (X, Y)
+        Location resLoc = lamcProjection(location, 0, mLamcParameter);
+        resLoc.setLongitude(resLoc.getLongitude() + 1.5);
+        resLoc.setLatitude(resLoc.getLatitude() + 1.5);
+        return resLoc;
+    }
+
+    /**
+     * Lambert Conformal Conic Projection
+     * @param location 위경도 또는 격자값
+     * @param convertType 0 : (위경도 -> 격자), 1 : (격자 -> 위경도)
+     * @param mapParam
+     * @return
+     */
+    private Location lamcProjection(Location location, int convertType, LamcParameter mapParam) {
+        Location resLocation = new Location(location);
+
+        double pi = Math.asin(1.0) * 2.0;
+        double degrad = pi / 180.0;
+        double raddeg = 180.0 / pi;
+
+        double re = mapParam.mapRadius / mapParam.gridDistance;
+        double slat1 = mapParam.startLatitude * degrad;
+        double slat2 = mapParam.endLatitude * degrad;
+        double olat = mapParam.datumLatitude * degrad;
+        double olon = mapParam.datumLongitude * degrad;
+
+        double sn = Math.tan(pi * 0.25 + slat2 * 0.5) / Math.tan(pi * 0.25 + slat1 * 0.5);
+        //Log.d(TAG, ">>> sn = " + sn);
+        //Log.d(TAG, ">>> Math.log(Math.cos(slat1) / Math.cos(slat2)) = " + Math.log(Math.cos(slat1) / Math.cos(slat2)));
+        //Log.d(TAG, ">>> Math.log(sn) = " + Math.log(sn));
+        sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+        double sf = Math.tan(pi * 0.25 + slat1 * 0.5);
+        sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+        double ro = Math.tan(pi * 0.25 + olat * 0.5);
+        ro = re * sf / Math.pow(ro, sn);
+
+        double ra = 0;
+        double theta = 0;
+        double xn = 0, yn = 0, alat = 0, alon = 0;
+        if (convertType == 0) {
+            ra = Math.tan(pi * 0.25 + location.getLatitude() * degrad * 0.5);
+            ra = re * sf / Math.pow(ra, sn);
+
+            theta = location.getLongitude() * degrad - olon;
+            if (theta > pi) {
+                theta -= 2.0 * pi;
+            }
+            if (theta < -pi) {
+                theta += 2.0 * pi;
+            }
+
+            theta *= sn;
+            resLocation.setLongitude(ra * Math.sin(theta) + mapParam.datumGridX);
+            resLocation.setLatitude(ro - ra * Math.cos(theta) + mapParam.datumGridY);
+        } else {
+            xn = location.getLongitude() - mapParam.datumGridX;
+            yn = ro - location.getLatitude() + mapParam.datumGridY;
+
+            ra = Math.sqrt(xn * xn + yn * yn);
+            if (sn < 0.0) {
+                ra = -ra;
+            }
+
+            alat = Math.pow(re * sf / ra, 1.0 / sn);
+            alat = 2.0 * Math.atan(alat) - pi * 0.5;
+            if (Math.abs(xn) <= 0.0) {
+                theta = 0.0;
+            } else {
+                if (Math.abs(yn) <= 0.0) {
+                    theta = pi * 0.5;
+                    if (xn < 0.0) {
+                        theta = -theta;
+                    } else {
+                        theta = Math.atan2(xn, yn);
+                    }
+
+                    alon = theta / sn + olon;
+                    resLocation.setLatitude(alat * raddeg);
+                    resLocation.setLongitude(alon * raddeg);
+                }
+            }
+        }
+
+        return resLocation;
+    }
 
     ///////////////////////////////////
     // for weather
@@ -279,11 +402,51 @@ public class WeatherView extends LinearLayout {
      * 실황데이터
      * @param pageNo
      */
-    public void updateGeocode() {
+    public void updateForecastGrib(int pageNo) {
         if (mWeatherRequestQueue == null) {
             mWeatherRequestQueue = Volley.newRequestQueue(getContext());
         }
         String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_GRIB + "?";
+        url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
+
+        Location currLoc = LauncherSettings.getInstance(getContext()).getPreferredUserLocation();
+        if (currLoc == null) {
+            Log.d(TAG, ">> set default location");
+            currLoc = new Location("stub");
+            currLoc.setLongitude(126.929810);
+            currLoc.setLatitude(37.488201);
+        }
+
+        Location gridLoc = convertLocation2Grid(currLoc);
+        Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
+
+        url += "&" + "nx=" + (int)gridLoc.getLongitude();
+        url += "&" + "ny=" + (int)gridLoc.getLatitude();
+
+
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+
+        // 실황은 매시간 30분에 해당시간자료가 발표
+        if (minutes < 30) {
+            if ((hour - 1) < 0) {
+                calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
+            }
+            int newHour = (hour - 1) < 0 ? 24 + (hour - 1) : (hour - 1);
+            url += "&" + "base_time=" + ((newHour) < 10 ? "0" + newHour : newHour) + "00";
+        } else {
+            url += "&" + "base_time=" + ((hour) < 10 ? "0" + hour : hour) + "00";
+        }
+
+        SimpleDateFormat sdf;
+        sdf = new SimpleDateFormat("yyyyMMdd");
+        url += "&" + "base_date=" + sdf.format(calendar.getTime());
+        url += "&" + "pageNo=" + pageNo;
+
+        if (pageNo == 1) {
+            Log.d(TAG, ">> ReqURL = " + url);
+        }
         GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastGrib.class, new Response.Listener<ForecastGrib>() {
 
             @Override
@@ -525,11 +688,89 @@ public class WeatherView extends LinearLayout {
     /**
      * 기상청에서 받아온 날씨데이터를 화면에 업데이트
      */
+    private ForecastItem getForecastItemCategory(ArrayList<ForecastItem> items, String category) {
+        ForecastItem item = null;
+
+        if (category == null) {
+            return null;
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            ForecastItem tmp = items.get(i);
+            if (category.equals(tmp.category)) {
+                item = tmp;
+                break;
+            }
+        }
+
+        return item;
+    }
+
     private class ForecastOfDay {
         public ForecastItem maxCelsius;
         public ForecastItem skyStatus;
     }
 
+    /**
+     * 특정 날짜의 최고기온과 하늘상태를 가져온다.
+     * @param items
+     * @param forecastDate
+     * @return
+     */
+    private ForecastOfDay getMaxCelsiusAndSkyStatusOfDay(ArrayList<ForecastItem> items, String forecastDate) {
+        if (forecastDate == null) {
+            return null;
+        }
+
+        ForecastOfDay result = new ForecastOfDay();
+        int searchDate = Integer.parseInt(forecastDate);
+        int baseTime = 1500;
+
+        for (int i = 0; i < items.size(); i++) {
+            ForecastItem tmp = items.get(i);
+
+            int fcstDate;
+            try {
+                fcstDate = Integer.parseInt(tmp.fcstDate);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+
+            if (fcstDate > searchDate) {
+                break;
+            }
+            if (fcstDate == searchDate) {
+                if (ForecastItem.TMX.equals(tmp.category)) {
+                    if (result.maxCelsius == null) {
+                        result.maxCelsius = tmp;
+                    } else {
+                        // 시간을비교해서 15:00를최적으로한다.
+                        int fcstTime = Integer.parseInt(tmp.fcstTime);
+                        int resultTime = Integer.parseInt(result.maxCelsius.fcstTime);
+                        if (fcstTime > resultTime && fcstTime <= baseTime) {
+                            result.maxCelsius = tmp;
+                        }
+                    }
+                }
+                if (ForecastItem.SKY.equals(tmp.category)) {
+                    if (result.skyStatus == null) {
+                        result.skyStatus = tmp;
+                    } else {
+                        // 시간을비교해서 14:00를최적으로한다.
+                        int fcstTime = Integer.parseInt(tmp.fcstTime);
+                        int resultTime = Integer.parseInt(result.maxCelsius.fcstTime);
+                        if (fcstTime > resultTime && fcstTime <= baseTime) {
+                            result.skyStatus = tmp;
+                        }
+                    }
+                }
+            } else {
+                continue;
+            }
+        }
+
+        return result;
+    }
     private void updateForecastGribWeatherView() {
         Log.d(TAG, ">> updateForecastGribWeatherViewWeatherView().......");
 

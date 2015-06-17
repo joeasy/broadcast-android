@@ -11,6 +11,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
@@ -178,10 +179,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     ShortcutData data = (ShortcutData)view.getTag();
                     VBroadcastServer serverData = LauncherSettings.getInstance(getActivity()).getServerInformation();
 
-                    String docServer = serverData.getDocServer();
-
                     Log.d(TAG, ">>> Clicked = " + data.getName());
-                    Log.d(TAG, ">>> Open URL = " + docServer + data.getPath());
+                    Log.d(TAG, ">>> Open URL = " + serverData.getDocServer() + data.getPath());
 
                     switch (data.getType()) {
                         case Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER :
@@ -194,6 +193,13 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                             startActivity(intent);
                             break;
                         case Constants.SHORTCUT_TYPE_NATIVE_INTERFACE :
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            RadioDialogFragment dialogFragment = new RadioDialogFragment();
+                            Bundle bundle = new Bundle();
+                            data.setDomain(serverData.getDocServer());
+                            bundle.putParcelable(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
+                            dialogFragment.setArguments(bundle);
+                            dialogFragment.show(fm, "fragment_dialog_radio");
                             break;
                         default :
                             Log.d(TAG, "Unknown shortcut type !!!");

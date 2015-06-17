@@ -118,19 +118,21 @@ public class HomeLauncherActivity extends AppCompatActivity
         } else {
             //is phone
             Log.d("Device", "Phone");
-//            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    finish();
-//                }
-//            });
-//            alert.setMessage(R.string.alert_phone_message);
-//            alert.show();
-//            return;
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            alert.setMessage(R.string.alert_phone_message);
+            alert.show();
+            return;
         }
 
-        Point p = DisplayUtils.getScreenSize(this);
+//        Point p = DisplayUtils.getScreenSize(this);
+        int mForecastSpaceDataRetry = 0;
+        int mForecastSpaceDataRequestPage = 1;
 
         // set background image
         View mainLayout = findViewById(R.id.main_layout);
@@ -359,11 +361,25 @@ public class HomeLauncherActivity extends AppCompatActivity
 
             Log.d(TAG, ">>> latitude = " + location.getLatitude());
             Log.d(TAG, ">>> Longitude = " + location.getLongitude());
+
+            boolean isChanged = false;
+            Location prevLocation = LauncherSettings.getInstance(this).getPreferredUserLocation();
             LauncherSettings.getInstance(this).setPreferredUserLocation(location);
 
+            if (prevLocation != null) {
+                double lonDiff = prevLocation.getLongitude() - location.getLongitude();
+                double latDiff = prevLocation.getLatitude() - location.getLatitude();
+
+                if (lonDiff > 0.5 || lonDiff < -0.5 || latDiff > 0.5 || latDiff < -0.5) {
+                    isChanged = true;
+                }
+            }
+
             // sned to weatherview
-            Intent intent=new Intent(Constants.LOCATION_CHANGED_ACTION);
-            sendBroadcast(intent);
+            if (prevLocation == null || isChanged) {
+                Intent intent=new Intent(Constants.LOCATION_CHANGED_ACTION);
+                sendBroadcast(intent);
+            }
 
             // TODO : remove later
             if (this.mActivityInteractionListener != null) {

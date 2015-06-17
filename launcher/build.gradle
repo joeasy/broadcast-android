@@ -49,6 +49,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:6.5.+'
     compile 'com.mcxiaoke.volley:library:1.0.+'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'me.neavo:vitamio:4.2.2'
     compile project(':iot_gateway')
     compile project(':media_player')
     compile project(':push_agent')
