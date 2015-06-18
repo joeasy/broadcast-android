@@ -68,9 +68,12 @@ public class Constants {
     // for yahoo weather
 //    public static final String YAHOO_APP_ID = "e1szeL7k";
 //    public static final String GEO_API = "http://where.yahooapis.com/geocode?location=%f,%f&flags=J&gflags=R&appid=" + YAHOO_APP_ID;
-    public static final String YAHOO_WEATHER_API = "http://query.yahooapis.com/v1/public/yql?q=%s&format=json&callback=?";
-    public static final String YAHOO_WEOID_QUERY = "select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"";
+    public static final String YAHOO_WEATHER_API = "http://query.yahooapis.com/v1/public/yql?q=%s&format=json";
+    public static final String YAHOO_WOEID_QUERY = "select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"";
     public static final String YAHOO_WEATHER_QUERY = "select * from weather.forecast where woeid=%s and u=\"c\"";
+
+    public static final String YAHOO_QUERY_WOEID_RESULT = "Result";
+    public static final String YAHOO_QUERY_WEATHER_RESULT = "channel";
 
     //public static final String WEEK_WEATHER_YQL = "select item from weather.forecast where woeid=%s&d=7&format=json";
     public static final String WEATHER_SERVICE_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate";

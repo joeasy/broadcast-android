@@ -4,9 +4,11 @@
         <item>맑음</item>
         <item>구름조금</item>
         <item>구름많음</item>
-        <item>흐림</item>
+        <item>비</item>
+        <item>눈</item>
     </string-array>
     <string-array name="sky_status_drawable">
+        <item>@drawable/ic_launcher</item>
         <item>@drawable/ic_launcher</item>
         <item>@drawable/ic_launcher</item>
         <item>@drawable/ic_launcher</item>

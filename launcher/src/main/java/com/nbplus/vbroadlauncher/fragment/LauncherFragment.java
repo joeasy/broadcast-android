@@ -34,7 +34,6 @@ import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.api.GsonRequest;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
-import com.nbplus.vbroadlauncher.data.ForecastSpaceData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;

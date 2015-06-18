@@ -24,6 +24,7 @@ public class LauncherSettings implements Parcelable {
     String deviceID;
     // 날씨정보에 사용할 로케이션정보
     Location preferredUserLocation;
+    GeocodeData yahooGeocode;
 
     // 마을정보
     @SerializedName("vill_code")
@@ -72,6 +73,7 @@ public class LauncherSettings implements Parcelable {
     public static final String KEY_VBROADCAST_IS_COMPLETED_SETUP = "key_is_completed_setup";
     public static final String KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE = "key_is_exclusive_device";
     public static final String KEY_VBROADCAST_PREFERRED_LOCATION = "key_preferred_location";
+    public static final String KEY_VBROADCAST_YAHOO_GEOCODE = "key_yahoo_geocode";
     public static final String KEY_VBROADCAST_DEVICE_ID = "key_device_id";
     public static final String KEY_VBROADCAST_SERVER_INFO = "key_server_info";
     public static final String KEY_VBROADCAST_SHORTCUT = "key_shortcut";
@@ -252,6 +254,15 @@ public class LauncherSettings implements Parcelable {
     public void setPreferredUserLocation(Location preferredUserLocation) {
         this.preferredUserLocation = preferredUserLocation;
         setPrefsJsonObject(KEY_VBROADCAST_PREFERRED_LOCATION, this.preferredUserLocation);
+    }
+
+    public GeocodeData getGeocodeData() {
+        return yahooGeocode;
+    }
+
+    public void setGeocodeData(GeocodeData geocode) {
+        this.yahooGeocode = geocode;
+        setPrefsJsonObject(KEY_VBROADCAST_YAHOO_GEOCODE, this.yahooGeocode);
     }
 
     public void setPrefsJsonObject(String key, Object obj) {

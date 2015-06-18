@@ -25,21 +25,24 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.api.GsonRequest;
 import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.data.ForecastGrib;
-import com.nbplus.vbroadlauncher.data.ForecastItem;
-import com.nbplus.vbroadlauncher.data.ForecastSpaceData;
-import com.nbplus.vbroadlauncher.data.ForecastTimeData;
+import com.nbplus.vbroadlauncher.data.ForecastData;
+import com.nbplus.vbroadlauncher.data.GeocodeData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
+import com.nbplus.vbroadlauncher.data.YahooQueryForecastResult;
+import com.nbplus.vbroadlauncher.data.YahooQueryGeocodeResult;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by basagee on 2015. 6. 3..
@@ -50,9 +53,7 @@ public class WeatherView extends LinearLayout {
     private boolean mAttached;
     private boolean mLocationChangedReceived = false;
     RequestQueue mWeatherRequestQueue;
-    private ArrayList<ForecastItem> mForecastSpaceDataItems = new ArrayList<ForecastItem>();
-    private ArrayList<ForecastItem> mForecastTimeDataItems = new ArrayList<ForecastItem>();
-    private ArrayList<ForecastItem> mForecastGribItems = new ArrayList<ForecastItem>();
+    ForecastData mForecastData;
     private int mForecastRetry = 0;
 
     // layout
@@ -73,8 +74,6 @@ public class WeatherView extends LinearLayout {
     private TextView mTodayTitle;
     private ImageView mTodaySkyStatus;
     private TextView mTodayMaxCelsius;
-    // 오후 2시 이후에 발표하는 데이터에는 오늘의 최고기온이 없다.
-    private String mLastMaxTodayCelsius;
     // tomorrow
     private TextView mTomorrowTitle;
     private ImageView mTomorrowSkyStatus;
@@ -94,7 +93,7 @@ public class WeatherView extends LinearLayout {
 
                     // update weather and set next alarm
                     updateForecast();
-                    setNextAlarm();
+                    setNextForecastAlarm();
                 } else if (Constants.LOCATION_CHANGED_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "LOCATION_CHANGED_ACTION received !!!");
                     if (!mLocationChangedReceived) {
@@ -111,12 +110,12 @@ public class WeatherView extends LinearLayout {
                         releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
 
                         // update weather and set next alarm
-                        if (LauncherSettings.getInstance(getContext()).getGeocode() == null) {
+                        if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
                             updateGeocode();
                         } else {
                             updateForecast();
                         }
-                        setNextAlarm();
+                        setNextForecastAlarm();
                     }
                 }
             }
@@ -202,7 +201,13 @@ public class WeatherView extends LinearLayout {
             mAttached = true;
 
             registerReceiver();
-            setAlarm(System.currentTimeMillis() + 5000, null);
+
+            if (LauncherSettings.getInstance(getContext()).getGeocodeData() != null) {
+                Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+                getContext().sendBroadcast(intent);
+            } else {
+                setAlarm(System.currentTimeMillis() + 5000, null);
+            }
         }
     }
 
@@ -276,114 +281,49 @@ public class WeatherView extends LinearLayout {
     // for weather
     ///////////////////////////////////
     /**
-     * 실황데이터
-     * @param pageNo
+     *  Yahoo! woeid  검색
      */
     public void updateGeocode() {
         if (mWeatherRequestQueue == null) {
             mWeatherRequestQueue = Volley.newRequestQueue(getContext());
         }
-        String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_GRIB + "?";
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastGrib.class, new Response.Listener<ForecastGrib>() {
+
+        Location location = LauncherSettings.getInstance(getContext()).getPreferredUserLocation();
+        String yql = String.format(Constants.YAHOO_WOEID_QUERY, location.getLatitude(), location.getLongitude());
+        try {
+            yql = URLEncoder.encode(yql, "utf-8");
+            yql = yql.replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String url = String.format(Constants.YAHOO_WEATHER_API, yql);
+        Log.d(TAG, ">> updateGeocode URL = " + url);
+
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, YahooQueryGeocodeResult.class, new Response.Listener<YahooQueryGeocodeResult>() {
 
             @Override
-            public void onResponse(ForecastGrib response) {
-                Log.d(TAG, ">>> updateForecastGrib success resultCode = " + response.getResultCode() + ", resultMessage = " + response.getResultMessage());
-                mForecastGribRetry = 0;
-                if (Constants.RESULT_OK.equals(response.getResultCode())) {
-                    mForecastGribItems.clear();
-                    mForecastGribItems = response.getWeatherItems();
+            public void onResponse(YahooQueryGeocodeResult response) {
+                Log.d(TAG, ">>> updateGeocode success !!!");
+                mForecastRetry = 0;
 
-                    updateForecastGribWeatherView();
+                GeocodeData data = response.getGeocodeData();
+                if (data != null) {
+                    LauncherSettings.getInstance(getContext()).setGeocodeData(data);
+                    updateForecast();
                 }
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> updateForecastGrib error");
-                mForecastGribRetry++;
-                if (mForecastGribRetry > 3) {     // retry 3 times
-                    mForecastGribRetry = 0;
-                    Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
-                    updateForecastGribWeatherView();
-                } else {                // retry
-                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastSpaceDataRetry);
-                    updateForecastGrib(1);
-                }
-            }
-        });
-
-        mWeatherRequestQueue.add(jsRequest);
-    }
-    public void updateForecastTimeData(int pageNo) {
-        if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
-        }
-        String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_TIMEDATA + "?";
-        url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
-
-        Location currLoc = LauncherSettings.getInstance(getContext()).getPreferredUserLocation();
-        if (currLoc == null) {
-            Log.d(TAG, ">> set default location");
-            currLoc = new Location("stub");
-            currLoc.setLongitude(126.929810);
-            currLoc.setLatitude(37.488201);
-        }
-
-        Location gridLoc = convertLocation2Grid(currLoc);
-        Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
-
-        url += "&" + "nx=" + (int)gridLoc.getLongitude();
-        url += "&" + "ny=" + (int)gridLoc.getLatitude();
-
-
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-
-        // 동네예보 초단기는 매시간 30분에 발표된다.
-        if (minutes < 30) {
-            if ((hour - 1) < 0) {
-                calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
-            }
-            int newHour = (hour - 1) < 0 ? 24 + (hour - 1) : (hour - 1);
-            url += "&" + "base_time=" + ((newHour) < 10 ? "0" + newHour : newHour) + "30";
-        } else {
-            url += "&" + "base_time=" + ((hour) < 10 ? "0" + hour : hour) + "30";
-        }
-
-        SimpleDateFormat sdf;
-        sdf = new SimpleDateFormat("yyyyMMdd");
-        url += "&" + "base_date=" + sdf.format(calendar.getTime());
-        url += "&" + "pageNo=" + pageNo;
-
-        if (pageNo == 1) {
-            Log.d(TAG, ">> ReqURL = " + url);
-        }
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastTimeData.class, new Response.Listener<ForecastTimeData>() {
-
-            @Override
-            public void onResponse(ForecastTimeData response) {
-                Log.d(TAG, ">>> updateForecastTimeData success resultCode = " + response.getResultCode() + ", resultMessage = " + response.getResultMessage());
-                mForecastTimeDataRetry = 0;
-                if (Constants.RESULT_OK.equals(response.getResultCode())) {
-                    mForecastTimeDataItems.clear();
-                    mForecastTimeDataItems = response.getWeatherItems();
-                }
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> updateForecastTimeData error");
-                mForecastSpaceDataRetry++;
-                if (mForecastTimeDataRetry > 3) {     // retry 3 times
-                    mForecastTimeDataRetry = 0;
+                Log.d(TAG, ">>> updateGeocode error");
+                mForecastRetry++;
+                if (mForecastRetry > 3) {     // retry 3 times
+                    mForecastRetry = 0;
                     Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
                 } else {                // retry
-                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastSpaceDataRetry);
-                    updateForecastTimeData(1);
+                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastRetry);
+                    updateGeocode();
                 }
             }
         });
@@ -392,129 +332,48 @@ public class WeatherView extends LinearLayout {
     }
 
     /**
-     * 단기 예보
-     * @param pageNo
+     *  Yahoo! woeid  검색
      */
-    public void updateForecastSpaceData(int pageNo) {
+    public void updateForecast() {
         if (mWeatherRequestQueue == null) {
             mWeatherRequestQueue = Volley.newRequestQueue(getContext());
         }
-        String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_SPACEDATA + "?";
-        url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
 
-        Location currLoc = LauncherSettings.getInstance(getContext()).getPreferredUserLocation();
-        if (currLoc == null) {
-            Log.d(TAG, ">> set default location");
-            currLoc = new Location("stub");
-            currLoc.setLongitude(126.929810);
-            currLoc.setLatitude(37.488201);
+        GeocodeData geoCode = LauncherSettings.getInstance(getContext()).getGeocodeData();
+        String yql = String.format(Constants.YAHOO_WEATHER_QUERY, geoCode.woeid);
+        try {
+            yql = URLEncoder.encode(yql, "utf-8");
+            yql = yql.replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
+        String url = String.format(Constants.YAHOO_WEATHER_API, yql);
+        Log.d(TAG, ">> updatForecast URL = " + url);
 
-        Location gridLoc = convertLocation2Grid(currLoc);
-        Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
-
-        url += "&" + "nx=" + (int)gridLoc.getLongitude();
-        url += "&" + "ny=" + (int)gridLoc.getLatitude();
-
-
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-
-        // 동네예보 단기는 3시간간격으로 해당시간 + 3일치의 데이터가 내려온다. (02, 05, 08, 11, 14, 17, 20, 23)
-        int remain = hour % 3;
-        if (remain == 2) {
-            // 해당시간대에도 30분 이전에는 이전시간을 사용한다.
-            if (minutes < 30) {
-                if (hour - (remain + 1) < 0) {
-                    calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
-                }
-                int newHour = (hour - 3) < 0 ? 24  - (3 - hour) : (hour - 3);
-                url += "&" + "base_time=" + ((newHour) < 10 ? "0" + newHour : newHour) + "00";
-            } else {
-                url += "&" + "base_time=" + ((hour) < 10 ? "0" + hour : hour) + "00";
-            }
-        } else {
-            if (hour - (remain + 1) < 0) {
-                calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
-            }
-            int newHour = (hour - (remain + 1)) < 0 ? 24  - (remain + 1) : (hour - (remain + 1));
-            url += "&" + "base_time=" + ((newHour) < 10 ? "0" + newHour : newHour) + "00";
-        }
-
-        SimpleDateFormat sdf;
-        sdf = new SimpleDateFormat("yyyyMMdd");
-        url += "&" + "base_date=" + sdf.format(calendar.getTime());
-        url += "&" + "pageNo=" + pageNo;//sdf.format(date);
-        mForecastSpaceDataRequestPage = pageNo;
-
-        if (pageNo == 1) {
-            Log.d(TAG, ">> ReqURL = " + url);
-        }
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastSpaceData.class, new Response.Listener<ForecastSpaceData>() {
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, YahooQueryForecastResult.class, new Response.Listener<YahooQueryForecastResult>() {
 
             @Override
-            public void onResponse(ForecastSpaceData response) {
-                Log.d(TAG, ">>> updateForecastSpaceData success resultCode = " + response.getResultCode() + ", resultMessage = " + response.getResultMessage());
-                Log.d(TAG, ">>> ForecastSpaceData get page = " + response.getNumOfPage() + ", rows = " + response.getRowsPerPage());
+            public void onResponse(YahooQueryForecastResult response) {
+                Log.d(TAG, ">>> updatForecast success !!!");
+                mForecastRetry = 0;
 
-                mForecastSpaceDataRetry = 0;
-                if (Constants.RESULT_OK.equals(response.getResultCode())) {
-                    if (response.getNumOfPage() == 1) {
-                        mForecastSpaceDataItems.clear();
-                        mForecastSpaceDataItems = response.getWeatherItems();
-
-                        if (response.getRowsPerPage() < response.getTotalCount()) {
-                            updateForecastSpaceData(response.getNumOfPage() + 1);
-                            mForecastSpaceDataNumRowsPerPage = response.getRowsPerPage();
-                            mForecastSpaceDataTotalCount = response.getTotalCount();
-                        } else {
-                            // end of update all space data
-                            updateForecastSpaceDataWeatherView();
-                        }
-                    } else {
-                        mForecastSpaceDataItems.addAll(mForecastSpaceDataItems.size(), response.getWeatherItems());
-                        if (((response.getNumOfPage() - 1) * mForecastSpaceDataNumRowsPerPage + response.getRowsPerPage()) < response.getTotalCount()) {
-                            updateForecastSpaceData(response.getNumOfPage() + 1);
-                        } else {
-                            // end of update all space data
-                            updateForecastSpaceDataWeatherView();
-                        }
-                    }
+                mForecastData = response.getForecastData();
+                if (mForecastData != null) {
+                    updateForecastView();
                 }
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> updateForecastSpaceData error... retry = " + error.toString());
-                int page = mForecastSpaceDataRetry & 0xff00 >> 8;
-                if (page == 0) {        // retry 이력이없음.
-                    mForecastSpaceDataRetry = (mForecastSpaceDataRequestPage << 8);
-                    mForecastSpaceDataRetry++;
-                    Log.d(TAG, ">> RETRY HISTORY = NONE");
-                    updateForecastSpaceData(mForecastSpaceDataRequestPage);
-                } else {
-                    int retryCnt = mForecastSpaceDataRetry & 0x00ff;
-                    if (retryCnt > 3) {     // retry 3 times
-                        // try next page
-                        if (mForecastSpaceDataRequestPage * mForecastSpaceDataNumRowsPerPage < mForecastSpaceDataTotalCount) {
-                            mForecastSpaceDataRequestPage ++;
-                            mForecastSpaceDataRetry = (mForecastSpaceDataRequestPage << 8);
-                            mForecastSpaceDataRetry++;
-                            Log.d(TAG, ">> 3 회재시도 실패.... 다음페이지 = " + mForecastSpaceDataRequestPage);
-                            updateForecastSpaceData(mForecastSpaceDataRequestPage);
-                        } else {
-                            // end of update all space data
-                            Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
-                            mForecastSpaceDataRetry = 0;
-                            updateForecastSpaceDataWeatherView();
-                        }
-                    } else {                // retry
-                        Log.d(TAG, ">> 재시도를한다.  page = " + page + ", retry count = " + (mForecastSpaceDataRetry & 0x00ff));
-                        mForecastSpaceDataRetry++;
-                        updateForecastSpaceData(mForecastSpaceDataRequestPage);
-                    }
+                Log.d(TAG, ">>> updatForecast error");
+                mForecastRetry++;
+                if (mForecastRetry > 3) {     // retry 3 times
+                    mForecastRetry = 0;
+                    Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
+                } else {                // retry
+                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastRetry);
+                    updateForecast();
                 }
             }
         });
@@ -525,189 +384,215 @@ public class WeatherView extends LinearLayout {
     /**
      * 기상청에서 받아온 날씨데이터를 화면에 업데이트
      */
-    private class ForecastOfDay {
-        public ForecastItem maxCelsius;
-        public ForecastItem skyStatus;
+    private int conditonCodeToSkyStatus(String conditionCode) {
+        /**
+         https://developer.yahoo.com/weather/documentation.html#codes
+         // 비
+         Code	Description
+         0	tornado
+         1	tropical storm
+         2	hurricane
+         3	severe thunderstorms
+         4	thunderstorms
+         5	mixed rain and snow
+         6	mixed rain and sleet
+         11	showers
+         12	showers
+         37	isolated thunderstorms
+         38	scattered thunderstorms
+         39	scattered thunderstorms
+         40	scattered showers
+         45	thundershowers
+
+         // 눈
+         7	mixed snow and sleet
+         8	freezing drizzle    // 눈
+         9	drizzle
+         10	freezing rain       //
+         13	snow flurries
+         14	light snow showers
+         15	blowing snow
+         16	snow
+         17	hail
+         18	sleet
+         35	mixed rain and hail
+         41	heavy snow
+         42	scattered snow showers
+         43	heavy snow
+         46	snow showers
+         47	isolated thundershowers
+
+         // 바람
+         // 조금 흐림 + 안개등
+         19	dust
+         20	foggy
+         21	haze
+         22	smoky
+         23	blustery
+         24	windy
+         25	cold
+         29	partly cloudy (night)
+         30	partly cloudy (day)
+         44	partly cloudy
+
+         // 많이 흐림
+         26	cloudy
+         27	mostly cloudy (night)
+         28	mostly cloudy (day)
+
+         // 맑음
+         31	clear (night)
+         32	sunny
+         33	fair (night)
+         34	fair (day)
+         36	hot
+
+         3200	not available
+         */
+        final List<String> sunny = Arrays.asList("31", "32", "33", "34", "36");
+        final List<String> littleCloudy = Arrays.asList("19", "20", "21", "22", "23", "24", "25", "29", "30", "44");
+        final List<String> mostlyCloudy = Arrays.asList("26", "27", "28");
+        final List<String> rainy = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "11", "12", "37", "38", "39", "40", "45");
+        final List<String> snow = Arrays.asList("7", "8", "9", "10", "13", "14", "15", "16", "17", "18", "35", "41", "42", "43", "46", "47");
+
+        if (sunny.indexOf(conditionCode) != -1) {
+            return 0;
+        } else if (littleCloudy.indexOf(conditionCode) != -1) {
+            return 1;
+        } else if (mostlyCloudy.indexOf(conditionCode) != -1) {
+            return 2;
+        } else if (rainy.indexOf(conditionCode) != -1) {
+            return 3;
+        } else if (snow.indexOf(conditionCode) != -1) {
+            return 4;
+        }
+
+        return 0;
     }
 
-    private void updateForecastGribWeatherView() {
-        Log.d(TAG, ">> updateForecastGribWeatherViewWeatherView().......");
+    private void updateForecastView() {
+        Log.d(TAG, ">> updateForecastView().......");
 
-        ForecastItem item = null;
-        int skyStatusValue = 1;
-
-        item = getForecastItemCategory(mForecastGribItems, ForecastItem.SKY);
-        if (item != null) {
-
-            /**
-             * 하늘상태 단위 - OpenAPI 활용 가이드(기상청_동네예보정보조회서비스)_v1.1.docx
-             * ----------------------------------------------------------------
-             *    하늘상태(SKY)         |                코드값
-             * ----------------------------------------------------------------
-             *        맑음             |                  1
-             *       구름조금           |                  2
-             *       구름많음           |                  3
-             *        흐림             |                  4
-             * ----------------------------------------------------------------
-             */
-
-            Resources res = getResources();
-            String[] skyStatusArray = res.getStringArray(R.array.sky_status);
-            skyStatusValue = Integer.parseInt(item.obsrValue);
-
-            String skyStatus = skyStatusArray[0];
-            if (skyStatusValue >= 1 && skyStatusValue <= 4) {       // 없는값이올수있을까??
-                 skyStatus = skyStatusArray[skyStatusValue - 1];
-            }
-
-            if (mCurrentSkyStatus != null) {
-                mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status, skyStatus, "무엇을?"));
-            }
+        if (mForecastData == null || mForecastData.item == null) {
+            return;
         }
-        item = getForecastItemCategory(mForecastGribItems, ForecastItem.T1H);
-        if (item != null) {
-            if (mCurrentCelsius != null) {
-                try {
-                    float currCelsiusVal = Float.parseFloat(item.obsrValue);
-                    float lastMaxCelsius = 0f;
-                    if (mLastMaxTodayCelsius != null) {
-                        lastMaxCelsius = Float.parseFloat(mLastMaxTodayCelsius);
-                    }
-                    if (lastMaxCelsius < currCelsiusVal) {
-                        mLastMaxTodayCelsius = item.obsrValue;
-                        mTodayMaxCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
-                    }
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
-
-                mCurrentCelsius.setTag(item);
-                mCurrentCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
-                TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
-                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue - 1, 0), 0);
-            }
-        }
-    }
-
-    private void updateForecastSpaceDataWeatherView() {
-        Log.d(TAG, ">> updateForecastSpaceDataWeatherView().......");
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdf;
-        sdf = new SimpleDateFormat("yyyyMMdd");
-        String date;
 
         Resources res = getResources();
+        String[] skyStatusArray = res.getStringArray(R.array.sky_status);
+        TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
         String[] weekStringArray = res.getStringArray(R.array.week_day);
 
-        TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
+        int skyStatusValue = 0;
+
+        /**
+         * TODO : =야후 API가 약3도정도 오차가 있다. 약간은 보정해 줘야하나?
+         */
+
+        // condition 과 humidity 를 보여준다.
+        if (mForecastData.atmosphere != null && mForecastData.item.currentCondition != null) {
+            skyStatusValue = conditonCodeToSkyStatus(mForecastData.item.currentCondition.conditionCode);
+
+            String skyStatusString = skyStatusArray[skyStatusValue];
+
+            if (mCurrentSkyStatus != null) {
+                mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status,
+                        skyStatusString, "습도 " + mForecastData.atmosphere.humidity + "%"));
+            }
+
+            //보정
+            float temp = Float.parseFloat(mForecastData.item.currentCondition.temperature);
+            temp += 3;
+
+            mCurrentCelsius.setText(getContext().getString(R.string.celsius, "" + ((int)temp)));
+            mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf;
 
         // today
-        mTodayTitle.setText(getContext().getString(R.string.weather_day,
-                calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
-        date = sdf.format(calendar.getTime());
-        ForecastOfDay data = getMaxCelsiusAndSkyStatusOfDay(mForecastSpaceDataItems, date);
+        ForecastData.Forecast data = mForecastData.item.weekCondition.get(0);
         if (data != null) {
-            if (data.maxCelsius != null) {
-                if ("-50".equals(data.maxCelsius.fcstValue)) {          // missing value
-                    Log.d(TAG, "단기정보에서 " + date + "에 해당하는 최고기온 정보가 missing value(-50) 이다.");
-                }
-                try {
-                    float celsiusVal = Float.parseFloat(data.maxCelsius.fcstValue);
-                    float lastMaxCelsius = 0f;
-                    if (mLastMaxTodayCelsius != null) {
-                        lastMaxCelsius = Float.parseFloat(mLastMaxTodayCelsius);
-                    }
-                    if (lastMaxCelsius < celsiusVal) {
-                        mLastMaxTodayCelsius = data.maxCelsius.fcstValue;
-                    }
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
-
-                mTodayMaxCelsius.setText(getContext().getString(R.string.celsius, mLastMaxTodayCelsius));
-            } else {
-                Log.d(TAG, "단기정보에서 " + date + "에 해당하는 최고기온 정보를 가져올 수 없다.");
+            //sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm z", Locale.US);
+            sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+            try {
+                calendar.setTime(sdf.parse(data.date));
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            if (data.skyStatus != null) {
-                int skyStaus = Integer.parseInt(data.skyStatus.fcstValue);
-                if (skyStaus < 1 || skyStaus > 4) {       // 없는값이올수있을까??
-                    skyStaus = 1;
-                }
 
-                mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStaus - 1, 0));
-                Log.d(TAG, ">> Today sky status = " + skyStaus);
-            } else {
-                Log.d(TAG, "단기정보에서 " + date + "에 해당하는 하늘상태 정보를 가져올 수 없다.");
+            mTodayTitle.setText(getContext().getString(R.string.weather_day,
+                    calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
+
+            try {
+                float currentCelsius = Float.parseFloat(mForecastData.item.currentCondition.temperature);
+                float maxCelsius = Float.parseFloat(data.high);
+                float minCelsius = Float.parseFloat(data.low);
+
+                if (maxCelsius < currentCelsius) {
+                    currentCelsius += 3;
+                    mTodayMaxCelsius.setText(getContext().getString(R.string.celsius, "" + ((int)currentCelsius)));
+                } else {
+                    maxCelsius += 3;
+                    mTodayMaxCelsius.setText(getContext().getString(R.string.celsius,  "" + ((int)maxCelsius)));
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
             }
-        } else {
-            Log.d(TAG, "단기정보에서 " + date + "에 해당하는 정보를 가져올 수 없다.");
+
+            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
+            mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
 
         // tomorrow
-        String tomorrowCelsiusValue = null;
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + 1);
-        mTomorrowTitle.setText(getContext().getString(R.string.weather_day,
-                calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
-        date = sdf.format(calendar.getTime());
-        data = getMaxCelsiusAndSkyStatusOfDay(mForecastSpaceDataItems, date);
+        data = mForecastData.item.weekCondition.get(1);
         if (data != null) {
-            if (data.maxCelsius != null) {
-                if ("-50".equals(data.maxCelsius.fcstValue)) {          // missing value
-                    Log.d(TAG, "단기정보에서 " + date + "에 해당하는 최고기온 정보가 missing value(-50) 이다.");
-                }
-                tomorrowCelsiusValue = data.maxCelsius.fcstValue;
-                mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, data.maxCelsius.fcstValue));
-            } else {
-                Log.d(TAG, "단기정보에서 " + date + "에 해당하는 최고기온 정보를 가져올 수 없다.");
+            //sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm z", Locale.US);
+            sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+            try {
+                calendar.setTime(sdf.parse(data.date));
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            if (data.skyStatus != null) {
-                int skyStaus = Integer.parseInt(data.skyStatus.fcstValue);
-                if (skyStaus < 1 || skyStaus > 4) {       // 없는값이올수있을까??
-                    skyStaus = 1;
-                }
 
-                mTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStaus - 1, 0));
-                Log.d(TAG, ">> Tomorrow sky status = " + skyStaus);
-            } else {
-                Log.d(TAG, "단기정보에서 " + date + "에 해당하는 하늘상태 정보를 가져올 수 없다.");
-            }
-        } else {
-            Log.d(TAG, "단기정보에서 " + date + "에 해당하는 정보를 가져올 수 없다.");
+            mTomorrowTitle.setText(getContext().getString(R.string.weather_day,
+                    calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
+
+            //보정
+            float temp = Float.parseFloat(data.high);
+            temp += 3;
+
+            mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + ((int)temp)));
+
+            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
+            mTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
 
-        // day after tomorrow
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + 1);
-        mDayAfterTomorrowTitle.setText(getContext().getString(R.string.weather_day,
-                calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
-        date = sdf.format(calendar.getTime());
-        data = getMaxCelsiusAndSkyStatusOfDay(mForecastSpaceDataItems, date);
+        // the day after tomorrow
+        data = mForecastData.item.weekCondition.get(2);
         if (data != null) {
-            if (data.maxCelsius != null) {
-                int celsiusValue = Integer.parseInt(data.maxCelsius.fcstValue);
-                if (celsiusValue == -50 || celsiusValue == 0) {          // missing value
-                    Log.d(TAG, "단기정보에서 " + date + "에 해당하는 최고기온 정보가 missing value(-50) 이거나 0이다.");
-                    // 이틀후 최고기온이 0으로 오기도 한다. 이럴경우 약간의 오류가 나올 수도 있지만 전날 최고기온으로 대체하자.
-                    mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, tomorrowCelsiusValue));
-                } else {
-                    mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, data.maxCelsius.fcstValue));
-                }
-
-            } else {
-                Log.d(TAG, "단기정보에서 " + date + "에 해당하는 최고기온 정보를 가져올 수 없다.");
+            //sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm z", Locale.US);
+            sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+            try {
+                calendar.setTime(sdf.parse(data.date));
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            if (data.skyStatus != null) {
-                int skyStatus = Integer.parseInt(data.skyStatus.fcstValue);
-                if (skyStatus < 1 || skyStatus > 4) {       // 없는값이올수있을까??
-                    skyStatus = 1;
-                }
 
-                Log.d(TAG, ">> DayAfterTomorrow sky status = " + skyStatus);
-                mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatus - 1, 0));
-            } else {
-                Log.d(TAG, "단기정보에서 " + date + "에 해당하는 하늘상태 정보를 가져올 수 없다.");
-            }
-        } else {
-            Log.d(TAG, "단기정보에서 " + date + "에 해당하는 정보를 가져올 수 없다.");
+            mDayAfterTomorrowTitle.setText(getContext().getString(R.string.weather_day,
+                    calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
+
+            //보정
+            float temp = Float.parseFloat(data.high);
+            temp += 3;
+
+            mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + ((int)temp)));
+
+            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
+            mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
     }
 
