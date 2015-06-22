@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
@@ -62,6 +63,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final String TAG = LauncherFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
+    private Button mOutdoorMode;
     private Button mServiceTreeMap;
     private Button mApplicationsView;
     private TextView mVillageName;
@@ -110,7 +112,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
         mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
 
-        mServiceTreeMap = (Button)v.findViewById(R.id.btn_show_map);
         mApplicationsView = (Button)v.findViewById(R.id.btn_show_apps);
         mApplicationsView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,6 +119,49 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Intent intent = new Intent(getActivity(), ShowApplicationActivity.class);
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        });
+        mServiceTreeMap = (Button)v.findViewById(R.id.btn_show_map);
+        mServiceTreeMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ShowApplicationActivity.class);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        });
+        mOutdoorMode = (Button)v.findViewById(R.id.btn_outdoor);
+        if (LauncherSettings.getInstance(getActivity()).isOutdoorMode()) {
+            mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
+            mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
+        } else {
+            mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+            mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
+        }
+        mOutdoorMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast toast;
+                if (LauncherSettings.getInstance(getActivity()).isOutdoorMode()) {
+                    LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(false);
+                    mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
+                    mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+
+                    toast = Toast.makeText(getActivity(), R.string.outdoor_mode_off, Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                    toast.show();
+                } else {
+                    LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(true);
+                    mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
+                    mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
+
+                    toast = Toast.makeText(getActivity(), R.string.outdoor_mode_on, Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                    toast.show();
+                }
+
+                // 서버에????
+
             }
         });
 
@@ -156,13 +200,13 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         // add main shortcut.
         ArrayList<ShortcutData> mainShortcutDatas = LauncherSettings.getInstance(getActivity()).getLauncherMainShortcuts();
         mMainShortcutGridLayout = (GridLayout)v.findViewById(R.id.main_shortcut_grid);
-        float dp = getResources().getDimension(R.dimen.launcher_ic_menu_main_shortcut_width) / getResources().getDisplayMetrics().density;
+        float dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_width);
         float widthPx = DisplayUtils.pxFromDp(getActivity(), dp);
 
-        dp = getResources().getDimension(R.dimen.launcher_ic_menu_main_shortcut_height) / getResources().getDisplayMetrics().density;
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_height);
         float heightPx = DisplayUtils.pxFromDp(getActivity(), dp);
 
-        dp = getResources().getDimension(R.dimen.launcher_ic_menu_main_shortcut_font_size) / getResources().getDisplayMetrics().density;
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_font_size);
         float mainShortcutFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
         for (int i = 0; i < mMainShortcutGridLayout.getColumnCount(); i++) {
             /**
@@ -170,6 +214,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
              */
             ShortcutData data = mainShortcutDatas.get(i);
             LinearLayout btnLayout = (LinearLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mMainShortcutGridLayout, false);//new Button(getActivity());
+            mMainShortcutGridLayout.addView(btnLayout);
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
 
@@ -190,7 +235,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             btnLayout.setTag(data);
             btnLayout.setOnClickListener(this);
-            mMainShortcutGridLayout.addView(btnLayout);
         }
 
         // add other shortcuts.
@@ -201,13 +245,13 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         int shortcutNum = shortcutDatas.size() > (columnNum * MAX_ROW_NUM) ? (columnNum * MAX_ROW_NUM) : shortcutDatas.size();
         // draw shortcut button
-        dp = getResources().getDimension(R.dimen.launcher_ic_menu_shortcut_size) / getResources().getDisplayMetrics().density;
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_size);
         float btnSizePx = DisplayUtils.pxFromDp(getActivity(), dp);
 
-        dp = getResources().getDimension(R.dimen.ic_nav_btn_drawable_padding) / getResources().getDisplayMetrics().density;
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.ic_nav_btn_drawable_padding);
         float drawablePadding = DisplayUtils.pxFromDp(getActivity(), dp);
 
-        dp = getResources().getDimension(R.dimen.launcher_ic_menu_shortcut_font_size) / getResources().getDisplayMetrics().density;
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_font_size);
         float btnFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
 
         for (int i = 0; i < shortcutNum; i++) {
@@ -216,6 +260,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
              */
             ShortcutData data = shortcutDatas.get(i);
             LinearLayout btnLayout = (LinearLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mShorcutGridLayout, false);//new Button(getActivity());
+            mShorcutGridLayout.addView(btnLayout);
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
 
@@ -236,7 +281,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             btnLayout.setTag(data);
             btnLayout.setOnClickListener(this);
-            mShorcutGridLayout.addView(btnLayout);
         }
 
         setContentViewByOrientation();
@@ -288,7 +332,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             lp = (LinearLayout.LayoutParams)mMainViewLeftPanel.getLayoutParams();
             lp.weight = 0.6f;
-            marginDp = getResources().getDimension(R.dimen.launcher_panel_margin) / getResources().getDisplayMetrics().density;
+            marginDp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_panel_margin);
             marginPx = DisplayUtils.pxFromDp(getActivity(), marginDp);
             lp.setMargins(0, 0, (int)marginPx, 0);
             mMainViewLeftPanel.setLayoutParams(lp);
@@ -301,7 +345,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             lp = (LinearLayout.LayoutParams)mMainViewLeftPanel.getLayoutParams();
             lp.weight = 1.0f;
-            marginDp = getResources().getDimension(R.dimen.launcher_panel_margin) / getResources().getDisplayMetrics().density;
+            marginDp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_panel_margin);
             marginPx = DisplayUtils.pxFromDp(getActivity(), marginDp);
             lp.setMargins(0, 0, 0, (int)marginPx);
             mMainViewLeftPanel.setLayoutParams(lp);
@@ -312,15 +356,15 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         }
         lp = (LinearLayout.LayoutParams)mMainViewLayout.getLayoutParams();
 
-        float heightDp = getResources().getDimension(R.dimen.launcher_main_view_margin_top) / getResources().getDisplayMetrics().density;
+        float heightDp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_main_view_margin_top);
         float px = DisplayUtils.pxFromDp(getActivity(), heightDp);
-        float horizontalMarginDp = getResources().getDimension(R.dimen.launcher_main_view_margin_horizontal) / getResources().getDisplayMetrics().density;
+        float horizontalMarginDp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_main_view_margin_horizontal);
         float horizontalMarginPx = DisplayUtils.pxFromDp(getActivity(), horizontalMarginDp);
 
         lp.setMargins((int)horizontalMarginPx, (int)px, (int)horizontalMarginPx, lp.bottomMargin);
         mMainViewLayout.setLayoutParams(lp);
 
-        float dp = getResources().getDimension(R.dimen.launcher_clock_height) / getResources().getDisplayMetrics().density;
+        float dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_clock_height);
         px = DisplayUtils.pxFromDp(getActivity(), dp);
         mTextClock.setTextSize(px);
         mWeatherView.onConfigurationChanged(orientation);

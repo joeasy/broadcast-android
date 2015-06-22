@@ -35,6 +35,8 @@ import com.nbplus.vbroadlauncher.data.ForecastSpaceData;
 import com.nbplus.vbroadlauncher.data.ForecastTimeData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
+import org.basdroid.common.DisplayUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -962,18 +964,53 @@ public class WeatherView extends LinearLayout {
     }
 
     public void onConfigurationChanged(int orientation) {
+        float heightDp;
+        float px;
+
         if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
             mWeatherViewMainLayout.setOrientation(LinearLayout.VERTICAL);
             mThreeDaysLayout.setOrientation(LinearLayout.HORIZONTAL);
             mTodayLayout.setOrientation(LinearLayout.VERTICAL);
             mTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
             mDayAfterTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
+
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)mCurrentSkyBgLayout.getLayoutParams();
+            if (lp != null) {
+                heightDp = DisplayUtils.getDimension(getContext(), R.dimen.weather_current_height);
+                px = DisplayUtils.pxFromDp(getContext(), heightDp);
+                lp.height = (int)px;
+
+                mCurrentSkyBgLayout.setLayoutParams(lp);
+            }
+
+            lp = (LinearLayout.LayoutParams)mThreeDaysLayout.getLayoutParams();
+            if (lp != null) {
+                heightDp = DisplayUtils.getDimension(getContext(), R.dimen.weather_week_height);
+                px = DisplayUtils.pxFromDp(getContext(), heightDp);
+                lp.height = (int)px;
+
+                mThreeDaysLayout.setLayoutParams(lp);
+            }
         } else {
             mWeatherViewMainLayout.setOrientation(LinearLayout.HORIZONTAL);
             mThreeDaysLayout.setOrientation(LinearLayout.VERTICAL);
             mTodayLayout.setOrientation(LinearLayout.HORIZONTAL);
             mTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
             mDayAfterTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)mCurrentSkyBgLayout.getLayoutParams();
+            heightDp = DisplayUtils.getDimension(getContext(), R.dimen.weather_current_height);
+            px = DisplayUtils.pxFromDp(getContext(), heightDp);
+            if (lp != null) {
+                lp.height = (int)px;
+                mCurrentSkyBgLayout.setLayoutParams(lp);
+            }
+
+            lp = (LinearLayout.LayoutParams)mThreeDaysLayout.getLayoutParams();
+            if (lp != null) {
+                lp.height = (int)px;
+                mThreeDaysLayout.setLayoutParams(lp);
+            }
         }
     }
 

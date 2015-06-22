@@ -24,6 +24,6 @@
     <dimen name="weather_week_margin">20dp</dimen>
     <dimen name="weather_week_icon_size">30dp</dimen>
 
-    <dimen name="installed_apps_list_icon_size">45dp</dimen>
+    <dimen name="installed_apps_list_icon_size">55dp</dimen>
     <dimen name="installed_apps_list_font_size">12dp</dimen>
 </resources>

@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Surface;
 
@@ -175,6 +176,15 @@ public class DisplayUtils {
         return new Point(size.x / (metrics.densityDpi / 160), size.y / (metrics.densityDpi / 160));
     }
 
+    public static int getScreenDensity(Context activityContext) {
+        Activity activity = (Activity) activityContext;
+
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+
+        return metrics.densityDpi;
+    }
     public static Point getRealScreenDp(Context activityContext) {
         Point size = DisplayUtils.getScreenSize(activityContext);
         Activity activity = (Activity) activityContext;
@@ -196,12 +206,15 @@ public class DisplayUtils {
     }
 
     public static float dpFromPx(Context context, float px) {
-        return px / context.getResources().getDisplayMetrics().density;
+        return px / (context.getResources().getDisplayMetrics().density/* / DisplayMetrics.DENSITY_DEFAULT*/);
     }
 
+    public static float getDimension(Context context, int dimenId) {
+        return context.getResources().getDimension(dimenId) / context.getResources().getDisplayMetrics().density;
+    }
 
     public static float pxFromDp(Context context, float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 
     public static int getScreenOrientation(Activity activity) {

@@ -20,6 +20,8 @@
     <string name="btn_show_map">Site Map</string>
     <string name="btn_show_apps">Apps</string>
     <string name="alert_calendar_not_found">Can\'t find Calendar Application. Check your application settings?</string>
+    <string name="outdoor_mode_on">외출모드가 활성화 되었습니다.</string>
+    <string name="outdoor_mode_off">외출모드가 비활성화 되었습니다.</string>
 
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">Show Broadcast</string>

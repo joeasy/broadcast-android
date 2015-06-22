@@ -37,6 +37,8 @@ public class LauncherSettings implements Parcelable {
 
     boolean isCompletedSetup;
 
+    boolean isOutdoorMode = false;
+
     // 서버정보
     @SerializedName("svc_domain")
     VBroadcastServer serverInformation;
@@ -80,6 +82,7 @@ public class LauncherSettings implements Parcelable {
     public static final String KEY_VBROADCAST_SERVER_INFO = "key_server_info";
     public static final String KEY_VBROADCAST_SHORTCUT = "key_shortcut";
     public static final String KEY_WALLPAPER_RESOURCE_ID = "key_wallpaper_resource_id";
+    public static final String KEY_VBROADCAST_IS_OUTDOOR_MODE = "key_is_outdoor_mode";
 
     public static int[] landWallpaperResource;
     public static int[] portWallpaperResource;
@@ -100,6 +103,8 @@ public class LauncherSettings implements Parcelable {
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
         int wallpaperId = prefs.getInt(KEY_WALLPAPER_RESOURCE_ID, -1);
+
+        this.isOutdoorMode = prefs.getBoolean(KEY_VBROADCAST_IS_OUTDOOR_MODE, false);
 
         landWallpaperResource = new int[]{ R.drawable.ic_bg_main_land };
         portWallpaperResource = new int[]{ R.drawable.ic_bg_main_port };
@@ -176,6 +181,15 @@ public class LauncherSettings implements Parcelable {
         prefs.edit().putInt(KEY_WALLPAPER_RESOURCE_ID, this.wallpagerResourceId).commit();
     }
 
+    public boolean isOutdoorMode() {
+        return isOutdoorMode;
+    }
+
+    public void setIsOutdoorMode(boolean isOutdoorMode) {
+        this.isOutdoorMode = isOutdoorMode;
+        prefs.edit().putBoolean(KEY_VBROADCAST_IS_OUTDOOR_MODE, this.isOutdoorMode).commit();
+    }
+
     /**
      * 숏컷은 단말에서 유지하기로해서..
      * 미리 고정된 값으로넣는다.
@@ -189,21 +203,6 @@ public class LauncherSettings implements Parcelable {
     }
 
     public void setupLauncherMainShortcuts(Context context) {
-        /**
-        <!--shortcut-->
-        <string name="shortcut_btn_emergency_call">Emergency Call</string>
-        <string name="shortcut_btn_new_broadcast">New Broadcast</string>
-        <string name="shortcut_btn_new_participation">New Participation</string>
-        <string name="shortcut_btn_my_settings">My Settings</string>
-        <string name="shortcut_btn_additional_function">Additional Function</string>
-        <string name="shortcut_btn_radio">Internet Radio</string>
-        <string name="shortcut_addr_emergency_call">/test/test.html</string>
-        <string name="shortcut_addr_new_broadcast">/test/test.html</string>
-        <string name="shortcut_addr_new_participation">/test/test.html</string>
-        <string name="shortcut_addr_my_settings">/test/test.html</string>
-        <string name="shortcut_addr_additional_function">/test/test.html</string>
-        <string name="shortcut_addr_radio">/test/test.html</string>
-        */
         launcherMainShortcuts.clear();
         ShortcutData data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_show_broadcast),

@@ -636,19 +636,19 @@ public class TextClock extends TextView {
         CharSequence timeString = DateFormat.format(mFormat, mTime);
 
         Spannable span = new SpannableString(timeString + "\n" +  dateStr);
-        float sizeDp = getResources().getDimension(R.dimen.launcher_clock_time_font_size) / getResources().getDisplayMetrics().density;
+        float sizeDp = DisplayUtils.getDimension(getContext(), R.dimen.launcher_clock_time_font_size);
         float sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
 
         if (mFormat.equals(mFormat12)) {
             if (Locale.KOREA.toString().equals(locale.toString())) {
                 // 앞쪽에있다.
                 span.setSpan(new AbsoluteSizeSpan((int)sizePx), 3, timeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                sizeDp = getResources().getDimension(R.dimen.launcher_clock_time_ampm_font_size) / getResources().getDisplayMetrics().density;
+                sizeDp = DisplayUtils.getDimension(getContext(), R.dimen.launcher_clock_time_ampm_font_size);
                 sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
                 span.setSpan(new AbsoluteSizeSpan((int)sizePx), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else {
                 span.setSpan(new AbsoluteSizeSpan((int)sizePx), 0, timeString.length() - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                sizeDp = getResources().getDimension(R.dimen.launcher_clock_time_ampm_font_size) / getResources().getDisplayMetrics().density;
+                sizeDp = DisplayUtils.getDimension(getContext(), R.dimen.launcher_clock_time_ampm_font_size);
                 sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
                 span.setSpan(new AbsoluteSizeSpan((int)sizePx), timeString.length() - 2, timeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
@@ -656,7 +656,7 @@ public class TextClock extends TextView {
             span.setSpan(new AbsoluteSizeSpan((int)sizePx), 0, timeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
-        sizeDp = getResources().getDimension(R.dimen.launcher_clock_date_font_size) / getResources().getDisplayMetrics().density;
+        sizeDp = DisplayUtils.getDimension(getContext(), R.dimen.launcher_clock_date_font_size);
         sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
         span.setSpan(new AbsoluteSizeSpan((int)sizePx), timeString.length(), span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         span.setSpan(new ForegroundColorSpan(Color.BLACK), timeString.length(), span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

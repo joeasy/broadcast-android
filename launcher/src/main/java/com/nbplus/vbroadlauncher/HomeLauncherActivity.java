@@ -135,11 +135,16 @@ public class HomeLauncherActivity extends AppCompatActivity
 //            return;
         }
 
-        Point p = DisplayUtils.getScreenDp(this);
+        Point p = DisplayUtils.getScreenSize(this);
+        Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
+        p = DisplayUtils.getScreenDp(this);
         Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
+        int density = DisplayUtils.getScreenDensity(this);
+        Log.d(TAG, "Screen density = " + density);
         // vitamio library load
-        if (!LibsChecker.checkVitamioLibs(this))
+        if (!LibsChecker.checkVitamioLibs(this)) {
             return;
+        }
 
         // set background image
         setContentViewByOrientation();

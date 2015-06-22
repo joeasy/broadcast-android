@@ -20,6 +20,8 @@
     <string name="btn_show_map">사이트맵</string>
     <string name="btn_show_apps">앱스</string>
     <string name="alert_calendar_not_found">캘린더 어플리케이션 실행에 실패했습니다. 어플리케이션 설정이 정상적인지 확인하시기 바랍니다.</string>
+    <string name="outdoor_mode_on">외출모드가 활성화 되었습니다.</string>
+    <string name="outdoor_mode_off">외출모드가 비활성화 되었습니다.</string>
 
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">방송듣기</string>

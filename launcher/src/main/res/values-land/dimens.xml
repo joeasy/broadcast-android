@@ -7,13 +7,8 @@
     <dimen name="launcher_main_view_margin_top">38dp</dimen>
     <dimen name="launcher_main_view_margin_horizontal">115dp</dimen>
     <dimen name="launcher_clock_height">116dp</dimen>
-
     <dimen name="gridview_vertical_cellspacing">0dp</dimen>
     <dimen name="gridview_horizontal_cellspacing">10dp</dimen>
-    <dimen name="launcher_clock_size">70sp</dimen>
-    <dimen name="launcher_shortcut_font_size">25sp</dimen>
-    <dimen name="launcher_shortcut_default_height">150dp</dimen>
-
-    <!-- for calendar -->
-    <dimen name="calendar_tile_size">60dp</dimen>
+    <dimen name="weather_current_height">161dp</dimen>
+    <dimen name="weather_week_height">133dp</dimen>
 </resources>

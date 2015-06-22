@@ -68,7 +68,8 @@
         android:layout_weight="1"
         android:background="@color/white"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/weather_week_margin"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
