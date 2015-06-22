@@ -14,5 +14,7 @@
     <color name="pager_indicator_unselectedColor">#FF888888</color>
     <color name="pager_indicator_selectedColor">#FF880000</color>
     <color name="launcher_top_nav_color">#CC152138</color>
+    <color name="weather_week_font_color">#333333</color>
+    <color name="weather_shadow_color">#c6333333</color>
 
 </resources>

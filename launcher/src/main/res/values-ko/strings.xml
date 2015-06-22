@@ -15,25 +15,31 @@
     <string name="parse_error">Data parse error !! Check it.</string>
     <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
 
-    <!-- main launcher -->
+    <!-- launcher top nav -->
     <string name="btn_outdoor">외출중</string>
     <string name="btn_show_map">사이트맵</string>
     <string name="btn_show_apps">앱스</string>
     <string name="alert_calendar_not_found">캘린더 어플리케이션 실행에 실패했습니다. 어플리케이션 설정이 정상적인지 확인하시기 바랍니다.</string>
 
-    <!--shortcut-->
-    <string name="shortcut_btn_emergency_call">긴급호출 하기</string>
-    <string name="shortcut_btn_new_broadcast">방송제작</string>
-    <string name="shortcut_btn_new_participation">참여마당 제작</string>
-    <string name="shortcut_btn_my_settings">나의정보 관리</string>
+    <!--main shortcut -->
+    <string name="shortcut_btn_show_broadcast">방송듣기</string>
+    <string name="shortcut_btn_call_emergency">긴급호출 하기</string>
+    <string name="shortcut_addr_show_broadcast">/web_test/test.html</string>
+    <string name="shortcut_addr_call_emergency">/is/api/Service/RegistEmergencyCall</string>
+
+    <!--sub shortcut -->
+    <string name="shortcut_btn_radio">라디오듣기</string>
+    <string name="shortcut_btn_participation">참여마당</string>
     <string name="shortcut_btn_additional_function">부가기능</string>
-    <string name="shortcut_btn_radio">인터넷 라디오</string>
-    <string name="shortcut_addr_emergency_call">/is/api/Service/RegistEmergencyCall</string>
-    <string name="shortcut_addr_new_broadcast">/web_test/test.html</string>
-    <string name="shortcut_addr_new_participation">/web_test/test.html</string>
-    <string name="shortcut_addr_my_settings">/web_test/test.html</string>
-    <string name="shortcut_addr_additional_function">/web_test/test.html</string>
+    <string name="shortcut_btn_official_address">관공서 연락처</string>
+    <string name="shortcut_btn_smart_home">스마트홈 서비스</string>
+    <string name="shortcut_btn_my_information">나의 정보관리</string>
     <string name="shortcut_addr_radio">/is/api/Service/GetRadioList</string>
+    <string name="shortcut_addr_participation">/web_test/test.html</string>
+    <string name="shortcut_addr_additional_function">/web_test/test.html</string>
+    <string name="shortcut_addr_official_address">/web_test/test.html</string>
+    <string name="shortcut_addr_smart_home">/web_test/test.html</string>
+    <string name="shortcut_addr_my_information">/web_test/test.html</string>
 
     <string name="weather_title">%1$s 현재날씨</string>
     <string name="celsius">%1$s°C</string>

@@ -113,7 +113,7 @@
 
             <com.nbplus.vbroadlauncher.widget.TextClock
                 android:id="@+id/text_clock"
-                android:layout_weight=".6"
+                android:layout_weight=".7"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -124,9 +124,10 @@
 
             <com.nbplus.vbroadlauncher.widget.WeatherView
                 android:id="@+id/weather_view"
-                android:layout_weight=".4"
+                android:layout_weight=".3"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:layout_marginTop="@dimen/clock_bottom_margin"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -140,6 +141,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <!-- right : service shortcuts... etc -->
+            <android.support.v7.widget.GridLayout
+                xmlns:grid="http://schemas.android.com/apk/res-auto"
+
+                android:id="@+id/main_shortcut_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/launcher_ic_menu_main_shortcut_margin"
+                android:layout_centerHorizontal="true"
+
+                grid:alignmentMode="alignBounds"
+                grid:columnCount="2"
+                grid:rowCount="1"
+                grid:rowOrderPreserved="false"
+                grid:useDefaultMargins="true">
+
+            </android.support.v7.widget.GridLayout>
             <android.support.v7.widget.GridLayout
                 xmlns:grid="http://schemas.android.com/apk/res-auto"
 

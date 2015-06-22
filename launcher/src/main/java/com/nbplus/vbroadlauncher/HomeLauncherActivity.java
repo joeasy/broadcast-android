@@ -135,7 +135,8 @@ public class HomeLauncherActivity extends AppCompatActivity
 //            return;
         }
 
-//        Point p = DisplayUtils.getScreenSize(this);
+        Point p = DisplayUtils.getScreenDp(this);
+        Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this))
             return;

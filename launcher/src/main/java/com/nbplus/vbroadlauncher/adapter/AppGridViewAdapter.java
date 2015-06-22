@@ -24,6 +24,7 @@ public class AppGridViewAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<ApplicationInfo> mAppList;
+    private View.OnClickListener mOnClickListener;
 
     public static class AppViewHolder {
         public ImageView icon;
@@ -31,9 +32,10 @@ public class AppGridViewAdapter extends BaseAdapter {
         public ApplicationInfo appInfo;
     }
 
-    public AppGridViewAdapter(Context context, ArrayList<ApplicationInfo> appList) {
+    public AppGridViewAdapter(Context context, ArrayList<ApplicationInfo> appList, View.OnClickListener listener) {
         this.context = context;
         this.mAppList = appList;
+        this.mOnClickListener = listener;
     }
 
     public void setApplicationList(ArrayList<ApplicationInfo> appList) {
@@ -50,7 +52,7 @@ public class AppGridViewAdapter extends BaseAdapter {
 
         if (convertView == null) {
             // get layout from mobile.xml
-            convertView = inflater.inflate(R.layout.gridview, null);
+            convertView = inflater.inflate(R.layout.apps_grid_view, null);
             viewHolder = new AppViewHolder();
             // set value into textview
             viewHolder.name = (TextView) convertView.findViewById(R.id.grid_item_label);
@@ -74,6 +76,11 @@ public class AppGridViewAdapter extends BaseAdapter {
             viewHolder.appInfo = appInfo;
         } else {
             Log.d(TAG, ">> invalid appInfo...");
+        }
+
+        // 버튼타입으로 했기.. 때문에 ...
+        if (convertView != null) {
+            convertView.setOnClickListener(this.mOnClickListener);
         }
 
         return convertView;

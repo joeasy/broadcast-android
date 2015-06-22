@@ -1,7 +1,6 @@
 package com.nbplus.vbroadlauncher.adapter;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +50,7 @@ public class RadioGridViewAdapter extends BaseAdapter {
 
         if (convertView == null) {
             // get layout from mobile.xml
-            convertView = inflater.inflate(R.layout.gridview, null);
+            convertView = inflater.inflate(R.layout.apps_grid_view, null);
             viewHolder = new RadioViewHolder();
             // set value into textview
             viewHolder.name = (TextView) convertView.findViewById(R.id.grid_item_label);

@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
+              android:id="@+id/weather_view_main_layout"
+              android:orientation="vertical"
+              android:layout_gravity="center"
+              android:gravity="center"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/current_sky_bg"
         android:layout_weight="1"
         android:orientation="vertical"
+        android:layout_gravity="center"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,9 +21,13 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:textColor="@color/white"
-            android:textSize="25dp"
+            android:textSize="@dimen/weather_current_title_font_size"
             android:textAlignment="center"
             android:textStyle="bold"
+            android:shadowColor="@color/weather_shadow_color"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -27,9 +36,13 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:textColor="@color/white"
-            android:textSize="15dp"
+            android:textSize="@dimen/weather_current_skystatus_font_size"
             android:textAlignment="center"
             android:textStyle="bold"
+            android:shadowColor="@color/weather_shadow_color"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -38,10 +51,14 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:textColor="@color/white"
-            android:textSize="35dp"
+            android:textSize="@dimen/weather_current_temp_font_size"
             android:textAlignment="center"
             android:textStyle="bold"
-            android:drawableRight="@drawable/ic_launcher"
+            android:shadowColor="@color/weather_shadow_color"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="2"
+            android:drawableRight="@drawable/ic_weather_01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -49,14 +66,16 @@
     <LinearLayout
         android:id="@+id/ll_three_days"
         android:layout_weight="1"
-        android:orientation="vertical"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/weather_week_margin"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/ll_todays"
             android:layout_weight="1"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -65,29 +84,33 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="25dp"
+                android:textColor="@color/weather_week_font_color"
+                android:textSize="@dimen/weather_week_day_font_size"
                 android:textAlignment="center"
                 android:textStyle="bold"
+                android:text="21일(월)"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <ImageView
                 android:id="@+id/today_sky_status_icon"
+                android:src="@drawable/ic_weather_01"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:scaleType="fitXY"
+                android:layout_width="@dimen/weather_week_icon_size"
+                android:layout_height="@dimen/weather_week_icon_size"/>
 
             <TextView
                 android:id="@+id/today_max_celsius"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="25dp"
+                android:textColor="@color/weather_week_font_color"
+                android:textSize="@dimen/weather_week_temp_font_size"
                 android:textAlignment="center"
                 android:textStyle="bold"
+                android:text="28°C"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -95,7 +118,7 @@
         <LinearLayout
             android:id="@+id/ll_tomorrow"
             android:layout_weight="1"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -104,36 +127,40 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="25dp"
+                android:textColor="@color/weather_week_font_color"
+                android:textSize="@dimen/weather_week_day_font_size"
                 android:textAlignment="center"
                 android:textStyle="bold"
+                android:text="21일(월)"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <ImageView
                 android:id="@+id/tomorrow_sky_status_icon"
+                android:src="@drawable/ic_weather_01"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:scaleType="fitXY"
+                android:layout_width="@dimen/weather_week_icon_size"
+                android:layout_height="@dimen/weather_week_icon_size"/>
 
             <TextView
                 android:id="@+id/tomorrow_max_celsius"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="25dp"
+                android:textColor="@color/weather_week_font_color"
+                android:textSize="@dimen/weather_week_temp_font_size"
                 android:textAlignment="center"
                 android:textStyle="bold"
+                android:text="28°C"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_day_after_tomorrow"
             android:layout_weight="1"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -142,29 +169,33 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="25dp"
+                android:textColor="@color/weather_week_font_color"
+                android:textSize="@dimen/weather_week_day_font_size"
                 android:textAlignment="center"
                 android:textStyle="bold"
+                android:text="21일(월)"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <ImageView
                 android:id="@+id/day_after_tomorrow_sky_status_icon"
+                android:src="@drawable/ic_weather_01"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:scaleType="fitXY"
+                android:layout_width="@dimen/weather_week_icon_size"
+                android:layout_height="@dimen/weather_week_icon_size"/>
 
             <TextView
                 android:id="@+id/day_after_tomorrow_max_celsius"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="25dp"
+                android:textColor="@color/weather_week_font_color"
+                android:textSize="@dimen/weather_week_temp_font_size"
                 android:textAlignment="center"
                 android:textStyle="bold"
+                android:text="28°C"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

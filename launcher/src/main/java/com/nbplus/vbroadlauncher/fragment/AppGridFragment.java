@@ -30,7 +30,8 @@ import java.util.ArrayList;
  * Use the {@link AppGridFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AppGridFragment extends Fragment implements AdapterView.OnItemClickListener, OnActivityInteractionListener {
+public class AppGridFragment extends Fragment implements AdapterView.OnItemClickListener,
+        OnActivityInteractionListener, View.OnClickListener {
 
     private static final String TAG = AppGridFragment.class.getSimpleName();
 
@@ -96,7 +97,7 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
          * 제대로 되지 않는듯하다.
          */
         //if (mAdapter == null) {
-            mAdapter = new AppGridViewAdapter(getActivity(), mAppsList);
+            mAdapter = new AppGridViewAdapter(getActivity(), mAppsList, this);
             mGridLayout.setAdapter(mAdapter);
             mGridLayout.setOnItemClickListener(this);
         //} else {
@@ -125,14 +126,6 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        AppGridViewAdapter.AppViewHolder viewHolder = (AppGridViewAdapter.AppViewHolder)view.getTag();
-
-        String packageName = viewHolder.appInfo.packageName;
-        Intent startIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
-
-        if(startIntent != null){
-            startActivity(startIntent);
-        }
     }
 
     /**
@@ -158,6 +151,18 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
         Log.d(TAG, "onDataChanged() update grid layout");
         if (mCreated) {
             updateGridLayout();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        AppGridViewAdapter.AppViewHolder viewHolder = (AppGridViewAdapter.AppViewHolder)view.getTag();
+
+        String packageName = viewHolder.appInfo.packageName;
+        Intent startIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
+
+        if(startIntent != null){
+            startActivity(startIntent);
         }
     }
 }

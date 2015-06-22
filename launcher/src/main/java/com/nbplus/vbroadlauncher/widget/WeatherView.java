@@ -70,6 +70,7 @@ public class WeatherView extends LinearLayout {
     private int mForecastGribRetry = 0;
 
     // layout
+    private LinearLayout mWeatherViewMainLayout;
     private LinearLayout mThreeDaysLayout;
     private LinearLayout mTodayLayout;
     private LinearLayout mTomorrowLayout;
@@ -79,6 +80,7 @@ public class WeatherView extends LinearLayout {
      * weather views
      */
     // current
+    private LinearLayout mCurrentSkyBgLayout;
     private TextView mCurrentTitle;
     private TextView mCurrentCelsius;
     private TextView mCurrentSkyStatus;
@@ -159,6 +161,7 @@ public class WeatherView extends LinearLayout {
         View v = li.inflate(R.layout.weather_view, this, false);
         addView(v);
 
+        mWeatherViewMainLayout = (LinearLayout) v.findViewById(R.id.weather_view_main_layout);
         mThreeDaysLayout = (LinearLayout) v.findViewById(R.id.ll_three_days);
         mTodayLayout = (LinearLayout) v.findViewById(R.id.ll_todays);
         mTomorrowLayout = (LinearLayout) v.findViewById(R.id.ll_tomorrow);
@@ -168,6 +171,7 @@ public class WeatherView extends LinearLayout {
          * weather views
          */
         // current
+        mCurrentSkyBgLayout = (LinearLayout) v.findViewById(R.id.current_sky_bg);
         mCurrentTitle = (TextView) v.findViewById(R.id.village_name);
         mCurrentTitle.setText(getContext().getString(R.string.weather_title,
                 LauncherSettings.getInstance(getContext()).getVillageName()));
@@ -828,7 +832,9 @@ public class WeatherView extends LinearLayout {
                 mCurrentCelsius.setTag(item);
                 mCurrentCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
                 TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
+                TypedArray skyStatusBgDrawable = getResources().obtainTypedArray(R.array.sky_status_bg_drawable);
                 mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue - 1, 0), 0);
+                mCurrentSkyBgLayout.setBackgroundResource(skyStatusBgDrawable.getResourceId(skyStatusValue - 1, 0));
             }
         }
     }
@@ -957,15 +963,17 @@ public class WeatherView extends LinearLayout {
 
     public void onConfigurationChanged(int orientation) {
         if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
-            mThreeDaysLayout.setOrientation(LinearLayout.VERTICAL);
-            mTodayLayout.setOrientation(LinearLayout.HORIZONTAL);
-            mTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
-            mDayAfterTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
-        } else {
+            mWeatherViewMainLayout.setOrientation(LinearLayout.VERTICAL);
             mThreeDaysLayout.setOrientation(LinearLayout.HORIZONTAL);
             mTodayLayout.setOrientation(LinearLayout.VERTICAL);
             mTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
             mDayAfterTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
+        } else {
+            mWeatherViewMainLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mThreeDaysLayout.setOrientation(LinearLayout.VERTICAL);
+            mTodayLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mDayAfterTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
         }
     }
 

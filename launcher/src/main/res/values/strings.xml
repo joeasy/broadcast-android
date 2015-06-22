@@ -15,25 +15,31 @@
     <string name="parse_error">Data parse error !! Check it.</string>
     <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
 
-    <!-- main launcher -->
+    <!-- main top nav launcher -->
     <string name="btn_outdoor">Out-Door</string>
     <string name="btn_show_map">Site Map</string>
     <string name="btn_show_apps">Apps</string>
     <string name="alert_calendar_not_found">Can\'t find Calendar Application. Check your application settings?</string>
 
-    <!--shortcut-->
-    <string name="shortcut_btn_emergency_call">Emergency Call</string>
-    <string name="shortcut_btn_new_broadcast">New Broadcast</string>
-    <string name="shortcut_btn_new_participation">New Participation</string>
-    <string name="shortcut_btn_my_settings">My Settings</string>
-    <string name="shortcut_btn_additional_function">Additional Function</string>
+    <!--main shortcut -->
+    <string name="shortcut_btn_show_broadcast">Show Broadcast</string>
+    <string name="shortcut_btn_call_emergency">Emergency Call</string>
+    <string name="shortcut_addr_show_broadcast">/web_test/test.html</string>
+    <string name="shortcut_addr_call_emergency">/is/api/Service/RegistEmergencyCall</string>
+
+    <!--sub shortcut -->
     <string name="shortcut_btn_radio">Internet Radio</string>
-    <string name="shortcut_addr_emergency_call">/is/api/Service/RegistEmergencyCall</string>
-    <string name="shortcut_addr_new_broadcast">/web_test/test.html</string>
-    <string name="shortcut_addr_new_participation">/web_test/test.html</string>
-    <string name="shortcut_addr_my_settings">/web_test/test.html</string>
-    <string name="shortcut_addr_additional_function">/web_test/test.html</string>
+    <string name="shortcut_btn_participation">Participation</string>
+    <string name="shortcut_btn_additional_function">Additional Function</string>
+    <string name="shortcut_btn_official_address">Official Addressbook</string>
+    <string name="shortcut_btn_smart_home">Smart Home</string>
+    <string name="shortcut_btn_my_information">My Information</string>
     <string name="shortcut_addr_radio">/is/api/Service/GetRadioList</string>
+    <string name="shortcut_addr_participation">/web_test/test.html</string>
+    <string name="shortcut_addr_additional_function">/web_test/test.html</string>
+    <string name="shortcut_addr_official_address">/web_test/test.html</string>
+    <string name="shortcut_addr_smart_home">/web_test/test.html</string>
+    <string name="shortcut_addr_my_information">/web_test/test.html</string>
 
     <string name="weather_title">%1$s 현재날씨</string>
     <string name="celsius">%1$s°C</string>

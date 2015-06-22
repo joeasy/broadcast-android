@@ -165,7 +165,18 @@ public class DisplayUtils {
      * @return Point
      */
     public static Point getScreenDp(Context activityContext) {
-        Point size = DisplayUtils.getRealScreenSize(activityContext);
+        Point size = DisplayUtils.getScreenSize(activityContext);
+        Activity activity = (Activity) activityContext;
+
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+
+        return new Point(size.x / (metrics.densityDpi / 160), size.y / (metrics.densityDpi / 160));
+    }
+
+    public static Point getRealScreenDp(Context activityContext) {
+        Point size = DisplayUtils.getScreenSize(activityContext);
         Activity activity = (Activity) activityContext;
 
         Display display = activity.getWindowManager().getDefaultDisplay();

@@ -4,14 +4,14 @@
               android:layout_height="wrap_content"
               android:orientation="vertical"
               style="@android:style/Widget.Button"
-              android:focusable="true"
-              android:focusableInTouchMode="true"
+              android:clickable="true"
+              android:background="@drawable/ic_apps_grid_selector"
               android:padding="5dp" >
 
     <ImageView
         android:id="@+id/grid_item_image"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="@dimen/installed_apps_list_icon_size"
+        android:layout_height="@dimen/installed_apps_list_icon_size"
         android:layout_margin="5dp"
         android:scaleType="fitXY"
         android:layout_gravity="center"
@@ -28,7 +28,7 @@
         android:lines="2"
         android:gravity="center"
         android:layout_gravity="center"
-        android:textSize="12dp" >
+        android:textSize="@dimen/installed_apps_list_font_size" >
     </TextView>
 
 </LinearLayout>
