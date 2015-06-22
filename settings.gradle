@@ -1,2 +1,2 @@
-include ':launcher', ':push_agent', ':media_player', ':common_library', ':iot_gateway', ':calendar_library', ':vbroadlistener', ':vitamio', ':randommusic'
+include ':launcher', ':push_agent', ':media_player', ':common_library', ':iot_gateway', ':calendar_library', ':vbroadlistener', ':vitamio'
 include ':viewpager_indicator'
