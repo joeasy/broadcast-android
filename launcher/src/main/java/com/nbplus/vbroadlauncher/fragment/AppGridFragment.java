@@ -160,9 +160,4 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
             updateGridLayout();
         }
     }
-
-    @Override
-    public void onLocationDataChanged(Location location) {
-
-    }
 }

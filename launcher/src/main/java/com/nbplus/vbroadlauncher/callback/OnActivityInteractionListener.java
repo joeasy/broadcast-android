@@ -9,6 +9,4 @@ import android.location.Location;
 public interface OnActivityInteractionListener {
     public void onBackPressed();
     public void onDataChanged();
-    // TODO : remove later. for test...
-    public void onLocationDataChanged(Location location);
 }

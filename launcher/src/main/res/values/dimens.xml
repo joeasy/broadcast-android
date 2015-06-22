@@ -1,21 +1,12 @@
 <resources>
-    <!-- Example customization of dimensions originally defined in res/values/dimens.xml
-         (such as screen margins) for screens with more than 820dp of available width. This
-         would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively). -->
-    <dimen name="launcher_top_layer_height">64dp</dimen>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
-    <dimen name="launcher_top_layer_margin">10dp</dimen>
-    <dimen name="launcher_village_name">30dp</dimen>
-    <dimen name="gridview_vertical_cellspacing">0dp</dimen>
-    <dimen name="gridview_horizontal_cellspacing">10dp</dimen>
-    <dimen name="launcher_clock_size">70sp</dimen>
-    <dimen name="launcher_shortcut_font_size">25sp</dimen>
-    <dimen name="launcher_shortcut_default_height">150dp</dimen>
-
-    <!-- for calendar -->
-    <dimen name="calendar_tile_size">60dp</dimen>
-
+    <!-- 공통 -->
+    <dimen name="launcher_top_nav_title_font_size">18dp</dimen>
+    <dimen name="launcher_top_nav_menu_font_size">15dp</dimen>
+    <dimen name="ic_nav_btn_drawable_padding">4dp</dimen>
+    <dimen name="launcher_clock_time_font_size">80dp</dimen>
+    <dimen name="launcher_clock_time_ampm_font_size">35dp</dimen>
+    <dimen name="launcher_clock_date_font_size">22dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_size">134dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_font_size">16dp</dimen>
+    <dimen name="launcher_panel_margin">52dp</dimen>
 </resources>

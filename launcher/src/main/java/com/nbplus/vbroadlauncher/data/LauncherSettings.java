@@ -14,6 +14,7 @@ import com.nbplus.vbroadlauncher.R;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by basagee on 2015. 5. 18..
@@ -35,8 +36,6 @@ public class LauncherSettings implements Parcelable {
     boolean isExclusive;
 
     boolean isCompletedSetup;
-
-    int wallpagerResource;
 
     // 서버정보
     @SerializedName("svc_domain")
@@ -77,6 +76,11 @@ public class LauncherSettings implements Parcelable {
     public static final String KEY_VBROADCAST_DEVICE_ID = "key_device_id";
     public static final String KEY_VBROADCAST_SERVER_INFO = "key_server_info";
     public static final String KEY_VBROADCAST_SHORTCUT = "key_shortcut";
+    public static final String KEY_WALLPAPER_RESOURCE_ID = "key_wallpaper_resource_id";
+
+    public static int[] landWallpaperResource;
+    public static int[] portWallpaperResource;
+    private int wallpagerResourceId = -1;
 
     private Context context;
     private SharedPreferences prefs;
@@ -92,6 +96,19 @@ public class LauncherSettings implements Parcelable {
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
+        int wallpaperId = prefs.getInt(KEY_WALLPAPER_RESOURCE_ID, -1);
+
+        landWallpaperResource = new int[]{ R.drawable.ic_bg_main_land };
+        portWallpaperResource = new int[]{ R.drawable.ic_bg_main_port };
+
+        if (wallpaperId <= 0) {
+            Random oRandom = new Random();
+            wallpaperId = oRandom.nextInt(landWallpaperResource.length);
+
+            setWallpagerResourceId(wallpaperId);
+        } else {
+            this.wallpagerResourceId = wallpaperId;
+        }
 
         /**
          * 숏컷은 단말에서 유지하기로해서..
@@ -146,12 +163,13 @@ public class LauncherSettings implements Parcelable {
         this.registerAddress = registerAddress;
     }
 
-    public int getWallpagerResource() {
-        return wallpagerResource;
+    public int getWallpagerResourceId() {
+        return wallpagerResourceId;
     }
 
-    public void setWallpagerResource(int wallpagerResource) {
-        this.wallpagerResource = wallpagerResource;
+    public void setWallpagerResourceId(int resourceId) {
+        this.wallpagerResourceId = resourceId;
+        prefs.edit().putInt(KEY_WALLPAPER_RESOURCE_ID, this.wallpagerResourceId).commit();
     }
 
     /**
@@ -182,38 +200,38 @@ public class LauncherSettings implements Parcelable {
         ShortcutData data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_emergency_call),
                 context.getResources().getString(R.string.shortcut_addr_emergency_call),
-                R.drawable.ic_launcher,
-                R.drawable.launcher_shortcut_background_blue);
+                R.drawable.ic_menu_03,
+                R.drawable.ic_menu_shortcut_01_selector);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_new_broadcast),
                 context.getResources().getString(R.string.shortcut_addr_new_broadcast),
-                R.drawable.ic_launcher,
-                R.drawable.launcher_shortcut_background_black);
+                R.drawable.ic_menu_04,
+                R.drawable.ic_menu_shortcut_02_selector);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_new_participation),
                 context.getResources().getString(R.string.shortcut_addr_new_participation),
-                R.drawable.ic_launcher,
-                R.drawable.launcher_shortcut_background_blue);
+                R.drawable.ic_menu_05,
+                R.drawable.ic_menu_shortcut_03_selector);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_my_settings),
                 context.getResources().getString(R.string.shortcut_addr_my_settings),
-                R.drawable.ic_launcher,
-                R.drawable.launcher_shortcut_background_black);
+                R.drawable.ic_menu_06,
+                R.drawable.ic_menu_shortcut_04_selector);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_additional_function),
                 context.getResources().getString(R.string.shortcut_addr_additional_function),
-                R.drawable.ic_launcher,
-                R.drawable.launcher_shortcut_background_blue);
+                R.drawable.ic_menu_07,
+                R.drawable.ic_menu_shortcut_05_selector);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_NATIVE_INTERFACE,
                 context.getResources().getString(R.string.shortcut_btn_radio),
                 context.getResources().getString(R.string.shortcut_addr_radio),
-                R.drawable.ic_launcher,
-                R.drawable.launcher_shortcut_background_black);
+                R.drawable.ic_menu_08,
+                R.drawable.ic_menu_shortcut_06_selector);
         launcherShortcuts.add(data);
     }
 
@@ -304,7 +322,7 @@ public class LauncherSettings implements Parcelable {
         dest.writeString(this.villageName);
         dest.writeByte(isExclusive ? (byte) 1 : (byte) 0);
         dest.writeByte(isCompletedSetup ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.wallpagerResource);
+        dest.writeInt(this.wallpagerResourceId);
         dest.writeParcelable(this.serverInformation, 0);
         dest.writeSerializable(this.launcherShortcuts);
         dest.writeString(this.registerAddress);
@@ -317,7 +335,7 @@ public class LauncherSettings implements Parcelable {
         this.villageName = in.readString();
         this.isExclusive = in.readByte() != 0;
         this.isCompletedSetup = in.readByte() != 0;
-        this.wallpagerResource = in.readInt();
+        this.wallpagerResourceId = in.readInt();
         this.serverInformation = in.readParcelable(VBroadcastServer.class.getClassLoader());
         this.launcherShortcuts = (ArrayList<ShortcutData>) in.readSerializable();
         this.registerAddress = in.readString();

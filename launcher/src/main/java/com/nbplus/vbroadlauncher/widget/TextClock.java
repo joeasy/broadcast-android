@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.database.ContentObserver;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import android.text.SpannableString;
 import android.text.format.DateFormat;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,6 +43,8 @@ import android.widget.TextView;
 
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.Constants;
+
+import org.basdroid.common.DisplayUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -622,16 +626,40 @@ public class TextClock extends TextView {
         Locale locale = getContext().getResources().getConfiguration().locale;
         SimpleDateFormat sdf;
         if (Locale.KOREA.toString().equals(locale.toString())) {
-            sdf = new SimpleDateFormat("yyyy년 MM월 dd일 E요일");
+            sdf = new SimpleDateFormat("MM월 dd일 E요일");
         } else {
-            sdf = new SimpleDateFormat("EEE, MMM d, ''yy");
+            sdf = new SimpleDateFormat("EEE, MMM dd");
         }
         Date date = new Date(currTimems);
         String dateStr = sdf.format(date);
 
         CharSequence timeString = DateFormat.format(mFormat, mTime);
+
         Spannable span = new SpannableString(timeString + "\n" +  dateStr);
-        span.setSpan(new RelativeSizeSpan(0.35f), timeString.length(), span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        float sizeDp = getResources().getDimension(R.dimen.launcher_clock_time_font_size) / getResources().getDisplayMetrics().density;
+        float sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
+
+        if (mFormat.equals(mFormat12)) {
+            if (Locale.KOREA.toString().equals(locale.toString())) {
+                // 앞쪽에있다.
+                span.setSpan(new AbsoluteSizeSpan((int)sizePx), 3, timeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sizeDp = getResources().getDimension(R.dimen.launcher_clock_time_ampm_font_size) / getResources().getDisplayMetrics().density;
+                sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
+                span.setSpan(new AbsoluteSizeSpan((int)sizePx), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                span.setSpan(new AbsoluteSizeSpan((int)sizePx), 0, timeString.length() - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sizeDp = getResources().getDimension(R.dimen.launcher_clock_time_ampm_font_size) / getResources().getDisplayMetrics().density;
+                sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
+                span.setSpan(new AbsoluteSizeSpan((int)sizePx), timeString.length() - 2, timeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        } else {
+            span.setSpan(new AbsoluteSizeSpan((int)sizePx), 0, timeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        sizeDp = getResources().getDimension(R.dimen.launcher_clock_date_font_size) / getResources().getDisplayMetrics().density;
+        sizePx = DisplayUtils.pxFromDp(getContext(), sizeDp);
+        span.setSpan(new AbsoluteSizeSpan((int)sizePx), timeString.length(), span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span.setSpan(new ForegroundColorSpan(Color.BLACK), timeString.length(), span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         span.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
                             0, span.length(),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

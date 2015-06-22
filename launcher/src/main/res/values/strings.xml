@@ -16,8 +16,9 @@
     <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
 
     <!-- main launcher -->
-    <string name="btn_show_map">Service Map</string>
-    <string name="btn_show_apps">Applications</string>
+    <string name="btn_outdoor">Out-Door</string>
+    <string name="btn_show_map">Site Map</string>
+    <string name="btn_show_apps">Apps</string>
     <string name="alert_calendar_not_found">Can\'t find Calendar Application. Check your application settings?</string>
 
     <!--shortcut-->

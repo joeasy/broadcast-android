@@ -5,6 +5,7 @@ package com.nbplus.vbroadlauncher;
  */
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +24,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -52,6 +54,8 @@ import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.StringUtils;
 
+import io.vov.vitamio.LibsChecker;
+
 
 public class HomeLauncherActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -72,6 +76,7 @@ public class HomeLauncherActivity extends AppCompatActivity
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
     protected Location mLastLocation;
+
     /**
      * The formatted location address.
      */
@@ -118,31 +123,25 @@ public class HomeLauncherActivity extends AppCompatActivity
         } else {
             //is phone
             Log.d("Device", "Phone");
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            alert.setMessage(R.string.alert_phone_message);
-            alert.show();
-            return;
+//            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    finish();
+//                }
+//            });
+//            alert.setMessage(R.string.alert_phone_message);
+//            alert.show();
+//            return;
         }
 
 //        Point p = DisplayUtils.getScreenSize(this);
-        int mForecastSpaceDataRetry = 0;
-        int mForecastSpaceDataRequestPage = 1;
+        // vitamio library load
+        if (!LibsChecker.checkVitamioLibs(this))
+            return;
 
         // set background image
-        View mainLayout = findViewById(R.id.main_layout);
-        int wallpagerResource = LauncherSettings.getInstance(this).getWallpagerResource();
-        if (wallpagerResource <= 0) {
-            getWindow().setBackgroundDrawableResource(R.drawable.wallpaper);
-        } else {
-            getWindow().setBackgroundDrawableResource(wallpagerResource);
-        }
-
+        setContentViewByOrientation();
         if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
             Location defaultLocation = new Location("stub");
 
@@ -380,11 +379,6 @@ public class HomeLauncherActivity extends AppCompatActivity
                 Intent intent=new Intent(Constants.LOCATION_CHANGED_ACTION);
                 sendBroadcast(intent);
             }
-
-            // TODO : remove later
-            if (this.mActivityInteractionListener != null) {
-                this.mActivityInteractionListener.onLocationDataChanged(location);
-            }
         } else {
             Log.d(TAG, ">>> onLocationChanged().. but location is null");
         }
@@ -568,4 +562,19 @@ public class HomeLauncherActivity extends AppCompatActivity
         Log.d(TAG, "onFragmentInteraction()");
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setContentViewByOrientation();
+    }
+
+    private void setContentViewByOrientation() {
+        int wallpagerResourceId = LauncherSettings.getInstance(this).getWallpagerResourceId();
+        int orientation = DisplayUtils.getScreenOrientation(this);
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+            getWindow().setBackgroundDrawableResource(LauncherSettings.landWallpaperResource[wallpagerResourceId]);
+        } else {
+            getWindow().setBackgroundDrawableResource(LauncherSettings.portWallpaperResource[wallpagerResourceId]);
+        }
+    }
 }

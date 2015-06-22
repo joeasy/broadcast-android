@@ -122,10 +122,4 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
     public void onDataChanged() {
 
     }
-
-    @Override
-    public void onLocationDataChanged(Location location) {
-
-    }
-
 }

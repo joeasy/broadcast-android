@@ -1,0 +1,161 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical"
+             tools:context="com.nbplus.vbroadlauncher.fragment.LauncherFragment">
+
+    <!-- top navigation layer -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="@color/launcher_top_nav_color"
+        android:paddingLeft="@dimen/launcher_top_nav_padding_horizontal"
+        android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        android:layout_height="@dimen/launcher_top_nav_height">
+        <ImageView
+            android:id="@+id/ic_nav_wifi"
+            android:src="@drawable/ic_nav_wifi_on"
+            android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/launcher_village_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/launcher_top_nav_title_font_size"
+            android:textStyle="bold|normal"
+            android:lines="1"
+            android:ellipsize="end"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            />
+
+        <ImageView
+            android:src="@drawable/ic_nav_line"
+            android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btn_outdoor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/btn_outdoor"
+            android:textColor="@color/btn_color_absentia_off"
+            android:textAllCaps="false"
+            android:textSize="@dimen/launcher_top_nav_menu_font_size"
+            android:background="@android:color/transparent"
+            android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+            android:drawableLeft="@drawable/ic_nav_absentia_off"
+            android:drawablePadding="@dimen/ic_nav_btn_drawable_padding"/>
+
+        <ImageView
+            android:src="@drawable/ic_nav_line"
+            android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btn_show_apps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/btn_show_apps"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:textSize="@dimen/launcher_top_nav_menu_font_size"
+            android:background="@android:color/transparent"
+            android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+            android:drawableLeft="@drawable/ic_nav_apps"
+            android:drawablePadding="@dimen/ic_nav_btn_drawable_padding"/>
+
+        <ImageView
+            android:src="@drawable/ic_nav_line"
+            android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btn_show_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/btn_show_map"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:textSize="@dimen/launcher_top_nav_menu_font_size"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/ic_nav_sitemap"
+            android:drawablePadding="@dimen/ic_nav_btn_drawable_padding"/>
+    </LinearLayout>
+
+    <!-- launcher main layer -->
+    <LinearLayout
+        android:id="@+id/main_view_layout"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/launcher_main_view_margin_top"
+        android:layout_marginLeft="@dimen/launcher_main_view_margin_horizontal"
+        android:layout_marginRight="@dimen/launcher_main_view_margin_horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <!-- left : clock, weather and calendar etc -->
+        <LinearLayout
+            android:id="@+id/main_view_left_panel"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.nbplus.vbroadlauncher.widget.TextClock
+                android:id="@+id/text_clock"
+                android:layout_weight=".6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@color/launcher_clock_time"
+                />
+
+            <com.nbplus.vbroadlauncher.widget.WeatherView
+                android:id="@+id/weather_view"
+                android:layout_weight=".4"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/main_view_right_panel"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- right : service shortcuts... etc -->
+            <android.support.v7.widget.GridLayout
+                xmlns:grid="http://schemas.android.com/apk/res-auto"
+
+                android:id="@+id/shortcut_grid"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+
+                grid:alignmentMode="alignBounds"
+                grid:columnCount="3"
+                grid:rowOrderPreserved="false"
+                grid:useDefaultMargins="true">
+
+            </android.support.v7.widget.GridLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
