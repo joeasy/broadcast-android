@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -23,8 +24,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +49,7 @@ import com.nbplus.vbroadlauncher.widget.YahooWeatherView;
 
 import org.basdroid.common.DisplayUtils;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -213,7 +217,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
              * right shortcut panel
              */
             ShortcutData data = mainShortcutDatas.get(i);
-            LinearLayout btnLayout = (LinearLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mMainShortcutGridLayout, false);//new Button(getActivity());
+            FrameLayout btnLayout = (FrameLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mMainShortcutGridLayout, false);//new Button(getActivity());
             mMainShortcutGridLayout.addView(btnLayout);
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
@@ -259,7 +263,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
              * right shortcut panel
              */
             ShortcutData data = shortcutDatas.get(i);
-            LinearLayout btnLayout = (LinearLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mShorcutGridLayout, false);//new Button(getActivity());
+            FrameLayout btnLayout = (FrameLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mShorcutGridLayout, false);//new Button(getActivity());
             mShorcutGridLayout.addView(btnLayout);
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
@@ -371,7 +375,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     }
 
     /**
-     * when click right panel shortcut button ...
+     * when click right panel shortcdddut button ...
      * @param view
      */
     @Override
@@ -382,24 +386,53 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         Log.d(TAG, ">>> Clicked = " + data.getName());
         Log.d(TAG, ">>> Open URL = " + serverData.getDocServer() + data.getPath());
 
+        Intent intent;
+
         switch (data.getType()) {
             case Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER:
                 data.setDomain(serverData.getApiServer());
                 break;
             case Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER:
-                Intent intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
+                intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
                 data.setDomain(serverData.getDocServer());
                 intent.putExtra(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
                 startActivity(intent);
                 break;
             case Constants.SHORTCUT_TYPE_NATIVE_INTERFACE:
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                RadioDialogFragment dialogFragment = new RadioDialogFragment();
-                Bundle bundle = new Bundle();
-                data.setDomain(serverData.getDocServer());
-                bundle.putParcelable(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
-                dialogFragment.setArguments(bundle);
-                dialogFragment.show(fm, "fragment_dialog_radio");
+                switch (data.getNativeType()) {
+                    case 0 :            // activity
+                        intent = new Intent(getActivity(), data.getNativeClass());
+                        data.setDomain(serverData.getDocServer());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
+                        startActivity(intent);
+                        break;
+                    case 1 :            // fragment
+                        break;
+                    case 2 :            // dialog fragment
+                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                        //no paramater
+                        //Class noparams[] = {};
+                        //String parameter
+                        Class[] param = new Class[1];
+                        param[0] = ShortcutData.class;
+                        DialogFragment fragment = null;
+
+                        try {
+                            Object obj =  data.getNativeClass().newInstance();
+                            Method method = data.getNativeClass().getDeclaredMethod("newInstance", param);
+
+                            data.setDomain(serverData.getDocServer());
+                            fragment = (DialogFragment)method.invoke(obj, data);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if (fragment != null) {
+                            fragment.show(fm, "fragment_dialog_radio");
+                        }
+                        break;
+                }
                 break;
             default:
                 Log.d(TAG, "Unknown shortcut type !!!");

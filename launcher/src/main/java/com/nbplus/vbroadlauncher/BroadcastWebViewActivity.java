@@ -1,6 +1,7 @@
 package com.nbplus.vbroadlauncher;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,8 @@ import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
+
+import org.basdroid.common.DisplayUtils;
 
 
 /**
@@ -50,6 +53,7 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
                 mWebViewClient.loadUrl(url);
             }
         });
+        setContentViewByOrientation();
     }
 
     /**
@@ -103,6 +107,16 @@ public class BroadcastWebViewActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "BroadcastWebViewActivity onConfigurationChanged()");
+        setContentViewByOrientation();
     }
 
+    private void setContentViewByOrientation() {
+        int wallpagerResourceId = LauncherSettings.getInstance(this).getWallpagerResourceId();
+        int orientation = DisplayUtils.getScreenOrientation(this);
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+            mWebViewClient.setBackgroundResource(LauncherSettings.landWallpaperResource[wallpagerResourceId]);
+        } else {
+            mWebViewClient.setBackgroundResource(LauncherSettings.portWallpaperResource[wallpagerResourceId]);
+        }
+    }
 }

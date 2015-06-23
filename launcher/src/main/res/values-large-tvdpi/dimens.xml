@@ -26,4 +26,13 @@
 
     <dimen name="installed_apps_list_icon_size">50dp</dimen>
     <dimen name="installed_apps_list_font_size">11.25dp</dimen>
+
+    <!-- radio activity -->
+    <dimen name="radio_activity_width">601.875dp</dimen>
+    <dimen name="radio_activity_height">271.875dp</dimen>
+    <dimen name="radio_activity_padding">15dp</dimen>
+    <dimen name="radio_view_horizontal_padding">20.625dp</dimen>
+    <dimen name="radio_view_title_vertical_padding">9.375dp</dimen>
+    <dimen name="radio_grid_vertical_margin">18.75dp</dimen>
+    <dimen name="radio_indicator_bottom_margin">20.625dp</dimen>
 </resources>

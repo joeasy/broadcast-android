@@ -11,6 +11,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlauncher.R;
+import com.nbplus.vbroadlauncher.RadioActivity;
+import com.nbplus.vbroadlauncher.fragment.RadioDialogFragment;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -208,13 +210,17 @@ public class LauncherSettings implements Parcelable {
                 context.getResources().getString(R.string.shortcut_btn_show_broadcast),
                 context.getResources().getString(R.string.shortcut_addr_show_broadcast),
                 R.drawable.ic_menu_01,
-                R.drawable.ic_menu_main_01_selector);
+                R.drawable.ic_menu_main_01_selector,
+                0,
+                null);
         launcherMainShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_call_emergency),
                 context.getResources().getString(R.string.shortcut_addr_call_emergency),
                 R.drawable.ic_menu_02,
-                R.drawable.ic_menu_main_02_selector);
+                R.drawable.ic_menu_main_02_selector,
+                0,
+                null);
         launcherMainShortcuts.add(data);
     }
 
@@ -224,37 +230,49 @@ public class LauncherSettings implements Parcelable {
                 context.getResources().getString(R.string.shortcut_btn_radio),
                 context.getResources().getString(R.string.shortcut_addr_radio),
                 R.drawable.ic_menu_03,
-                R.drawable.ic_menu_shortcut_01_selector);
+                R.drawable.ic_menu_shortcut_01_selector,
+                0,
+                RadioActivity.class);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_participation),
                 context.getResources().getString(R.string.shortcut_addr_participation),
                 R.drawable.ic_menu_04,
-                R.drawable.ic_menu_shortcut_02_selector);
+                R.drawable.ic_menu_shortcut_02_selector,
+                0,
+                null);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_additional_function),
                 context.getResources().getString(R.string.shortcut_addr_additional_function),
                 R.drawable.ic_menu_05,
-                R.drawable.ic_menu_shortcut_03_selector);
+                R.drawable.ic_menu_shortcut_03_selector,
+                0,
+                null);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_official_address),
                 context.getResources().getString(R.string.shortcut_addr_official_address),
                 R.drawable.ic_menu_06,
-                R.drawable.ic_menu_shortcut_04_selector);
+                R.drawable.ic_menu_shortcut_04_selector,
+                0,
+                null);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_smart_home),
                 context.getResources().getString(R.string.shortcut_addr_smart_home),
                 R.drawable.ic_menu_07,
-                R.drawable.ic_menu_shortcut_05_selector);
+                R.drawable.ic_menu_shortcut_05_selector,
+                0,
+                null);
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 context.getResources().getString(R.string.shortcut_btn_my_information),
                 context.getResources().getString(R.string.shortcut_addr_my_information),
                 R.drawable.ic_menu_08,
-                R.drawable.ic_menu_shortcut_06_selector);
+                R.drawable.ic_menu_shortcut_06_selector,
+                0,
+                null);
         launcherShortcuts.add(data);
     }
 

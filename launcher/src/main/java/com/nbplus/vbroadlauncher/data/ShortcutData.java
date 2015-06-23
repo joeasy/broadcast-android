@@ -26,6 +26,12 @@ public class ShortcutData implements Parcelable {
     @SerializedName("background")
     private int iconBackResId;
 
+    @SerializedName("native_type")
+    private int nativeType = 0;     // 0 : activity, 1 : fragment, 2 : dialogfragment
+
+    @SerializedName("native_class")
+    private Class nativeClass = null;     // 0 : activity, 1 : fragment, 2 : dialogfragment
+
     public String getDomain() {
         return domain;
     }
@@ -74,12 +80,30 @@ public class ShortcutData implements Parcelable {
         this.iconResId = iconResId;
     }
 
-    public ShortcutData(int type, String name, String path, int iconRes, int backgroundRes) {
+    public int getNativeType() {
+        return nativeType;
+    }
+
+    public void setNativeType(int nativeType) {
+        this.nativeType = nativeType;
+    }
+
+    public Class getNativeClass() {
+        return nativeClass;
+    }
+
+    public void setNativeClass(Class nativeClass) {
+        this.nativeClass = nativeClass;
+    }
+
+    public ShortcutData(int type, String name, String path, int iconRes, int backgroundRes, int nativeType, Class clazz) {
         this.type = type;
         this.name = name;
         this.path = path;
         this.iconResId = iconRes;
         this.iconBackResId = backgroundRes;
+        this.nativeType = nativeType;
+        this.nativeClass = clazz;
     }
 
     public ShortcutData() {
@@ -92,21 +116,25 @@ public class ShortcutData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.iconBackResId);
+        dest.writeValue(this.type);
         dest.writeString(this.name);
         dest.writeString(this.domain);
         dest.writeString(this.path);
         dest.writeInt(this.iconResId);
-        dest.writeValue(this.type);
+        dest.writeInt(this.iconBackResId);
+        dest.writeInt(this.nativeType);
+        dest.writeSerializable(this.nativeClass);
     }
 
-    private ShortcutData(Parcel in) {
-        this.iconBackResId = in.readInt();
+    protected ShortcutData(Parcel in) {
+        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
         this.name = in.readString();
         this.domain = in.readString();
         this.path = in.readString();
         this.iconResId = in.readInt();
-        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.iconBackResId = in.readInt();
+        this.nativeType = in.readInt();
+        this.nativeClass = (Class) in.readSerializable();
     }
 
     public static final Creator<ShortcutData> CREATOR = new Creator<ShortcutData>() {

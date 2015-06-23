@@ -10,12 +10,10 @@
     </style>
     <style name="NBPlusTheme.NoActionBar.Translucent" parent="Theme.AppCompat.Light.NoActionBar" >
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
-        <!--<item name="android:windowAnimationStyle">@android:style/Animation</item>-->
-        <!--<item name="windowActionBar">false</item>--> <!-- For 2.x version  -->
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
     </style>
 
     <style name="NBPlusTheme.NoActionBar.TranslucentDecor" parent="Theme.AppCompat.Light.NoActionBar" >

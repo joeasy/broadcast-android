@@ -16,5 +16,6 @@
     <color name="launcher_top_nav_color">#CC152138</color>
     <color name="weather_week_font_color">#333333</color>
     <color name="weather_shadow_color">#c6333333</color>
+    <color name="title_seperator">#a4a4a4</color>
 
 </resources>

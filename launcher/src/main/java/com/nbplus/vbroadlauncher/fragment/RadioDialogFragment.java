@@ -47,6 +47,14 @@ public class RadioDialogFragment extends DialogFragment implements AdapterView.O
 
     public RadioDialogFragment() {}
 
+    public static RadioDialogFragment newInstance(ShortcutData data) {
+        RadioDialogFragment fragment = new RadioDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     private final RadioChannelListHandler mHandler = new RadioChannelListHandler(this);
 
     // 핸들러 객체 만들기
