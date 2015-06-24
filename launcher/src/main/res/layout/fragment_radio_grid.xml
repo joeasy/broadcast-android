@@ -1,0 +1,21 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+
+    <GridView
+        android:id="@+id/grid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingLeft="@dimen/radio_view_horizontal_padding"
+        android:paddingRight="@dimen/radio_view_horizontal_padding"
+        android:verticalSpacing="@dimen/radio_grid_vertical_cellspacing"
+        android:horizontalSpacing="@dimen/radio_grid_horizontal_cellspacing"
+        android:listSelector="@android:color/transparent"
+        android:stretchMode="columnWidth"
+        android:numColumns="@integer/radio_grid_numcolumns"
+        />
+</FrameLayout>

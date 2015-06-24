@@ -2,4 +2,5 @@
 <resources>
     <integer name="app_grid_numcolumns">5</integer>
     <integer name="app_grid_numrows">7</integer>
+    <integer name="radio_grid_numcolumns">3</integer>
 </resources>

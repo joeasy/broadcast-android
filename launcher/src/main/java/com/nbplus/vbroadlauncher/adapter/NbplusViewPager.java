@@ -10,14 +10,14 @@ import android.view.MotionEvent;
 /**
  * Created by basagee on 2015. 5. 7..
  */
-public class AppViewPager extends ViewPager {
+public class NbplusViewPager extends ViewPager {
     private boolean swipeable = true;
 
-    public AppViewPager(Context context) {
+    public NbplusViewPager(Context context) {
         super(context);
     }
 
-    public AppViewPager(Context context, AttributeSet attrs) {
+    public NbplusViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

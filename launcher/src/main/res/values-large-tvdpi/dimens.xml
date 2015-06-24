@@ -35,4 +35,9 @@
     <dimen name="radio_view_title_vertical_padding">9.375dp</dimen>
     <dimen name="radio_grid_vertical_margin">18.75dp</dimen>
     <dimen name="radio_indicator_bottom_margin">20.625dp</dimen>
+    <dimen name="radio_grid_vertical_cellspacing">18.75dp</dimen>
+    <dimen name="radio_grid_horizontal_cellspacing">18.75dp</dimen>
+    <dimen name="radio_activity_title_height">60dp</dimen>
+    <dimen name="radio_activity_label_font_size">16.875dp</dimen>
+    <dimen name="radio_channel_button_font_size">15dp</dimen>
 </resources>

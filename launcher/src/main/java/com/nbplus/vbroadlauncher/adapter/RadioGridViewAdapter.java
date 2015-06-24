@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,21 +25,17 @@ public class RadioGridViewAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelList;
+    private View.OnClickListener mClickListener;
 
     public static class RadioViewHolder {
-        public ImageView icon;
-        public TextView name;
-        public String url;
+        public Button channelButton;
+        public RadioChannelInfo.RadioChannel radioChannel;
     }
 
-    public RadioGridViewAdapter(Context context, ArrayList<RadioChannelInfo.RadioChannel> channelList) {
+    public RadioGridViewAdapter(Context context, ArrayList<RadioChannelInfo.RadioChannel> channelList, View.OnClickListener listener) {
         this.context = context;
         this.mRadioChannelList = channelList;
-    }
-
-    public void setApplicationList(ArrayList<RadioChannelInfo.RadioChannel> appList) {
-        this.mRadioChannelList = appList;
-        this.notifyDataSetChanged();
+        this.mClickListener = listener;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -50,27 +47,25 @@ public class RadioGridViewAdapter extends BaseAdapter {
 
         if (convertView == null) {
             // get layout from mobile.xml
-            convertView = inflater.inflate(R.layout.apps_grid_view, null);
+            convertView = inflater.inflate(R.layout.radio_grid_view, null);
             viewHolder = new RadioViewHolder();
-            // set value into textview
-            viewHolder.name = (TextView) convertView.findViewById(R.id.grid_item_label);
-            // set image based on selected text
-            //viewHolder.icon = (ImageView) convertView.findViewById(R.id.grid_item_image);
-
             convertView.setTag(viewHolder);
+            viewHolder.channelButton = (Button)convertView.findViewById(R.id.btn_radio_channel);
         } else {
             viewHolder = (RadioViewHolder) convertView.getTag();
         }
 
         RadioChannelInfo.RadioChannel radioChannel = mRadioChannelList.get(position);
         if (radioChannel != null) {
+            viewHolder.radioChannel = radioChannel;
+
             if (StringUtils.isEmptyString(radioChannel.channelName)) {
-                viewHolder.name.setText("xxxxx");
+                viewHolder.channelButton.setText("xxxxx");
             } else {
-                viewHolder.name.setText(radioChannel.channelName);
+                viewHolder.channelButton.setText(radioChannel.channelName);
             }
-            //viewHolder.icon.setImageDrawable(appInfo.loadIcon(context.getPackageManager()));
-            viewHolder.url = radioChannel.channelUrl;
+
+            viewHolder.channelButton.setOnClickListener(this.mClickListener);
         } else {
             Log.d(TAG, ">> invalid radioChannel...");
         }

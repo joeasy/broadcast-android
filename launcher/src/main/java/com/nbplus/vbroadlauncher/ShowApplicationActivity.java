@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.adapter.AppPagerAdapter;
-import com.nbplus.vbroadlauncher.adapter.AppViewPager;
+import com.nbplus.vbroadlauncher.adapter.NbplusViewPager;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.service.InstalledApplicationTask;
 import com.viewpagerindicator.LinePageIndicator;
@@ -28,10 +28,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 
-public class ShowApplicationActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+public class ShowApplicationActivity extends BaseActivity implements OnFragmentInteractionListener {
     private static final String TAG = ShowApplicationActivity.class.getSimpleName();
 
-    private AppViewPager mViewPager;
+    private NbplusViewPager mViewPager;
     AppPagerAdapter mAppPagerAdapter;
     PageIndicator mIndicator;
     InstalledApplicationTask mLoadAsyncTask;
@@ -115,7 +115,7 @@ public class ShowApplicationActivity extends AppCompatActivity implements OnFrag
 
         // ViewPager 화면.
         // 사용자등록이나 어플리케이션 설치등을수행하는 프래그먼트들이 불린다.
-        mViewPager = (AppViewPager) findViewById(R.id.viewPager);
+        mViewPager = (NbplusViewPager) findViewById(R.id.viewPager);
         mIndicator = (LinePageIndicator)findViewById(R.id.indicator);
 
         mAppPagerAdapter = new AppPagerAdapter(this, getSupportFragmentManager());

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/radio_progress_layer"
+    android:clickable="false"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:indeterminate="true"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:id="@+id/progress_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_progress_label"
+        android:textColor="@color/white"
+        android:textSize="@dimen/radio_activity_label_font_size"
+        android:textStyle="bold"
+        android:layout_alignEnd="@+id/progress_bar"
+        android:layout_alignStart="@+id/progress_bar"
+        android:gravity="center"
+        android:layout_alignBottom="@+id/progress_bar"
+        android:layout_alignTop="@+id/progress_bar"
+        />
+</RelativeLayout>
+

@@ -52,12 +52,13 @@ import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
 import io.vov.vitamio.LibsChecker;
 
 
-public class HomeLauncherActivity extends AppCompatActivity
+public class HomeLauncherActivity extends BaseActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, ResultCallback<LocationSettingsResult>, OnFragmentInteractionListener {
 
@@ -114,6 +115,7 @@ public class HomeLauncherActivity extends AppCompatActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_home_launcher);
 
         boolean isTablet = DisplayUtils.isTabletDevice(this);
@@ -135,6 +137,10 @@ public class HomeLauncherActivity extends AppCompatActivity
 //            return;
         }
 
+        if (!NetworkUtils.isConnected(this)) {
+            showNetworkConnectionAlertDialog();
+        }
+
         Point p = DisplayUtils.getScreenSize(this);
         Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
         p = DisplayUtils.getScreenDp(this);
@@ -143,6 +149,15 @@ public class HomeLauncherActivity extends AppCompatActivity
         Log.d(TAG, "Screen density = " + density);
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            alert.setMessage(R.string.alert_media_message);
+            alert.show();
             return;
         }
 

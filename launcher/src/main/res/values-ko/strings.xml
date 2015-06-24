@@ -8,16 +8,22 @@
     <string name="btn_start_location_updates">START LOCATION UPDATES</string>
     <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
 
-    <string name="alert_phone_finish_ok">OK</string>
-    <string name="alert_phone_message">Your device is mobile phone. You can\'t execute this application !!</string>
+    <string name="alert_ok">확인</string>
+    <string name="alert_phone_message">이 어플리케이션은 태블릿 전용입니다.</string>
+    <string name="alert_media_message">미디어 라이브러리를 초기화하는데 실패하였습니다.</string>
 
     <string name="empty_value">Data is empty !!</string>
-    <string name="parse_error">Data parse error !! Check it.</string>
-    <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
+    <string name="parse_error">잘못된 데이터 입니다.</string>
+    <string name="alert_settings_message">초기 설정이 완료되지 않았습니다. 설정을 완료하시기 바랍니다.</string>
+
+    <string name="alert_network_title">Network</string>
+    <string name="alert_network_message">인터넷을 사용할 수 없습니다. 네트워크 설정을 확인하시고 다시 시도해 주시기 바랍니다.\n(문제가 해결되지 않으면 관리자에게 문의하시기 바랍니다.)</string>
+    <string name="alert_network_btn_check_wifi">와이파이 설정</string>
 
     <!-- launcher top nav -->
     <string name="btn_outdoor">외출중</string>
     <string name="btn_show_map">사이트맵</string>
+    <string name="addr_show_map">/web_test/test.html</string>
     <string name="btn_show_apps">앱스</string>
     <string name="alert_calendar_not_found">캘린더 어플리케이션 실행에 실패했습니다. 어플리케이션 설정이 정상적인지 확인하시기 바랍니다.</string>
     <string name="outdoor_mode_on">외출모드가 활성화 되었습니다.</string>
@@ -47,6 +53,10 @@
     <string name="celsius">%1$s°C</string>
     <string name="sky_status">%1$s | %2$s</string>
     <string name="weather_day">%1$02d일(%2$s)</string>
+
+    <!-- radio -->
+    <string name="activity_radio_default_title">인터넷 라디오</string>
+    <string name="default_progress_label">진행중</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">불러오기</string>

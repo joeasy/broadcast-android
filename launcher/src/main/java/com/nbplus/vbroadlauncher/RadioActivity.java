@@ -4,28 +4,36 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageButton;
 
-import com.nbplus.vbroadlauncher.adapter.AppPagerAdapter;
-import com.nbplus.vbroadlauncher.adapter.AppViewPager;
+import com.nbplus.media.MusicRetriever;
+import com.nbplus.media.MusicService;
+import com.nbplus.vbroadlauncher.adapter.NbplusViewPager;
 import com.nbplus.vbroadlauncher.adapter.RadioPagerAdapter;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
+import com.nbplus.vbroadlauncher.callback.OnRadioFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
+import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
+import com.nbplus.vbroadlauncher.fragment.RadioGridFragment;
 import com.nbplus.vbroadlauncher.service.GetRadioChannelTask;
 import com.nbplus.vbroadlauncher.service.InstalledApplicationTask;
 import com.viewpagerindicator.CirclePageIndicator;
-import com.viewpagerindicator.LinePageIndicator;
 import com.viewpagerindicator.PageIndicator;
 
 import java.lang.ref.WeakReference;
@@ -34,24 +42,23 @@ import java.util.ArrayList;
 /**
  * Created by basagee on 2015. 6. 22..
  */
-public class RadioActivity extends AppCompatActivity {
+public class RadioActivity extends BaseActivity implements OnRadioFragmentInteractionListener {
     private static final String TAG = RadioActivity.class.getSimpleName();
 
-    private AppViewPager mViewPager;
+    private NbplusViewPager mViewPager;
     RadioPagerAdapter mRadioPagerAdapter;
     PageIndicator mIndicator;
     private ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelItems = new ArrayList<>();
     ShortcutData mShortcutData;
+    ProgressDialogFragment mProgressDialogFragment;
 
-    private ArrayList<OnActivityInteractionListener> mActivityInteractionListener = new ArrayList<OnActivityInteractionListener>();
-
-    private final RadioListHandler mHandler = new RadioListHandler(this);
+    private final RadioActivityHandler mHandler = new RadioActivityHandler(this);
 
     // 핸들러 객체 만들기
-    private static class RadioListHandler extends Handler {
+    private static class RadioActivityHandler extends Handler {
         private final WeakReference<RadioActivity> mActivity;
 
-        public RadioListHandler(RadioActivity activity) {
+        public RadioActivityHandler(RadioActivity activity) {
             mActivity = new WeakReference<>(activity);
         }
 
@@ -71,6 +78,7 @@ public class RadioActivity extends AppCompatActivity {
         switch (msg.what) {
             case Constants.HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK :
                 Log.d(TAG, "HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK received !!!");
+
                 RadioChannelInfo data = (RadioChannelInfo)msg.obj;
 
                 if (Constants.RESULT_OK.equals(data.getResultCode())) {
@@ -80,13 +88,92 @@ public class RadioActivity extends AppCompatActivity {
                     }
                 }
 
+                setupRadioChannelPager();
+                dismissProgressDialog();
                 break;
+            case Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT :
+                Log.d(TAG, "HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT received !!!");
+                Intent i = new Intent(this, MusicService.class);
+                i.setAction(MusicService.ACTION_STOP);
+                i.putExtra(MusicService.EXTRA_MUSIC_FORCE_STOP, true);
+                startService(i);
+                break;
+
+        }
+    }
+
+    private BroadcastReceiver musicServiceReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            Log.d(TAG, ">> musicServiceReceiver action received = " + action);
+            mHandler.removeMessages(Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT);
+            // send handler message
+            dismissProgressDialog();
+        }
+    };
+
+    private void setupRadioChannelPager() {
+        if (mRadioChannelItems.size() > 0) {
+            ArrayList<RadioGridFragment> viewPagerFragments = new ArrayList<>();
+
+            int pages = mRadioChannelItems.size() / Constants.RADIO_CHANNEL_GRIDVIEW_SIZE;
+            int remains = mRadioChannelItems.size() % Constants.RADIO_CHANNEL_GRIDVIEW_SIZE;
+
+            if (remains > 0) {
+                pages++;
+            }
+
+            // create fragment
+            for (int i = 0; i < pages; i++) {
+                int start = i * Constants.RADIO_CHANNEL_GRIDVIEW_SIZE;
+                int end = start + Constants.RADIO_CHANNEL_GRIDVIEW_SIZE;
+                if (end > mRadioChannelItems.size()) {
+                    end = mRadioChannelItems.size();
+                }
+                ArrayList<RadioChannelInfo.RadioChannel> subList = new ArrayList<>(mRadioChannelItems.subList(start, end));
+
+                viewPagerFragments.add(RadioGridFragment.newInstance(i, subList));
+            }
+
+            mRadioPagerAdapter = new RadioPagerAdapter(this, getSupportFragmentManager(), viewPagerFragments);
+            mViewPager.setAdapter(mRadioPagerAdapter);
+            mViewPager.setSwipeable(true);
+            mIndicator.setViewPager(mViewPager);
+            mIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    Log.d(TAG, ">> page selected position = " + position);
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                }
+            });
+        } else {
+            // show relaod or close
+            Log.e(TAG, ">> Radio channel list update failed. show error message !!!");
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        showProgressDialog();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(getResources().getColor(R.color.activity_radio_background));
+        }
 
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_radio);
@@ -99,33 +186,26 @@ public class RadioActivity extends AppCompatActivity {
         }
         new GetRadioChannelTask(this, mHandler, mShortcutData.getDomain() + mShortcutData.getPath()).execute();
 
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MusicService.ACTION_PLAYED);
+        filter.addAction(MusicService.ACTION_PAUSED);
+        filter.addAction(MusicService.ACTION_STOPPED);
+        filter.addAction(MusicService.ACTION_ERROR);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(musicServiceReceiver, filter);
+
         // ViewPager 화면.
         // 사용자등록이나 어플리케이션 설치등을수행하는 프래그먼트들이 불린다.
-        mViewPager = (AppViewPager) findViewById(R.id.viewPager);
+        mViewPager = (NbplusViewPager) findViewById(R.id.viewPager);
         mIndicator = (CirclePageIndicator)findViewById(R.id.indicator);
 
-        mRadioPagerAdapter = new RadioPagerAdapter(this, getSupportFragmentManager(), 0);
-        mViewPager.setAdapter(mRadioPagerAdapter);
-        mViewPager.setSwipeable(true);
-        mIndicator.setViewPager(mViewPager);
-        mIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        // close button
+        ImageButton closeButton = (ImageButton) findViewById(R.id.btn_close);
+        closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.d(TAG, ">> page selected position = " + position);
-//                AppGridFragment fragment = (AppGridFragment)mViewPager.getActiveFragment(getSupportFragmentManager(), position);
-//                if (fragment != null) {
-//                    fragment.updateGridLayout();
-//                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+            public void onClick(View view) {
+                finish();
             }
         });
     }
@@ -177,21 +257,44 @@ public class RadioActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        dismissProgressDialog();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(musicServiceReceiver);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
-    /**
-     * Activity에서 일어나는 Interaction lister 이다.
-     * 여러개의 프래그먼트에서 동시에 처리하지 않도록 하나만 유지된다.
-     * @param listener
-     */
-    public void setOnActivityInteractionListener(OnActivityInteractionListener listener) {
-        this.mActivityInteractionListener.add(listener);
-    }
-    public void removeOnActivityInteractionListener(OnActivityInteractionListener listener) {
-        this.mActivityInteractionListener.remove(listener);
+    @Override
+    public void onPlayRadioRequest(RadioChannelInfo.RadioChannel channel) {
+        Log.d(TAG, "> User select radio channel... show progrss and ....");
+
+        showProgressDialog();
+
+        if (channel != null) {
+            Intent i = new Intent(this, MusicService.class);
+            i.setAction(MusicService.ACTION_URL);
+            MusicRetriever.Item item = new MusicRetriever.Item(0, channel.index, null, channel.channelName, null, channel.channelUrl, 0);
+            i.putExtra(MusicService.EXTRA_MUSIC_ITEM, item);
+            startService(i);
+
+            mHandler.sendEmptyMessageDelayed(Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT, 10000);
+        }
     }
 
+    private void showProgressDialog() {
+        dismissProgressDialog();
+        mProgressDialogFragment = ProgressDialogFragment.newInstance();
+        mProgressDialogFragment.show(getSupportFragmentManager(), "radio_progress_dialog");
+    }
+    private void dismissProgressDialog() {
+        if (mProgressDialogFragment != null) {
+            mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+    }
 }

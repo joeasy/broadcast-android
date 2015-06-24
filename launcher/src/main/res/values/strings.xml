@@ -8,16 +8,22 @@
     <string name="btn_start_location_updates">START LOCATION UPDATES</string>
     <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
 
-    <string name="alert_phone_finish_ok">OK</string>
+    <string name="alert_ok">OK</string>
     <string name="alert_phone_message">Your device is mobile phone. You can\'t execute this application !!</string>
+    <string name="alert_media_message">Failed media library initialization.</string>
 
     <string name="empty_value">Data is empty !!</string>
     <string name="parse_error">Data parse error !! Check it.</string>
     <string name="alert_settings_message">Your settings is not completed. Check settings !!</string>
 
+    <string name="alert_network_title">Network</string>
+    <string name="alert_network_message">Please Check your internet connection and try Again.\n(Contact to your administrator if you need assistance..)</string>
+    <string name="alert_network_btn_check_wifi">Check Wi-Fi</string>
+
     <!-- main top nav launcher -->
     <string name="btn_outdoor">Out-Door</string>
     <string name="btn_show_map">Site Map</string>
+    <string name="addr_show_map">/web_test/test.html</string>
     <string name="btn_show_apps">Apps</string>
     <string name="alert_calendar_not_found">Can\'t find Calendar Application. Check your application settings?</string>
     <string name="outdoor_mode_on">외출모드가 활성화 되었습니다.</string>
@@ -47,6 +53,10 @@
     <string name="celsius">%1$s°C</string>
     <string name="sky_status">%1$s | %2$s</string>
     <string name="weather_day">%1$02d일(%2$s)</string>
+
+    <!-- radio -->
+    <string name="activity_radio_default_title">Internet Radio</string>
+    <string name="default_progress_label">Wait..</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">Load</string>

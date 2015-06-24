@@ -4,6 +4,8 @@ package com.nbplus.vbroadlauncher.data;
  * Created by basagee on 2015. 6. 1..
  */
 public class Constants {
+    public static final int RADIO_CHANNEL_GRIDVIEW_SIZE = 6;
+
     public static final int SUCCESS_RESULT = 0;
 
     public static final int FAILURE_RESULT = 1;
@@ -35,6 +37,7 @@ public class Constants {
     // installed application list retrieve message
     public static final int HANDLER_MESSAGE_INSTALLED_APPLIST_TASK = 0x1001;
     public static final int HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK = 0x2001;
+    public static final int HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT = 0x2002;
     public static final int HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK = 0x3001;
 
     // weather open api key

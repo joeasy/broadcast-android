@@ -8,6 +8,8 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -76,11 +78,12 @@ public class MusicRetriever {
         // add each song to mItems
         do {
             Log.i(TAG, "ID: " + cur.getString(idColumn) + " Title: " + cur.getString(titleColumn));
-            mItems.add(new Item(
+            mItems.add(new Item(1,
                     cur.getLong(idColumn),
                     cur.getString(artistColumn),
                     cur.getString(titleColumn),
                     cur.getString(albumColumn),
+                    null,
                     cur.getLong(durationColumn)));
         } while (cur.moveToNext());
 
@@ -97,18 +100,23 @@ public class MusicRetriever {
         return mItems.get(mRandom.nextInt(mItems.size()));
     }
 
-    public static class Item {
+    public static class Item implements Parcelable {
         long id;
+        int type;       // 0 : media url, 1 : media store
         String artist;
         String title;
+        String url;
+
         String album;
         long duration;
 
-        public Item(long id, String artist, String title, String album, long duration) {
+        public Item(int type, long id, String artist, String title, String album, String url, long duration) {
+            this.type = type;
             this.id = id;
             this.artist = artist;
             this.title = title;
             this.album = album;
+            this.url = url;
             this.duration = duration;
         }
 
@@ -133,8 +141,54 @@ public class MusicRetriever {
         }
 
         public Uri getURI() {
-            return ContentUris.withAppendedId(
-                    android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+            if (type == 1) {
+                return ContentUris.withAppendedId(
+                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+            } else {
+                return Uri.parse(url);
+            }
         }
+        public int getType() {
+            return type;
+        }
+        public String getUrl() {
+            return url;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeLong(this.id);
+            dest.writeInt(this.type);
+            dest.writeString(this.artist);
+            dest.writeString(this.title);
+            dest.writeString(this.url);
+            dest.writeString(this.album);
+            dest.writeLong(this.duration);
+        }
+
+        protected Item(Parcel in) {
+            this.id = in.readLong();
+            this.type = in.readInt();
+            this.artist = in.readString();
+            this.title = in.readString();
+            this.url = in.readString();
+            this.album = in.readString();
+            this.duration = in.readLong();
+        }
+
+        public static final Parcelable.Creator<Item> CREATOR = new Parcelable.Creator<Item>() {
+            public Item createFromParcel(Parcel source) {
+                return new Item(source);
+            }
+
+            public Item[] newArray(int size) {
+                return new Item[size];
+            }
+        };
     }
 }

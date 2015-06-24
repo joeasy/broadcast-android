@@ -22,7 +22,7 @@ import org.basdroid.common.DisplayUtils;
 /**
  * Created by basagee on 2015. 5. 28..
  */
-public class BroadcastWebViewActivity extends AppCompatActivity {
+public class BroadcastWebViewActivity extends BaseActivity {
     private static final String TAG = BroadcastWebViewActivity.class.getSimpleName();
 
     BroadcastWebViewClient mWebViewClient;

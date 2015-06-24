@@ -12,7 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.RadioActivity;
-import com.nbplus.vbroadlauncher.fragment.RadioDialogFragment;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

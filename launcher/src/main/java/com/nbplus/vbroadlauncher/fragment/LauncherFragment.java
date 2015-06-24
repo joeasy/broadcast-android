@@ -2,15 +2,20 @@ package com.nbplus.vbroadlauncher.fragment;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,6 +36,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nbplus.media.MusicService;
+import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
@@ -38,6 +45,7 @@ import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
+import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
@@ -48,7 +56,9 @@ import com.nbplus.vbroadlauncher.widget.WeatherView;
 import com.nbplus.vbroadlauncher.widget.YahooWeatherView;
 
 import org.basdroid.common.DisplayUtils;
+import org.basdroid.common.NetworkUtils;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,6 +77,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final String TAG = LauncherFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
+    private ImageView mWifiStatus;
     private Button mOutdoorMode;
     private Button mServiceTreeMap;
     private Button mApplicationsView;
@@ -78,7 +89,54 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private LinearLayout mMainViewRightPanel;
     private GridLayout mMainShortcutGridLayout;
     private GridLayout mShorcutGridLayout;
-    private Handler mHandler = new Handler();
+
+    private final LauncherFragmentHandler mHandler = new LauncherFragmentHandler(this);
+
+    private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
+    // 핸들러 객체 만들기
+    private static class LauncherFragmentHandler extends Handler {
+        private final WeakReference<LauncherFragment> mFragment;
+
+        public LauncherFragmentHandler(LauncherFragment fragment) {
+            mFragment = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            LauncherFragment fragment = mFragment.get();
+            if (fragment != null) {
+                fragment.handleMessage(msg);
+            }
+        }
+    }
+
+    public void handleMessage(Message msg) {
+        if (msg == null) {
+            return;
+        }
+        switch (msg.what) {
+            case HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
+                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
+
+                if (NetworkUtils.isConnected(getActivity())) {
+                    mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
+                } else {
+                    mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+                }
+                break;
+        }
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
+            }
+        }
+    };
 
     /**
      * Use this factory method to create a new instance of
@@ -113,6 +171,13 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         mMainViewLayout = (LinearLayout)v.findViewById(R.id.main_view_layout);
 
+        mWifiStatus = (ImageView) v.findViewById(R.id.ic_nav_wifi);
+        if (NetworkUtils.isConnected(getActivity())) {
+            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
+        } else {
+            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+        }
+
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
         mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
 
@@ -129,9 +194,25 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         mServiceTreeMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ShowApplicationActivity.class);
+                if (!NetworkUtils.isConnected(getActivity())) {
+                    ((BaseActivity)getActivity()).showNetworkConnectionAlertDialog();
+                    return;
+                }
+                Intent intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
+
+                ShortcutData data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
+                        getActivity().getResources().getString(R.string.btn_show_map),
+                        getActivity().getResources().getString(R.string.addr_show_map),
+                        R.drawable.ic_menu_04,
+                        R.drawable.ic_menu_shortcut_02_selector,
+                        0,
+                        null);
+
+                VBroadcastServer serverInfo = LauncherSettings.getInstance(getActivity()).getServerInformation();
+                data.setDomain(serverInfo.getDocServer());
+
+                intent.putExtra(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
         mOutdoorMode = (Button)v.findViewById(R.id.btn_outdoor);
@@ -182,7 +263,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     } catch (ActivityNotFoundException e) {
                         e.printStackTrace();
                         AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                        alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
+                        alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent i = new Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
@@ -297,6 +378,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         try {
             mListener = (OnFragmentInteractionListener) activity;
             ((HomeLauncherActivity)activity).setOnActivityInteractionListener(this);
+
+            // check network status
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -307,11 +393,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        getActivity().unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
     public void onBackPressed() {
-
     }
 
     @Override
@@ -388,6 +474,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         Intent intent;
 
+        if (!NetworkUtils.isConnected(getActivity())) {
+            ((BaseActivity)getActivity()).showNetworkConnectionAlertDialog();
+            return;
+        }
         switch (data.getType()) {
             case Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER:
                 data.setDomain(serverData.getApiServer());

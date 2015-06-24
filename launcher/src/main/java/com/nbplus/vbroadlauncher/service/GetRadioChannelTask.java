@@ -43,21 +43,27 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
     protected RadioChannelInfo doInBackground(Void... params) {
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
         RadioChannelInfo response = null;
-
-        RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
-
         String url = mGetServerPath + "?DEVICE_ID=" + LauncherSettings.getInstance(mContext).getDeviceID();
-        GsonRequest request = new GsonRequest(Request.Method.GET, url, RadioChannelInfo.class, future, future);
-        requestQueue.add(request);
 
-        try {
-            response = future.get(); // this will block (forever)
-        } catch (InterruptedException e) {
-            // exception handling
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // exception handling
-            e.printStackTrace();
+        int retryCount = 0;
+        while (retryCount < 3) {        // retry 3 times
+            RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
+
+            GsonRequest request = new GsonRequest(Request.Method.GET, url, RadioChannelInfo.class, future, future);
+            requestQueue.add(request);
+
+            try {
+                response = future.get(); // this will block (forever)
+                break;
+            } catch (InterruptedException e) {
+                // exception handling
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // exception handling
+                e.printStackTrace();
+            }
+            retryCount++;
+            continue;
         }
         return response;
     }
@@ -77,6 +83,7 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
 
         ArrayList<RadioChannelInfo.RadioChannel> items = new ArrayList<>();
         RadioChannelInfo.RadioChannel item = new RadioChannelInfo.RadioChannel();
+/**
         item.channelName = "KBS 제1라디오 강릉국";
         item.channelUrl = "mms://121.189.147.12:8080";
         items.add(item);
@@ -172,6 +179,7 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
         items.add(item);
 
         item = new RadioChannelInfo.RadioChannel();
+ */
         item.channelName = "MBC 표준FM 전주";
         item.channelUrl = "mms://210.105.237.100/mbcam";
         items.add(item);
@@ -584,6 +592,13 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
         result.setRadioChannelList(items);
 
         // end of TODO : sample data
+
+        items = result.getRadioChannelList();
+        if (items != null) {
+            for (int i = 0; i < items.size(); i++) {
+                items.get(i).index = i;
+            }
+        }
 
         if (mHandler != null) {
             Message message = new Message();
