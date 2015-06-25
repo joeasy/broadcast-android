@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/radio_activity_background"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:padding="@dimen/radio_activity_padding"
@@ -25,7 +26,7 @@
         android:layout_height="@dimen/radio_activity_height" >
         
         <!-- activity title -->
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
@@ -34,26 +35,73 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/radio_activity_title_height">
             <ImageView
+                android:id="@+id/radio_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:paddingStart="0dp"
                 android:paddingEnd="5dp"
                 android:src="@drawable/ic_icon_radio" />
             <TextView
                 android:id="@+id/radio_activity_label"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/radio_icon"
+                android:layout_alignBaseline="@id/radio_icon"
+                android:layout_centerVertical="true"
                 android:gravity="bottom"
                 android:text="@string/activity_radio_default_title"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:ellipsize="end"
+                android:lines="1"
                 android:textSize="@dimen/radio_activity_label_font_size"
                 android:layout_marginBottom="5dp"/>
 
             <!-- player control -->
-        </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:id="@+id/ic_media_control_play"
+                    android:background="@drawable/ic_btn_radio_play_selector"
+                    android:layout_marginEnd="@dimen/radio_play_control_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <ImageButton
+                    android:id="@+id/ic_media_control_stop"
+                    android:background="@drawable/ic_btn_radio_stop_selector"
+                    android:layout_marginEnd="@dimen/radio_play_control_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="@dimen/radio_play_control_margin"
+                    android:background="@color/title_seperator" />
+
+                <ImageButton
+                    android:id="@+id/ic_media_control_volume_btn"
+                    android:background="@drawable/ic_button_radio_sound_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/ic_media_control_volume_seek"
+                    android:layout_width="@dimen/radio_play_control_progress_width"
+                    android:layout_height="wrap_content"
+                    android:progressDrawable="@drawable/ic_btn_radio_volume_progress"
+                    android:thumb="@drawable/ic_btn_radio_progress_thumb_selector" >
+                </SeekBar>
+            </LinearLayout>
+        </RelativeLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -64,7 +112,7 @@
         <com.nbplus.vbroadlauncher.adapter.NbplusViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dip"
             android:layout_marginTop="@dimen/radio_grid_vertical_margin"
             android:layout_marginBottom="@dimen/radio_grid_vertical_margin"
             android:layout_gravity="center_vertical"
@@ -74,15 +122,17 @@
         <com.viewpagerindicator.CirclePageIndicator
             android:id="@+id/indicator"
             android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:paddingLeft="@dimen/radio_view_horizontal_padding"
             android:paddingRight="@dimen/radio_view_horizontal_padding"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
             android:layout_marginBottom="@dimen/radio_indicator_bottom_margin"
-            app:radius="10dp"
-            app:fillColor="#FF888888"
-            app:pageColor="#88FF0000"
-            app:strokeColor="#FF000000"
-            app:strokeWidth="2dp"        />
+            app:radius="5dp"
+            app:fillColor="#ff000000"
+            app:pageColor="#a4a4a4"
+            app:strokeColor="#a4a4a4"
+            app:strokeWidth="1dp"        />
     </LinearLayout>
 
 </RelativeLayout>

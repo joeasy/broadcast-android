@@ -1,0 +1,73 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+
+    <!-- remoteview icon -->
+    <ImageView
+        android:id="@+id/radio_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingStart="0dp"
+        android:paddingEnd="20dp"
+        android:src="@drawable/ic_icon_radio" />
+
+    <!-- remote view main -->
+    <!-- play title and play time -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight=".6"
+        android:gravity="center_vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/play_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="@string/activity_radio_default_title"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:lines="1"
+            android:layout_marginEnd="10dp"
+            android:textSize="@dimen/radio_channel_button_font_size"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center_vertical|end"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="3dp"
+        android:layout_weight=".4"
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/ic_media_control_play"
+            android:src="@drawable/ic_btn_radio_play_selector"
+            android:layout_marginStart="13dp"
+             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/ic_media_control_stop"
+            android:src="@drawable/ic_btn_radio_stop_selector"
+            android:layout_marginStart="13dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</LinearLayout>

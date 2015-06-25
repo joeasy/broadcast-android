@@ -6,8 +6,8 @@
         <item>구름많음</item>
         <item>흐림</item>
         <item>비</item>
-        <item>눈</item>
         <item>비/눈</item>
+        <item>눈</item>
     </string-array>
     <string-array name="sky_status_drawable">
         <item>@drawable/ic_weather_01</item>
@@ -15,8 +15,8 @@
         <item>@drawable/ic_weather_03</item>
         <item>@drawable/ic_weather_04</item>
         <item>@drawable/ic_weather_05</item>
-        <item>@drawable/ic_weather_06</item>
         <item>@drawable/ic_weather_07</item>
+        <item>@drawable/ic_weather_06</item>
     </string-array>
     <string-array name="sky_status_bg_drawable">
         <item>@drawable/ic_weather_bg_01</item>
@@ -24,8 +24,8 @@
         <item>@drawable/ic_weather_bg_03</item>
         <item>@drawable/ic_weather_bg_04</item>
         <item>@drawable/ic_weather_bg_05</item>
-        <item>@drawable/ic_weather_bg_06</item>
         <item>@drawable/ic_weather_bg_07</item>
+        <item>@drawable/ic_weather_bg_06</item>
     </string-array>
     <string-array name="week_day">
         <item>일</item>

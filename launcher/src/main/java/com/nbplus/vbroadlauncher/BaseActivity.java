@@ -13,7 +13,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public void showNetworkConnectionAlertDialog() {
         new AlertDialog.Builder(this).setMessage(R.string.alert_network_message)
-                .setTitle(R.string.alert_network_title)
+                //.setTitle(R.string.alert_network_title)
                 .setCancelable(true)
                 .setNegativeButton(R.string.alert_network_btn_check_wifi,
                         new DialogInterface.OnClickListener() {
@@ -28,5 +28,11 @@ public class BaseActivity extends AppCompatActivity {
                             }
                         })
                 .show();
+    }
+
+    public void restartActivity() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 }

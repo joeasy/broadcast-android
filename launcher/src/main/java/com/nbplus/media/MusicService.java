@@ -12,20 +12,29 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.nbplus.vbroadlauncher.R;
+import com.nbplus.vbroadlauncher.RadioActivity;
+
+import org.basdroid.common.StringUtils;
+
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import io.vov.vitamio.MediaPlayer;
 
@@ -48,6 +57,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String ACTION_SKIP = "com.nbplus.android.musicplayer.action.SKIP";
     public static final String ACTION_REWIND = "com.nbplus.android.musicplayer.action.REWIND";
     public static final String ACTION_URL = "com.nbplus.android.musicplayer.action.URL";
+    public static final String ACTION_PLAYING_STATUS = "com.nbplus.android.musicplayer.action.PLAYINGSTATUS";
 
     // broadcast receiver action
     public static final String ACTION_PLAYED = "com.nbplus.android.musicplayer.action.PLAYED";
@@ -56,8 +66,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String ACTION_ERROR = "com.nbplus.android.musicplayer.action.ERROR";
     public static final String ACTION_COMPLETED = "com.nbplus.android.musicplayer.action.COMPLETED";
 
+    public static final String EXTRA_ACTION = "extra_action";
     public static final String EXTRA_MUSIC_ITEM = "extra_url_item";
     public static final String EXTRA_MUSIC_FORCE_STOP = "extra_music_force_stop";
+    public static final String EXTRA_PLAYING_STATUS = "extra_playing_status";
 
     // The volume we set the media player to when we lose audio focus, but are allowed to reduce
     // the volume instead of stopping playback.
@@ -71,7 +83,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     AudioFocusHelper mAudioFocusHelper = null;
 
     // indicates the state our service:
-    enum State {
+    public enum State {
         Retrieving, // the MediaRetriever is retrieving music
         Stopped,    // media player is stopped and not prepared to play
         Preparing,  // media player is preparing...
@@ -144,6 +156,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     NotificationManager mNotificationManager;
 
     Notification mNotification = null;
+    RemoteViews mRemoteViews;
+    NotificationCompat.Builder mBuilder;
 
     /**
      * Makes sure the media player exists and has been reset. This will create the media player
@@ -205,16 +219,28 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
-        if (action.equals(ACTION_TOGGLE_PLAYBACK)) processTogglePlaybackRequest();
-        else if (action.equals(ACTION_PLAY)) processPlayRequest();
-        else if (action.equals(ACTION_PAUSE)) processPauseRequest();
-        else if (action.equals(ACTION_SKIP)) processSkipRequest();
-        else if (action.equals(ACTION_STOP)) processStopRequest(intent);
-        else if (action.equals(ACTION_REWIND)) processRewindRequest();
-        else if (action.equals(ACTION_URL)) processAddRequest(intent);
+        if (action != null && action instanceof String) {
+            if (action.equals(ACTION_TOGGLE_PLAYBACK)) processTogglePlaybackRequest();
+            else if (action.equals(ACTION_PLAY)) processPlayRequest();
+            else if (action.equals(ACTION_PAUSE)) processPauseRequest();
+            else if (action.equals(ACTION_SKIP)) processSkipRequest();
+            else if (action.equals(ACTION_STOP)) processStopRequest(intent);
+            else if (action.equals(ACTION_REWIND)) processRewindRequest();
+            else if (action.equals(ACTION_URL)) processAddRequest(intent);
+            else if (action.equals(ACTION_PLAYING_STATUS)) broadcastPlayingStaus();
+        }
 
         return START_NOT_STICKY; // Means we started the service, but don't want it to
         // restart in case it's killed.
+    }
+
+    void broadcastPlayingStaus() {
+        Log.d(TAG, "Send Broadcasting message action = " + ACTION_PLAYING_STATUS);
+        Intent intent = new Intent(ACTION_PLAYING_STATUS);
+        // You can also include some extra data.
+        intent.putExtra(EXTRA_PLAYING_STATUS, mState);
+        intent.putExtra(EXTRA_MUSIC_ITEM, mPlayingItem);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     void processTogglePlaybackRequest() {
@@ -242,12 +268,13 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             // If we're stopped, just go ahead to the next song and start playing
             //playNextSong(null);
             sendBroadcastMessage(ACTION_ERROR, mPlayingItem);
+            stopForeground(true);
         }
         else if (mState == State.Paused) {
             // If we're paused, just continue playback and restore the 'foreground service' state.
             mState = State.Playing;
-            setUpAsForeground(mSongTitle + " (playing)");
             configAndStartMediaPlayer();
+            updateNotification(mPlayingItem.getTitle());
         }
 
         // Tell any remote controls that our playback state is 'playing'.
@@ -272,6 +299,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             relaxResources(false); // while paused, we always retain the MediaPlayer
             // do not give up audio focus
             sendBroadcastMessage(ACTION_PAUSED, mPlayingItem);
+            updateNotification(mPlayingItem.getTitle());
         }
 
         // Tell any remote controls that our playback state is 'paused'.
@@ -332,7 +360,9 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     void relaxResources(boolean releaseMediaPlayer) {
         // stop being a foreground service
         stopForeground(true);
-
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(NOTIFICATION_ID);
+        }
         // stop and release the Media Player, if it's available
         if (releaseMediaPlayer && mPlayer != null) {
             mPlayer.reset();
@@ -364,6 +394,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             // is State.Playing. But we stay in the Playing state so that we know we have to resume
             // playback once we get the focus back.
             if (mPlayer.isPlaying()) {
+                mState = State.Paused;
                 mPlayer.pause();
                 sendBroadcastMessage(ACTION_PAUSED, mPlayingItem);
             }
@@ -525,6 +556,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         //playNextSong(null);
         Log.d(TAG, "MusicPlayer onCompletion !!!");
         sendBroadcastMessage(ACTION_COMPLETED, mPlayingItem);
+        if (mPlayingItem.getType() == 0) {      // streaming
+            mState = State.Stopped;
+            relaxResources(true);
+            giveUpAudioFocus();
+        }
         mPlayingItem = null;
     }
 
@@ -533,35 +569,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         // The media player is done preparing. That means we can start playing!
         Log.d(TAG, "MusicPlayer onPrepared !!!");
         mState = State.Playing;
-        updateNotification(mSongTitle + " (playing)");
         configAndStartMediaPlayer();
-    }
-
-    /** Updates the notification. */
-    void updateNotification(String text) {
-        //PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-        //        new Intent(getApplicationContext(), MainActivity.class),
-        //        PendingIntent.FLAG_UPDATE_CURRENT);
-        //mNotification.setLatestEventInfo(getApplicationContext(), "RandomMusicPlayer", text, pi);
-        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
-    }
-
-    /**
-     * Configures service as a foreground service. A foreground service is a service that's doing
-     * something the user is actively aware of (such as playing music), and must appear to the
-     * user as a notification. That's why we create the notification here.
-     */
-    void setUpAsForeground(String text) {
-        //PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-        //        new Intent(getApplicationContext(), MainActivity.class),
-        //        PendingIntent.FLAG_UPDATE_CURRENT);
-        mNotification = new Notification();
-        mNotification.tickerText = text;
-        //mNotification.icon = R.drawable.ic_stat_playing;
-        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
-        //mNotification.setLatestEventInfo(getApplicationContext(), "RandomMusicPlayer",
-        //        text, pi);
-        startForeground(NOTIFICATION_ID, mNotification);
+        updateNotification(mPlayingItem.getTitle());
     }
 
     /**
@@ -632,7 +641,100 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         Log.d(TAG, "Send Broadcasting message action = " + action);
         Intent intent = new Intent(action);
         // You can also include some extra data.
+        intent.putExtra(EXTRA_PLAYING_STATUS, mState);
         intent.putExtra(EXTRA_MUSIC_ITEM, item);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    /** Updates the notification. */
+    void updateNotification(String text) {
+//        Intent i = new Intent(getApplicationContext(), RadioActivity.class);
+//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+//                i,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+//        mNotification.setLatestEventInfo(getApplicationContext(), "MusicPlayer", text, pi);
+
+        setRemoteViews();
+        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+    }
+
+    /**
+     * Configures service as a foreground service. A foreground service is a service that's doing
+     * something the user is actively aware of (such as playing music), and must appear to the
+     * user as a notification. That's why we create the notification here.
+     */
+    void setUpAsForeground(String text) {
+        // notification's layout
+        mRemoteViews = new RemoteViews(getPackageName(), R.layout.music_notification);
+        setRemoteViews();
+        mBuilder = new NotificationCompat.Builder(this);
+
+        CharSequence ticker = text;
+        int apiVersion = Build.VERSION.SDK_INT;
+
+        if (apiVersion < Build.VERSION_CODES.HONEYCOMB) {
+            mNotification = new Notification(R.drawable.ic_launcher, ticker, System.currentTimeMillis());
+            mNotification.contentView = mRemoteViews;
+            //mNotification.contentIntent = pendIntent;
+
+            mNotification.flags |= Notification.FLAG_NO_CLEAR;
+            mNotification.defaults |= Notification.DEFAULT_LIGHTS;
+
+            startForeground(NOTIFICATION_ID, mNotification);
+
+        } else if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
+            mBuilder.setSmallIcon(R.drawable.ic_launcher)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
+                    //.setContentIntent(pendIntent)
+                    .setContent(mRemoteViews)
+                    .setTicker(ticker);
+
+            mNotification = mBuilder.build();
+            mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+            mNotification.defaults |= Notification.DEFAULT_LIGHTS;
+            startForeground(NOTIFICATION_ID, mNotification);
+        }
+    }
+
+    private void setRemoteViews() {
+        if (mPlayingItem != null) {
+            mRemoteViews.setTextViewText(R.id.play_title, mPlayingItem.getTitle());
+            // TODO : play_time이 필요하다면 play_title 에 spannable 로 처리하자.
+//            if (mPlayingItem.getDuration() > 0) {
+//                mRemoteViews.setViewVisibility(R.id.play_time, View.VISIBLE);
+//
+//                long millis = mPlayingItem.getDuration();
+//                String time = String.format("%02d:%02d",
+//                        TimeUnit.MILLISECONDS.toMinutes(millis) -
+//                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), // The change is in this line
+//                        TimeUnit.MILLISECONDS.toSeconds(millis) -
+//                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+//
+//                mRemoteViews.setTextViewText(R.id.play_time, time);
+//            } else {
+//                mRemoteViews.setViewVisibility(R.id.play_time, View.INVISIBLE);
+//            }
+        } else {
+            mRemoteViews.setTextViewText(R.id.play_title, getString(R.string.activity_radio_default_title));
+//            mRemoteViews.setViewVisibility(R.id.play_time, View.GONE);
+        }
+
+        // toggle playback
+        Intent intent = new Intent(this, MusicService.class);
+        intent.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
+        PendingIntent pi = PendingIntent.getService(this, 0, intent, 0);
+        mRemoteViews.setOnClickPendingIntent(R.id.ic_media_control_play, pi);
+        if (mState == State.Paused) {
+            mRemoteViews.setImageViewResource(R.id.ic_media_control_play, R.drawable.ic_btn_radio_play_selector);
+        } else {
+            mRemoteViews.setImageViewResource(R.id.ic_media_control_play, R.drawable.ic_btn_radio_pause_selector);
+        }
+        // stop button
+        intent = new Intent(this, MusicService.class);
+        intent.setAction(MusicService.ACTION_STOP);
+        pi = PendingIntent.getService(this, 0, intent, 0);
+        mRemoteViews.setOnClickPendingIntent(R.id.ic_media_control_stop, pi);
     }
 }

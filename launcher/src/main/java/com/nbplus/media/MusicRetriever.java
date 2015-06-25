@@ -42,7 +42,7 @@ public class MusicRetriever {
      * blocking the main thread.
      */
     public void prepare() {
-        Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Log.i(TAG, "Querying media...");
         Log.i(TAG, "URI: " + uri.toString());
 
@@ -143,7 +143,7 @@ public class MusicRetriever {
         public Uri getURI() {
             if (type == 1) {
                 return ContentUris.withAppendedId(
-                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
             } else {
                 return Uri.parse(url);
             }
@@ -181,7 +181,7 @@ public class MusicRetriever {
             this.duration = in.readLong();
         }
 
-        public static final Parcelable.Creator<Item> CREATOR = new Parcelable.Creator<Item>() {
+        public static final Creator<Item> CREATOR = new Creator<Item>() {
             public Item createFromParcel(Parcel source) {
                 return new Item(source);
             }

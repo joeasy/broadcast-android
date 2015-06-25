@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.location.Location;
@@ -29,33 +28,23 @@ import com.android.volley.toolbox.Volley;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.api.GsonRequest;
 import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.data.ForecastData;
 import com.nbplus.vbroadlauncher.data.ForecastGrib;
 import com.nbplus.vbroadlauncher.data.ForecastItem;
 import com.nbplus.vbroadlauncher.data.ForecastSpaceData;
 import com.nbplus.vbroadlauncher.data.ForecastTimeData;
-import com.nbplus.vbroadlauncher.data.GeocodeData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.nbplus.vbroadlauncher.data.YahooQueryForecastResult;
-import com.nbplus.vbroadlauncher.data.YahooQueryGeocodeResult;
 
 import org.basdroid.common.DisplayUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by basagee on 2015. 6. 3..
  */
-public class WeatherView extends LinearLayout {
-    private static final String TAG = WeatherView.class.getSimpleName();
+public class WeatherViewBackup extends LinearLayout {
+    private static final String TAG = WeatherViewBackup.class.getSimpleName();
 
     private class LamcParameter {
         public double mapRadius = Constants.DEFAULT_MAP_RADIUS;
@@ -80,8 +69,6 @@ public class WeatherView extends LinearLayout {
     private int mForecastSpaceDataRetry = 0;
     private int mForecastTimeDataRetry = 0;
     private int mForecastGribRetry = 0;
-
-    private static final int BASE_SKY_STATUS_END_VALUE = 3;
 
     // layout
     private LinearLayout mWeatherViewMainLayout;
@@ -125,20 +112,13 @@ public class WeatherView extends LinearLayout {
                     // update weather and set next alarm
                     updateForecastGrib(1);
                     setNextForecastGribAlarm();
-
-                    if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
-                        updateYahooGeocode();
-                    } else {
-                        updateYahooForecast();
-                    }
                 } else if (Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "Weather service action received !!!");
                     releaseAlarm(Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION);
 
                     // update weather and set next alarm
-                    // TODO : 데이터도 제대로 오지 않음... 아후거 쓰자.
-                    //updateForecastSpaceData(1);
-                    //setNextForecastSpaceDataAlarm();
+                    updateForecastSpaceData(1);
+                    setNextForecastSpaceDataAlarm();
                 } else if (Constants.LOCATION_CHANGED_ACTION.equals(intent.getAction()) ||
                         Constants.WEATHER_SERVICE_DEFAULT_TIMER.equals(intent.getAction())) {
                     Log.d(TAG, "LOCATION_CHANGED_ACTION received !!!");
@@ -148,38 +128,31 @@ public class WeatherView extends LinearLayout {
                     // 실황예보
                     updateForecastGrib(1);
                     // 단기예보
-                    // TODO : 데이터도 제대로 오지 않음... 아후거 쓰자.
-                    //updateForecastSpaceData(1);
+                    updateForecastSpaceData(1);
                     setNextForecastGribAlarm();
-                    // TODO : 데이터도 제대로 오지 않음... 아후거 쓰자.
-                    //setNextForecastSpaceDataAlarm();
-                    if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
-                        updateYahooGeocode();
-                    } else {
-                        updateYahooForecast();
-                    }
+                    setNextForecastSpaceDataAlarm();
                 }
             }
         }
     };
 
-    public WeatherView(Context context) {
+    public WeatherViewBackup(Context context) {
         super(context);
         initializeWeatherView(context);
     }
 
-    public WeatherView(Context context, AttributeSet attrs) {
+    public WeatherViewBackup(Context context, AttributeSet attrs) {
         super(context, attrs);
         initializeWeatherView(context);
     }
 
-    public WeatherView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WeatherViewBackup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initializeWeatherView(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public WeatherView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WeatherViewBackup(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initializeWeatherView(context);
     }
@@ -829,54 +802,15 @@ public class WeatherView extends LinearLayout {
 
             Resources res = getResources();
             String[] skyStatusArray = res.getStringArray(R.array.sky_status);
-            skyStatusValue = Integer.parseInt(item.obsrValue) - 1;
-            // 강수형태를 가져온다.
-            item = getForecastItemCategory(mForecastGribItems, ForecastItem.PTY);
-            int rainValue = 0;      // 하늘상태면 습도, 강수형태면 1시간 강수/적설량
-            int rainStatus = Integer.parseInt(item.obsrValue);
-            if (rainStatus > 0) {
-                skyStatusValue = BASE_SKY_STATUS_END_VALUE + rainStatus;
+            skyStatusValue = Integer.parseInt(item.obsrValue);
 
-                // 1시간 강수 또는 적설량
-                item = getForecastItemCategory(mForecastGribItems, ForecastItem.RN1);
-                if (item != null) {
-                    try {
-                        rainValue = Integer.parseInt(item.obsrValue);
-                    } catch (Exception e) {
-                        //
-                    }
-                }
-            } else {
-                // 현재 습도
-                item = getForecastItemCategory(mForecastGribItems, ForecastItem.REH);
-                if (item != null) {
-                    try {
-                        rainValue = Integer.parseInt(item.obsrValue);
-                    } catch (Exception e) {
-                        //
-                    }
-                }
-            }
-
-            String skyStatus;
-            try {
-                skyStatus = skyStatusArray[skyStatusValue];
-            } catch (Exception e) {
-                skyStatus = skyStatusArray[0];
+            String skyStatus = skyStatusArray[0];
+            if (skyStatusValue >= 1 && skyStatusValue <= 4) {       // 없는값이올수있을까??
+                skyStatus = skyStatusArray[skyStatusValue - 1];
             }
 
             if (mCurrentSkyStatus != null) {
-                String rainValueString = "";
-                if (skyStatusValue <= BASE_SKY_STATUS_END_VALUE) {
-                    rainValueString = getContext().getString(R.string.humidity, rainValue + "%");
-                } else {
-                    if (skyStatusValue == skyStatusArray.length - 1) {
-                        rainValueString = getContext().getString(R.string.snowfall, rainValue);
-                    } else {
-                        rainValueString = getContext().getString(R.string.rainfall, rainValue);
-                    }
-                }
-                mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status, skyStatus, rainValueString));
+                mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status, skyStatus, "무엇을?"));
             }
         }
         item = getForecastItemCategory(mForecastGribItems, ForecastItem.T1H);
@@ -900,8 +834,8 @@ public class WeatherView extends LinearLayout {
                 mCurrentCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
                 TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
                 TypedArray skyStatusBgDrawable = getResources().obtainTypedArray(R.array.sky_status_bg_drawable);
-                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
-                mCurrentSkyBgLayout.setBackgroundResource(skyStatusBgDrawable.getResourceId(skyStatusValue, 0));
+                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue - 1, 0), 0);
+                mCurrentSkyBgLayout.setBackgroundResource(skyStatusBgDrawable.getResourceId(skyStatusValue - 1, 0));
             }
         }
     }
@@ -1039,7 +973,7 @@ public class WeatherView extends LinearLayout {
             mTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
             mDayAfterTomorrowLayout.setOrientation(LinearLayout.VERTICAL);
 
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)mCurrentSkyBgLayout.getLayoutParams();
+            LayoutParams lp = (LayoutParams)mCurrentSkyBgLayout.getLayoutParams();
             if (lp != null) {
                 heightDp = DisplayUtils.getDimension(getContext(), R.dimen.weather_current_height);
                 px = DisplayUtils.pxFromDp(getContext(), heightDp);
@@ -1048,7 +982,7 @@ public class WeatherView extends LinearLayout {
                 mCurrentSkyBgLayout.setLayoutParams(lp);
             }
 
-            lp = (LinearLayout.LayoutParams)mThreeDaysLayout.getLayoutParams();
+            lp = (LayoutParams)mThreeDaysLayout.getLayoutParams();
             if (lp != null) {
                 heightDp = DisplayUtils.getDimension(getContext(), R.dimen.weather_week_height);
                 px = DisplayUtils.pxFromDp(getContext(), heightDp);
@@ -1063,7 +997,7 @@ public class WeatherView extends LinearLayout {
             mTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
             mDayAfterTomorrowLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)mCurrentSkyBgLayout.getLayoutParams();
+            LayoutParams lp = (LayoutParams)mCurrentSkyBgLayout.getLayoutParams();
             heightDp = DisplayUtils.getDimension(getContext(), R.dimen.weather_current_height);
             px = DisplayUtils.pxFromDp(getContext(), heightDp);
             if (lp != null) {
@@ -1071,7 +1005,7 @@ public class WeatherView extends LinearLayout {
                 mCurrentSkyBgLayout.setLayoutParams(lp);
             }
 
-            lp = (LinearLayout.LayoutParams)mThreeDaysLayout.getLayoutParams();
+            lp = (LayoutParams)mThreeDaysLayout.getLayoutParams();
             if (lp != null) {
                 lp.height = (int)px;
                 mThreeDaysLayout.setLayoutParams(lp);
@@ -1083,344 +1017,5 @@ public class WeatherView extends LinearLayout {
         mCurrentTitle.setText(getContext().getString(R.string.weather_title,
                 LauncherSettings.getInstance(getContext()).getVillageName()));
 
-    }
-
-    /****
-     * 야후 날씨 사용시
-     */
-    ///////////////////////////////////
-    // for weather
-    ///////////////////////////////////
-    /**
-     *  Yahoo! woeid  검색
-     */
-    ForecastData mForecastData;
-    private int mForecastRetry = 0;
-
-    public void updateYahooGeocode() {
-        if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
-        }
-
-        Location location = LauncherSettings.getInstance(getContext()).getPreferredUserLocation();
-        String yql = String.format(Constants.YAHOO_WOEID_QUERY, location.getLatitude(), location.getLongitude());
-        try {
-            yql = URLEncoder.encode(yql, "utf-8");
-            yql = yql.replaceAll("\\+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        String url = String.format(Constants.YAHOO_WEATHER_API, yql);
-        Log.d(TAG, ">> updateGeocode URL = " + url);
-
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, YahooQueryGeocodeResult.class, new Response.Listener<YahooQueryGeocodeResult>() {
-
-            @Override
-            public void onResponse(YahooQueryGeocodeResult response) {
-                Log.d(TAG, ">>> updateGeocode success !!!");
-                mForecastRetry = 0;
-
-                GeocodeData data = response.getGeocodeData();
-                if (data != null) {
-                    LauncherSettings.getInstance(getContext()).setGeocodeData(data);
-                    updateYahooForecast();
-                }
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> updateGeocode error");
-                mForecastRetry++;
-                if (mForecastRetry > 3) {     // retry 3 times
-                    mForecastRetry = 0;
-                    Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
-                } else {                // retry
-                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastRetry);
-                    updateYahooGeocode();
-                }
-            }
-        });
-
-        mWeatherRequestQueue.add(jsRequest);
-    }
-
-    /**
-     *  Yahoo! get weather data  검색
-     */
-    public void updateYahooForecast() {
-        if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
-        }
-
-        GeocodeData geoCode = LauncherSettings.getInstance(getContext()).getGeocodeData();
-        String yql = String.format(Constants.YAHOO_WEATHER_QUERY, geoCode.woeid);
-        try {
-            yql = URLEncoder.encode(yql, "utf-8");
-            yql = yql.replaceAll("\\+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        String url = String.format(Constants.YAHOO_WEATHER_API, yql);
-        Log.d(TAG, ">> updatForecast URL = " + url);
-
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, YahooQueryForecastResult.class, new Response.Listener<YahooQueryForecastResult>() {
-
-            @Override
-            public void onResponse(YahooQueryForecastResult response) {
-                Log.d(TAG, ">>> updatForecast success !!!");
-                mForecastRetry = 0;
-
-                mForecastData = response.getForecastData();
-                if (mForecastData != null) {
-                    updateYahooForecastView();
-                }
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> updatForecast error");
-                mForecastRetry++;
-                if (mForecastRetry > 3) {     // retry 3 times
-                    mForecastRetry = 0;
-                    Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
-                } else {                // retry
-                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastRetry);
-                    updateYahooForecast();
-                }
-            }
-        });
-
-        mWeatherRequestQueue.add(jsRequest);
-    }
-
-    final List<String> sunny = Arrays.asList("24", "25", "31", "32", "33", "34", "36");
-    final List<String> littleCloudy = Arrays.asList("19", "20", "21", "22", "23", "29", "30", "44");
-    final List<String> mostlyCloudy = Arrays.asList();
-    final List<String> overcast = Arrays.asList("26", "27", "28");
-    final List<String> rainy = Arrays.asList("0", "1", "2", "3", "4", "11", "12", "37", "38", "39", "40", "45", "47");
-    final List<String> rainyAndSnow = Arrays.asList("5", "6", "10", "35");
-    final List<String> snow = Arrays.asList("7", "8", "9", "13", "14", "15", "16", "17", "18", "41", "42", "43", "46");
-
-    /**
-     * 기상청에서 받아온 날씨데이터를 화면에 업데이트
-     */
-    private int conditonCodeToSkyStatus(String conditionCode) {
-        /**
-         https://developer.yahoo.com/weather/documentation.html#codes
-         // 비
-         Code    Description
-         0    tornado
-         1    tropical storm
-         2    hurricane
-         3    severe thunderstorms
-         4    thunderstorms
-         11    showers
-         12    showers
-         37    isolated thunderstorms
-         38    scattered thunderstorms
-         39    scattered thunderstorms
-         40    scattered showers
-         45    thundershowers
-         47    isolated thundershowers
-
-         // 비/눈
-         5    mixed rain and snow
-         6    mixed rain and sleet
-         10    freezing rain       //
-         35    mixed rain and hail
-
-         // 눈
-         7    mixed snow and sleet
-         8    freezing drizzle    // 눈
-         9    drizzle
-         13    snow flurries
-         14    light snow showers
-         15    blowing snow
-         16    snow
-         17    hail
-         18    sleet
-         41    heavy snow
-         42    scattered snow showers
-         43    heavy snow
-         46    snow showers
-
-         // 바람
-         // 조금 흐림 + 안개등
-         19    dust
-         20    foggy
-         21    haze
-         22    smoky
-         23    blustery
-         29    partly cloudy (night)
-         30    partly cloudy (day)
-         44    partly cloudy
-
-         // 많이 흐림
-         26    cloudy
-         27    mostly cloudy (night)
-         28    mostly cloudy (day)
-
-         // 맑음
-         24    windy
-         25    cold
-         31    clear (night)
-         32    sunny
-         33    fair (night)
-         34    fair (day)
-         36    hot
-
-         3200    not available
-         */
-
-        if (sunny.indexOf(conditionCode) != -1) {
-            return 0;
-        } else if (littleCloudy.indexOf(conditionCode) != -1) {
-            return 1;
-        } else if (mostlyCloudy.indexOf(conditionCode) != -1) {
-            return 2;
-        } else if (overcast.indexOf(conditionCode) != -1) {
-            return 3;
-        } else if (rainy.indexOf(conditionCode) != -1) {
-            return 4;
-        } else if (rainyAndSnow.indexOf(conditionCode) != -1) {
-            return 5;
-        } else if (snow.indexOf(conditionCode) != -1) {
-            return 6;
-        }
-
-        return 0;
-    }
-
-    private void updateYahooForecastView() {
-        Log.d(TAG, ">> updateForecastView().......");
-
-        if (mForecastData == null || mForecastData.item == null) {
-            return;
-        }
-
-        Resources res = getResources();
-        String[] skyStatusArray = res.getStringArray(R.array.sky_status);
-        TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
-        String[] weekStringArray = res.getStringArray(R.array.week_day);
-
-        int skyStatusValue = 0;
-
-        /**
-         * TODO : =야후 API가 약3도정도 오차가 있다. 약간은 보정해 줘야하나?
-         */
-
-//        // condition 과 humidity 를 보여준다.
-//        if (mForecastData.atmosphere != null && mForecastData.item.currentCondition != null) {
-//            skyStatusValue = conditonCodeToSkyStatus(mForecastData.item.currentCondition.conditionCode);
-//
-//            String skyStatusString = skyStatusArray[skyStatusValue];
-//
-//            if (mCurrentSkyStatus != null) {
-//                mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status,
-//                        skyStatusString, "습도 " + mForecastData.atmosphere.humidity + "%"));
-//            }
-//
-//            //보정
-//            float temp = Float.parseFloat(mForecastData.item.currentCondition.temperature);
-//            temp += 3;
-//
-//            mCurrentCelsius.setText(getContext().getString(R.string.celsius, "" + ((int)temp)));
-//            mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
-//        }
-
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdf;
-
-        // today
-        ForecastData.Forecast data = mForecastData.item.weekCondition.get(0);
-        if (data != null) {
-            //sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm z", Locale.US);
-            sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-            try {
-                calendar.setTime(sdf.parse(data.date));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            mTodayTitle.setText(getContext().getString(R.string.weather_day,
-                    calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
-
-            try {
-                float maxCelsius = Float.parseFloat(data.high);
-                float minCelsius = Float.parseFloat(data.low);
-
-                float lastMaxCelsius = 0f;
-                if (mLastMaxTodayCelsius != null) {
-                    lastMaxCelsius = Float.parseFloat(mLastMaxTodayCelsius);
-                }
-
-                if (lastMaxCelsius != 0f) {
-                    if (lastMaxCelsius > 0 && lastMaxCelsius > maxCelsius) {
-                        maxCelsius = lastMaxCelsius;
-                    } else if (lastMaxCelsius < 0 && lastMaxCelsius < maxCelsius) {
-                        maxCelsius = lastMaxCelsius;
-                    }
-                }
-                mTodayMaxCelsius.setText(getContext().getString(R.string.celsius,  "" + Math.round(maxCelsius)));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-
-            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
-            mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
-            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
-        }
-
-        // tomorrow
-        data = mForecastData.item.weekCondition.get(1);
-        if (data != null) {
-            //sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm z", Locale.US);
-            sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-            try {
-                calendar.setTime(sdf.parse(data.date));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            mTomorrowTitle.setText(getContext().getString(R.string.weather_day,
-                    calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
-
-            //보정
-            float temp = Float.parseFloat(data.high);
-            //temp += 3;
-
-            mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + Math.round(temp)));
-
-            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
-            mTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
-            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
-        }
-
-        // the day after tomorrow
-        data = mForecastData.item.weekCondition.get(2);
-        if (data != null) {
-            //sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm z", Locale.US);
-            sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-            try {
-                calendar.setTime(sdf.parse(data.date));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            mDayAfterTomorrowTitle.setText(getContext().getString(R.string.weather_day,
-                    calendar.get(Calendar.DAY_OF_MONTH), weekStringArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
-
-            //보정
-            float temp = Float.parseFloat(data.high);
-            //temp += 3;
-
-            mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + Math.round(temp)));
-
-            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
-            mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
-            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
-        }
     }
 }

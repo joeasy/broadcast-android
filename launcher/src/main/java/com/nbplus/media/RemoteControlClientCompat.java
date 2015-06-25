@@ -198,7 +198,7 @@ public class RemoteControlClientCompat {
          * @return Returns a reference to the same MetadataEditor object, so you can chain put
          *      calls together.
          * @throws IllegalArgumentException
-         * @see android.graphics.Bitmap
+         * @see Bitmap
          */
         public MetadataEditorCompat putBitmap(int key, Bitmap bitmap) {
             if (sHasRemoteControlAPIs) {

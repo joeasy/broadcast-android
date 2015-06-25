@@ -12,6 +12,7 @@ public class ForecastItem {
     public static final String SKY = "SKY";     // 하늘상태
     public static final String POP = "POP";     // 강수확률
     public static final String PTY = "PTY";     // 강수형태
+    public static final String RN1 = "RN1";     // 1시간강수
     public static final String T3H = "T3H";     // 3시간기온
     public static final String T1H = "T1H";     // 1시간기온 - 실황에포함됨.
 

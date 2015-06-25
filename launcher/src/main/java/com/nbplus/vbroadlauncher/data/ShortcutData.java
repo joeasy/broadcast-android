@@ -12,7 +12,7 @@ public class ShortcutData implements Parcelable {
     @SerializedName("type")
     private Integer type;
     @SerializedName("name")
-    private String name;
+    private int name;
 
     @SerializedName("domain")
     private String domain;
@@ -56,11 +56,11 @@ public class ShortcutData implements Parcelable {
         this.type = type;
     }
 
-    public String getName() {
+    public int getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(int name) {
         this.name = name;
     }
 
@@ -96,7 +96,7 @@ public class ShortcutData implements Parcelable {
         this.nativeClass = nativeClass;
     }
 
-    public ShortcutData(int type, String name, String path, int iconRes, int backgroundRes, int nativeType, Class clazz) {
+    public ShortcutData(int type, int name, String path, int iconRes, int backgroundRes, int nativeType, Class clazz) {
         this.type = type;
         this.name = name;
         this.path = path;
@@ -117,7 +117,7 @@ public class ShortcutData implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(this.type);
-        dest.writeString(this.name);
+        dest.writeInt(this.name);
         dest.writeString(this.domain);
         dest.writeString(this.path);
         dest.writeInt(this.iconResId);
@@ -128,7 +128,7 @@ public class ShortcutData implements Parcelable {
 
     protected ShortcutData(Parcel in) {
         this.type = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.name = in.readString();
+        this.name = in.readInt();
         this.domain = in.readString();
         this.path = in.readString();
         this.iconResId = in.readInt();

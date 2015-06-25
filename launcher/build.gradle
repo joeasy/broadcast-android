@@ -50,7 +50,7 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.+'
     compile 'com.google.code.gson:gson:2.2.4'
     compile project(':iot_gateway')
-    compile project(':media_player')
+    compile project(':vitamio')
     compile project(':push_agent')
     compile project(':common_library')
     compile project(':viewpager_indicator')

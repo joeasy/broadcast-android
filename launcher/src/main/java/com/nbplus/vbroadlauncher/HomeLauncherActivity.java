@@ -55,8 +55,9 @@ import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
-import io.vov.vitamio.LibsChecker;
+import java.util.Locale;
 
+import io.vov.vitamio.LibsChecker;
 
 public class HomeLauncherActivity extends BaseActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -77,6 +78,7 @@ public class HomeLauncherActivity extends BaseActivity
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
     protected Location mLastLocation;
+    private Locale mCurrentLocale;
 
     /**
      * The formatted location address.
@@ -118,6 +120,7 @@ public class HomeLauncherActivity extends BaseActivity
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_home_launcher);
 
+        mCurrentLocale = getResources().getConfiguration().locale;
         boolean isTablet = DisplayUtils.isTabletDevice(this);
         if (isTablet) {
             //is tablet
@@ -586,6 +589,7 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged !!!");
         setContentViewByOrientation();
     }
 

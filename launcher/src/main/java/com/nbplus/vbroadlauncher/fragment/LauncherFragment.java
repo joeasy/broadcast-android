@@ -93,6 +93,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private final LauncherFragmentHandler mHandler = new LauncherFragmentHandler(this);
 
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
+    private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
+
     // 핸들러 객체 만들기
     private static class LauncherFragmentHandler extends Handler {
         private final WeakReference<LauncherFragment> mFragment;
@@ -201,7 +203,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Intent intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
 
                 ShortcutData data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
-                        getActivity().getResources().getString(R.string.btn_show_map),
+                        R.string.btn_show_map,
                         getActivity().getResources().getString(R.string.addr_show_map),
                         R.drawable.ic_menu_04,
                         R.drawable.ic_menu_shortcut_02_selector,
@@ -493,7 +495,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     case 0 :            // activity
                         intent = new Intent(getActivity(), data.getNativeClass());
                         data.setDomain(serverData.getDocServer());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
                         startActivity(intent);
                         break;

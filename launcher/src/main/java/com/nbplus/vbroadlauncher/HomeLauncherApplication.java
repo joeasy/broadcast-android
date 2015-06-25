@@ -14,4 +14,8 @@ public class HomeLauncherApplication extends Application  {
         new InstalledApplicationTask(this).execute();
     }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
 }

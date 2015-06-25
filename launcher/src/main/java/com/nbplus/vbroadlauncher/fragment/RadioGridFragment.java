@@ -14,11 +14,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.nbplus.vbroadlauncher.R;
+import com.nbplus.vbroadlauncher.RadioActivity;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.adapter.AppGridViewAdapter;
 import com.nbplus.vbroadlauncher.adapter.RadioGridViewAdapter;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
+import com.nbplus.vbroadlauncher.callback.OnRadioActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnRadioFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
  * 1. 시작시에 뮤직서비스의 플레이 상태를 알아보기 위하여 messenger를 이용하여 조회한다.
  * 2. 그 외에 실행중 뮤직서비스 상태변화는 LocalBroadcastManager 를 이용한다.
  */
-public class RadioGridFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class RadioGridFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, OnRadioActivityInteractionListener {
 
     private static final String TAG = RadioGridFragment.class.getSimpleName();
 
@@ -41,6 +43,7 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
     RadioGridViewAdapter mAdapter;
     ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelList;
     int mViewPagePosition = -1;
+    Activity mActivity;
 
     private OnRadioFragmentInteractionListener mListener;
 
@@ -83,7 +86,14 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_radio_grid, container, false);
         mGridLayout = (GridView)v.findViewById(R.id.grid_layout);
+
+        Bundle b = null;
+        if (mListener != null) {
+            b = mListener.getMusicPlayingStatus();
+        }
+
         mAdapter = new RadioGridViewAdapter(getActivity(), mRadioChannelList, this);
+        mAdapter.setPlayingItems(b);
         mGridLayout.setAdapter(mAdapter);
         mGridLayout.setOnItemClickListener(this);
         return v;
@@ -92,8 +102,11 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
+        mActivity = activity;
         try {
             mListener = (OnRadioFragmentInteractionListener) activity;
+            ((RadioActivity)mActivity).setOnRadioActivityInteractionListener(this);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -104,6 +117,7 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        ((RadioActivity)mActivity).removeOnRadioActivityInteractionListener(this);
     }
 
     @Override
@@ -134,5 +148,11 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
         if (mListener != null) {
             mListener.onPlayRadioRequest(channel);
         }
+    }
+
+    @Override
+    public void onPlayItemChanged(Bundle b) {
+        mAdapter.setPlayingItems(b);
+        mAdapter.notifyDataSetChanged();
     }
 }

@@ -4,10 +4,8 @@ package com.nbplus.vbroadlauncher.callback;
  * Created by basagee on 2015. 5. 19..
  */
 
-import android.net.Uri;
 import android.os.Bundle;
 
-import com.nbplus.media.MusicRetriever;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 
 /**
@@ -20,7 +18,6 @@ import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
  * "http://developer.android.com/training/basics/fragments/communicating.html"
  * >Communicating with Other Fragments</a> for more information.
  */
-public interface OnRadioFragmentInteractionListener {
-    public void onPlayRadioRequest(RadioChannelInfo.RadioChannel channel);
-    public Bundle getMusicPlayingStatus();
+public interface OnRadioActivityInteractionListener {
+    public void onPlayItemChanged(Bundle b);
 }

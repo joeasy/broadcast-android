@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:gravity="center"
-        android:background="@drawable/ic_weather_bg_01"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -96,7 +95,6 @@
 
             <ImageView
                 android:id="@+id/today_sky_status_icon"
-                android:src="@drawable/ic_weather_01"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:scaleType="fitXY"
@@ -139,7 +137,6 @@
 
             <ImageView
                 android:id="@+id/tomorrow_sky_status_icon"
-                android:src="@drawable/ic_weather_01"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:scaleType="fitXY"
@@ -181,7 +178,6 @@
 
             <ImageView
                 android:id="@+id/day_after_tomorrow_sky_status_icon"
-                android:src="@drawable/ic_weather_01"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:scaleType="fitXY"

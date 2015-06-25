@@ -40,4 +40,6 @@
     <dimen name="radio_activity_title_height">60dp</dimen>
     <dimen name="radio_activity_label_font_size">16.875dp</dimen>
     <dimen name="radio_channel_button_font_size">15dp</dimen>
+    <dimen name="radio_play_control_margin">22.5dp</dimen>
+    <dimen name="radio_play_control_progress_width">120dp</dimen>
 </resources>

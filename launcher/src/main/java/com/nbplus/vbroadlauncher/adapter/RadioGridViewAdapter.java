@@ -1,6 +1,7 @@
 package com.nbplus.vbroadlauncher.adapter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nbplus.media.MusicRetriever;
+import com.nbplus.media.MusicService;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 
@@ -26,6 +29,7 @@ public class RadioGridViewAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelList;
     private View.OnClickListener mClickListener;
+    private long mPlayingItemIdx = -1;
 
     public static class RadioViewHolder {
         public Button channelButton;
@@ -39,7 +43,6 @@ public class RadioGridViewAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -64,12 +67,21 @@ public class RadioGridViewAdapter extends BaseAdapter {
             } else {
                 viewHolder.channelButton.setText(radioChannel.channelName);
             }
+            if (radioChannel.index == mPlayingItemIdx) {
+                viewHolder.channelButton.setBackgroundResource(R.drawable.ic_radio_channel_pressed);
+                viewHolder.channelButton.setClickable(false);
+                //convertView.setClickable();
 
-            viewHolder.channelButton.setOnClickListener(this.mClickListener);
+                viewHolder.channelButton.setOnClickListener(null);
+            } else {
+                viewHolder.channelButton.setBackgroundResource(R.drawable.ic_radio_channel_selector);
+                viewHolder.channelButton.setClickable(true);
+
+                viewHolder.channelButton.setOnClickListener(this.mClickListener);
+            }
         } else {
             Log.d(TAG, ">> invalid radioChannel...");
         }
-
         return convertView;
     }
     @Override
@@ -85,5 +97,21 @@ public class RadioGridViewAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return 0;
+    }
+
+    public void setPlayingItems(Bundle b) {
+        if (b != null && b.getSerializable(MusicService.EXTRA_PLAYING_STATUS) != null) {
+            MusicService.State state = (MusicService.State)b.getSerializable(MusicService.EXTRA_PLAYING_STATUS);
+            if (state == MusicService.State.Paused || state == MusicService.State.Playing) {
+                MusicRetriever.Item item = b.getParcelable(MusicService.EXTRA_MUSIC_ITEM);
+                if (item != null) {
+                    mPlayingItemIdx = item.getId();
+                } else {
+                    mPlayingItemIdx = -1;
+                }
+            } else {
+                mPlayingItemIdx = -1;
+            }
+        }
     }
 }
