@@ -14,13 +14,14 @@
 
         <EditText
             android:id="@+id/et_test_url"
-            android:maxLines="1"
+            android:lines="1"
+            android:inputType="textUri"
             android:ellipsize="end"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:maxLength="1000"
             android:layout_weight="1"
-            android:layout_width="match_parent"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             />
 

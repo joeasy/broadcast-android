@@ -1357,13 +1357,11 @@ public class WeatherView extends LinearLayout {
                 }
 
                 if (lastMaxCelsius != 0f) {
-                    if (lastMaxCelsius > 0 && lastMaxCelsius > maxCelsius) {
-                        maxCelsius = lastMaxCelsius;
-                    } else if (lastMaxCelsius < 0 && lastMaxCelsius < maxCelsius) {
+                    if (lastMaxCelsius > maxCelsius) {
                         maxCelsius = lastMaxCelsius;
                     }
                 }
-                mTodayMaxCelsius.setText(getContext().getString(R.string.celsius,  "" + Math.round(maxCelsius)));
+                mTodayMaxCelsius.setText(getContext().getString(R.string.celsius,  "" + (int)Math.ceil(maxCelsius)));
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -1391,7 +1389,7 @@ public class WeatherView extends LinearLayout {
             float temp = Float.parseFloat(data.high);
             //temp += 3;
 
-            mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + Math.round(temp)));
+            mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             mTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
@@ -1416,7 +1414,7 @@ public class WeatherView extends LinearLayout {
             float temp = Float.parseFloat(data.high);
             //temp += 3;
 
-            mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + Math.round(temp)));
+            mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));

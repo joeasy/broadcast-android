@@ -1,6 +1,7 @@
-package com.nbplus.vbroadlauncher.hybrid;
+package com.nbplus.vbroadlistener.hybrid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -9,13 +10,13 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
-import com.nbplus.vbroadlauncher.R;
-import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.nbplus.vbroadlauncher.data.RegSettingData;
-import com.nbplus.vbroadlauncher.data.VBroadcastServer;
-import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
+import com.nbplus.vbroadlistener.R;
+import com.nbplus.vbroadlistener.data.Constants;
+import com.nbplus.vbroadlistener.data.RegSettingData;
+import com.nbplus.vbroadlistener.data.VBroadcastServer;
+import com.nbplus.vbroadlistener.gcm.RegistrationIntentService;
+import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
-import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
 /**
@@ -29,12 +30,12 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
     }
 
     /**
-     * 디바이스의 UUID 조회. mac address 기반 40bytes SHA-1 value
+     * 원격수신은 device uuid 를 전달하지 않는다.
      */
     @Override
     @JavascriptInterface
     public String getDeviceId() {
-        return LauncherSettings.getInstance(mContext).getDeviceID();
+        return null;
     }
 
     /**
@@ -61,15 +62,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
                         return;
                     } else {
                         VBroadcastServer serverInfo = settings.getServerInformation();
-                        if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
                         if (StringUtils.isEmptyString(serverInfo.getDocServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        if (StringUtils.isEmptyString(serverInfo.getPushInterfaceServer())) {
                             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -89,37 +82,34 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
     }
 
     /**
-     *
-     * @param appId
+     * GCM 등록
+     * @return boolean
      */
     @JavascriptInterface
-    public void registerPushApplication(String appId) {
-        Log.d(TAG, ">> registerPushApplication() called = " + appId);
+    public boolean registerGcm() {
+        // Start IntentService to register this application with GCM.
+        Intent intent = new Intent(mContext, RegistrationIntentService.class);
+        intent.setAction(Constants.REGISTER_GCM);
+        mContext.startService(intent);
+        return true;
     }
 
     /**
-     * 어플리케이션 또는 현재 액티비티를 종료한다.
+     * GCM 해제
+     * @return boolean
      */
-    @Override
-    @JavascriptInterface
-    public void closeWebApplication() {
-        Log.d(TAG, ">> closeWebApplication() called");
-
-        mContext.finish();
-    }
-
-    // not support
-    @JavascriptInterface
-    public boolean registerGcm() {
-        return false;
-    }
-
-    // not support
     @JavascriptInterface
     public boolean unRegisterGcm() {
-        return false;
+        // Start IntentService to register this application with GCM.
+        Intent intent = new Intent(mContext, RegistrationIntentService.class);
+        intent.setAction(Constants.UNREGISTER_GCM);
+        mContext.startService(intent);
+        return true;
     }
 
+    /**
+     * IoT GW 로부터 IoT Devices  목록을 갱신한다.
+     */
     @JavascriptInterface
     public void updateIoTDevices() {
 
@@ -130,16 +120,25 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
      * 아래에서 불리는 자바스크립트 function 들은 웹앱에서 구현이 되어 있어야 한다.
      *
      */
+    /**
+     * GCM 등록 토큰 전달
+     * @param gcmRegToken 토큰
+     */
     public void onRegistered(String gcmRegToken) {
-        // do not anything
-        //mWebView.loadUrl("javascript:window.onRegistered(" + gcmRegToken + ");");
+        mWebView.loadUrl("javascript:window.onRegistered('" + gcmRegToken + "');");
     }
 
+    /**
+     * GCM 해제 결과
+     */
     public void onUnRegistered() {
-        // do not anything
-        //mWebView.loadUrl("javascript:window.onUnRegistered();");
+        mWebView.loadUrl("javascript:window.onUnRegistered();");
     }
 
+    /**
+     * 검색된 IoT device 목록 전달
+     * @param iotDevices device list
+     */
     public void onUpdateIoTDevices(String iotDevices) {
         mWebView.loadUrl("javascript:window.onRegistered('" + iotDevices + "');");
     }

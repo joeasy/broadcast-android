@@ -1,13 +1,16 @@
 package com.nbplus.hybrid;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
@@ -34,6 +37,7 @@ public class BasicWebViewClient extends WebViewClient {
     protected WebView mWebView;
     protected Activity mContext;
     protected BroadcastWebChromeClient mWebChromeClient;
+    protected boolean mPageLoadSuccess = false;
 
     /**
      * Created by basagee on 2015. 4. 30..
@@ -108,7 +112,7 @@ public class BasicWebViewClient extends WebViewClient {
      * @param url
      */
     public void loadUrl(String url) {
-        if (StringUtils.isEmptyString(url) == false) {
+        if (!StringUtils.isEmptyString(url)) {
             mWebView.loadUrl(url);
         }
     }
@@ -151,10 +155,46 @@ public class BasicWebViewClient extends WebViewClient {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        Log.d(TAG, "WebView client onPageFinished = " + url);
         super.onPageFinished(view, url);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             CookieSyncManager.getInstance().sync();
         }
+        mPageLoadSuccess = true;
+    }
+
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        mPageLoadSuccess = false;
+        Log.e(TAG, "WebView client onReceivedError code = " + errorCode);
+//        switch (errorCode) {
+//            case ERROR_AUTHENTICATION:               // 서버에서 사용자 인증 실패
+//            case ERROR_BAD_URL:                            // 잘못된 URL
+//            case ERROR_CONNECT:                           // 서버로 연결 실패
+//            case ERROR_FAILED_SSL_HANDSHAKE:     // SSL handshake 수행 실패
+//            case ERROR_FILE:                                   // 일반 파일 오류
+//            case ERROR_FILE_NOT_FOUND:                // 파일을 찾을 수 없습니다
+//            case ERROR_HOST_LOOKUP:            // 서버 또는 프록시 호스트 이름 조회 실패
+//            case ERROR_IO:                               // 서버에서 읽거나 서버로 쓰기 실패
+//            case ERROR_PROXY_AUTHENTICATION:    // 프록시에서 사용자 인증 실패
+//            case ERROR_REDIRECT_LOOP:                // 너무 많은 리디렉션
+//            case ERROR_TIMEOUT:                          // 연결 시간 초과
+//            case ERROR_TOO_MANY_REQUESTS:            // 페이지 로드중 너무 많은 요청 발생
+//            case ERROR_UNKNOWN:                         // 일반 오류
+//            case ERROR_UNSUPPORTED_AUTH_SCHEME:  // 지원되지 않는 인증 체계
+//            case ERROR_UNSUPPORTED_SCHEME:
+//                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        closeWebApplication();
+//                    }
+//                });
+//                builder.setMessage(R.string.webview_page_loading_error);
+//                builder.show();
+//        }
+
+        // Default behaviour
+        super.onReceivedError(view, errorCode, description, failingUrl);
     }
 
     ////////////////////////////////
@@ -163,11 +203,16 @@ public class BasicWebViewClient extends WebViewClient {
      * window.nbplus.{methodName}  형식으로 사용하면 된다.
      */
     /**
-     * 디바이스가 콜 호출이 가능한지 체크한다.
+     * 디바이스의 UUID 조회. 40bytes SHA-1 value
      */
     @JavascriptInterface
     public String getDeviceId() {
-        return DeviceUtils.getDeviceIdByMacAddress(mContext);
+        return DeviceUtils.getDeviceIdByAndroidID(mContext);
+    }
+
+    @JavascriptInterface
+    public void getApplicationPackageName() {
+        mContext.getApplicationContext().getPackageName();
     }
 
     /**
@@ -189,73 +234,12 @@ public class BasicWebViewClient extends WebViewClient {
     }
 
     /**
-     *
-     * @param data
-     */
-    @JavascriptInterface
-    public void setApplicationData(String data) {
-        Log.d(TAG, ">> setApplicationData() received = " + data);
-    }
-
-    /**
-     *
-     * @param appId
-     */
-    @JavascriptInterface
-    public void registerPushApplication(String appId) {
-        Log.d(TAG, ">> registerPushApplication() called = " + appId);
-    }
-
-    /**
      * 어플리케이션 또는 현재 액티비티를 종료한다.
      */
     @JavascriptInterface
     public void closeWebApplication() {
         Log.d(TAG, ">> closeWebApplication() called");
-        //mContext.finish();
-        return;
-    }
-
-    /**
-     * 어플리케이션 또는 현재 액티비티를 종료한다.
-     */
-    @JavascriptInterface
-    public boolean isMediaPlaying() {
-        return false;
-    }
-
-    /**
-     * 어플리케이션 또는 현재 액티비티를 종료한다.
-     */
-    @JavascriptInterface
-    public String getPlayingData() {
-        return null;
-    }
-
-    /**
-     * 미디어 플레이어에 재생 요청.
-     * json 이 없는경우, 재생목록에 일시정지된 미디어가 있다면 일시정지된 미디어를 플레이한다.
-     * @param json 미디어플레이어에서 재생할 미디어 정보
-     */
-    @JavascriptInterface
-    public boolean playMedia(String json) {
-        return false;
-    }
-
-    /**
-     * 미디어 플레이어에서 재생중인 미디어가 있을 경우, 일시정지
-     */
-    @JavascriptInterface
-    public boolean pauseMedia() {
-        return false;
-    }
-
-    /**
-     * 미디어플레이어가 재생중인 미디어가 있을경우, 미디어 재생을 종료하고 재생목록에서 삭제
-     */
-    @JavascriptInterface
-    public boolean stopMedia() {
-        return false;
+        mContext.finish();
     }
 
     ////////////////////////////////
@@ -272,101 +256,12 @@ public class BasicWebViewClient extends WebViewClient {
     }
 
     public void onBackPressed() {
-        // Use loadUrl("javascript:...") (API Level 1-18)
-        // or evaluateJavascript() (API Level 19+) to evaluate your own JavaScript in the context of the currently-loaded Web page
-        mWebView.loadUrl("javascript:window.onBackPressed();");
+        if (!mPageLoadSuccess) {
+            closeWebApplication();
+        } else {
+            // Use loadUrl("javascript:...") (API Level 1-18)
+            // or evaluateJavascript() (API Level 19+) to evaluate your own JavaScript in the context of the currently-loaded Web page
+            mWebView.loadUrl("javascript:window.onBackPressed();");
+        }
     }
-
-    /**
-     *
-     Here's what I came up with today. It's thread-safe, reasonably efficient, and allows for synchronous Javascript execution from Java for an Android WebView.
-
-     Works in Android 2.2 and up. (Requires commons-lang because I need my code snippets passed to eval() as a Javascript string. You could remove this dependency by wrapping the code not in quotation marks, but in function(){})
-
-     First, add this to your Javascript file:
-
-     function evalJsForAndroid(evalJs_index, jsString) {
-     var evalJs_result = "";
-     try {
-     evalJs_result = ""+eval(jsString);
-     } catch (e) {
-     console.log(e);
-     }
-     androidInterface.processReturnValue(evalJs_index, evalJs_result);
-     }
-     Then, add this to your Android activity:
-
-     private Handler handler = new Handler();
-     private final AtomicInteger evalJsIndex = new AtomicInteger(0);
-     private final Map<Integer, String> jsReturnValues = new HashMap<Integer, String>();
-     private final Object jsReturnValueLock = new Object();
-     private WebView webView;
-
-     @Override
-     public void onCreate(Bundle savedInstanceState) {
-     super.onCreate(savedInstanceState);
-     webView = (WebView) findViewById(R.id.webView);
-     webView.addJavascriptInterface(new MyJavascriptInterface(this), "androidInterface");
-     }
-
-     public String evalJs(final String js) {
-     final int index = evalJsIndex.incrementAndGet();
-     handler.post(new Runnable() {
-     public void run() {
-     webView.loadUrl("javascript:evalJsForAndroid(" + index + ", " +
-     "\"" + StringEscapeUtils.escapeEcmaScript(js) + "\")");
-     }
-     });
-     return waitForJsReturnValue(index, 10000);
-     }
-
-     private String waitForJsReturnValue(int index, int waitMs) {
-     long start = System.currentTimeMillis();
-
-     while (true) {
-     long elapsed = System.currentTimeMillis() - start;
-     if (elapsed > waitMs)
-     break;
-     synchronized (jsReturnValueLock) {
-     String value = jsReturnValues.remove(index);
-     if (value != null)
-     return value;
-
-     long toWait = waitMs - (System.currentTimeMillis() - start);
-     if (toWait > 0)
-     try {
-     jsReturnValueLock.wait(toWait);
-     } catch (InterruptedException e) {
-     break;
-     }
-     else
-     break;
-     }
-     }
-     Log.e("MyActivity", "Giving up; waited " + (waitMs/1000) + "sec for return value " + index);
-     return "";
-     }
-
-     private void processJsReturnValue(int index, String value) {
-     synchronized (jsReturnValueLock) {
-     jsReturnValues.put(index, value);
-     jsReturnValueLock.notifyAll();
-     }
-     }
-
-     private static class MyJavascriptInterface {
-     private MyActivity activity;
-
-     public MyJavascriptInterface(MyActivity activity) {
-     this.activity = activity;
-     }
-
-     // this annotation is required in Jelly Bean and later:
-     @JavascriptInterface
-     public void processReturnValue(int index, String value) {
-     activity.processJsReturnValue(index, value);
-     }
-     }
-    */
-
 }

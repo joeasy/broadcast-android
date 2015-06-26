@@ -22,6 +22,9 @@ import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.hybrid.RegisterWebViewClient;
 
+import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.StringUtils;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -71,22 +74,48 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_register, container, false);
+        View v = inflater.inflate(R.layout.activity_broadcast_webview, container, false);
 
         WebView webView = (WebView)v.findViewById(R.id.webview);
         mWebViewClient = new RegisterWebViewClient(getActivity(), webView);
         mWebViewClient.setBackgroundTransparent();
 
-        mWebViewClient.loadUrl(LauncherSettings.getInstance(getActivity()).getRegisterAddress());
+        String url = LauncherSettings.getInstance(getActivity()).getRegisterAddress();
+        if (url.indexOf("?") > 0) {
+            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+            url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
+        } else {
+            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+            url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
+        }
+        mWebViewClient.loadUrl(url);
 
         // test view
         final EditText editText = (EditText)v.findViewById(R.id.et_test_url);
-        editText.setText(LauncherSettings.getInstance(getActivity()).getRegisterAddress());
+        editText.setText(url);
         Button button = (Button)v.findViewById(R.id.btn_test_load);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = editText.getText().toString();
+                if (StringUtils.isEmptyString(url)) {
+                    return;
+                }
+                if (url.indexOf("?") > 0) {
+                    if (!url.contains("UUID=")) {
+                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+                    }
+                    if (!url.contains("APPID=")) {
+                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
+                    }
+                } else {
+                    if (!url.contains("UUID=")) {
+                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+                    }
+                    if (!url.contains("APPID=")) {
+                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
+                    }
+                }
                 mWebViewClient.loadUrl(url);
             }
         });

@@ -335,8 +335,8 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
         });
 
         mActivityLayout = (RelativeLayout) findViewById(R.id.radio_activity_background);
-        int wallpagerId = LauncherSettings.getInstance(this).getWallpagerResourceId();
-        mActivityLayout.setBackgroundResource(LauncherSettings.landWallpaperResource[wallpagerId]);
+        int wallpaperId = LauncherSettings.getInstance(this).getWallpaperId();
+        mActivityLayout.setBackgroundResource(LauncherSettings.landWallpaperResource[wallpaperId]);
 
         // title.
         mRadioTitle = (TextView) findViewById(R.id.radio_activity_label);

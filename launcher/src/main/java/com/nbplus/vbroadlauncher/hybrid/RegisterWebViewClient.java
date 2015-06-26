@@ -33,61 +33,63 @@ public class RegisterWebViewClient extends BasicWebViewClient {
     }
 
     /**
+     * 디바이스의 UUID 조회. mac address 기반 40bytes SHA-1 value
+     */
+    @Override
+    @JavascriptInterface
+    public String getDeviceId() {
+        return LauncherSettings.getInstance(mContext).getDeviceID();
+    }
+
+    /**
      *
      * @param data
      */
-    @Override
     @JavascriptInterface
     public void setApplicationData(String data) {
         Log.d(TAG, ">> setApplicationData() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
-            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
+            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
         } else {
             try {
                 Gson gson = new GsonBuilder().create();
                 RegSettingData settings = gson.fromJson(data, RegSettingData.class);
                 if (settings != null) {
                     if (StringUtils.isEmptyString(settings.getVillageName())) {
-                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
+                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (settings.getServerInformation() == null) {
-                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
+                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
                     } else {
                         VBroadcastServer serverInfo = settings.getServerInformation();
                         if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
+                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
                         }
                         if (StringUtils.isEmptyString(serverInfo.getDocServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
+                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
                         }
                         if (StringUtils.isEmptyString(serverInfo.getPushInterfaceServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
+                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
                         }
                     }
-//                    if (settings.getLauncherShortcuts() == null || settings.getLauncherShortcuts().size() == 0) {
-//                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
-//                        return;
-//                    }
 
                     LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
                     LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
                     LauncherSettings.getInstance(mContext).setServerInformation(settings.getServerInformation());
-                    //LauncherSettings.getInstance(mContext).setLauncherShortcuts(settings.getLauncherShortcuts());
                     Log.d(TAG, ">> setApplicationData() completed !!!");
                     LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
                 } else {
-                    Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT);
-                    return;
+                    Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(mContext, R.string.parse_error, Toast.LENGTH_SHORT);
+                Toast.makeText(mContext, R.string.parse_error, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -96,7 +98,6 @@ public class RegisterWebViewClient extends BasicWebViewClient {
      *
      * @param appId
      */
-    @Override
     @JavascriptInterface
     public void registerPushApplication(String appId) {
         Log.d(TAG, ">> registerPushApplication() called = " + appId);
@@ -110,7 +111,7 @@ public class RegisterWebViewClient extends BasicWebViewClient {
     public void closeWebApplication() {
         Log.d(TAG, ">> closeWebApplication() called");
 
-        if (LauncherSettings.getInstance(mContext).isCompletedSetup() == false) {
+        if (!LauncherSettings.getInstance(mContext).isCompletedSetup()) {
             AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
             alert.setPositiveButton(R.string.alert_settings_message, new DialogInterface.OnClickListener() {
                 @Override
@@ -129,9 +130,41 @@ public class RegisterWebViewClient extends BasicWebViewClient {
             ft.replace(R.id.launcherFragment, fragment);
             ft.commit();
         }
-
-        //mContext.finish();
-        return;
     }
 
+    // not support
+    @JavascriptInterface
+    public boolean registerGcm() {
+        return false;
+    }
+
+    // not support
+    @JavascriptInterface
+    public boolean unRegisterGcm() {
+        return false;
+    }
+
+    @JavascriptInterface
+    public void updateIoTDevices() {
+
+    }
+    ////////////////////////////////
+    /**
+     * 아래의 함수들은 자바스크립트를 Native 에서 호출할 필요가 있을때 사용한다.
+     * 아래에서 불리는 자바스크립트 function 들은 웹앱에서 구현이 되어 있어야 한다.
+     *
+     */
+    public void onRegistered(String gcmRegToken) {
+        // do not anything
+        //mWebView.loadUrl("javascript:window.onRegistered(" + gcmRegToken + ");");
+    }
+
+    public void onUnRegistered() {
+        // do not anything
+        //mWebView.loadUrl("javascript:window.onUnRegistered();");
+    }
+
+    public void onUpdateIoTDevices(String iotDevices) {
+        mWebView.loadUrl("javascript:window.onRegistered('" + iotDevices + "');");
+    }
 }

@@ -594,12 +594,12 @@ public class HomeLauncherActivity extends BaseActivity
     }
 
     private void setContentViewByOrientation() {
-        int wallpagerResourceId = LauncherSettings.getInstance(this).getWallpagerResourceId();
+        int wallpaperId = LauncherSettings.getInstance(this).getWallpaperId();
         int orientation = DisplayUtils.getScreenOrientation(this);
         if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
-            getWindow().setBackgroundDrawableResource(LauncherSettings.landWallpaperResource[wallpagerResourceId]);
+            getWindow().setBackgroundDrawableResource(LauncherSettings.landWallpaperResource[wallpaperId]);
         } else {
-            getWindow().setBackgroundDrawableResource(LauncherSettings.portWallpaperResource[wallpagerResourceId]);
+            getWindow().setBackgroundDrawableResource(LauncherSettings.portWallpaperResource[wallpaperId]);
         }
     }
 }

@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">VBroad Listener</string>
 
-    <string name="empty_value">Data is empty !!</string>
-    <string name="parse_error">Data parse error !! Check it.</string>
+    <string name="empty_value">입력된 데이터가 올바르지 않습니다. 다시 확인해 주시기 바랍니다.</string>
+    <string name="parse_error">잘못된 데이터 입니다.</string>
 
-    <string name="alert_ok">OK</string>
+    <string name="alert_ok">확인</string>
     <string name="alert_network_title">Network</string>
-    <string name="alert_network_message">Please Check your internet connection and try Again.\n(Contact to your administrator if you need assistance..)</string>
+    <string name="alert_network_message">인터넷을 사용할 수 없습니다. 네트워크 설정을 확인하시고 다시 시도해 주시기 바랍니다.</string>
 
     <!-- TODO : remove layer -->
     <string name="hello_world">Hello world!</string>

@@ -19,6 +19,7 @@ package com.nbplus.vbroadlistener.gcm;
 import android.content.Intent;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
+import com.nbplus.vbroadlistener.data.Constants;
 
 public class MyInstanceIDListenerService extends InstanceIDListenerService {
 
@@ -34,6 +35,7 @@ public class MyInstanceIDListenerService extends InstanceIDListenerService {
     public void onTokenRefresh() {
         // Fetch updated Instance ID token and notify our app's server of any changes (if applicable).
         Intent intent = new Intent(this, RegistrationIntentService.class);
+        intent.setAction(Constants.REGISTER_GCM);
         startService(intent);
     }
     // [END refresh_token]

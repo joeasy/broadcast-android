@@ -16,7 +16,9 @@ import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
 
+import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
+import org.basdroid.common.StringUtils;
 
 
 /**
@@ -40,16 +42,43 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
         Intent i = getIntent();
         mShortcutData = i.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
-        mWebViewClient.loadUrl(mShortcutData.getDomain() + mShortcutData.getPath());
+        String url = mShortcutData.getDomain() + mShortcutData.getPath();
+        if (url.indexOf("?") > 0) {
+            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+            url += ("&APPID=" + getApplicationContext().getPackageName());
+        } else {
+            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+            url += ("&APPID=" + getApplicationContext().getPackageName());
+        }
+        mWebViewClient.loadUrl(url);
 
         // test view
         final EditText editText = (EditText)findViewById(R.id.et_test_url);
-        editText.setText(mShortcutData.getDomain() + mShortcutData.getPath());
+        editText.setText(url);
         Button button = (Button)findViewById(R.id.btn_test_load);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = editText.getText().toString();
+                if (StringUtils.isEmptyString(url)) {
+                    return;
+                }
+
+                if (url.indexOf("?") > 0) {
+                    if (!url.contains("UUID=")) {
+                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+                    }
+                    if (!url.contains("APPID=")) {
+                        url += ("&APPID=" + getApplicationContext().getPackageName());
+                    }
+                } else {
+                    if (!url.contains("UUID=")) {
+                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+                    }
+                    if (!url.contains("APPID=")) {
+                        url += ("&APPID=" + getApplicationContext().getPackageName());
+                    }
+                }
                 mWebViewClient.loadUrl(url);
             }
         });
@@ -111,12 +140,12 @@ public class BroadcastWebViewActivity extends BaseActivity {
     }
 
     private void setContentViewByOrientation() {
-        int wallpagerResourceId = LauncherSettings.getInstance(this).getWallpagerResourceId();
+        int wallpapereId = LauncherSettings.getInstance(this).getWallpaperId();
         int orientation = DisplayUtils.getScreenOrientation(this);
         if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
-            mWebViewClient.setBackgroundResource(LauncherSettings.landWallpaperResource[wallpagerResourceId]);
+            mWebViewClient.setBackgroundResource(LauncherSettings.landWallpaperResource[wallpapereId]);
         } else {
-            mWebViewClient.setBackgroundResource(LauncherSettings.portWallpaperResource[wallpagerResourceId]);
+            mWebViewClient.setBackgroundResource(LauncherSettings.portWallpaperResource[wallpapereId]);
         }
     }
 }

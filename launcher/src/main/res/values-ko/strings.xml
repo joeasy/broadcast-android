@@ -32,7 +32,7 @@
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">방송듣기</string>
     <string name="shortcut_btn_call_emergency">긴급호출 하기</string>
-    <string name="shortcut_addr_show_broadcast">/web_test/test.html</string>
+    <string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>
     <string name="shortcut_addr_call_emergency">/is/api/Service/RegistEmergencyCall</string>
 
     <!--sub shortcut -->
@@ -43,11 +43,11 @@
     <string name="shortcut_btn_smart_home">스마트홈 서비스</string>
     <string name="shortcut_btn_my_information">나의 정보관리</string>
     <string name="shortcut_addr_radio">/is/api/Service/GetRadioList</string>
-    <string name="shortcut_addr_participation">/web_test/test.html</string>
-    <string name="shortcut_addr_additional_function">/web_test/test.html</string>
-    <string name="shortcut_addr_official_address">/web_test/test.html</string>
-    <string name="shortcut_addr_smart_home">/web_test/test.html</string>
-    <string name="shortcut_addr_my_information">/web_test/test.html</string>
+    <string name="shortcut_addr_participation">/participation/residentvote/getResidetVoteList.rcc</string>
+    <string name="shortcut_addr_additional_function">/addfunction/iotdata/getIotDataList.rcc</string>
+    <string name="shortcut_addr_official_address">/addfunction/publicoffice/getPublicOfficeList.rcc</string>
+    <string name="shortcut_addr_smart_home">/addfunction/smarthome/getSmartHomeList.rcc</string>
+    <string name="shortcut_addr_my_information">/myinfo/myinfo/getMyinfoDetail.rcc</string>
 
     <string name="weather_title">%1$s 현재날씨</string>
     <string name="celsius">%1$s°C</string>
