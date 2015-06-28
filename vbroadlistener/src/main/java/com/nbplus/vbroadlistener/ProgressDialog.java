@@ -1,4 +1,4 @@
-package com.nbplus.vbroadlauncher.widget;
+package com.nbplus.vbroadlistener;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -6,8 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-
-import com.nbplus.vbroadlauncher.R;
 
 /**
  * Created by basagee on 2015. 6. 23..

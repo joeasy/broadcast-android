@@ -120,6 +120,7 @@ public class WeatherView extends LinearLayout {
             if (intent != null) {
                 if (Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION.equals(intent.getAction())) {
                     Log.d(TAG, "Weather service action received !!!");
+                    releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
                     releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
 
                     // update weather and set next alarm
@@ -1302,7 +1303,7 @@ public class WeatherView extends LinearLayout {
 
         Resources res = getResources();
         String[] skyStatusArray = res.getStringArray(R.array.sky_status);
-        TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
+        TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_sm_drawable);
         String[] weekStringArray = res.getStringArray(R.array.week_day);
 
         int skyStatusValue = 0;
@@ -1419,6 +1420,23 @@ public class WeatherView extends LinearLayout {
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
             Log.d(TAG, ">> Today sky status = " + skyStatusValue);
+        }
+    }
+
+    public void onNetworkConnected() {
+        if (mForecastGribItems == null || mForecastGribItems.size() == 0) {
+            releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+            releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
+
+            // update weather and set next alarm
+            updateForecastGrib(1);
+            setNextForecastGribAlarm();
+
+            if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
+                updateYahooGeocode();
+            } else {
+                updateYahooForecast();
+            }
         }
     }
 }

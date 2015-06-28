@@ -1,6 +1,8 @@
 package com.nbplus.vbroadlauncher.hybrid;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -14,6 +16,7 @@ import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
+import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
@@ -23,6 +26,8 @@ import org.basdroid.common.StringUtils;
  */
 public class BroadcastWebViewClient extends BasicWebViewClient {
     private static final String TAG = BroadcastWebViewClient.class.getSimpleName();
+
+    ProgressDialogFragment mProgressDialogFragment;
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
         super(activity, view);
@@ -142,5 +147,40 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
 
     public void onUpdateIoTDevices(String iotDevices) {
         mWebView.loadUrl("javascript:window.onRegistered('" + iotDevices + "');");
+    }
+
+    // progress bar
+    private void showProgressDialog() {
+        dismissProgressDialog();
+        mProgressDialogFragment = ProgressDialogFragment.newInstance();
+        mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+    }
+    private void dismissProgressDialog() {
+        if (mProgressDialogFragment != null) {
+            mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+    }
+
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        return super.shouldOverrideUrlLoading(view, url);
+    }
+
+    @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        this.showProgressDialog();
+        super.onPageStarted(view, url, favicon);
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        this.dismissProgressDialog();
+        super.onPageFinished(view, url);
+    }
+
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        super.onReceivedError(view, errorCode, description, failingUrl);
     }
 }

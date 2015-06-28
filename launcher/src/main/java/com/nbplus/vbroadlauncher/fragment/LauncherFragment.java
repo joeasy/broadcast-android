@@ -122,6 +122,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
                 if (NetworkUtils.isConnected(getActivity())) {
                     mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
+                    mWeatherView.onNetworkConnected();
                 } else {
                     mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
                 }
