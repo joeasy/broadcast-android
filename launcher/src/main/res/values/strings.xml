@@ -56,10 +56,12 @@
     <string name="humidity">Humidity : %1$s</string>
     <string name="rainfall">1H Rainfall : %1$dmm</string>
     <string name="snowfall">1H Snowfall : %1$dmm</string>
-sss
+
     <!-- radio -->
     <string name="activity_radio_default_title">Internet Radio</string>
     <string name="default_progress_label">Wait..</string>
+    <string name="emergency_call_success_message">Sending emergency call is succeeded.</string>
+    <string name="emergency_call_fail_message">Sending emergency call is failed. Call direct or retry sending.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">Load</string>

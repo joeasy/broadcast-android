@@ -432,7 +432,11 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
             }
         });
 
-        new GetRadioChannelTask(this, mHandler, mShortcutData.getDomain() + mShortcutData.getPath()).execute();
+        GetRadioChannelTask task = new GetRadioChannelTask();
+        if (task != null) {
+            task.setBroadcastApiData(this, mHandler, mShortcutData.getDomain() + mShortcutData.getPath());
+            task.execute();
+        }
     }
 
     /**

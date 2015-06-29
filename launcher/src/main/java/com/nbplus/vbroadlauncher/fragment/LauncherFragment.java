@@ -13,6 +13,7 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,6 +45,7 @@ import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
+import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
@@ -51,6 +53,8 @@ import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 //import com.nbplus.vbroadlauncher.widget.IButton;
 
+import com.nbplus.vbroadlauncher.service.BaseServerApiAsyncTask;
+import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
 import com.nbplus.vbroadlauncher.widget.TextClock;
 import com.nbplus.vbroadlauncher.widget.WeatherView;
 
@@ -76,6 +80,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final String TAG = LauncherFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
+    ProgressDialogFragment mProgressDialogFragment;
     private ImageView mWifiStatus;
     private Button mOutdoorMode;
     private Button mServiceTreeMap;
@@ -116,7 +121,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             return;
         }
         switch (msg.what) {
-            case HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
+            case HANDLER_MESSAGE_CONNECTIVITY_CHANGED:
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
 
                 if (NetworkUtils.isConnected(getActivity())) {
@@ -126,6 +131,27 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
                 }
                 break;
+
+            case Constants.HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK:
+                BaseApiResult result = (BaseApiResult) msg.obj;
+                Toast toast;
+                dismissProgressDialog();
+                if (result != null) {
+                    Log.d(TAG, ">> EMERGENCY CALL result code = " + result.getResultCode() + ", message = " + result.getResultMessage());
+                    if (Constants.RESULT_OK.equals(result.getResultCode())) {
+                        toast = Toast.makeText(getActivity(), R.string.emergency_call_success_message, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    } else {
+                        toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                } else {
+                    toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
         }
     }
 
@@ -532,7 +558,20 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         }
         switch (data.getType()) {
             case Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER:
+                BaseServerApiAsyncTask task;
                 data.setDomain(serverData.getApiServer());
+                try {
+                    task = (BaseServerApiAsyncTask)data.getNativeClass().newInstance();
+                    if (task != null) {
+                        showProgressDialog();
+                        task.setBroadcastApiData(getActivity(), mHandler, data.getDomain() + data.getPath());
+                        task.execute();
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (java.lang.InstantiationException e) {
+                    e.printStackTrace();
+                }
                 break;
             case Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER:
                 intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
@@ -580,4 +619,17 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Log.d(TAG, "Unknown shortcut type !!!");
         }
     }
+
+    private void showProgressDialog() {
+        dismissProgressDialog();
+        mProgressDialogFragment = ProgressDialogFragment.newInstance();
+        mProgressDialogFragment.show(getActivity().getSupportFragmentManager(), "launcher_progress_dialog");
+    }
+    private void dismissProgressDialog() {
+        if (mProgressDialogFragment != null) {
+            mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+    }
+
 }

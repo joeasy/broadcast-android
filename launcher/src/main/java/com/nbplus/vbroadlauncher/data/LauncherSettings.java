@@ -12,6 +12,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.RadioActivity;
+import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
 
 import org.basdroid.common.StringUtils;
 
@@ -229,7 +230,7 @@ public class LauncherSettings implements Parcelable {
                 R.drawable.ic_menu_02,
                 R.drawable.ic_menu_main_02_selector,
                 0,
-                null);
+                SendEmergencyCallTask.class);
         launcherMainShortcuts.add(data);
     }
 

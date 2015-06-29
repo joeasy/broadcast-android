@@ -10,6 +10,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 import com.nbplus.vbroadlauncher.api.GsonRequest;
+import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
@@ -23,27 +24,13 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by basagee on 2015. 6. 2..
  */
-public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo> {
-    //private ProgressDialog progress = null;
-    private Context mContext;
-    private Handler mHandler;
-    private String mGetServerPath;
-
-    public GetRadioChannelTask(Context context) {
-        this.mContext = context;
-    }
-
-    public GetRadioChannelTask(Context context, Handler handler, String url) {
-        this.mContext = context;
-        this.mHandler = handler;
-        this.mGetServerPath = url;
-    }
+public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 
     @Override
-    protected RadioChannelInfo doInBackground(Void... params) {
+    protected BaseApiResult doInBackground(Void... voids) {
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
         RadioChannelInfo response = null;
-        String url = mGetServerPath + "?DEVICE_ID=" + LauncherSettings.getInstance(mContext).getDeviceID();
+        String url = mServerPath + "?DEVICE_ID=" + LauncherSettings.getInstance(mContext).getDeviceID();
 
         int retryCount = 0;
         while (retryCount < 3) {        // retry 3 times
@@ -65,21 +52,16 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
             retryCount++;
             continue;
         }
-        return response;
+        return (BaseApiResult)response;
     }
 
     @Override
-    protected void onCancelled() {
-        super.onCancelled();
-    }
-
-    @Override
-    protected void onPostExecute(RadioChannelInfo result) {
+    protected void onPostExecute(BaseApiResult result) {
 
         // TODO : sample data
-        result = new RadioChannelInfo();
-        result.setResultCode("0000");
-        result.setResultMessage("Success");
+        RadioChannelInfo testResult = new RadioChannelInfo();
+        testResult.setResultCode("0000");
+        testResult.setResultMessage("Success");
 
         ArrayList<RadioChannelInfo.RadioChannel> items = new ArrayList<>();
         RadioChannelInfo.RadioChannel item = new RadioChannelInfo.RadioChannel();
@@ -589,11 +571,12 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
         item.channelUrl = "mms://aod.wbsi.kr/wbs983";
         items.add(item);
 
-        result.setRadioChannelList(items);
+        testResult.setRadioChannelList(items);
+        result = testResult;
 
         // end of TODO : sample data
 
-        items = result.getRadioChannelList();
+        items = ((RadioChannelInfo)result).getRadioChannelList();
         if (items != null) {
             for (int i = 0; i < items.size(); i++) {
                 items.get(i).index = i;
@@ -608,15 +591,4 @@ public class GetRadioChannelTask extends AsyncTask<Void, Void, RadioChannelInfo>
         }
     }
 
-    @Override
-    protected void onPreExecute() {
-        //progress = ProgressDialog.show(AllAppsActivity.this, null,
-        //        "Loading application info...");
-        super.onPreExecute();
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
-    }
 }

@@ -60,6 +60,8 @@
     <!-- radio -->
     <string name="activity_radio_default_title">인터넷 라디오</string>
     <string name="default_progress_label">진행중</string>
+    <string name="emergency_call_success_message">긴급호출 메시지를 전송하였습니다.</string>
+    <string name="emergency_call_fail_message">긴급호출 메시지 전송에 실패하였습니다.\n다시 시도해 주시거나 직접 전화를 시도해 주세요.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">불러오기</string>

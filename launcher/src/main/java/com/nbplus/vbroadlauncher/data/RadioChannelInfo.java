@@ -12,61 +12,26 @@ import java.util.ArrayList;
  *
  * 단기예보
  */
-public class RadioChannelInfo {
-    @SerializedName("result")
-    protected Response response;
+public class RadioChannelInfo extends BaseApiResult {
 
-    public String getResultCode() {
-        return (response != null) ? response.resultCode : "-1";
-    }
-    public String getResultMessage() {
-        return (response != null) ? response.resultMessage : null;
-    }
+    @SerializedName("RADIO_LIST")
+    protected ArrayList<RadioChannel> radioChannels;
+
     public ArrayList<RadioChannel> getRadioChannelList() {
-        return (response != null) ? response.radioChannels : null;
+        return radioChannels;
     }
 
     // TODO : for sample data
     public void setResultCode(String code) {
-        if (response == null) {
-            response = new Response();
-        }
-        if (code != null) {
-            this.response.resultCode = code;
-        } else {
-            this.response.resultCode = "0000";
-        }
+        resultCode = code;
     }
     public void setResultMessage(String msg) {
-        if (response == null) {
-            response = new Response();
-        }
-        if (msg != null) {
-            this.response.resultMessage = msg;
-        } else {
-            this.response.resultMessage = "Success";
-        }
+        this.resultMessage = msg;
     }
     public void setRadioChannelList(ArrayList<RadioChannel> items) {
-        if (response == null) {
-            response = new Response();
-        }
-        if (items != null) {
-            this.response.radioChannels = items;
-        } else {
-            this.response.radioChannels = new ArrayList<>();
-        }
+        this.radioChannels = items;
     }
     // end of TODO
-
-    public static class Response {
-        @SerializedName("RT")
-        public String resultCode;
-        @SerializedName("RT_MSG")
-        public String resultMessage;
-        @SerializedName("RADIO_LIST")
-        protected ArrayList<RadioChannel> radioChannels;
-    }
 
     public static class RadioChannel implements Parcelable {
         @SerializedName("RADIO_NAME")
