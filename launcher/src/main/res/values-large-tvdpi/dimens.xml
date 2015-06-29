@@ -3,6 +3,7 @@
     <dimen name="launcher_top_nav_title_font_size">16.875dp</dimen>
     <dimen name="launcher_top_nav_menu_font_size">14.0625dp</dimen>
     <dimen name="ic_nav_btn_drawable_padding">3.75dp</dimen>
+    <dimen name="launcher_main_view_margin_bottom">9.375dp</dimen>
     <dimen name="launcher_clock_time_font_size">75dp</dimen>
     <dimen name="launcher_clock_time_ampm_font_size">32.8125dp</dimen>
     <dimen name="launcher_clock_date_font_size">20.625dp</dimen>
@@ -10,7 +11,8 @@
     <dimen name="launcher_ic_menu_main_shortcut_height">128.125dp</dimen>
     <dimen name="launcher_ic_menu_main_shortcut_font_size">16.875dp</dimen>
     <dimen name="launcher_ic_menu_main_shortcut_margin">5.375dp</dimen>
-    <dimen name="launcher_ic_menu_shortcut_size">140.625dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_width">140.625dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_height">140.625dp</dimen>
     <dimen name="launcher_ic_menu_shortcut_font_size">16.875dp</dimen>
     <dimen name="launcher_panel_margin">35.75dp</dimen>
 
@@ -24,6 +26,7 @@
     <dimen name="weather_week_margin">18.75dp</dimen>
     <dimen name="weather_week_icon_size">28.125dp</dimen>
 
+    <dimen name="show_apps_title_font_size">18.75dp</dimen>
     <dimen name="installed_apps_list_icon_size">50dp</dimen>
     <dimen name="installed_apps_list_font_size">11.25dp</dimen>
 

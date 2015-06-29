@@ -27,7 +27,7 @@
         <item>@drawable/ic_weather_sm_07</item>
         <item>@drawable/ic_weather_sm_06</item>
     </string-array>
-    <string-array name="sky_status_bg_drawable">
+    <string-array name="sky_status_bg_land_drawable">
         <item>@drawable/ic_weather_bg_01</item>
         <item>@drawable/ic_weather_bg_02</item>
         <item>@drawable/ic_weather_bg_03</item>
@@ -35,6 +35,15 @@
         <item>@drawable/ic_weather_bg_05</item>
         <item>@drawable/ic_weather_bg_07</item>
         <item>@drawable/ic_weather_bg_06</item>
+    </string-array>
+    <string-array name="sky_status_bg_port_drawable">
+        <item>@drawable/ic_weather_bg_v_01</item>
+        <item>@drawable/ic_weather_bg_v_02</item>
+        <item>@drawable/ic_weather_bg_v_03</item>
+        <item>@drawable/ic_weather_bg_v_04</item>
+        <item>@drawable/ic_weather_bg_v_05</item>
+        <item>@drawable/ic_weather_bg_v_07</item>
+        <item>@drawable/ic_weather_bg_v_06</item>
     </string-array>
     <string-array name="week_day">
         <item>일</item>

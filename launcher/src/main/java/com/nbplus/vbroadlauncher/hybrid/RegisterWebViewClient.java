@@ -24,6 +24,9 @@ import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
 
 import org.basdroid.common.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * Created by basagee on 2015. 5. 19..
  */
@@ -57,6 +60,7 @@ public class RegisterWebViewClient extends BasicWebViewClient {
             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
         } else {
             try {
+                data = new String(data.getBytes("utf-8"));
                 Gson gson = new GsonBuilder().create();
                 RegSettingData settings = gson.fromJson(data, RegSettingData.class);
                 if (settings != null) {

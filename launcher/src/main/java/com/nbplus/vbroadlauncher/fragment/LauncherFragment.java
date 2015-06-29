@@ -53,7 +53,6 @@ import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 
 import com.nbplus.vbroadlauncher.widget.TextClock;
 import com.nbplus.vbroadlauncher.widget.WeatherView;
-import com.nbplus.vbroadlauncher.widget.YahooWeatherView;
 
 import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.NetworkUtils;
@@ -288,11 +287,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         // add main shortcut.
         ArrayList<ShortcutData> mainShortcutDatas = LauncherSettings.getInstance(getActivity()).getLauncherMainShortcuts();
         mMainShortcutGridLayout = (GridLayout)v.findViewById(R.id.main_shortcut_grid);
-        float dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_width);
-        float widthPx = DisplayUtils.pxFromDp(getActivity(), dp);
-
-        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_height);
-        float heightPx = DisplayUtils.pxFromDp(getActivity(), dp);
+        float dp;// = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_width);
+//        float widthPx = DisplayUtils.pxFromDp(getActivity(), dp);
+//
+//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_height);
+//        float heightPx = DisplayUtils.pxFromDp(getActivity(), dp);
 
         dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_font_size);
         float mainShortcutFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
@@ -306,10 +305,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
 
-            GridLayout.LayoutParams lp = (GridLayout.LayoutParams)btnLayout.getLayoutParams();
-            lp.width = (int)widthPx;
-            lp.height = (int)heightPx;
-            btnLayout.setLayoutParams(lp);
+//            GridLayout.LayoutParams lp = (GridLayout.LayoutParams)btnLayout.getLayoutParams();
+//            lp.width = (int)widthPx;
+//            lp.height = (int)heightPx;
+//            btnLayout.setLayoutParams(lp);
 
             TextView label = (TextView)btnLayout.findViewById(R.id.menu_item_label);
             label.setText(data.getName());
@@ -333,12 +332,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         int shortcutNum = shortcutDatas.size() > (columnNum * MAX_ROW_NUM) ? (columnNum * MAX_ROW_NUM) : shortcutDatas.size();
         // draw shortcut button
-        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_size);
-        float btnSizePx = DisplayUtils.pxFromDp(getActivity(), dp);
-
-        dp = DisplayUtils.getDimension(getActivity(), R.dimen.ic_nav_btn_drawable_padding);
-        float drawablePadding = DisplayUtils.pxFromDp(getActivity(), dp);
-
+//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_width);
+//        float btnWidthPx = DisplayUtils.pxFromDp(getActivity(), dp);
+//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_height);
+//        float btnHeightPx = DisplayUtils.pxFromDp(getActivity(), dp);
+//
+//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.ic_nav_btn_drawable_padding);
+//        float drawablePadding = DisplayUtils.pxFromDp(getActivity(), dp);
+//
         dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_font_size);
         float btnFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
 
@@ -352,10 +353,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
 
-            GridLayout.LayoutParams lp = (GridLayout.LayoutParams)btnLayout.getLayoutParams();
-            lp.width = (int)btnSizePx;
-            lp.height = (int) btnSizePx;
-            btnLayout.setLayoutParams(lp);
+//            GridLayout.LayoutParams lp = (GridLayout.LayoutParams)btnLayout.getLayoutParams();
+//            lp.width = (int)btnWidthPx;
+//            lp.height = (int) btnHeightPx;
+//            btnLayout.setLayoutParams(lp);
 
             TextView label = (TextView)btnLayout.findViewById(R.id.menu_item_label);
             label.setText(data.getName());
@@ -461,6 +462,54 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         px = DisplayUtils.pxFromDp(getActivity(), dp);
         mTextClock.setTextSize(px);
         mWeatherView.onConfigurationChanged(orientation);
+
+        // right shortcut menu
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_width);
+        float widthPx = DisplayUtils.pxFromDp(getActivity(), dp);
+
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_height);
+        float heightPx = DisplayUtils.pxFromDp(getActivity(), dp);
+
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_main_shortcut_font_size);
+        float mainShortcutFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
+
+        GridLayout.LayoutParams childlp;
+        View child;
+        for (int i = 0; i < mMainShortcutGridLayout.getChildCount(); i++) {
+            /**
+             * right shortcut panel
+             */
+            child = mMainShortcutGridLayout.getChildAt(i);
+
+            childlp = (GridLayout.LayoutParams)child.getLayoutParams();
+            childlp.width = (int)widthPx;
+            childlp.height = (int)heightPx;
+            child.setLayoutParams(childlp);
+        }
+
+        // add other shortcuts.
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_width);
+        float btnWidthPx = DisplayUtils.pxFromDp(getActivity(), dp);
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_height);
+        float btnHeightPx = DisplayUtils.pxFromDp(getActivity(), dp);
+
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.ic_nav_btn_drawable_padding);
+        float drawablePadding = DisplayUtils.pxFromDp(getActivity(), dp);
+
+        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_font_size);
+        float btnFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
+
+        for (int i = 0; i < mShorcutGridLayout.getChildCount(); i++) {
+            /**
+             * right shortcut panel
+             */
+            child = mShorcutGridLayout.getChildAt(i);
+
+            childlp = (GridLayout.LayoutParams)child.getLayoutParams();
+            childlp.width = (int)btnWidthPx;
+            childlp.height = (int) btnHeightPx;
+            child.setLayoutParams(childlp);
+        }
     }
 
     /**

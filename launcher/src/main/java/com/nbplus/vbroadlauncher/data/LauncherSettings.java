@@ -15,6 +15,7 @@ import com.nbplus.vbroadlauncher.RadioActivity;
 
 import org.basdroid.common.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Random;
@@ -106,6 +107,12 @@ public class LauncherSettings implements Parcelable {
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
+//        try {
+//            this.villageName = new String(this.villageName.getBytes("ISO-8859-1"), "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//
+//            e.printStackTrace();
+//        }
         int wallpaperId = prefs.getInt(KEY_WALLPAPER_RESOURCE_ID, -1);
 
         this.isOutdoorMode = prefs.getBoolean(KEY_VBROADCAST_IS_OUTDOOR_MODE, false);

@@ -21,7 +21,7 @@
         android:text="@string/btn_show_apps"
         android:textColor="@color/white"
         android:ellipsize="end"
-        android:textSize="20dp"
+        android:textSize="@dimen/show_apps_title_font_size"
         android:layout_marginBottom="5dp"/>
         />
     <View

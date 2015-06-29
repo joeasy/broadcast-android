@@ -76,6 +76,26 @@ public class DisplayUtils {
         return (xlarge || large);
     }
 
+    public static double getDisplayInches(Activity activityContext) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        activityContext.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        float yInches;
+        float xInches;
+
+        int orientation = DisplayUtils.getScreenOrientation(activityContext);
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+            yInches = metrics.heightPixels / metrics.ydpi;
+            xInches = metrics.widthPixels / metrics.xdpi;
+        } else {
+            yInches = metrics.widthPixels / metrics.xdpi;
+            xInches = metrics.heightPixels / metrics.ydpi;
+        }
+        double diagonalInches = Math.sqrt(xInches * xInches + yInches * yInches);
+
+        return diagonalInches;
+    }
+
     /**
      * Checks if the device is a tablet or a phone
      *

@@ -1,6 +1,7 @@
 package com.nbplus.vbroadlauncher.widget;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -13,6 +14,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.location.Location;
 import android.os.Build;
+import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -74,6 +76,8 @@ public class WeatherView extends LinearLayout {
     private ArrayList<ForecastItem> mForecastSpaceDataItems = new ArrayList<ForecastItem>();
     private ArrayList<ForecastItem> mForecastTimeDataItems = new ArrayList<ForecastItem>();
     private ArrayList<ForecastItem> mForecastGribItems = new ArrayList<ForecastItem>();
+
+    private int mCurrentSkyStatusValue = 0;
     private int mForecastSpaceDataNumRowsPerPage = 0;
     private int mForecastSpaceDataTotalCount = 0;
     private int mForecastSpaceDataRequestPage = 0;
@@ -900,9 +904,10 @@ public class WeatherView extends LinearLayout {
                 mCurrentCelsius.setTag(item);
                 mCurrentCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
                 TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
-                TypedArray skyStatusBgDrawable = getResources().obtainTypedArray(R.array.sky_status_bg_drawable);
                 mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
-                mCurrentSkyBgLayout.setBackgroundResource(skyStatusBgDrawable.getResourceId(skyStatusValue, 0));
+                mCurrentSkyStatusValue = skyStatusValue;
+
+                setCurrentSkyStatusBackground(DisplayUtils.getScreenOrientation((AppCompatActivity) getContext()));
             }
         }
     }
@@ -1078,6 +1083,17 @@ public class WeatherView extends LinearLayout {
                 mThreeDaysLayout.setLayoutParams(lp);
             }
         }
+        setCurrentSkyStatusBackground(orientation);
+    }
+
+    private void setCurrentSkyStatusBackground(int orientation) {
+        TypedArray skyStatusBgDrawable;
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+            skyStatusBgDrawable = getResources().obtainTypedArray(R.array.sky_status_bg_land_drawable);
+        } else {
+            skyStatusBgDrawable = getResources().obtainTypedArray(R.array.sky_status_bg_port_drawable);
+        }
+        mCurrentSkyBgLayout.setBackgroundResource(skyStatusBgDrawable.getResourceId(mCurrentSkyStatusValue, 0));
     }
 
     public void onChangedVillageName() {

@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -121,28 +122,6 @@ public class HomeLauncherActivity extends BaseActivity
         setContentView(R.layout.activity_home_launcher);
 
         mCurrentLocale = getResources().getConfiguration().locale;
-        boolean isTablet = DisplayUtils.isTabletDevice(this);
-        if (isTablet) {
-            //is tablet
-            Log.d("Device", "Tablet");
-        } else {
-            //is phone
-            Log.d("Device", "Phone");
-//            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//            alert.setPositiveButton(R.string.alert_phone_finish_ok, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    finish();
-//                }
-//            });
-//            alert.setMessage(R.string.alert_phone_message);
-//            alert.show();
-//            return;
-        }
-
-        if (!NetworkUtils.isConnected(this)) {
-            showNetworkConnectionAlertDialog();
-        }
 
         Point p = DisplayUtils.getScreenSize(this);
         Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
@@ -150,6 +129,40 @@ public class HomeLauncherActivity extends BaseActivity
         Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
         int density = DisplayUtils.getScreenDensity(this);
         Log.d(TAG, "Screen density = " + density);
+
+        boolean isTablet = DisplayUtils.isTabletDevice(this);
+        if (isTablet) {
+            //is tablet
+            Log.d(TAG, "Tablet");
+        } else {
+            //is phone
+            Log.d(TAG, "isTabletDevice() returns Phone.. now check display inches");
+            double diagonalInches = DisplayUtils.getDisplayInches(this);
+            if (diagonalInches >= 6.4) {
+                // 800x400 인경우 portrait 에서 6.43 가량이 나온다.
+                // 6.5inch device or bigger
+                Log.d(TAG, "DisplayUtils.getDisplayInches() bigger than 6.5");
+            } else {
+                // smaller device
+                Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+                alert.setMessage(R.string.alert_phone_message);
+                alert.show();
+
+                return;
+            }
+        }
+
+        if (!NetworkUtils.isConnected(this)) {
+            showNetworkConnectionAlertDialog();
+        }
+
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);

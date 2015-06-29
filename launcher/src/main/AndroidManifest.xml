@@ -92,7 +92,7 @@
             android:name=".RadioActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:noHistory="false"
-            android:screenOrientation="landscape"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/NBPlusTheme.NoActionBar.Translucent"
             android:label="@string/title_activity_broadcast_webview"
             >

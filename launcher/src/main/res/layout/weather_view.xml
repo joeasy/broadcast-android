@@ -13,6 +13,7 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:gravity="center"
+        android:background="@drawable/ic_weather_bg_v_01"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

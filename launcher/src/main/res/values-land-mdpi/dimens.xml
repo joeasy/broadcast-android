@@ -1,0 +1,18 @@
+<resources>
+    <!-- Example customization of dimensions originally defined in res/values/dimens.xml
+         (such as screen margins) for screens with more than 820dp of available width. This
+         would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively). -->
+    <dimen name="launcher_top_nav_height">35.9375dp</dimen>
+    <dimen name="launcher_top_nav_padding_horizontal">11.71875dp</dimen>
+    <dimen name="launcher_main_view_margin_top">20dp</dimen>
+    <dimen name="launcher_main_view_margin_horizontal">89.84375dp</dimen>
+    <dimen name="launcher_clock_height">90.625dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_width">178dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_height">110.9375dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_width">116dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_height">104.6875dp</dimen>
+    <dimen name="gridview_vertical_cellspacing">8dp</dimen>
+    <dimen name="gridview_horizontal_cellspacing">7.8125dp</dimen>
+    <dimen name="weather_current_height">120dp</dimen>
+    <dimen name="weather_week_height">100dp</dimen>
+</resources>
