@@ -1,0 +1,44 @@
+<resources>
+    <!-- 공통 -->
+    <dimen name="launcher_top_nav_title_font_size">10.546875dp</dimen>
+    <dimen name="launcher_top_nav_menu_font_size">8.789dp</dimen>
+    <dimen name="ic_nav_btn_drawable_padding">2.343dp</dimen>
+    <dimen name="launcher_main_view_margin_bottom">5.86dp</dimen>
+    <dimen name="launcher_clock_time_font_size">46.875dp</dimen>
+    <dimen name="launcher_clock_time_ampm_font_size">20.508dp</dimen>
+    <dimen name="launcher_clock_date_font_size">12.89dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_font_size">10.5468dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_margin">5.86dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_font_size">10.5468dp</dimen>
+    <dimen name="launcher_panel_margin">30.468dp</dimen>
+
+    <dimen name="clock_bottom_margin">8.79dp</dimen>
+    <!-- weather -->
+    <dimen name="weather_current_title_font_size">12.89dp</dimen>
+    <dimen name="weather_current_skystatus_font_size">9.375dp</dimen>
+    <dimen name="weather_current_temp_font_size">23.4375dp</dimen>
+    <dimen name="weather_week_day_font_size">10.5468dp</dimen>
+    <dimen name="weather_week_temp_font_size">12.3046dp</dimen>
+    <dimen name="weather_week_margin">11.71875dp</dimen>
+    <dimen name="weather_week_icon_size">17.578dp</dimen>
+
+    <dimen name="show_apps_title_font_size">11.71875dp</dimen>
+    <dimen name="installed_apps_list_icon_size">32.2265dp</dimen>
+    <dimen name="installed_apps_list_font_size">7.03125dp</dimen>
+
+    <!-- radio activity -->
+    <dimen name="radio_activity_width">376.171875dp</dimen>
+    <dimen name="radio_activity_height">169.921875dp</dimen>
+    <dimen name="radio_activity_padding">9.375dp</dimen>
+    <dimen name="radio_view_horizontal_padding">12.8906dp</dimen>
+    <dimen name="radio_view_title_vertical_padding">5.8593dp</dimen>
+    <dimen name="radio_grid_vertical_margin">11.71875dp</dimen>
+    <dimen name="radio_indicator_bottom_margin">12.8906dp</dimen>
+    <dimen name="radio_grid_vertical_cellspacing">11.71875dp</dimen>
+    <dimen name="radio_grid_horizontal_cellspacing">11.71875dp</dimen>
+    <dimen name="radio_activity_title_height">37.5dp</dimen>
+    <dimen name="radio_activity_label_font_size">10.5468dp</dimen>
+    <dimen name="radio_channel_button_font_size">9.375dp</dimen>
+    <dimen name="radio_play_control_margin">14.0625dp</dimen>
+    <dimen name="radio_play_control_progress_width">75dp</dimen>
+</resources>

@@ -10,6 +10,7 @@
         android:id="@+id/progress_bar"
         android:indeterminate="true"
         style="?android:attr/progressBarStyleLarge"
+        android:indeterminateDrawable="@drawable/progress_indeterminate_drawable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />

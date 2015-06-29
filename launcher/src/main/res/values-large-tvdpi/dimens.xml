@@ -7,12 +7,8 @@
     <dimen name="launcher_clock_time_font_size">75dp</dimen>
     <dimen name="launcher_clock_time_ampm_font_size">32.8125dp</dimen>
     <dimen name="launcher_clock_date_font_size">20.625dp</dimen>
-    <dimen name="launcher_ic_menu_main_shortcut_width">214.875dp</dimen>
-    <dimen name="launcher_ic_menu_main_shortcut_height">128.125dp</dimen>
     <dimen name="launcher_ic_menu_main_shortcut_font_size">16.875dp</dimen>
     <dimen name="launcher_ic_menu_main_shortcut_margin">5.375dp</dimen>
-    <dimen name="launcher_ic_menu_shortcut_width">140.625dp</dimen>
-    <dimen name="launcher_ic_menu_shortcut_height">140.625dp</dimen>
     <dimen name="launcher_ic_menu_shortcut_font_size">16.875dp</dimen>
     <dimen name="launcher_panel_margin">35.75dp</dimen>
 

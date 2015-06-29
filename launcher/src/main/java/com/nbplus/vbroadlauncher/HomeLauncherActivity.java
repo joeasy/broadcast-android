@@ -145,17 +145,17 @@ public class HomeLauncherActivity extends BaseActivity
             } else {
                 // smaller device
                 Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                });
-                alert.setMessage(R.string.alert_phone_message);
-                alert.show();
-
-                return;
+//                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        finish();
+//                    }
+//                });
+//                alert.setMessage(R.string.alert_phone_message);
+//                alert.show();
+//
+//                return;
             }
         }
 

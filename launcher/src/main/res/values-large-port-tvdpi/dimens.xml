@@ -7,7 +7,10 @@
     <dimen name="launcher_main_view_margin_top">65dp</dimen>
     <dimen name="launcher_main_view_margin_horizontal">77.43dp</dimen>
     <dimen name="launcher_clock_height">105dp</dimen>
-
+    <dimen name="launcher_ic_menu_main_shortcut_width">214.875dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_height">128.125dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_width">140.625dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_height">140.625dp</dimen>
     <dimen name="gridview_vertical_cellspacing">0dp</dimen>
     <dimen name="gridview_horizontal_cellspacing">9.375dp</dimen>
     <dimen name="weather_current_height">150.9375dp</dimen>

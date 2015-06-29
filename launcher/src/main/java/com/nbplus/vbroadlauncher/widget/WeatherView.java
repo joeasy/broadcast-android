@@ -1384,7 +1384,8 @@ public class WeatherView extends LinearLayout {
             }
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
-            mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+            // 현재 시간 날씨 기준으로 맞춘다.
+            mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(mCurrentSkyStatusValue, 0));
             Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
 
