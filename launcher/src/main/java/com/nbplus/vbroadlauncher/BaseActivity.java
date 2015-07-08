@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
 import java.util.Locale;
@@ -160,5 +161,18 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
         if ((mDefaultWindowFlags & WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON) != 0) {
             wind.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
+    }
+
+    /**
+     * Push agent status...
+     */
+    protected int mPushServiceStatus = PushConstants.PUSH_STATUS_VALUE_DISCONNECTED;
+
+    public boolean isPushServiceConnected() {
+        return (mPushServiceStatus == PushConstants.PUSH_STATUS_VALUE_CONNECTED);
+    }
+
+    public void setPushServiceStatus(int pushServiceStatus) {
+        this.mPushServiceStatus = pushServiceStatus;
     }
 }

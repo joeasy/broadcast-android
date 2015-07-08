@@ -36,7 +36,7 @@ public class OnBootReceiver extends BroadcastReceiver {
                 i.setComponent(componentName);
                 i.setAction(PushConstants.ACTION_START_SERVICE);
                 i.putExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS, serverInfo.getPushInterfaceServer());
-                ComponentName serviceName = context.startService(new Intent().setComponent(componentName));
+                ComponentName serviceName = context.startService(i);
                 if (serviceName == null) {
                     Log.e(TAG, "Could not start service " + componentName.toString());
                 } else {

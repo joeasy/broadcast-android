@@ -114,10 +114,8 @@
             <!--android:name=".BroadcastPushReceiver"-->
             <!--android:enabled="true">-->
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-                <!--<action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
-                <!--<action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>-->
-                <!--<data android:scheme="package"  />-->
+                <!--<action android:name="com.nbplus.pushservice.intent.action.PUSH_STATUS_CHANGED" />-->
+                <!--<action android:name="com.nbplus.pushservice.intent.action.PUSH_MESSAGE_RECEIVED" />-->
             <!--</intent-filter>-->
         <!--</receiver>-->
 

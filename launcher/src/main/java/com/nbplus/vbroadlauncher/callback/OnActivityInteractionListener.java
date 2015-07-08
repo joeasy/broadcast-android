@@ -1,5 +1,6 @@
 package com.nbplus.vbroadlauncher.callback;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 
@@ -9,4 +10,5 @@ import android.location.Location;
 public interface OnActivityInteractionListener {
     public void onBackPressed();
     public void onDataChanged();
+    public void onPushReceived(Intent intent);
 }

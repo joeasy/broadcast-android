@@ -4,8 +4,12 @@ package com.nbplus.vbroadlauncher;
  * Created by basagee on 2015. 5. 15..
  */
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Point;
+import android.os.Message;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentManager;
@@ -37,6 +41,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
@@ -52,6 +57,8 @@ import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import io.vov.vitamio.LibsChecker;
@@ -65,7 +72,7 @@ public class HomeLauncherActivity extends BaseActivity
 
     protected Handler mActivityHandler = new Handler();
 
-    private OnActivityInteractionListener mActivityInteractionListener;
+    private ArrayList<OnActivityInteractionListener> mActivityInteractionListener = new ArrayList<>();
 
     /**
      * Constant used in the location settings dialog.
@@ -110,6 +117,68 @@ public class HomeLauncherActivity extends BaseActivity
     //
     protected static final String REQUESTING_LOCATION_UPDATES_KEY = "RequestLocationUpdates";
     protected static final String LOCATION_KEY = "Location";
+
+    // 앱이 설치후 실행하면.. 런처설정시에 기존액티비티가 살아있는 상태로 새로운 액티비티가 실행된다.
+    // 실행중인 액티비티를 죽인다.
+    private long mActivityRunningTime = -1;
+    private static final int HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING = 1;
+
+    private final HomeLauncherActivityHandler mHandler = new HomeLauncherActivityHandler(this);
+
+    // 핸들러 객체 만들기
+    private static class HomeLauncherActivityHandler extends Handler {
+        private final WeakReference<HomeLauncherActivity> mActivity;
+
+        public HomeLauncherActivityHandler(HomeLauncherActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            HomeLauncherActivity activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
+    }
+
+    public void handleMessage(Message msg) {
+        if (msg == null) {
+            return;
+        }
+        switch (msg.what) {
+            case HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING :
+                Long runningTime = (Long)msg.obj;
+
+                if (runningTime > this.mActivityRunningTime) {
+                    Log.d(TAG, "HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING. new activity is create.. finish");
+                    finish();
+                }
+                break;
+        }
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
+            mHandler.removeMessages(Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT);
+            // send handler message
+            switch (action) {
+                case Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING :
+                    Message msg = new Message();
+                    msg.what = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING;
+                    msg.obj = intent.getLongExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, 0);
+                    mHandler.sendMessage(msg);
+                    break;
+                default :
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -158,6 +227,17 @@ public class HomeLauncherActivity extends BaseActivity
                 return;
             }
         }
+
+        // 앱이 설치후 실행하면.. 런처설정시에 기존액티비티가 살아있는 상태로 새로운 액티비티가 실행된다.
+        // 실행중인 액티비티를 죽인다.
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
+
+        Intent intent = new Intent(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
+        mActivityRunningTime = System.currentTimeMillis();
+        intent.putExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, mActivityRunningTime);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         if (!NetworkUtils.isConnected(this)) {
             showNetworkConnectionAlertDialog();
@@ -361,6 +441,7 @@ public class HomeLauncherActivity extends BaseActivity
             mText2Speech.shutdown();
         }
         mText2Speech = null;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -571,7 +652,9 @@ public class HomeLauncherActivity extends BaseActivity
     public void onBackPressed() {
         //super.onBackPressed();
         if (this.mActivityInteractionListener != null) {
-            this.mActivityInteractionListener.onBackPressed();
+            for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+                listener.onBackPressed();
+            }
         }
     }
 
@@ -622,8 +705,14 @@ public class HomeLauncherActivity extends BaseActivity
      * 여러개의 프래그먼트에서 동시에 처리하지 않도록 하나만 유지된다.
      * @param listener
      */
-    public void setOnActivityInteractionListener(OnActivityInteractionListener listener) {
-        this.mActivityInteractionListener = listener;
+    public void registerActivityInteractionListener(OnActivityInteractionListener listener) {
+        if (this.mActivityInteractionListener.indexOf(listener) < 0) {
+            this.mActivityInteractionListener.add(listener);
+        }
+    }
+
+    public void unRegisterActivityInteractionListener(OnActivityInteractionListener listener) {
+        this.mActivityInteractionListener.remove(listener);
     }
 
     @Override
@@ -642,4 +731,38 @@ public class HomeLauncherActivity extends BaseActivity
             getWindow().setBackgroundDrawableResource(LauncherSettings.portWallpaperResource[wallpaperId]);
         }
     }
+
+    /**
+     * Handle onNewIntent() to inform the fragment manager that the
+     * state is not saved.  If you are handling new intents and may be
+     * making changes to the fragment state, you want to be sure to call
+     * through to the super-class here first.  Otherwise, if your state
+     * is saved but the activity is not stopped, you could get an
+     * onNewIntent() call which happens before onResume() and trying to
+     * perform fragment operations at that point will throw IllegalStateException
+     * because the fragment manager thinks the state is still saved.
+     *
+     * @param intent
+     */
+    /**
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //super.onNewIntent(intent);
+        if (intent == null) {
+            return;
+        }
+
+        String action = intent.getAction();
+        Log.d(TAG, "onNewIntent.. action = " + action);
+        if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action) || PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
+            setPushServiceStatus(intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+
+            if (mActivityInteractionListener != null) {
+                for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+                    listener.onPushReceived(intent);
+                }
+            }
+        }
+    }
+    */
 }

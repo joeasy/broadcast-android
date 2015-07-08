@@ -186,6 +186,11 @@ public class PushService extends Service {
 
                     Intent intent = new Intent();
                     intent.setAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
+                    if (mState == State.Connected) {
+                        intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_CONNECTED);
+                    } else {
+                        intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+                    }
                     intent.putExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA, payloadData);
                     sendBroadcast(intent);
                 } else {
@@ -393,7 +398,6 @@ public class PushService extends Service {
     private void sendSatusChangedBroadcastMessage() {
         Log.d(TAG, "Send Broadcasting message action = " + PushConstants.ACTION_PUSH_STATUS_CHANGED);
         Intent intent = new Intent(PushConstants.ACTION_PUSH_STATUS_CHANGED);
-        // You can also include some extra data.
         if (mState == State.Connected) {
             intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_CONNECTED);
         } else {

@@ -293,6 +293,17 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             final String action = intent.getAction();
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
+            } else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
+                Message msg = new Message();
+                msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
+                msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+                mHandler.sendMessage(msg);
+            } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
+                Message msg = new Message();
+                msg.what = HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
+                msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+                msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+                mHandler.sendMessage(msg);
             }
         }
     };
@@ -343,10 +354,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         // push agent 연결상태이다.
         mPushServiceStatus = (ImageView) v.findViewById(R.id.ic_nav_wifi);
-//        if (NetworkUtils.isConnected(getActivity())) {
-//            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
+//        if (((BaseActivity)getActivity()).isPushServiceConnected()) {
+//            mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_on);
 //        } else {
-//            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+//            mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_off);
 //        }
 
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
@@ -555,11 +566,28 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     }
 
     @Override
+    public void onPushReceived(Intent intent) {
+        final String action = intent.getAction();
+        if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
+            Message msg = new Message();
+            msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
+            msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+            mHandler.sendMessage(msg);
+        } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
+            Message msg = new Message();
+            msg.what = HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
+            msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+            msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+            mHandler.sendMessage(msg);
+        }
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             Log.d(TAG, "LauncherFragment onAttach()");
-            ((HomeLauncherActivity)activity).setOnActivityInteractionListener(this);
+            ((HomeLauncherActivity)getActivity()).registerActivityInteractionListener(this);
 
             // check network status
             IntentFilter intentFilter = new IntentFilter();
@@ -579,6 +607,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     public void onDetach() {
         super.onDetach();
         getActivity().unregisterReceiver(mBroadcastReceiver);
+        ((HomeLauncherActivity)getActivity()).unRegisterActivityInteractionListener(this);
 
         Log.d(TAG, "LauncherFragment onDetach()");
         mHandler = null;
@@ -793,9 +822,13 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         mProgressDialogFragment.show(getActivity().getSupportFragmentManager(), "launcher_progress_dialog");
     }
     private void dismissProgressDialog() {
-        if (mProgressDialogFragment != null) {
-            mProgressDialogFragment.dismiss();
-            mProgressDialogFragment = null;
+        try {
+            if (mProgressDialogFragment != null) {
+                mProgressDialogFragment.dismiss();
+                mProgressDialogFragment = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

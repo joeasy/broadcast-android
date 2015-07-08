@@ -100,4 +100,8 @@ public class Constants {
  *
     public static final String PUSH_PAYLOAD_TYPE_APP_UPDATE = "11";
  */
+
+    public static final String ACTION_LAUNCHER_ACTIVITY_RUNNING = "com.nbplus.vbroadlauncher.intent.action.LAUNCHER_ACTIVITY_RUNNING";
+    public static final String EXTRA_LAUNCHER_ACTIVITY_RUNNING = "EXTRA_LAUNCHER_ACTIVITY_RUNNING";
+
 }

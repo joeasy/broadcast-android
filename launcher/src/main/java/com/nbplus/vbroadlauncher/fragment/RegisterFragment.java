@@ -1,6 +1,7 @@
 package com.nbplus.vbroadlauncher.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.location.Location;
@@ -122,7 +123,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            ((HomeLauncherActivity)activity).setOnActivityInteractionListener(this);
+            ((HomeLauncherActivity)getActivity()).registerActivityInteractionListener(this);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -131,6 +132,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
 
     @Override
     public void onDetach() {
+        ((HomeLauncherActivity)getActivity()).unRegisterActivityInteractionListener(this);
         super.onDetach();
     }
 
@@ -143,6 +145,11 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
 
     @Override
     public void onDataChanged() {
+
+    }
+
+    @Override
+    public void onPushReceived(Intent intent) {
 
     }
 }

@@ -160,4 +160,9 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
             startActivity(startIntent);
         }
     }
+
+    @Override
+    public void onPushReceived(Intent intent) {
+
+    }
 }

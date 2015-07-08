@@ -121,7 +121,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * @param data
      */
     @JavascriptInterface
-    public void setServerInformation(String data) {
+    public void setServerInfomation(String data) {
         Log.d(TAG, ">> setApplicationData() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
