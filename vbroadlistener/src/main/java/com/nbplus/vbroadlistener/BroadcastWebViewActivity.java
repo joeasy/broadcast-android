@@ -129,15 +129,16 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = LauncherSettings.getInstance(this).getRegisterAddress();
         }
         if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+//            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
             url += ("&APPID=" + getApplicationContext().getPackageName());
         } else {
-            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
-            url += ("&APPID=" + getApplicationContext().getPackageName());
+//            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+            url += ("?APPID=" + getApplicationContext().getPackageName());
         }
         mWebViewClient.loadUrl(url);
 
         // test view
+        /*
         final EditText editText = (EditText)findViewById(R.id.et_test_url);
         editText.setText(url);
         Button button = (Button)findViewById(R.id.btn_test_load);
@@ -149,23 +150,24 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     return;
                 }
                 if (url.indexOf("?") > 0) {
-                    if (!url.contains("UUID=")) {
-                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-                    }
+//                    if (!url.contains("UUID=")) {
+//                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+//                    }
                     if (!url.contains("APPID=")) {
                         url += ("&APPID=" + getApplicationContext().getPackageName());
                     }
                 } else {
-                    if (!url.contains("UUID=")) {
-                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-                    }
+//                    if (!url.contains("UUID=")) {
+//                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+//                    }
                     if (!url.contains("APPID=")) {
-                        url += ("&APPID=" + getApplicationContext().getPackageName());
+                        url += ("?APPID=" + getApplicationContext().getPackageName());
                     }
                 }
                 mWebViewClient.loadUrl(url);
             }
         });
+        */
         setContentViewByOrientation();
 
         checkPlayServices();
