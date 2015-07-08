@@ -1,6 +1,8 @@
 package com.nbplus.vbroadlauncher.fragment;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,18 +12,18 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.location.Location;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.util.TypedValue;
@@ -29,49 +31,49 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nbplus.media.MusicService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.nbplus.push.data.PushConstants;
+import com.nbplus.push.PushService;
 import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
+import com.nbplus.vbroadlauncher.data.PushPayloadData;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
-//import com.nbplus.vbroadlauncher.widget.IButton;
 
 import com.nbplus.vbroadlauncher.service.BaseServerApiAsyncTask;
-import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
 import com.nbplus.vbroadlauncher.widget.TextClock;
 import com.nbplus.vbroadlauncher.widget.WeatherView;
 
 import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.NetworkUtils;
+import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link LauncherFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -79,9 +81,8 @@ import java.util.Date;
 public class LauncherFragment extends Fragment implements OnActivityInteractionListener, View.OnClickListener {
     private static final String TAG = LauncherFragment.class.getSimpleName();
 
-    private OnFragmentInteractionListener mListener;
     ProgressDialogFragment mProgressDialogFragment;
-    private ImageView mWifiStatus;
+    private ImageView mPushServiceStatus;
     private Button mOutdoorMode;
     private Button mServiceTreeMap;
     private Button mApplicationsView;
@@ -94,10 +95,15 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private GridLayout mMainShortcutGridLayout;
     private GridLayout mShorcutGridLayout;
 
-    private final LauncherFragmentHandler mHandler = new LauncherFragmentHandler(this);
+    private LauncherFragmentHandler mHandler;
 
+    private static final int PUSH_NOTIFICATION_ID = 1001;
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
     private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
+    private static final int HANDLER_MESSAGE_PUSH_STATUS_CHANGED = 0x03;
+    private static final int HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED = 0x04;
+
+    private ArrayList<ShortcutData> mPushNotifiableShorcuts = new ArrayList<>();
 
     // 핸들러 객체 만들기
     private static class LauncherFragmentHandler extends Handler {
@@ -125,10 +131,134 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
 
                 if (NetworkUtils.isConnected(getActivity())) {
-                    mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
                     mWeatherView.onNetworkConnected();
+                    // start push agent service
+                    VBroadcastServer serverInfo = LauncherSettings.getInstance(getActivity()).getServerInformation();
+                    if (serverInfo != null && StringUtils.isEmptyString(serverInfo.getPushInterfaceServer()) == false) {
+                        Intent intent = new Intent(getActivity(), PushService.class);
+                        intent.setAction(PushConstants.ACTION_START_SERVICE);
+                        intent.putExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS, serverInfo.getPushInterfaceServer());
+                        getActivity().startService(intent);
+                    }
+                }
+                break;
+
+            case HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
+                Log.d(TAG, "HANDLER_MESSAGE_PUSH_STATUS_CHANGED received !!!");
+                int status = msg.arg1;
+                if (status == PushConstants.PUSH_STATUS_VALUE_CONNECTED) {
+                    mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_on);
                 } else {
-                    mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+                    mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+                }
+                break;
+            case HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
+                String data = (String)msg.obj;
+                Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + data);
+
+                if (data == null || StringUtils.isEmptyString(data)) {
+                    Log.d(TAG, "empty push message string !!");
+                    return;
+                }
+
+                PushPayloadData payloadData = null;
+                try {
+                    Gson gson = new GsonBuilder().create();
+                    payloadData = gson.fromJson(data, new TypeToken<PushPayloadData>(){}.getType());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (payloadData != null) {
+                    String type = payloadData.getServiceType();
+                    switch (type) {
+                        // 방송알림
+                        case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
+                        case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
+                        case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
+                            boolean isOutdoor = LauncherSettings.getInstance(getActivity()).isOutdoorMode();
+                            if (isOutdoor) {        // 외출모드에서는 재생하지 않음.
+                                View btnShortcut = null;
+                                for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
+                                    ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
+                                    String[] pushType = shortcut.getPushType();
+                                    if (pushType != null && pushType.length > 0 && Arrays.asList(pushType).indexOf(type) >= 0) {
+                                        btnShortcut = shortcut.getLauncherButton();
+                                        break;
+                                    }
+                                }
+
+                                // push notification badge 를 보여준다.
+                                if (btnShortcut != null) {
+                                    TextView badgeView = (TextView) btnShortcut.findViewById(R.id.launcher_menu_badge);
+                                    if (badgeView != null) {
+                                        badgeView.setVisibility(View.VISIBLE);
+                                        playNotificationAlarm(R.string.notification_broadcast_push);
+                                    }
+                                }
+                            } else {
+                                ((BaseActivity)getActivity()).acquireCpuWakeLock();
+                                playNotificationAlarm(R.string.notification_broadcast_push);
+
+                                boolean isRealTime = Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(payloadData.getServiceType());
+                                if (isRealTime) {
+                                    // fake home key event.
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_MAIN);
+                                    intent.addCategory(Intent.CATEGORY_HOME);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                                            | Intent.FLAG_ACTIVITY_FORWARD_RESULT
+                                            | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
+                                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                                    getActivity().startActivity(intent);
+                                } else {
+
+                                }
+                            }
+
+                            break;
+                        // 긴급호출메시지
+                        case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
+                            break;
+                        // 주민투표
+                        case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
+                        // 공동구매
+                        case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
+                            View btnShortcut = null;
+                            for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
+                                ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
+                                String[] pushType = shortcut.getPushType();
+                                if (pushType != null && pushType.length > 0 && Arrays.asList(pushType).indexOf(type) >= 0) {
+                                    btnShortcut = shortcut.getLauncherButton();
+                                    break;
+                                }
+                            }
+
+                            // push notification badge 를 보여준다.
+                            if (btnShortcut != null) {
+                                TextView badgeView = (TextView)btnShortcut.findViewById(R.id.launcher_menu_badge);
+                                if (badgeView != null) {
+                                    badgeView.setVisibility(View.VISIBLE);
+                                    int strId = Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL.equals(payloadData.getServiceType())
+                                            ? R.string.notification_inhabitant_push : R.string.notification_cooperative_buying_push;
+                                    playNotificationAlarm(strId);
+                                }
+                            }
+                            break;
+                        // IOT DEVICE 제어(스마트홈 서비스)
+                        case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
+                            break;
+                        // IOT DEVICE 제어(스마트홈 서비스)
+                        case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :
+                            break;
+                        // IOT DEVICE 제어(스마트홈 서비스)
+                        case Constants.PUSH_PAYLOAD_TYPE_FIND_PASSWORD :
+                            break;
+
+                        default:
+                            Log.d(TAG, "Unknown push payload type !!!");
+                            break;
+                    }
                 }
                 break;
 
@@ -139,16 +269,16 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 if (result != null) {
                     Log.d(TAG, ">> EMERGENCY CALL result code = " + result.getResultCode() + ", message = " + result.getResultMessage());
                     if (Constants.RESULT_OK.equals(result.getResultCode())) {
-                        toast = Toast.makeText(getActivity(), R.string.emergency_call_success_message, Toast.LENGTH_LONG);
+                        toast = Toast.makeText(getActivity(), R.string.emergency_call_success_message, Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     } else {
-                        toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_LONG);
+                        toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }
                 } else {
-                    toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_LONG);
+                    toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                 }
@@ -159,6 +289,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Broadcast message received !!!");
             final String action = intent.getAction();
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
@@ -189,6 +320,17 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         getActivity().setTitle("LauncherFragment");
+
+        if (!LauncherSettings.getInstance(getActivity()).isCheckedTTSEngine()) {
+            Intent checkIntent = new Intent();
+            checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+            getActivity().startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
+        }
+
+        // check push agent status
+        Intent intent = new Intent(getActivity(), PushService.class);
+        intent.setAction(PushConstants.ACTION_GET_STATUS);
+        getActivity().startService(intent);
     }
 
     @Override
@@ -199,12 +341,13 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         mMainViewLayout = (LinearLayout)v.findViewById(R.id.main_view_layout);
 
-        mWifiStatus = (ImageView) v.findViewById(R.id.ic_nav_wifi);
-        if (NetworkUtils.isConnected(getActivity())) {
-            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
-        } else {
-            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
-        }
+        // push agent 연결상태이다.
+        mPushServiceStatus = (ImageView) v.findViewById(R.id.ic_nav_wifi);
+//        if (NetworkUtils.isConnected(getActivity())) {
+//            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_on);
+//        } else {
+//            mWifiStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+//        }
 
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
         mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
@@ -255,6 +398,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             @Override
             public void onClick(View view) {
                 Toast toast;
+
                 if (LauncherSettings.getInstance(getActivity()).isOutdoorMode()) {
                     LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(false);
                     mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
@@ -328,6 +472,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             ShortcutData data = mainShortcutDatas.get(i);
             FrameLayout btnLayout = (FrameLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mMainShortcutGridLayout, false);//new Button(getActivity());
             mMainShortcutGridLayout.addView(btnLayout);
+            if (data.getPushType() != null && data.getPushType().length > 0) {
+                data.setLauncherButton(btnLayout);
+                mPushNotifiableShorcuts.add(data);
+            }
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
 
@@ -376,6 +524,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             ShortcutData data = shortcutDatas.get(i);
             FrameLayout btnLayout = (FrameLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mShorcutGridLayout, false);//new Button(getActivity());
             mShorcutGridLayout.addView(btnLayout);
+            if (data.getPushType() != null && data.getPushType().length > 0) {
+                data.setLauncherButton(btnLayout);
+                mPushNotifiableShorcuts.add(data);
+            }
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
 
@@ -406,13 +558,17 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            Log.d(TAG, "LauncherFragment onAttach()");
             ((HomeLauncherActivity)activity).setOnActivityInteractionListener(this);
 
             // check network status
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
+            intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
+
+            mHandler = new LauncherFragmentHandler(this);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -422,8 +578,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         getActivity().unregisterReceiver(mBroadcastReceiver);
+
+        Log.d(TAG, "LauncherFragment onDetach()");
+        mHandler = null;
     }
 
     @Override
@@ -556,6 +714,15 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             ((BaseActivity)getActivity()).showNetworkConnectionAlertDialog();
             return;
         }
+
+        // push notification badge 를 제거한다.
+        if (data.getPushType() != null) {
+            TextView badgeView = (TextView)view.findViewById(R.id.launcher_menu_badge);
+            if (badgeView != null) {
+                badgeView.setVisibility(View.GONE);
+            }
+        }
+
         switch (data.getType()) {
             case Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER:
                 BaseServerApiAsyncTask task;
@@ -630,6 +797,17 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             mProgressDialogFragment.dismiss();
             mProgressDialogFragment = null;
         }
+    }
+
+    private void playNotificationAlarm(int textResId) {
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+        builder.setSound(soundUri);
+        notificationManager.notify(PUSH_NOTIFICATION_ID, builder.build());
+
+        Toast.makeText(getActivity(), textResId, Toast.LENGTH_SHORT).show();
     }
 
 }

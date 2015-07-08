@@ -132,7 +132,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     // The ID we use for the notification (the onscreen alert that appears at the notification
     // area at the top of the screen as an icon -- and as text as well if the user expands the
     // notification area).
-    final int NOTIFICATION_ID = 1;
+    final int NOTIFICATION_ID = 2001;
 
     // Our instance of our MusicRetriever, which handles scanning for media and
     // providing titles and URIs as we need.
@@ -267,7 +267,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         if (mState == State.Stopped) {
             // If we're stopped, just go ahead to the next song and start playing
             //playNextSong(null);
-            sendBroadcastMessage(ACTION_ERROR, mPlayingItem);
+            mPlayingItem = null;
+            //sendBroadcastMessage(ACTION_ERROR, mPlayingItem);
             stopForeground(true);
         }
         else if (mState == State.Paused) {
@@ -592,7 +593,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     public void onGainedAudioFocus() {
-        Toast.makeText(getApplicationContext(), "gained audio focus.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "gained audio focus.", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "gained audio focus.");
         mAudioFocus = AudioFocus.Focused;
 
         // restart media player with new focus settings
@@ -601,8 +603,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     public void onLostAudioFocus(boolean canDuck) {
-        Toast.makeText(getApplicationContext(), "lost audio focus." + (canDuck ? "can duck" :
-                "no duck"), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "lost audio focus." + (canDuck ? "can duck" : "no duck"), Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "lost audio focus. " + (canDuck ? "can duck" : "no duck"));
         mAudioFocus = canDuck ? AudioFocus.NoFocusCanDuck : AudioFocus.NoFocusNoDuck;
 
         // start/restart/pause media player with new focus settings

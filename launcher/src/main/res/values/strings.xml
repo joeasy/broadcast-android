@@ -19,6 +19,8 @@
     <string name="alert_network_title">Network</string>
     <string name="alert_network_message">Please Check your internet connection and try Again.\n(Contact to your administrator if you need assistance..)</string>
     <string name="alert_network_btn_check_wifi">Check Wi-Fi</string>
+    <string name="alert_tts_message">TTS Engine is not available. Check your TTS settings.</string>
+    <string name="alert_tts_btn_settings">Settings</string>
 
     <!-- main top nav launcher -->
     <string name="btn_outdoor">Out-Door</string>
@@ -32,7 +34,8 @@
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">Show Broadcast</string>
     <string name="shortcut_btn_call_emergency">Emergency Call</string>
-    <string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>
+    <string name="shortcut_addr_show_broadcast">/web_test/broadcast_test.html</string>
+    <!--<string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>-->
     <string name="shortcut_addr_call_emergency">/is/api/Service/RegistEmergencyCall</string>
 
     <!--sub shortcut -->

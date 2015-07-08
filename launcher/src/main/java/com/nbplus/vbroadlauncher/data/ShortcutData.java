@@ -2,6 +2,7 @@ package com.nbplus.vbroadlauncher.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -31,6 +32,26 @@ public class ShortcutData implements Parcelable {
 
     @SerializedName("native_class")
     private Class nativeClass = null;     // 0 : activity, 1 : fragment, 2 : dialogfragment
+
+    // for push notification
+    private String[] pushType;
+    private View launcherButton;
+
+    public View getLauncherButton() {
+        return launcherButton;
+    }
+
+    public void setLauncherButton(View launcherButton) {
+        this.launcherButton = launcherButton;
+    }
+
+    public String[] getPushType() {
+        return pushType;
+    }
+
+    public void setPushType(String[] pushType) {
+        this.pushType = pushType;
+    }
 
     public String getDomain() {
         return domain;
@@ -104,6 +125,19 @@ public class ShortcutData implements Parcelable {
         this.iconBackResId = backgroundRes;
         this.nativeType = nativeType;
         this.nativeClass = clazz;
+
+        this.pushType = null;
+    }
+    public ShortcutData(int type, int name, String path, int iconRes, int backgroundRes, int nativeType, Class clazz, String[] pushType) {
+        this.type = type;
+        this.name = name;
+        this.path = path;
+        this.iconResId = iconRes;
+        this.iconBackResId = backgroundRes;
+        this.nativeType = nativeType;
+        this.nativeClass = clazz;
+
+        this.pushType = pushType;
     }
 
     public ShortcutData() {

@@ -6,21 +6,22 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application
         android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:clearTaskOnLaunch="true"
         android:launchMode="singleTask"
         android:stateNotNeeded="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
         android:name=".HomeLauncherApplication"
         android:theme="@style/NBPlusTheme.NoActionBar" >
         <activity
             android:name=".HomeLauncherActivity"
-            android:clearTaskOnLaunch="true"
             android:exported="true"
             android:label="@string/app_name"
+            android:clearTaskOnLaunch="true"
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
             android:configChanges="orientation|screenSize"
@@ -33,27 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!--
-        <activity-alias
-            android:name=".HomeScreenDirect"
-            android:clearTaskOnLaunch="true"
-            android:excludeFromRecents="true"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:stateNotNeeded="true"
-            android:targetActivity="com.nbplus.vbroadlauncher.HomeLauncherActivity"
-            android:theme="@style/AppTheme" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-        -->
-
 
         <!--
         Service to asynchronously fetch a location address using a Geocoder. Setting the
@@ -73,17 +53,9 @@
             android:label="@string/title_activity_show_application"
              >
         </activity>
-        <!--
-        <activity
-            android:name=".CalendarActivity"
-            android:label="@string/title_activity_calendar"
-            android:theme="@style/NBPlusTheme.WallPager.NoActionBar.TranslucentDecor" >
-        </activity>
-        -->
         <activity
             android:name=".BroadcastWebViewActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:noHistory="false"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_broadcast_webview"
             >
@@ -91,7 +63,6 @@
         <activity
             android:name=".RadioActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:noHistory="false"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/NBPlusTheme.NoActionBar.Translucent"
             android:label="@string/title_activity_broadcast_webview"
@@ -108,6 +79,7 @@
         <service android:exported="false" android:name="com.nbplus.media.MusicService">
             <intent-filter>
                 <action android:name="com.nbplus.android.musicplayer.action.TOGGLE_PLAYBACK" />
+                <action android:name="com.nbplus.android.musicplayer.action.PLAYINGSTATU" />
                 <action android:name="com.nbplus.android.musicplayer.action.PLAY" />
                 <action android:name="com.nbplus.android.musicplayer.action.PAUSE" />
                 <action android:name="com.nbplus.android.musicplayer.action.SKIP" />
@@ -128,6 +100,26 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".OnBootReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <data android:scheme="package"  />
+            </intent-filter>
+        </receiver>
+        <!--<receiver-->
+            <!--android:name=".BroadcastPushReceiver"-->
+            <!--android:enabled="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
+                <!--<action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
+                <!--<action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>-->
+                <!--<data android:scheme="package"  />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
     </application>
 

@@ -46,12 +46,18 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
         return null;
     }
 
+    @JavascriptInterface
+    public void setVillageName(String villageName) {
+        if (!StringUtils.isEmptyString(villageName)) {
+            LauncherSettings.getInstance(mContext).setVillageName(villageName);
+        }
+    }
     /**
      *
      * @param data
      */
     @JavascriptInterface
-    public void setApplicationData(String data) {
+    public void setServerInformation(String data) {
         Log.d(TAG, ">> setApplicationData() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
@@ -60,26 +66,35 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
             try {
                 data = new String(data.getBytes("utf-8"));
                 Gson gson = new GsonBuilder().create();
-                RegSettingData settings = gson.fromJson(data, RegSettingData.class);
-                if (settings != null) {
-                    if (StringUtils.isEmptyString(settings.getVillageName())) {
+                VBroadcastServer serverInfo = gson.fromJson(data, VBroadcastServer.class);
+                if (serverInfo != null) {
+//                    if (StringUtils.isEmptyString(settings.getVillageName())) {
+//                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
+                    /*if (settings.getServerInformation() == null) {
                         Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
-                    }
-                    if (settings.getServerInformation() == null) {
-                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                        return;
-                    } else {
-                        VBroadcastServer serverInfo = settings.getServerInformation();
+                    } else*/ {
+                        //VBroadcastServer serverInfo = settings.getServerInformation();
+                        if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
+                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         if (StringUtils.isEmptyString(serverInfo.getDocServer())) {
+                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (StringUtils.isEmptyString(serverInfo.getPushInterfaceServer())) {
                             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
                         }
                     }
 
-                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
-                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
-                    LauncherSettings.getInstance(mContext).setServerInformation(settings.getServerInformation());
+//                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
+//                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
+                    LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
+
                 } else {
                     Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                 }
@@ -89,6 +104,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
             }
         }
     }
+
 
     /**
      * GCM 등록
@@ -159,9 +175,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
         mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
     }
     private void dismissProgressDialog() {
-        if (mProgressDialogFragment != null) {
-            mProgressDialogFragment.dismiss();
-            mProgressDialogFragment = null;
+        try {
+            if (mProgressDialogFragment != null) {
+                mProgressDialogFragment.dismiss();
+                mProgressDialogFragment = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -180,6 +200,9 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
     public void onPageFinished(WebView view, String url) {
         this.dismissProgressDialog();
         super.onPageFinished(view, url);
+
+        Log.d(TAG, ">> line number = " + getLineNumber());
+        Log.d(TAG, ">> getApplicationPackageName = " + getApplicationPackageName());
     }
 
     @Override

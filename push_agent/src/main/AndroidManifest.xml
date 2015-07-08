@@ -1,35 +1,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.nbplus.push">
+    package="com.nbplus.push">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <permission android:name="com.sg.droid.pushservice.permission.RECEIVE" android:label="sg_push_permission_receive"
+    <permission android:name="com.nbplus.pushservice.permission.RECEIVE" android:label="nbplus_push_permission_receive"
                 android:protectionLevel="dangerous" />
-    <permission android:name="com.sg.droid.pushservice.permission.SEND" android:label="sg_push_permission_send"
+    <permission android:name="com.nbplus.pushservice.permission.SEND" android:label="nbplus_push_permission_send"
                 android:protectionLevel="dangerous" />
-    <uses-permission android:name="com.sg.droid.pushservice.permission.SEND"/>
+    <uses-permission android:name="com.nbplus.pushservice.permission.SEND"/>
 
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
         >
-        <receiver
-            android:name="com.nbplus.push.OnBootReceiver"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
-
         <service
-            android:name="com.nbplus.push.RemoteService"
-            android:permission="com.sg.droid.pushservice.permission.RECEIVE"
+            android:name="com.nbplus.push.PushService"
+            android:permission="com.nbplus.pushservice.permission.RECEIVE"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.sg.droid.pushservice.intent.ACTION_BIND" />
+                <action android:name="com.nbplus.pushservice.intent.action.SETUP_PUSH_GW" />
+                <action android:name="com.nbplus.pushservice.intent.action.GET_TATUS" />
+                <action android:name="com.nbplus.pushservice.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </service>
 

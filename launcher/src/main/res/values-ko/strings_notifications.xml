@@ -21,4 +21,8 @@
     <string name="label_previous">이전</string>
     <string name="label_next">다음</string>
     <string name="error_empty_metadata">정보 없음</string>
+
+    <string name="notification_broadcast_push">새로운 방송 알림이 도착하였습니다.</string>
+    <string name="notification_inhabitant_push">새로운 주민투표 알림이 도착하였습니다.</string>
+    <string name="notification_cooperative_buying_push">새로운 공동구매 알림이 도착하였습니다.</string>
 </resources>

@@ -47,12 +47,12 @@ dependencies {
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.android.support:gridlayout-v7:22.1.1'
     compile 'com.google.android.gms:play-services-location:6.5.+'
-    compile 'com.mcxiaoke.volley:library:1.0.+'
-    compile 'com.google.code.gson:gson:2.2.4'
+//    compile 'com.mcxiaoke.volley:library:1.0.+'
+//    compile 'com.google.code.gson:gson:2.2.4'
     compile project(':iot_gateway')
     compile project(':vitamio')
     compile project(':push_agent')
-    compile project(':common_library')
+//    compile project(':common_library')
     compile project(':viewpager_indicator')
     //compile project(':calendar_library')
 }

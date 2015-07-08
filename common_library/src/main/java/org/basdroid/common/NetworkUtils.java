@@ -125,6 +125,51 @@ public class NetworkUtils {
         }
     }
 
+    public static boolean isLTE(Context context){
+        NetworkInfo info = getNetworkInfo(context);
+        if (info == null || !info.isConnected()) {
+            return false;
+        }
+
+        int type = info.getType();
+        int subType = info.getSubtype();
+
+        if (type == ConnectivityManager.TYPE_WIFI){
+            return false;
+        } else if (type == ConnectivityManager.TYPE_MOBILE) {
+            switch(subType){
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                    return false; // ~ 50-100 kbps
+            /*
+             * Above API level 7, make sure to set android:targetSdkVersion
+             * to appropriate level to use these
+             */
+                case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
+                case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
+                case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
+                case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
+                    return false; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
+                    return true; // ~ 10+ Mbps
+                // Unknown
+                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     /**
      * enable wifi device
      * @param context

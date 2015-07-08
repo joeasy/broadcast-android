@@ -1,9 +1,17 @@
 package com.nbplus.vbroadlauncher;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.speech.tts.TextToSpeech;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +19,8 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.nbplus.media.MusicRetriever;
+import com.nbplus.media.MusicService;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -19,6 +29,8 @@ import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.StringUtils;
+
+import java.lang.ref.WeakReference;
 
 
 /**
@@ -30,6 +42,56 @@ public class BroadcastWebViewActivity extends BaseActivity {
     BroadcastWebViewClient mWebViewClient;
     ShortcutData mShortcutData;
 
+    private static final int HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE = 0x01;
+    private final BroadcastWebViewActivityHandler mHandler = new BroadcastWebViewActivityHandler(this);
+
+    // 핸들러 객체 만들기
+    private static class BroadcastWebViewActivityHandler extends Handler {
+        private final WeakReference<BroadcastWebViewActivity> mActivity;
+
+        public BroadcastWebViewActivityHandler(BroadcastWebViewActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            BroadcastWebViewActivity activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
+    }
+
+    public void handleMessage(Message msg) {
+        if (msg == null) {
+            return;
+        }
+        switch (msg.what) {
+            case HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE :
+                if (mWebViewClient != null) {
+                    mWebViewClient.onCloseWebApplicationByUser();
+                }
+                break;
+        }
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
+            // send handler message
+            switch (action) {
+                case Constants.ACTION_BROWSER_ACTIVITY_CLOSE :
+                    mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
+                    break;
+                default :
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +101,10 @@ public class BroadcastWebViewActivity extends BaseActivity {
         Log.d(TAG, "BroadcastWebViewActivity onCreate()");
         WebView webView = (WebView)findViewById(R.id.webview);
         mWebViewClient = new BroadcastWebViewClient(this, webView);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
         Intent i = getIntent();
         mShortcutData = i.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
@@ -125,11 +191,25 @@ public class BroadcastWebViewActivity extends BaseActivity {
         mWebViewClient.onBackPressed();
     }
 
+    /**
+     * Dispatch onPause() to fragments.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         Log.d(TAG, "BroadcastWebViewActivity onDestroy()");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
     }
 
     @Override
@@ -148,4 +228,36 @@ public class BroadcastWebViewActivity extends BaseActivity {
             mWebViewClient.setBackgroundResource(LauncherSettings.portWallpaperResource[wallpapereId]);
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "BroadcastWebViewActivity called onStop()");
+    }
+
+    public void getText2SpeechObject(OnText2SpeechListener l) {
+        this.mcheckText2SpeechLister = l;
+
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA :
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    // check korean
+                    mText2Speech = new TextToSpeech(this, this);
+                } else {
+                    Log.d(TAG, "여기서 제대로 설정안했다면 관두자.... 사용자 맘인데...");
+                    showText2SpeechAlertDialog();
+
+                    LauncherSettings.getInstance(this).setIsCheckedTTSEngine(true);
+                }
+                break;
+        }
+    }
+
 }

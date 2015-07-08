@@ -22,4 +22,9 @@ public class PhoneState {
 
         return true;
     }
+
+    public static String getLineNumber1(Context context) {
+        TelephonyManager telephony = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        return telephony.getLine1Number();
+    }
 }

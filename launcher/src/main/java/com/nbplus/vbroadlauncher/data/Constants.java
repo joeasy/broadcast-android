@@ -12,6 +12,7 @@ public class Constants {
 
     public static final String PACKAGE_NAME =
             "com.google.android.gms.location.sample.locationaddress";
+    public static final String ACTION_BROWSER_ACTIVITY_CLOSE = "com.nbplus.vbroadlauncher.intent.action.BROWSER_ACTIVITY_CLOSE";
 
     public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
 
@@ -35,10 +36,12 @@ public class Constants {
     public static final String EXTRA_NAME_SHORTCUT_DATA = "extra_shortcut_data";
 
     // installed application list retrieve message
-    public static final int HANDLER_MESSAGE_INSTALLED_APPLIST_TASK = 0x1001;
-    public static final int HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK = 0x2001;
-    public static final int HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT = 0x2002;
-    public static final int HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK = 0x3001;
+    public static final int HANDLER_MESSAGE_INSTALLED_APPLIST_TASK = 1001;
+    public static final int HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK = 2001;
+    public static final int HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT = 2002;
+    public static final int HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK = 3001;
+
+    public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
 
     // weather open api key
     public static final String WEATHER_OPEN_API_KEY = "2GjUf7yXsE0w7ayKJ2jGnYctDTSyZYu1IoPphFuLaBq6Ij0as1Bks1KTLcVE7pqt9E76kdfLxtGc4ocQ9Lxpdg%3D%3D";
@@ -54,6 +57,7 @@ public class Constants {
     public static final String WEATHER_PARAM_SERVICE_KEY = "ServiceKey=";
     // parameter
     public static final String WEATHER_PARAM_TYPE = "_type=json";
+    public static final String WEATHER_PARAM_TYPE_VALUE = "json";
 
     public static final int NUM_GRID_X = 149;
     public static final int NUM_GRID_Y = 253;
@@ -80,4 +84,20 @@ public class Constants {
 
     //public static final String WEEK_WEATHER_YQL = "select item from weather.forecast where woeid=%s&d=7&format=json";
     public static final String WEATHER_SERVICE_UPDATE_ACTION = "com.nbplus.vbroadlauncher.intent.action.weaterupdate";
+
+    // push payload data type
+    public static final String PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST = "00";
+    public static final String PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST = "01";
+    public static final String PUSH_PAYLOAD_TYPE_TEXT_BROADCAST = "02";
+    public static final String PUSH_PAYLOAD_TYPE_EMERGENCY_CALL = "03";
+    public static final String PUSH_PAYLOAD_TYPE_INHABITANTS_POLL  = "04";
+    public static final String PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING = "05";
+    public static final String PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL = "06";
+    public static final String PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION = "07";
+    public static final String PUSH_PAYLOAD_TYPE_FIND_PASSWORD = "08";
+/**
+ *  removed.. interface 0.7
+ *
+    public static final String PUSH_PAYLOAD_TYPE_APP_UPDATE = "11";
+ */
 }

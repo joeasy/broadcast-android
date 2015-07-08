@@ -19,6 +19,8 @@
     <string name="alert_network_title">Network</string>
     <string name="alert_network_message">인터넷을 사용할 수 없습니다. 네트워크 설정을 확인하시고 다시 시도해 주시기 바랍니다.\n(문제가 해결되지 않으면 관리자에게 문의하시기 바랍니다.)</string>
     <string name="alert_network_btn_check_wifi">와이파이 설정</string>
+    <string name="alert_tts_message">TTS 엔진을 설정할 수 없습니다. 환경 설정에서 확인해 주시기 바랍니다.</string>
+    <string name="alert_tts_btn_settings">설정</string>
 
     <!-- launcher top nav -->
     <string name="btn_outdoor">외출중</string>
@@ -32,7 +34,8 @@
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">방송듣기</string>
     <string name="shortcut_btn_call_emergency">긴급호출 하기</string>
-    <string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>
+    <string name="shortcut_addr_show_broadcast">/web_test/broadcast_test.html</string>
+    <!--<string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>-->
     <string name="shortcut_addr_call_emergency">/is/api/Service/RegistEmergencyCall</string>
 
     <!--sub shortcut -->

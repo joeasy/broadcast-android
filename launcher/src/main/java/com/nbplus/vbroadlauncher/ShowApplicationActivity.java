@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.adapter.AppPagerAdapter;
 import com.nbplus.vbroadlauncher.adapter.NbplusViewPager;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -28,7 +27,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 
-public class ShowApplicationActivity extends BaseActivity implements OnFragmentInteractionListener {
+public class ShowApplicationActivity extends BaseActivity {
     private static final String TAG = ShowApplicationActivity.class.getSimpleName();
 
     private NbplusViewPager mViewPager;
@@ -176,11 +175,6 @@ public class ShowApplicationActivity extends BaseActivity implements OnFragmentI
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
     /**
      * Dispatch onResume() to fragments.  Note that for better inter-operation
      * with older versions of the platform, at the point of this call the
@@ -207,6 +201,11 @@ public class ShowApplicationActivity extends BaseActivity implements OnFragmentI
         super.onDestroy();
         unregisterReceiver(mPackageInstallReceiver);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
     }
 
     /**
@@ -221,4 +220,11 @@ public class ShowApplicationActivity extends BaseActivity implements OnFragmentI
         this.mActivityInteractionListener.remove(listener);
     }
 
+
+    // 사용할 일이 없다.
+    public void getText2SpeechObject(OnText2SpeechListener l) {
+        if (l != null) {
+            l.onCheckResult(null);
+        }
+    }
 }

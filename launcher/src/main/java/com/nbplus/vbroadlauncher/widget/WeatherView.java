@@ -29,7 +29,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.nbplus.vbroadlauncher.R;
-import com.nbplus.vbroadlauncher.api.GsonRequest;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.ForecastData;
 import com.nbplus.vbroadlauncher.data.ForecastGrib;
@@ -42,6 +41,7 @@ import com.nbplus.vbroadlauncher.data.YahooQueryForecastResult;
 import com.nbplus.vbroadlauncher.data.YahooQueryGeocodeResult;
 
 import org.basdroid.common.DisplayUtils;
+import org.basdroid.volley.GsonRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -84,6 +84,8 @@ public class WeatherView extends LinearLayout {
     private int mForecastSpaceDataRetry = 0;
     private int mForecastTimeDataRetry = 0;
     private int mForecastGribRetry = 0;
+
+    private long mLastUpdated = 0;
 
     private static final int BASE_SKY_STATUS_END_VALUE = 3;
 
@@ -249,12 +251,13 @@ public class WeatherView extends LinearLayout {
             mAttached = true;
 
             registerReceiver();
-            if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
-                Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
-                getContext().sendBroadcast(intent);
-            } else {
-                setAlarm(System.currentTimeMillis() + 5000, Constants.WEATHER_SERVICE_DEFAULT_TIMER);
-            }
+            // onNetworkConnected() 가 호출되므로...
+//            if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
+//                Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+//                getContext().sendBroadcast(intent);
+//            } else {
+//                setAlarm(System.currentTimeMillis() + 5000, Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+//            }
         }
     }
 
@@ -487,7 +490,7 @@ public class WeatherView extends LinearLayout {
         if (pageNo == 1) {
             Log.d(TAG, ">> ReqURL = " + url);
         }
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastGrib.class, new Response.Listener<ForecastGrib>() {
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, null, ForecastGrib.class, new Response.Listener<ForecastGrib>() {
 
             @Override
             public void onResponse(ForecastGrib response) {
@@ -497,6 +500,7 @@ public class WeatherView extends LinearLayout {
                     mForecastGribItems.clear();
                     mForecastGribItems = response.getWeatherItems();
 
+                    mLastUpdated = System.currentTimeMillis();
                     updateForecastGribWeatherView();
                 }
             }
@@ -564,7 +568,7 @@ public class WeatherView extends LinearLayout {
         if (pageNo == 1) {
             Log.d(TAG, ">> ReqURL = " + url);
         }
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastTimeData.class, new Response.Listener<ForecastTimeData>() {
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, null, ForecastTimeData.class, new Response.Listener<ForecastTimeData>() {
 
             @Override
             public void onResponse(ForecastTimeData response) {
@@ -654,7 +658,7 @@ public class WeatherView extends LinearLayout {
         if (pageNo == 1) {
             Log.d(TAG, ">> ReqURL = " + url);
         }
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, ForecastSpaceData.class, new Response.Listener<ForecastSpaceData>() {
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, null, ForecastSpaceData.class, new Response.Listener<ForecastSpaceData>() {
 
             @Override
             public void onResponse(ForecastSpaceData response) {
@@ -958,7 +962,6 @@ public class WeatherView extends LinearLayout {
                 }
 
                 mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStaus - 1, 0));
-                Log.d(TAG, ">> Today sky status = " + skyStaus);
             } else {
                 Log.d(TAG, "단기정보에서 " + date + "에 해당하는 하늘상태 정보를 가져올 수 없다.");
             }
@@ -1130,7 +1133,7 @@ public class WeatherView extends LinearLayout {
         String url = String.format(Constants.YAHOO_WEATHER_API, yql);
         Log.d(TAG, ">> updateGeocode URL = " + url);
 
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, YahooQueryGeocodeResult.class, new Response.Listener<YahooQueryGeocodeResult>() {
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, null, YahooQueryGeocodeResult.class, new Response.Listener<YahooQueryGeocodeResult>() {
 
             @Override
             public void onResponse(YahooQueryGeocodeResult response) {
@@ -1181,7 +1184,7 @@ public class WeatherView extends LinearLayout {
         String url = String.format(Constants.YAHOO_WEATHER_API, yql);
         Log.d(TAG, ">> updatForecast URL = " + url);
 
-        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, YahooQueryForecastResult.class, new Response.Listener<YahooQueryForecastResult>() {
+        GsonRequest jsRequest = new GsonRequest(Request.Method.GET, url, null, YahooQueryForecastResult.class, new Response.Listener<YahooQueryForecastResult>() {
 
             @Override
             public void onResponse(YahooQueryForecastResult response) {
@@ -1383,10 +1386,9 @@ public class WeatherView extends LinearLayout {
                 e.printStackTrace();
             }
 
-            skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
+            //skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             // 현재 시간 날씨 기준으로 맞춘다.
             mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(mCurrentSkyStatusValue, 0));
-            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
 
         // tomorrow
@@ -1411,7 +1413,6 @@ public class WeatherView extends LinearLayout {
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             mTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
-            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
 
         // the day after tomorrow
@@ -1436,12 +1437,14 @@ public class WeatherView extends LinearLayout {
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
-            Log.d(TAG, ">> Today sky status = " + skyStatusValue);
         }
     }
 
     public void onNetworkConnected() {
-        if (mForecastGribItems == null || mForecastGribItems.size() == 0) {
+        Log.d(TAG, "onNetworkConnected() called......");
+        long currMs = System.currentTimeMillis();
+        // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
+        if ((currMs - mLastUpdated) > 1000 * 60 * 60) {
             releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
             releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
 

@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -489,6 +490,8 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     protected void onPause() {
         super.onPause();
         dismissProgressDialog();
+
+        finish();
     }
 
     @Override
@@ -497,6 +500,11 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         getApplicationContext().getContentResolver().unregisterContentObserver(mSettingsContentObserver);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
     }
 
     @Override
@@ -544,4 +552,12 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
             mActivityInteractionListener.remove(l);
         }
     }
+
+    // 라디오에서는 사용할 일이 없다.
+    public void getText2SpeechObject(OnText2SpeechListener l) {
+        if (l != null) {
+            l.onCheckResult(null);
+        }
+    }
+
 }

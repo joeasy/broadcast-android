@@ -267,4 +267,12 @@ public class BroadcastWebViewActivity extends BaseActivity {
         }
         return true;
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mWebViewClient != null) {
+            //mWebViewClient.stopMediaStream();
+        }
+    }
 }

@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.hybrid.RegisterWebViewClient;
 
@@ -29,15 +28,12 @@ import org.basdroid.common.StringUtils;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link RegisterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class RegisterFragment extends Fragment implements OnActivityInteractionListener {
     private static final String TAG = RegisterFragment.class.getSimpleName();
-
-    private OnFragmentInteractionListener mListener;
 
     RegisterWebViewClient mWebViewClient;
 
@@ -65,7 +61,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         getActivity().setTitle("RegisterFragment");
 
     }
@@ -126,7 +122,6 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
             ((HomeLauncherActivity)activity).setOnActivityInteractionListener(this);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -137,7 +132,6 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override

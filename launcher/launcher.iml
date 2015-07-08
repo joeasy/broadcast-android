@@ -102,7 +102,6 @@
     <orderEntry type="library" exported="" name="play-services-base-7.3.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.1.1" level="project" />
     <orderEntry type="module" module-name="push_agent" exported="" />
-    <orderEntry type="module" module-name="common_library" exported="" />
     <orderEntry type="module" module-name="iot_gateway" exported="" />
     <orderEntry type="module" module-name="vitamio" exported="" />
     <orderEntry type="module" module-name="viewpager_indicator" exported="" />

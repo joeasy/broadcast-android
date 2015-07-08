@@ -1,5 +1,6 @@
 package com.nbplus.hybrid;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,12 +9,14 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -48,6 +51,29 @@ public class BasicWebViewClient extends WebViewClient {
         public void onProgressChanged(WebView view, int newProgress) {
             super.onProgressChanged(view, newProgress);
         }
+
+        @Override
+        public void onPermissionRequest(final PermissionRequest request) {
+            // Show a grant or deny dialog to the user
+            mContext.runOnUiThread(new Runnable() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void run() {
+                    //if(request.getOrigin().toString().equals("https://apprtc-m.appspot.com/")) {
+                        request.grant(request.getResources());
+                    //} else {
+                    //    request.deny();
+                    //}
+                }
+            });
+
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                // On accept or deny call
+//                request.grant(request.getResources());
+//                // or
+//                // request.deny();
+//            }
+        }
     }
 
     public WebView getWebView() {
@@ -64,6 +90,11 @@ public class BasicWebViewClient extends WebViewClient {
         mContext = activity;
 
         mWebChromeClient = new BroadcastWebChromeClient();
+
+        // Enable remote debugging via chrome://inspect
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mWebView.setWebContentsDebuggingEnabled(true);
+        }
         mWebView.setWebChromeClient(mWebChromeClient);
         mWebView.setWebViewClient(this);
 
@@ -71,6 +102,16 @@ public class BasicWebViewClient extends WebViewClient {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        // Use WideViewport and Zoom out if there is no viewport defined
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+
+        // Enable pinch to zoom without the zoom buttons
+        webSettings.setBuiltInZoomControls(true);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            // Hide the zoom controls for HONEYCOMB+
+            webSettings.setDisplayZoomControls(false);
+        }
 
         // TODO : clear cache ????
         mWebView.clearCache(true);
@@ -87,6 +128,9 @@ public class BasicWebViewClient extends WebViewClient {
             cookieManager.setAcceptThirdPartyCookies(mWebView, true);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            mWebView.getSettings().setTextZoom(100);
+        }
     }
 
     public void setBackgroundResource(int resId) {
@@ -97,6 +141,20 @@ public class BasicWebViewClient extends WebViewClient {
     public void setBackgroundTransparent() {
         mWebView.setBackgroundColor(Color.TRANSPARENT);
     }
+
+    public void setPreAuthorizePermission(String url) {
+        // mWebView.preauthorizePermission(Uri.parse(url), PermissionRequest.RESOURCE_AUDIO_CAPTURE | PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+    }
+
+//    public void stopMediaStream() {
+//        /**
+//         * When the application falls into the background we want to stop the media stream
+//         * such that the camera is free to use by other apps.
+//         */
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            mWebView.evaluateJavascript("if(window.localStream){window.localStream.stop();}", null);
+//        }
+//    }
 
     public void setBackground(Drawable drawable) {
         mWebView.setBackgroundColor(Color.TRANSPARENT);
@@ -211,8 +269,8 @@ public class BasicWebViewClient extends WebViewClient {
     }
 
     @JavascriptInterface
-    public void getApplicationPackageName() {
-        mContext.getApplicationContext().getPackageName();
+    public String getApplicationPackageName() {
+        return mContext.getApplicationContext().getPackageName();
     }
 
     /**
@@ -231,6 +289,12 @@ public class BasicWebViewClient extends WebViewClient {
     @JavascriptInterface
     public void toast(String message, int duration) {
         Toast.makeText(mContext, message, duration).show();
+    }
+
+    @JavascriptInterface
+    public String getLineNumber() {
+        Log.d(TAG, "" + PhoneState.getLineNumber1(mContext));
+        return PhoneState.getLineNumber1(mContext);
     }
 
     /**

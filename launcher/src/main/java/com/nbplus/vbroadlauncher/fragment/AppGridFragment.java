@@ -17,7 +17,6 @@ import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.adapter.AppGridViewAdapter;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link AppGridFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -36,7 +34,6 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     private static final String TAG = AppGridFragment.class.getSimpleName();
 
     private static final String ARGS_KEY_PAGE_POSITION = "key_page_position";
-    private OnFragmentInteractionListener mListener;
 
     private GridView mGridLayout;
     AppGridViewAdapter mAdapter;
@@ -109,7 +106,6 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
             ((ShowApplicationActivity)activity).setOnActivityInteractionListener(this);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -120,7 +116,6 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         ((ShowApplicationActivity)getActivity()).removeOnActivityInteractionListener(this);
     }
 

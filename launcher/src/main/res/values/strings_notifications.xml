@@ -21,4 +21,8 @@
     <string name="label_previous">Previous</string>
     <string name="label_next">Next</string>
     <string name="error_empty_metadata">Empty metadata!</string>
+
+    <string name="notification_broadcast_push">Received broadcast notification from server.</string>
+    <string name="notification_inhabitant_push">Received new inhabitants poll notification</string>
+    <string name="notification_cooperative_buying_push">Received new cooperative buying notification</string>
 </resources>

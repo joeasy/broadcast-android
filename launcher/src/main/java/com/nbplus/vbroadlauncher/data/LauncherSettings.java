@@ -39,8 +39,11 @@ public class LauncherSettings implements Parcelable {
     String villageName;
     @SerializedName("is_exclusive")
     boolean isExclusive;
+    boolean isVillageNameChanged = false;
 
     boolean isCompletedSetup;
+
+    boolean isCheckedTTSEngine;
 
     boolean isOutdoorMode = false;
 
@@ -60,7 +63,7 @@ public class LauncherSettings implements Parcelable {
 
     @SerializedName("register_address")
     String initialPageAddress = "http://175.207.46.132:8010/web_test/test.html";
-    // /common/selectServer.rcc
+    //String initialPageAddress = "http://175.207.46.132:8080/common/selectServer.rcc";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;
@@ -77,7 +80,6 @@ public class LauncherSettings implements Parcelable {
         return uniqueInstance;
     }
 
-    public static final String VBROADCAST_PREFERENCE_NAME = "vbroadcast_preference";
     public static final String KEY_VBROADCAST_VILLAGE_CODE = "key_village_code";
     public static final String KEY_VBROADCAST_VILLAGE_NAME = "key_village_name";
     public static final String KEY_VBROADCAST_IS_COMPLETED_SETUP = "key_is_completed_setup";
@@ -89,6 +91,7 @@ public class LauncherSettings implements Parcelable {
     public static final String KEY_VBROADCAST_SHORTCUT = "key_shortcut";
     public static final String KEY_WALLPAPER_RESOURCE_ID = "key_wallpaper_resource_id";
     public static final String KEY_VBROADCAST_IS_OUTDOOR_MODE = "key_is_outdoor_mode";
+    public static final String KEY_IS_CHECKED_TTS = "key_is_checked_tts";
 
     public static int[] landWallpaperResource;
     public static int[] portWallpaperResource;
@@ -100,7 +103,9 @@ public class LauncherSettings implements Parcelable {
 
     private LauncherSettings(Context context) {
         this.context = context;
-        this.prefs = context.getSharedPreferences(VBROADCAST_PREFERENCE_NAME, Context.MODE_PRIVATE);
+
+        String prefName = context.getApplicationContext().getPackageName() + "_preferences";
+        this.prefs = context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
 
         // load from preferences..
         this.deviceID = prefs.getString(KEY_VBROADCAST_DEVICE_ID, "");
@@ -108,6 +113,7 @@ public class LauncherSettings implements Parcelable {
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
+        this.isCheckedTTSEngine = prefs.getBoolean(KEY_IS_CHECKED_TTS, false);
 //        try {
 //            this.villageName = new String(this.villageName.getBytes("ISO-8859-1"), "UTF-8");
 //        } catch (UnsupportedEncodingException e) {
@@ -140,6 +146,15 @@ public class LauncherSettings implements Parcelable {
         this.serverInformation = (VBroadcastServer)getPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, new TypeToken<VBroadcastServer>(){}.getType());
     }
 
+    public boolean isCheckedTTSEngine() {
+        return isCheckedTTSEngine;
+    }
+
+    public void setIsCheckedTTSEngine(boolean isCheckedTTSEngine) {
+        this.isCheckedTTSEngine = isCheckedTTSEngine;
+        prefs.edit().putBoolean(KEY_IS_CHECKED_TTS, this.isCheckedTTSEngine).apply();
+    }
+
     public boolean isCompletedSetup() {
         return isCompletedSetup;
     }
@@ -158,12 +173,21 @@ public class LauncherSettings implements Parcelable {
         prefs.edit().putBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, this.isExclusive).apply();
     }
 
+    public boolean isVillageNameChanged() {
+        return isVillageNameChanged;
+    }
+
+    public void setIsVillageNameChanged(boolean isVillageNameChanged) {
+        this.isVillageNameChanged = isVillageNameChanged;
+    }
+
     public String getVillageName() {
         return villageName;
     }
 
     public void setVillageName(String villageName) {
         this.villageName = villageName;
+        isVillageNameChanged = true;
         prefs.edit().putString(KEY_VBROADCAST_VILLAGE_NAME, this.villageName).apply();
     }
 
@@ -222,7 +246,8 @@ public class LauncherSettings implements Parcelable {
                 R.drawable.ic_menu_01,
                 R.drawable.ic_menu_main_01_selector,
                 0,
-                null);
+                null,
+                new String[]{Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST, Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST, Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST});
         launcherMainShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER,
                 R.string.shortcut_btn_call_emergency,
@@ -250,7 +275,8 @@ public class LauncherSettings implements Parcelable {
                 R.drawable.ic_menu_04,
                 R.drawable.ic_menu_shortcut_02_selector,
                 0,
-                null);
+                null,
+                new String[]{Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL, Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING});
         launcherShortcuts.add(data);
         data = new ShortcutData(Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER,
                 R.string.shortcut_btn_additional_function,

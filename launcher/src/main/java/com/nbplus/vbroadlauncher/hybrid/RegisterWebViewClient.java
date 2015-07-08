@@ -1,6 +1,7 @@
 package com.nbplus.vbroadlauncher.hybrid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
+import com.nbplus.push.PushService;
+import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
@@ -48,12 +51,18 @@ public class RegisterWebViewClient extends BasicWebViewClient {
         return LauncherSettings.getInstance(mContext).getDeviceID();
     }
 
+    @JavascriptInterface
+    public void setVillageName(String villageName) {
+        if (!StringUtils.isEmptyString(villageName)) {
+            LauncherSettings.getInstance(mContext).setVillageName(villageName);
+        }
+    }
     /**
      *
      * @param data
      */
     @JavascriptInterface
-    public void setApplicationData(String data) {
+    public void setServerInformation(String data) {
         Log.d(TAG, ">> setApplicationData() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
@@ -62,17 +71,17 @@ public class RegisterWebViewClient extends BasicWebViewClient {
             try {
                 data = new String(data.getBytes("utf-8"));
                 Gson gson = new GsonBuilder().create();
-                RegSettingData settings = gson.fromJson(data, RegSettingData.class);
-                if (settings != null) {
-                    if (StringUtils.isEmptyString(settings.getVillageName())) {
+                VBroadcastServer serverInfo = gson.fromJson(data, VBroadcastServer.class);
+                if (serverInfo != null) {
+//                    if (StringUtils.isEmptyString(settings.getVillageName())) {
+//                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
+                    /*if (settings.getServerInformation() == null) {
                         Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
-                    }
-                    if (settings.getServerInformation() == null) {
-                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                        return;
-                    } else {
-                        VBroadcastServer serverInfo = settings.getServerInformation();
+                    } else*/ {
+                        //VBroadcastServer serverInfo = settings.getServerInformation();
                         if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
                             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
@@ -87,11 +96,14 @@ public class RegisterWebViewClient extends BasicWebViewClient {
                         }
                     }
 
-                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
-                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
-                    LauncherSettings.getInstance(mContext).setServerInformation(settings.getServerInformation());
-                    Log.d(TAG, ">> setApplicationData() completed !!!");
-                    LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
+//                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
+//                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
+                    LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
+
+                    Intent intent = new Intent(mContext, PushService.class);
+                    intent.setAction(PushConstants.ACTION_START_SERVICE);
+                    intent.putExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS, /*settings.getServerInformation()*/serverInfo.getPushInterfaceServer());
+                    mContext.startService(intent);
                 } else {
                     Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                 }

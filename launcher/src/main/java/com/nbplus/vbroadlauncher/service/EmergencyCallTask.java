@@ -1,6 +1,7 @@
 package com.nbplus.vbroadlauncher.service;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
@@ -9,17 +10,19 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
-import com.nbplus.vbroadlauncher.api.GsonRequest;
+import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
+
+import org.basdroid.volley.GsonRequest;
 
 import java.util.concurrent.ExecutionException;
 
 /**
  * Created by basagee on 2015. 6. 2..
  */
-public class EmergencyCallTask extends AsyncTask<Void, Void, Void> {
+public class EmergencyCallTask extends AsyncTask<Void, Void, BaseApiResult> {
     //private ProgressDialog progress = null;
     private Context mContext;
     private Handler mHandler;
@@ -36,26 +39,34 @@ public class EmergencyCallTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected BaseApiResult doInBackground(Void... params) {
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
-        RadioChannelInfo response = null;
+        BaseApiResult response = null;
 
-        RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
+        Uri.Builder builder = Uri.parse(mGetServerPath).buildUpon();
+        builder.appendQueryParameter("DEVICE_ID", LauncherSettings.getInstance(mContext).getDeviceID());
 
-        String url = mGetServerPath + "?DEVICE_ID=" + LauncherSettings.getInstance(mContext).getDeviceID();
-        GsonRequest request = new GsonRequest(Request.Method.GET, url, RadioChannelInfo.class, future, future);
-        requestQueue.add(request);
+        int retryCount = 0;
+        while (retryCount < 3) {        // retry 3 times
+            RequestFuture<BaseApiResult> future = RequestFuture.newFuture();
 
-        try {
-            response = future.get(); // this will block (forever)
-        } catch (InterruptedException e) {
-            // exception handling
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // exception handling
-            e.printStackTrace();
+            GsonRequest request = new GsonRequest(Request.Method.GET, builder.toString(), null, BaseApiResult.class, future, future);
+            requestQueue.add(request);
+
+            try {
+                response = future.get(); // this will block (forever)
+                Thread.sleep(1000);
+                break;
+            } catch (InterruptedException e) {
+                // exception handling
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // exception handling
+                e.printStackTrace();
+            }
+            retryCount++;
         }
-        return null;
+        return response;
     }
 
     @Override
@@ -64,7 +75,7 @@ public class EmergencyCallTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void result) {
+    protected void onPostExecute(BaseApiResult result) {
         if (mHandler != null) {
             Message message = new Message();
             message.what = Constants.HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK;

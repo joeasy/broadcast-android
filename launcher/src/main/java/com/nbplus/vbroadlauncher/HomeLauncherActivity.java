@@ -4,10 +4,10 @@ package com.nbplus.vbroadlauncher;
  * Created by basagee on 2015. 5. 15..
  */
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Point;
-import android.os.AsyncTask;
+import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
@@ -20,12 +20,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -49,7 +46,6 @@ import com.nbplus.vbroadlauncher.data.PreferredLocation;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.fragment.RegisterFragment;
 import com.nbplus.vbroadlauncher.location.FetchAddressIntentService;
-import com.nbplus.vbroadlauncher.callback.OnFragmentInteractionListener;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
@@ -62,7 +58,7 @@ import io.vov.vitamio.LibsChecker;
 
 public class HomeLauncherActivity extends BaseActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, ResultCallback<LocationSettingsResult>, OnFragmentInteractionListener {
+        LocationListener, ResultCallback<LocationSettingsResult> {
 
     // LogCat tag
     private static final String TAG = HomeLauncherActivity.class.getSimpleName();
@@ -123,12 +119,15 @@ public class HomeLauncherActivity extends BaseActivity
 
         mCurrentLocale = getResources().getConfiguration().locale;
 
-        Point p = DisplayUtils.getScreenSize(this);
-        Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
-        p = DisplayUtils.getScreenDp(this);
-        Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
-        int density = DisplayUtils.getScreenDensity(this);
-        Log.d(TAG, "Screen density = " + density);
+        if (BuildConfig.DEBUG) {
+            Point p = DisplayUtils.getScreenSize(this);
+            Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
+            Point screen = p;
+            p = DisplayUtils.getScreenDp(this);
+            Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
+            int density = DisplayUtils.getScreenDensity(this);
+            Log.d(TAG, "Screen density = " + density);
+        }
 
         boolean isTablet = DisplayUtils.isTabletDevice(this);
         if (isTablet) {
@@ -145,17 +144,18 @@ public class HomeLauncherActivity extends BaseActivity
             } else {
                 // smaller device
                 Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
-//                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        finish();
-//                    }
-//                });
-//                alert.setMessage(R.string.alert_phone_message);
-//                alert.show();
-//
-//                return;
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+                alert.setMessage(R.string.alert_phone_message);
+                alert.show();
+
+                return;
             }
         }
 
@@ -169,6 +169,7 @@ public class HomeLauncherActivity extends BaseActivity
             alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                     finish();
                 }
             });
@@ -343,6 +344,9 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, ">> Launcher onResume()");
+        Intent intent = new Intent(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override
@@ -352,12 +356,17 @@ public class HomeLauncherActivity extends BaseActivity
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        stopLocationUpdates();
+        Log.d(TAG, ">> Launcher onPause()");
     }
 
     @Override
@@ -566,6 +575,14 @@ public class HomeLauncherActivity extends BaseActivity
         }
     }
 
+    public void getText2SpeechObject(OnText2SpeechListener l) {
+        this.mcheckText2SpeechLister = l;
+
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -581,6 +598,22 @@ public class HomeLauncherActivity extends BaseActivity
                         break;
                 }
                 break;
+
+            case Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA :
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    // check korean
+                    mText2Speech = new TextToSpeech(this, this);
+                } else {
+                    Log.d(TAG, "여기서 제대로 설정안했다면 관두자.... 사용자 맘인데...");
+                    if (mcheckText2SpeechLister != null) {
+                        mcheckText2SpeechLister.onCheckResult(null);
+                        mText2Speech = null;
+                    }
+                    showText2SpeechAlertDialog();
+
+                    LauncherSettings.getInstance(this).setIsCheckedTTSEngine(true);
+                }
+                break;
         }
     }
 
@@ -591,12 +624,6 @@ public class HomeLauncherActivity extends BaseActivity
      */
     public void setOnActivityInteractionListener(OnActivityInteractionListener listener) {
         this.mActivityInteractionListener = listener;
-    }
-
-    // TODO: 필요한가?????
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        Log.d(TAG, "onFragmentInteraction()");
     }
 
     @Override

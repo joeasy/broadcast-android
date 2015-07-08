@@ -42,7 +42,7 @@ public class LauncherSettings implements Parcelable {
     VBroadcastServer serverInformation;
     @SerializedName("register_address")
     String initialPageAddress = "http://175.207.46.132:8010/web_test/listen_test.html";
-    // /common/selectServer.rmc
+    //String initialPageAddress = "http://175.207.46.132:8080/common/selectServer.rmc";
 
     public static final String firstPageContext = "/login.rmc";
 

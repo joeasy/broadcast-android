@@ -5,15 +5,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.Volley;
-import com.nbplus.vbroadlauncher.api.GsonRequest;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
-import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 
 import java.util.concurrent.ExecutionException;
 
