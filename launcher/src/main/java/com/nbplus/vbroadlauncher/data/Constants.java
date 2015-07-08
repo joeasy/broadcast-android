@@ -40,6 +40,8 @@ public class Constants {
     public static final int HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK = 2001;
     public static final int HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT = 2002;
     public static final int HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK = 3001;
+    public static final int HANDLER_MESSAGE_PUSH_STATUS_CHANGED = 4001;
+    public static final int HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED = 4002;
 
     public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
 

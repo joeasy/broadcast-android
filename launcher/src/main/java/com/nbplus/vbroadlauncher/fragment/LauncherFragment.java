@@ -100,8 +100,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final int PUSH_NOTIFICATION_ID = 1001;
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
     private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
-    private static final int HANDLER_MESSAGE_PUSH_STATUS_CHANGED = 0x03;
-    private static final int HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED = 0x04;
 
     private ArrayList<ShortcutData> mPushNotifiableShorcuts = new ArrayList<>();
 
@@ -143,7 +141,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
                 break;
 
-            case HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
+            case Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
                 Log.d(TAG, "HANDLER_MESSAGE_PUSH_STATUS_CHANGED received !!!");
                 int status = msg.arg1;
                 if (status == PushConstants.PUSH_STATUS_VALUE_CONNECTED) {
@@ -152,7 +150,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_off);
                 }
                 break;
-            case HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
+            case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
                 String data = (String)msg.obj;
                 Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + data);
 
@@ -293,7 +291,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             final String action = intent.getAction();
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
-            } else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
+            } /* else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
                 Message msg = new Message();
                 msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
@@ -304,7 +302,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
                 msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
                 mHandler.sendMessage(msg);
-            }
+            } */
         }
     };
 
@@ -354,11 +352,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         // push agent 연결상태이다.
         mPushServiceStatus = (ImageView) v.findViewById(R.id.ic_nav_wifi);
-//        if (((BaseActivity)getActivity()).isPushServiceConnected()) {
-//            mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_on);
-//        } else {
-//            mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_off);
-//        }
+        if (((BaseActivity)getActivity()).isPushServiceConnected()) {
+            mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_on);
+        } else {
+            mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_off);
+        }
 
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
         mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
@@ -566,20 +564,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     }
 
     @Override
-    public void onPushReceived(Intent intent) {
-        final String action = intent.getAction();
-        if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
-            Message msg = new Message();
-            msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
-            msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-            mHandler.sendMessage(msg);
-        } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
-            Message msg = new Message();
-            msg.what = HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
-            msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-            msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
-            mHandler.sendMessage(msg);
-        }
+    public boolean onPushReceived(Message message) {
+        Message msg = new Message();
+        msg.what = message.what;
+        msg.arg1 = message.arg1;
+        msg.arg2 = message.arg2;
+        msg.obj = message.obj;
+        mHandler.sendMessage(msg);
+        return true;
     }
 
     @Override
@@ -592,8 +584,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             // check network status
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
-            intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
+//            intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
+//            intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
 
             mHandler = new LauncherFragmentHandler(this);

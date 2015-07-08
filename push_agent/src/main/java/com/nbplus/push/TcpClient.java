@@ -44,6 +44,7 @@ public class TcpClient {
 
     private static final int HANDLER_MESSAGE_CHECK_KEEP_ALIVE = 01;
     private static final int HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION = 02;
+    private static final int HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE = 03;
     private TcpClientHandler mHandler;
     int mKeepAliveCheckSeconds = 0;
 
@@ -82,6 +83,13 @@ public class TcpClient {
                 break;
             case HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION :
                 Log.e(TAG, "HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION expired.. Server did not send response");
+                stopClient();
+                if (mMessageListener != null) {
+                    mMessageListener.onConnectionError();
+                }
+                break;
+            case HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE :
+                Log.e(TAG, "HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE expired.. Server did not send response");
                 stopClient();
                 if (mMessageListener != null) {
                     mMessageListener.onConnectionError();
@@ -218,6 +226,8 @@ public class TcpClient {
                 Log.d(TAG, "Send message to data output stream type = " + message[0]);
                 if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST) {
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION, 60 * 1000);
+                } else if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST) {
+                    mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE, 10 * 1000);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -278,7 +288,7 @@ public class TcpClient {
             try {
                 mKeepAliveCheckSeconds = Integer.parseInt(mInterfaceData.keepAliveSeconds);
                 if (mKeepAliveCheckSeconds > 0) {
-                    mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_CHECK_KEEP_ALIVE, mKeepAliveCheckSeconds);
+                    mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_CHECK_KEEP_ALIVE, mKeepAliveCheckSeconds * 1000);
                 }
             } catch (NumberFormatException e) {
                 e.printStackTrace();
@@ -321,10 +331,10 @@ public class TcpClient {
                 //in this while the client listens for the messages sent by the server
 
                 mHandler = new TcpClientHandler(Looper.getMainLooper(), this);
-                if (mMessageListener != null) {
-                    //call the method messageReceived from MyActivity class
-                    mMessageListener.onConnected();
-                }
+//                if (mMessageListener != null) {
+//                    //call the method messageReceived from MyActivity class
+//                    mMessageListener.onConnected();
+//                }
                 sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST));
 
                 while (mRun) {
@@ -352,8 +362,20 @@ public class TcpClient {
                             if (msgId == mConnectionRequestId && PushConstants.RESULT_OK.equals(new String(messageBytes))) {
                                 messageBytes = new byte[20];
                                 mDataIn.read(messageBytes, 0, 20);
-                                if (mInterfaceData.deviceAuthKey != null && mInterfaceData.deviceAuthKey.equals(new String(messageBytes))) {
+                                String receivedAuthKey = null;
+                                int i;
+                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
+                                if (i == 0) {
+                                    receivedAuthKey = "";
+                                } else {
+                                    receivedAuthKey = new String(messageBytes, 0, i, "utf-8");
+                                }
+                                if (mInterfaceData.deviceAuthKey != null && mInterfaceData.deviceAuthKey.equals(receivedAuthKey)) {
                                     setKeepAliveHandler();
+                                    if (mMessageListener != null) {
+                                        //call the method messageReceived from MyActivity class
+                                        mMessageListener.onConnected();
+                                    }
                                 } else {
                                     Log.e(TAG, ">> Device auth key is not matched.. ");
                                     isErrorOccurred = true;
@@ -375,7 +397,7 @@ public class TcpClient {
                                 mInterfaceData.keepAliveSeconds = new String(messageBytes);
                                 setKeepAliveHandler();
                             }
-                            sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE, msgId, -1));
+                            sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_CHANGE_RESPONSE, msgId, -1));
                             break;
                         case PushConstants.PUSH_MESSAGE_TYPE_PUSH_REQUEST :
                             receivedData = new PushMessageData();
@@ -389,14 +411,14 @@ public class TcpClient {
                             Arrays.fill(messageBytes, (byte) 0);
                             readBytes = mDataIn.read(messageBytes, 0, PushBaseData.MAX_APP_ID_LENGTH);
                             if (readBytes > 0) {
-//                                int i;
-//                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
-//                                if (i == 0) {
-//                                    ((PushMessageData) receivedData).setAppId("");
-//                                } else {
-                                    String str = new String(messageBytes, /*0, i, */"utf-8");
+                                int i;
+                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
+                                if (i == 0) {
+                                    ((PushMessageData) receivedData).setAppId("");
+                                } else {
+                                    String str = new String(messageBytes, 0, i, "utf-8");
                                     ((PushMessageData) receivedData).setAppId(str);
-//                                }
+                                }
                             } else {
                                 ((PushMessageData) receivedData).setAppId("");
                             }
@@ -405,14 +427,14 @@ public class TcpClient {
                             Arrays.fill(messageBytes, (byte) 0);
                             readBytes = mDataIn.read(messageBytes, 0, PushBaseData.MAX_REPEAT_KEY_LENGTH);
                             if (readBytes > 0) {
-//                                int i;
-//                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
-//                                if (i == 0) {
-//                                    ((PushMessageData) receivedData).setRepeatKey("");
-//                                } else {
-                                    String str = new String(messageBytes, /*0, i, */"utf-8");
+                                int i;
+                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
+                                if (i == 0) {
+                                    ((PushMessageData) receivedData).setRepeatKey("");
+                                } else {
+                                    String str = new String(messageBytes, 0, i, "utf-8");
                                     ((PushMessageData) receivedData).setRepeatKey(str);
-//                                }
+                                }
                             } else {
                                 ((PushMessageData) receivedData).setRepeatKey("");
                             }
@@ -421,14 +443,14 @@ public class TcpClient {
                             Arrays.fill(messageBytes, (byte) 0);
                             readBytes = mDataIn.read(messageBytes, 0, PushBaseData.MAX_ALERT_LENGTH);
                             if (readBytes > 0) {
-//                                int i;
-//                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
-//                                if (i == 0) {
-//                                    ((PushMessageData) receivedData).setAlert("");
-//                                } else {
-                                    String str = new String(messageBytes, /*0, i, */"utf-8");
+                                int i;
+                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
+                                if (i == 0) {
+                                    ((PushMessageData) receivedData).setAlert("");
+                                } else {
+                                    String str = new String(messageBytes, 0, i, "utf-8");
                                     ((PushMessageData) receivedData).setAlert(str);
-//                                }
+                                }
                             } else {
                                 ((PushMessageData) receivedData).setAlert("");
                             }
@@ -438,7 +460,7 @@ public class TcpClient {
                                 Arrays.fill(messageBytes, (byte) 0);
                                 readBytes = mDataIn.read(messageBytes, 0, receivedData.getBodyLength());
                                 if (readBytes > 0) {
-                                    ((PushMessageData) receivedData).setPayload(new String(messageBytes, "utf-8"));
+                                    ((PushMessageData) receivedData).setPayload(new String(messageBytes, 0, receivedData.getBodyLength(), "utf-8"));
                                 } else {
                                     ((PushMessageData) receivedData).setPayload("");
                                 }
@@ -466,7 +488,9 @@ public class TcpClient {
                             break;
                         case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE :
                             Log.d(TAG, "PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE received !! do nothing.. ");
-                            mDataIn.skipBytes(12);
+                            mDataIn.skipBytes(16);
+                            mHandler.removeMessages(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE);
+                            setKeepAliveHandler();
                             break;
                         default:
                             Log.d(TAG, "UNKNOWN PUSH MESSAGE TYPE received !!");

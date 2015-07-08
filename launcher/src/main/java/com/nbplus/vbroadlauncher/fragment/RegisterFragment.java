@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -149,7 +150,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
     }
 
     @Override
-    public void onPushReceived(Intent intent) {
-
+    public boolean onPushReceived(Message message) {
+        return false;
     }
 }

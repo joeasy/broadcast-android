@@ -18,6 +18,6 @@
     <color name="weather_shadow_color">#c6333333</color>
     <color name="title_seperator">#a4a4a4</color>
     <color name="activity_radio_background">#ffded6cd</color>
-    <color name="activity_radio_progress_background">#e6000000</color>
+    <color name="dimmed_background">#e6000000</color>
 
 </resources>

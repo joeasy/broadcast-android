@@ -155,6 +155,19 @@ public class HomeLauncherActivity extends BaseActivity
                     finish();
                 }
                 break;
+            case Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
+            case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
+                setPushServiceStatus(msg.arg1);
+                boolean isProcessed = false;
+                if (mActivityInteractionListener != null) {
+                    for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+                        isProcessed = listener.onPushReceived(msg);
+                    }
+                }
+                if (isProcessed == false) {
+                    Log.e(TAG, ">> Why... 이런경우에는 어떻게 해야 하는거냐????");
+                }
+                break;
         }
     }
 
@@ -167,15 +180,22 @@ public class HomeLauncherActivity extends BaseActivity
             Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
             mHandler.removeMessages(Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT);
             // send handler message
-            switch (action) {
-                case Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING :
-                    Message msg = new Message();
-                    msg.what = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING;
-                    msg.obj = intent.getLongExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, 0);
-                    mHandler.sendMessage(msg);
-                    break;
-                default :
-                    break;
+            if (Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING.equals(action)) {
+                Message msg = new Message();
+                msg.what = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING;
+                msg.obj = intent.getLongExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, 0);
+                mHandler.sendMessage(msg);
+            } else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
+                Message msg = new Message();
+                msg.what = Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
+                msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+                mHandler.sendMessage(msg);
+            } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
+                Message msg = new Message();
+                msg.what = Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
+                msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+                msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+                mHandler.sendMessage(msg);
             }
         }
     };
@@ -233,6 +253,11 @@ public class HomeLauncherActivity extends BaseActivity
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
+
+        filter = new IntentFilter();
+        filter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
+        filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
+        registerReceiver(mBroadcastReceiver, filter);
 
         Intent intent = new Intent(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
         mActivityRunningTime = System.currentTimeMillis();
@@ -442,6 +467,7 @@ public class HomeLauncherActivity extends BaseActivity
         }
         mText2Speech = null;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override

@@ -41,4 +41,8 @@
     <dimen name="radio_channel_button_font_size">9.375dp</dimen>
     <dimen name="radio_play_control_margin">14.0625dp</dimen>
     <dimen name="radio_play_control_progress_width">75dp</dimen>
+
+    <!-- broadcast fragment-->
+    <dimen name="window_width">205.078dp</dimen>
+    <dimen name="title_height">37.5dp</dimen>
 </resources>
