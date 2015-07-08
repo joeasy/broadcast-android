@@ -34,8 +34,8 @@
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">방송듣기</string>
     <string name="shortcut_btn_call_emergency">긴급호출 하기</string>
-    <string name="shortcut_addr_show_broadcast">/web_test/broadcast_test.html</string>
-    <!--<string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>-->
+    <!--<string name="shortcut_addr_show_broadcast">/web_test/broadcast_test.html</string>-->
+    <string name="shortcut_addr_show_broadcast">/broadcasting/broadcasting/getBroadcastingList.rcc</string>
     <string name="shortcut_addr_call_emergency">/is/api/Service/RegistEmergencyCall</string>
 
     <!--sub shortcut -->
@@ -46,7 +46,7 @@
     <string name="shortcut_btn_smart_home">스마트홈 서비스</string>
     <string name="shortcut_btn_my_information">나의 정보관리</string>
     <string name="shortcut_addr_radio">/is/api/Service/GetRadioList</string>
-    <string name="shortcut_addr_participation">/participation/residentvote/getResidetVoteList.rcc</string>
+    <string name="shortcut_addr_participation">/participation/residentvote/getResidentVoteList.rcc</string>
     <string name="shortcut_addr_additional_function">/addfunction/iotdata/getIotDataList.rcc</string>
     <string name="shortcut_addr_official_address">/addfunction/publicoffice/getPublicOfficeList.rcc</string>
     <string name="shortcut_addr_smart_home">/addfunction/smarthome/getSmartHomeList.rcc</string>

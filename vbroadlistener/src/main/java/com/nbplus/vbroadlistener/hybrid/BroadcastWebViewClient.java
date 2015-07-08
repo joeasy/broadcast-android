@@ -66,8 +66,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
             try {
                 data = new String(data.getBytes("utf-8"));
                 Gson gson = new GsonBuilder().create();
-                VBroadcastServer serverInfo = gson.fromJson(data, VBroadcastServer.class);
-                if (serverInfo != null) {
+                RegSettingData settings = gson.fromJson(data, RegSettingData.class);
+                if (settings != null) {
+                    VBroadcastServer serverInfo = settings.getServerInformation();
+                    if (serverInfo == null) {
+                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 //                    if (StringUtils.isEmptyString(settings.getVillageName())) {
 //                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
 //                        return;
@@ -94,6 +99,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
 //                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
 //                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
+                    LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 
                 } else {
                     Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();

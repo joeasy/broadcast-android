@@ -119,35 +119,35 @@ public class BroadcastWebViewActivity extends BaseActivity {
         mWebViewClient.loadUrl(url);
 
         // test view
-        final EditText editText = (EditText)findViewById(R.id.et_test_url);
-        editText.setText(url);
-        Button button = (Button)findViewById(R.id.btn_test_load);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = editText.getText().toString();
-                if (StringUtils.isEmptyString(url)) {
-                    return;
-                }
-
-                if (url.indexOf("?") > 0) {
-                    if (!url.contains("UUID=")) {
-                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-                    }
-                    if (!url.contains("APPID=")) {
-                        url += ("&APPID=" + getApplicationContext().getPackageName());
-                    }
-                } else {
-                    if (!url.contains("UUID=")) {
-                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-                    }
-                    if (!url.contains("APPID=")) {
-                        url += ("&APPID=" + getApplicationContext().getPackageName());
-                    }
-                }
-                mWebViewClient.loadUrl(url);
-            }
-        });
+//        final EditText editText = (EditText)findViewById(R.id.et_test_url);
+//        editText.setText(url);
+//        Button button = (Button)findViewById(R.id.btn_test_load);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String url = editText.getText().toString();
+//                if (StringUtils.isEmptyString(url)) {
+//                    return;
+//                }
+//
+//                if (url.indexOf("?") > 0) {
+//                    if (!url.contains("UUID=")) {
+//                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+//                    }
+//                    if (!url.contains("APPID=")) {
+//                        url += ("&APPID=" + getApplicationContext().getPackageName());
+//                    }
+//                } else {
+//                    if (!url.contains("UUID=")) {
+//                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
+//                    }
+//                    if (!url.contains("APPID=")) {
+//                        url += ("&APPID=" + getApplicationContext().getPackageName());
+//                    }
+//                }
+//                mWebViewClient.loadUrl(url);
+//            }
+//        });
         setContentViewByOrientation();
     }
 
@@ -175,8 +175,8 @@ public class BroadcastWebViewActivity extends BaseActivity {
         mWebViewClient.loadUrl(mShortcutData.getDomain() + mShortcutData.getPath());
 
         // test view
-        final EditText editText = (EditText)findViewById(R.id.et_test_url);
-        editText.setText(mShortcutData.getDomain() + mShortcutData.getPath());
+//        final EditText editText = (EditText)findViewById(R.id.et_test_url);
+//        editText.setText(mShortcutData.getDomain() + mShortcutData.getPath());
 
         Log.d(TAG, ">> reset url = " + mShortcutData.getDomain() + mShortcutData.getPath());
     }

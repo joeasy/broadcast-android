@@ -23,6 +23,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
@@ -100,6 +101,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final int PUSH_NOTIFICATION_ID = 1001;
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
     private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
+    private static final int HANDLER_MESSAGE_SET_VILLAGE_NAME = 0x03;
 
     private ArrayList<ShortcutData> mPushNotifiableShorcuts = new ArrayList<>();
 
@@ -280,6 +282,12 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                 }
+                break;
+            case HANDLER_MESSAGE_SET_VILLAGE_NAME :
+                if (mVillageName != null) {
+                    mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
+                }
+                break;
         }
     }
 
@@ -291,6 +299,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             final String action = intent.getAction();
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
+            } else if (Constants.ACTION_SET_VILLAGE_NAME.equals(action)) {
+                mHandler.sendEmptyMessage(HANDLER_MESSAGE_SET_VILLAGE_NAME);
             } /* else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
                 Message msg = new Message();
                 msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
@@ -588,6 +598,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 //            intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
 
+            intentFilter = new IntentFilter();
+            intentFilter.addAction(Constants.ACTION_SET_VILLAGE_NAME);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, intentFilter);
+
             mHandler = new LauncherFragmentHandler(this);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -600,6 +614,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         super.onDetach();
         getActivity().unregisterReceiver(mBroadcastReceiver);
         ((HomeLauncherActivity)getActivity()).unRegisterActivityInteractionListener(this);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
 
         Log.d(TAG, "LauncherFragment onDetach()");
         mHandler = null;

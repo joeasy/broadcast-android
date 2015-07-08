@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
 import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
+import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
@@ -55,6 +57,7 @@ public class RegisterWebViewClient extends BasicWebViewClient {
     public void setVillageName(String villageName) {
         if (!StringUtils.isEmptyString(villageName)) {
             LauncherSettings.getInstance(mContext).setVillageName(villageName);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.ACTION_SET_VILLAGE_NAME));
         }
     }
     /**
@@ -71,8 +74,13 @@ public class RegisterWebViewClient extends BasicWebViewClient {
             try {
                 data = new String(data.getBytes("utf-8"));
                 Gson gson = new GsonBuilder().create();
-                VBroadcastServer serverInfo = gson.fromJson(data, VBroadcastServer.class);
-                if (serverInfo != null) {
+                RegSettingData settings = gson.fromJson(data, RegSettingData.class);
+                if (settings != null) {
+                    VBroadcastServer serverInfo = settings.getServerInformation();
+                    if (serverInfo == null) {
+                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 //                    if (StringUtils.isEmptyString(settings.getVillageName())) {
 //                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
 //                        return;
@@ -81,7 +89,6 @@ public class RegisterWebViewClient extends BasicWebViewClient {
                         Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
                     } else*/ {
-                        //VBroadcastServer serverInfo = settings.getServerInformation();
                         if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
                             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                             return;
@@ -99,6 +106,7 @@ public class RegisterWebViewClient extends BasicWebViewClient {
 //                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
 //                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
+                    LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 
                     Intent intent = new Intent(mContext, PushService.class);
                     intent.setAction(PushConstants.ACTION_START_SERVICE);

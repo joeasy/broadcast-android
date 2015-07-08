@@ -89,34 +89,34 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
         mWebViewClient.loadUrl(url);
 
         // test view
-        final EditText editText = (EditText)v.findViewById(R.id.et_test_url);
-        editText.setText(url);
-        Button button = (Button)v.findViewById(R.id.btn_test_load);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = editText.getText().toString();
-                if (StringUtils.isEmptyString(url)) {
-                    return;
-                }
-                if (url.indexOf("?") > 0) {
-                    if (!url.contains("UUID=")) {
-                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
-                    }
-                    if (!url.contains("APPID=")) {
-                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
-                    }
-                } else {
-                    if (!url.contains("UUID=")) {
-                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
-                    }
-                    if (!url.contains("APPID=")) {
-                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
-                    }
-                }
-                mWebViewClient.loadUrl(url);
-            }
-        });
+//        final EditText editText = (EditText)v.findViewById(R.id.et_test_url);
+//        editText.setText(url);
+//        Button button = (Button)v.findViewById(R.id.btn_test_load);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String url = editText.getText().toString();
+//                if (StringUtils.isEmptyString(url)) {
+//                    return;
+//                }
+//                if (url.indexOf("?") > 0) {
+//                    if (!url.contains("UUID=")) {
+//                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+//                    }
+//                    if (!url.contains("APPID=")) {
+//                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
+//                    }
+//                } else {
+//                    if (!url.contains("UUID=")) {
+//                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+//                    }
+//                    if (!url.contains("APPID=")) {
+//                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
+//                    }
+//                }
+//                mWebViewClient.loadUrl(url);
+//            }
+//        });
         return v;
     }
 

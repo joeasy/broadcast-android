@@ -62,8 +62,8 @@ public class LauncherSettings implements Parcelable {
     ArrayList<ShortcutData> launcherMainShortcuts = new ArrayList<ShortcutData>();;
 
     @SerializedName("register_address")
-    String initialPageAddress = "http://175.207.46.132:8010/web_test/test.html";
-    //String initialPageAddress = "http://175.207.46.132:8080/common/selectServer.rcc";
+    //String initialPageAddress = "http://175.207.46.132:8010/web_test/test.html";
+    String initialPageAddress = "http://175.207.46.132:8080/common/selectServer.rcc";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;

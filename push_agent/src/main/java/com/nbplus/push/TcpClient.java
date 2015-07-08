@@ -78,7 +78,6 @@ public class TcpClient {
         }
         switch (msg.what) {
             case HANDLER_MESSAGE_CHECK_KEEP_ALIVE :
-                Log.d(TAG, "HANDLER_MESSAGE_CHECK_KEEP_ALIVE !!!");
                 sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST));
                 break;
             case HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION :
@@ -165,7 +164,6 @@ public class TcpClient {
 
                 break;
             case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST :
-                Log.d(TAG, "get message = " + PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST);
                 byteBuffer = ByteBuffer.allocate(13);        // 인터페이스설계서..
                 byteBuffer.put((byte) messageType);
                 byteBuffer.putInt(mRequestMessageId);
@@ -175,7 +173,6 @@ public class TcpClient {
                 mRequestMessageId++;
                 break;
             case PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE:
-                Log.d(TAG, "get message = " + PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE);
                 byteBuffer = ByteBuffer.allocate(17);        // 인터페이스설계서..
                 byteBuffer.put((byte) messageType);
                 byteBuffer.putInt(messageId);
@@ -184,7 +181,6 @@ public class TcpClient {
                 byteBuffer.putInt(correlator);
                 break;
             case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_CHANGE_RESPONSE:
-                Log.d(TAG, "get message = " + PushConstants.PUSH_MESSAGE_TYPE_APP_UPDATE_RESPONSE);
                 byteBuffer = ByteBuffer.allocate(13);        // 인터페이스설계서..
                 byteBuffer.put((byte) messageType);
                 byteBuffer.putInt(messageId);
@@ -192,7 +188,6 @@ public class TcpClient {
                 byteBuffer.put(PushConstants.RESULT_OK.getBytes(), 0, 4);
                 break;
             case PushConstants.PUSH_MESSAGE_TYPE_APP_UPDATE_RESPONSE:
-                Log.d(TAG, "get message = " + PushConstants.PUSH_MESSAGE_TYPE_APP_UPDATE_RESPONSE);
                 byteBuffer = ByteBuffer.allocate(13);        // 인터페이스설계서..
                 byteBuffer.put((byte) messageType);
                 byteBuffer.putInt(messageId);
@@ -223,7 +218,6 @@ public class TcpClient {
             try {
                 mDataOut.write(message);
                 mDataOut.flush();
-                Log.d(TAG, "Send message to data output stream type = " + message[0]);
                 if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST) {
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION, 60 * 1000);
                 } else if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST) {
@@ -347,7 +341,6 @@ public class TcpClient {
 
                     messageBytes = null;
                     int messageType = mDataIn.readByte();
-                    Log.d(TAG, ">> PUSH received msg type = " + messageType);
                     switch (messageType) {
                         case PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_RESPONSE :
                             Log.d(TAG, "PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_RESPONSE received !!");
@@ -487,7 +480,6 @@ public class TcpClient {
                             sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE, msgId, -1));
                             break;
                         case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE :
-                            Log.d(TAG, "PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE received !! do nothing.. ");
                             mDataIn.skipBytes(16);
                             mHandler.removeMessages(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE);
                             setKeepAliveHandler();

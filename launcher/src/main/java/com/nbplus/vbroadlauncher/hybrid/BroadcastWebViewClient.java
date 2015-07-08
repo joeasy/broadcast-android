@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -22,6 +23,7 @@ import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.R;
+import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
@@ -114,6 +116,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     public void setVillageName(String villageName) {
         if (!StringUtils.isEmptyString(villageName)) {
             LauncherSettings.getInstance(mContext).setVillageName(villageName);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.ACTION_SET_VILLAGE_NAME));
         }
     }
     /**
@@ -130,8 +133,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
             try {
                 data = new String(data.getBytes("utf-8"));
                 Gson gson = new GsonBuilder().create();
-                VBroadcastServer serverInfo = gson.fromJson(data, VBroadcastServer.class);
-                if (serverInfo != null) {
+                RegSettingData settings = gson.fromJson(data, RegSettingData.class);
+                if (settings != null) {
+                    VBroadcastServer serverInfo = settings.getServerInformation();
+                    if (serverInfo == null) {
+                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 //                    if (StringUtils.isEmptyString(settings.getVillageName())) {
 //                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
 //                        return;
@@ -158,6 +166,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 //                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
 //                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
+                    LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 
                     Intent intent = new Intent(mContext, PushService.class);
                     intent.setAction(PushConstants.ACTION_START_SERVICE);
