@@ -113,7 +113,6 @@ public class BasicWebViewClient extends WebViewClient {
             webSettings.setDisplayZoomControls(false);
         }
 
-        // TODO : clear cache ????
         mWebView.clearCache(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 

@@ -15,8 +15,8 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:background="@drawable/bg_white_corner_radius"
-        android:layout_width="@dimen/broadcast_audio_window_width"
-        android:layout_height="@dimen/broadcast_audio_window_height" >
+        android:layout_width="@dimen/broadcast_text_window_width"
+        android:layout_height="wrap_content" >
 
         <TextView
             android:id="@+id/title"
@@ -24,9 +24,11 @@
             android:layout_height="@dimen/broadcast_title_height"
             android:paddingStart="@dimen/broadcast_x_padding"
             android:paddingEnd="@dimen/broadcast_x_padding"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:layout_gravity="center_vertical"
-            android:text="@string/title_audio_broadcast"
+            android:drawableStart="@drawable/ic_icon_sms"
+            android:drawablePadding="5dp"
+            android:text="@string/title_text_broadcast"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:ellipsize="end"
@@ -39,13 +41,15 @@
             android:layout_height="1dp"
             android:background="@color/title_seperator" />
 
-        <!-- register and settings webview -->
-        <WebView
-            android:id="@+id/webview"
+        <TextView
+            android:id="@+id/broadcast_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/broadcast_text_body_height"
             android:layout_gravity="center_vertical"
             android:padding="@dimen/broadcast_x_padding"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/broadcast_audio_body_height"
+            android:textStyle="bold"
+            android:textSize="@dimen/radio_activity_label_font_size"
+            android:lineSpacingExtra="5dp"
             />
     </LinearLayout>
 

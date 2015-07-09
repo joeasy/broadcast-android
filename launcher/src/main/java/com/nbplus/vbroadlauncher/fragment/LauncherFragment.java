@@ -51,6 +51,7 @@ import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
+import com.nbplus.vbroadlauncher.callback.OnLauncherFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PushPayloadData;
@@ -95,6 +96,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private LinearLayout mMainViewRightPanel;
     private GridLayout mMainShortcutGridLayout;
     private GridLayout mShorcutGridLayout;
+
+    private OnLauncherFragmentInteractionListener mOnLauncherFragmentInteractionListener = null;
 
     private LauncherFragmentHandler mHandler;
 
@@ -202,17 +205,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
                                 boolean isRealTime = Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(payloadData.getServiceType());
                                 if (isRealTime) {
-                                    // fake home key event.
-                                    Intent intent = new Intent();
-                                    intent.setAction(Intent.ACTION_MAIN);
-                                    intent.addCategory(Intent.CATEGORY_HOME);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                                            | Intent.FLAG_ACTIVITY_FORWARD_RESULT
-                                            | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
-                                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                                    getActivity().startActivity(intent);
+                                    if (mOnLauncherFragmentInteractionListener != null) {
+                                        mOnLauncherFragmentInteractionListener.playBroadcast(payloadData);
+                                    }
                                 } else {
-
+                                    // TODO : 실시간음성이 아닌경우도.... ??
+                                    if (mOnLauncherFragmentInteractionListener != null) {
+                                        mOnLauncherFragmentInteractionListener.playBroadcast(payloadData);
+                                    }
                                 }
                             }
 
@@ -590,6 +590,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         try {
             Log.d(TAG, "LauncherFragment onAttach()");
             ((HomeLauncherActivity)getActivity()).registerActivityInteractionListener(this);
+            mOnLauncherFragmentInteractionListener = (OnLauncherFragmentInteractionListener)activity;
 
             // check network status
             IntentFilter intentFilter = new IntentFilter();
@@ -612,6 +613,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     @Override
     public void onDetach() {
         super.onDetach();
+
+        mOnLauncherFragmentInteractionListener = null;
         getActivity().unregisterReceiver(mBroadcastReceiver);
         ((HomeLauncherActivity)getActivity()).unRegisterActivityInteractionListener(this);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);

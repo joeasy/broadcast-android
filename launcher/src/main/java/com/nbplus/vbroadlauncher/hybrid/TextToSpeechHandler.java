@@ -78,7 +78,7 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
                     null,
                     "TTS_UTTERANCE_ID");
         }
-        mText2Speech.setSpeechRate(0.8f);
+        mText2Speech.setSpeechRate(0.6f);
     }
 
     public void stop() {

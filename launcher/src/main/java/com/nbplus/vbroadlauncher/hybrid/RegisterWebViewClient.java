@@ -141,13 +141,13 @@ public class RegisterWebViewClient extends BasicWebViewClient {
 
         if (!LauncherSettings.getInstance(mContext).isCompletedSetup()) {
             AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
-            alert.setPositiveButton(R.string.alert_settings_message, new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });
-            alert.setMessage(R.string.alert_phone_message);
+            alert.setMessage(R.string.alert_settings_message);
             alert.show();
 
         } else {

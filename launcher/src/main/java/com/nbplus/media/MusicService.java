@@ -526,7 +526,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                     .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, playingItem.getTitle())
                     .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
                             playingItem.getDuration())
-                            // TODO: fetch real item artwork
                     .putBitmap(
                             RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
                             mDummyAlbumArt)
@@ -612,20 +611,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             configAndStartMediaPlayer();
     }
 
-    // TODO : random music 에서 사용하는것이다. 일단 제거
-//    public void onMusicRetrieverPrepared() {
-//        // Done retrieving!
-//        mState = State.Stopped;
-//
-//        // If the flag indicates we should start playing after retrieving, let's do that now.
-//        if (mStartPlayingAfterRetrieve) {
-//            tryToGetAudioFocus();
-//            playNextSong(mWhatToPlayAfterRetrieve == null ?
-//                    null : mWhatToPlayAfterRetrieve.toString());
-//        }
-//    }
-
-
     @Override
     public void onDestroy() {
         // Service is being killed, so make sure we release our resources
@@ -703,24 +688,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     private void setRemoteViews() {
         if (mPlayingItem != null) {
             mRemoteViews.setTextViewText(R.id.play_title, mPlayingItem.getTitle());
-            // TODO : play_time이 필요하다면 play_title 에 spannable 로 처리하자.
-//            if (mPlayingItem.getDuration() > 0) {
-//                mRemoteViews.setViewVisibility(R.id.play_time, View.VISIBLE);
-//
-//                long millis = mPlayingItem.getDuration();
-//                String time = String.format("%02d:%02d",
-//                        TimeUnit.MILLISECONDS.toMinutes(millis) -
-//                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), // The change is in this line
-//                        TimeUnit.MILLISECONDS.toSeconds(millis) -
-//                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-//
-//                mRemoteViews.setTextViewText(R.id.play_time, time);
-//            } else {
-//                mRemoteViews.setViewVisibility(R.id.play_time, View.INVISIBLE);
-//            }
         } else {
             mRemoteViews.setTextViewText(R.id.play_title, getString(R.string.activity_radio_default_title));
-//            mRemoteViews.setViewVisibility(R.id.play_time, View.GONE);
         }
 
         // toggle playback

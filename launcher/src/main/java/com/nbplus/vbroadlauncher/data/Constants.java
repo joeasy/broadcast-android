@@ -106,5 +106,6 @@ public class Constants {
     public static final String ACTION_LAUNCHER_ACTIVITY_RUNNING = "com.nbplus.vbroadlauncher.intent.action.LAUNCHER_ACTIVITY_RUNNING";
     public static final String EXTRA_LAUNCHER_ACTIVITY_RUNNING = "EXTRA_LAUNCHER_ACTIVITY_RUNNING";
     public static final String ACTION_SET_VILLAGE_NAME = "com.nbplus.vbroadlauncher.intent.action.SET_VILLAGE_NAME";
+    public static final String EXTRA_BROADCAST_PAYLOAD_DATA = "EXTRA_BROADCAST_PAYLOAD_DATA";
 
 }

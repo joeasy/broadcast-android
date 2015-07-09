@@ -6,37 +6,6 @@
               android:orientation="vertical"
               tools:context="com.nbplus.vbroadlauncher.fragment.RegisterFragment">
 
-    <!-- TODO: remove this.. later -->
-    <!--
-    <LinearLayout
-        android:orientation="horizontal"
-        android:background="#ffffff"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/et_test_url"
-            android:lines="1"
-            android:inputType="textUri"
-            android:ellipsize="end"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:maxLength="1000"
-            android:layout_weight="1"
-            android:background="#ffffff"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            />
-
-        <Button
-            android:id="@+id/btn_test_load"
-            android:text="불러오기"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-    -->
-
     <!-- register and settings webview -->
     <WebView
         android:id="@+id/webview"

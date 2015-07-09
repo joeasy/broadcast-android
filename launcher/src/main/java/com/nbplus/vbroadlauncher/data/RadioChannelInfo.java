@@ -21,7 +21,6 @@ public class RadioChannelInfo extends BaseApiResult {
         return radioChannels;
     }
 
-    // TODO : for sample data
     public void setResultCode(String code) {
         resultCode = code;
     }
@@ -31,7 +30,6 @@ public class RadioChannelInfo extends BaseApiResult {
     public void setRadioChannelList(ArrayList<RadioChannel> items) {
         this.radioChannels = items;
     }
-    // end of TODO
 
     public static class RadioChannel implements Parcelable {
         @SerializedName("RADIO_NAME")

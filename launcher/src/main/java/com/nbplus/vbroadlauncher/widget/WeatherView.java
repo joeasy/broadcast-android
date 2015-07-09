@@ -143,7 +143,7 @@ public class WeatherView extends LinearLayout {
                     releaseAlarm(Constants.WEATHER_SERVICE_SPACE_UPDATE_ACTION);
 
                     // update weather and set next alarm
-                    // TODO : 데이터도 제대로 오지 않음... 아후거 쓰자.
+                    // 데이터도 제대로 오지 않음... 아후거 쓰자.
                     //updateForecastSpaceData(1);
                     //setNextForecastSpaceDataAlarm();
                 } else if (Constants.LOCATION_CHANGED_ACTION.equals(intent.getAction()) ||
@@ -155,10 +155,10 @@ public class WeatherView extends LinearLayout {
                     // 실황예보
                     updateForecastGrib(1);
                     // 단기예보
-                    // TODO : 데이터도 제대로 오지 않음... 아후거 쓰자.
+                    // 데이터도 제대로 오지 않음... 아후거 쓰자.
                     //updateForecastSpaceData(1);
                     setNextForecastGribAlarm();
-                    // TODO : 데이터도 제대로 오지 않음... 아후거 쓰자.
+                    // T데이터도 제대로 오지 않음... 아후거 쓰자.
                     //setNextForecastSpaceDataAlarm();
                     if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
                         updateYahooGeocode();
@@ -1328,7 +1328,7 @@ public class WeatherView extends LinearLayout {
         int skyStatusValue = 0;
 
         /**
-         * TODO : =야후 API가 약3도정도 오차가 있다. 약간은 보정해 줘야하나?
+         * 야후 API가 약3도정도 오차가 있다. 약간은 보정해 줘야하나?
          */
 
 //        // condition 과 humidity 를 보여준다.

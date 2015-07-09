@@ -32,18 +32,9 @@ import java.lang.ref.WeakReference;
 public class PushService extends Service {
     private static final String TAG = PushService.class.getName();
 
-    // indicates the state our service:
-    public enum State {
-        Stopped,            // Push agent stopped
-        IfRetrieving,       // Push gw server searching. conn to interface server
-        Connected           // connected to push gw server
-    };
-
-    State mState = State.Stopped;
-
     // minutes
-    final int MILLISECONDS = 1000;
-    final int mNextRetryPeriodTerm = 60;
+    public static final int MILLISECONDS = 1000;
+    public static final int mNextRetryPeriodTerm = 60;
 
     // Wifi lock that we hold when streaming files from the internet, in order to prevent the
     // device from shutting off the Wifi radio
@@ -57,8 +48,7 @@ public class PushService extends Service {
     Notification mNotification = null;
     NotificationCompat.Builder mBuilder;
 
-    Thread mTcpThread;
-    TcpClient mTcpClient;
+    PushThread mPushThread;
 
     String mPushInterfaceServerAddress = null;
     final String PUSH_IF_CONTEXT = "/is/api/appRequest/SessionRequest";
@@ -86,8 +76,6 @@ public class PushService extends Service {
         }
     }
 
-    // TODO : for test
-    private static int mTestMessageIdx = -1;
     public void handleMessage(Message msg) {
         if (msg == null) {
             return;
@@ -97,42 +85,6 @@ public class PushService extends Service {
                 if (NetworkUtils.isConnected(this)) {
                     Log.d(TAG, "HANDLER_MESSAGE_RETRY_MESSAGE received !!!");
                     getPushGatewayInformationFromServer();
-                }
-
-                // TODO : for test
-                mTestMessageIdx++;
-                if (mTestMessageIdx % 2 == 0) {
-                    Message testMsg = new Message();
-                    testMsg.what = PushConstants.HANDLER_MESSAGE_RECEIVE_PUSH_DATA;
-
-                    PushMessageData data = new PushMessageData();
-                    data.setMessageType(PushConstants.PUSH_MESSAGE_TYPE_PUSH_REQUEST);
-                    data.setMessageId(1);
-                    data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
-                            "\"MESSAGE\":\"" +
-                            "누구에게나 결함은 있단다.\n" + "그리고 고치려고 해도\n" + "때로 자기 힘으로는 어쩔 수 없는 결함도 있지.\n" +
-                            "집이 가난하다거나 다리가 부자유스러운 것은\n" +
-                            "그 아이로서도 어쩔 수 없는 부분이다.\n" +
-                            "네가 머리를 감는데도 \n" +
-                            "머리 냄새가 나는 것과 똑같이.\n" +
-                            "우리 모두는 저마다 모양이 다른 결함들을 \n" +
-                            "지니고 산단다.\n" +
-                            "하지만 결함이 때로는 고마운 것이 되기도 한단다. \n" +
-                            "세상일이란, \n" +
-                            "이해하려고 노력해서 이해할 수 있는 것도 있지만\n" +
-                            "이해하려고 애쓰지 않아도 \n" +
-                            "저절로 이해할 수 있는 것이 있더라.\n" +
-                            "그건 자기 결함 때문에 괴로움을 겪어 봤거나\n" +
-                            "자기 결함을 숨기지 않고 인정하는 사람이라면\n" +
-                            "가질 수 있는 이해심이지.\n" +
-                            "너의 머리 냄새가 \n" +
-                            "다른 사람을 쉽게 이해할 수 있는\n" +
-                            "아주 고마운 것이 되기를 엄마는 진정으로 바란다.\n" +
-
-                            "\", \"SERVICE_TYPE\":\"02\"}");
-                    testMsg.obj = data;
-
-                    mHandler.sendMessage(testMsg);
                 }
                 break;
             case PushConstants.HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA :
@@ -144,14 +96,10 @@ public class PushService extends Service {
 
                 PushInterfaceData data = (PushInterfaceData)msg.obj;
                 if (data != null && PushConstants.RESULT_OK.equals(data.resultCode)) {
-                    startPushClientSocket(data);
+                    mPushThread.startPushClientSocket(data);
                 } else {
-                    if (mState == State.Connected) {
-                        releasePushClientSocket();
-                    }
-
-                    if (NetworkUtils.isConnected(this)) {
-                        mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_RETRY_MESSAGE, MILLISECONDS * mNextRetryPeriodTerm);
+                    if (mPushThread.getState() == PushThread.State.Connected) {
+                        mPushThread.releasePushClientSocket(NetworkUtils.isConnected(this));
                     }
                 }
                 msg = null;
@@ -166,37 +114,11 @@ public class PushService extends Service {
                     }
                 } else {
                     Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED network is disconnected !!!");
-                    if (mState != State.Stopped) {
-                        releasePushClientSocket();
+                    if (mPushThread.getState() != PushThread.State.Stopped) {
+                        mPushThread.releasePushClientSocket(false);
                     }
                     mHandler.removeMessages(HANDLER_MESSAGE_RETRY_MESSAGE);
                 }
-                break;
-
-            case PushConstants.HANDLER_MESSAGE_RECEIVE_PUSH_DATA :
-                Log.d(TAG, "PushConstants.HANDLER_MESSAGE_RECEIVE_PUSH_DATA received !!!");
-                PushMessageData pushData = (PushMessageData)msg.obj;
-                if (pushData == null) {
-                    Log.d(TAG, "empty push message data !!");
-                    return;
-                }
-                String payloadData = pushData.getPayload();
-                if (payloadData != null && !StringUtils.isEmptyString(payloadData))  {
-                    Log.d(TAG, "Send broadcast payload to app !!!");
-
-                    Intent intent = new Intent();
-                    intent.setAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
-                    if (mState == State.Connected) {
-                        intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_CONNECTED);
-                    } else {
-                        intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-                    }
-                    intent.putExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA, payloadData);
-                    sendBroadcast(intent);
-                } else {
-                    Log.d(TAG, "Empty payload data !!!");
-                }
-
                 break;
         }
     }
@@ -262,14 +184,15 @@ public class PushService extends Service {
                     if (mPushInterfaceServerAddress == null || !pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
                         mPushInterfaceServerAddress = pushInterfaceServerAddress;
 
-                        if (mState == State.IfRetrieving) {
+                        if (mPushThread.getState() == PushThread.State.IfRetrieving) {
                             if (mIfTask != null) {
                                 mIfTask.cancel(true);
                             }
                             mIfTask = null;
                         }
-                        if (mState == State.Connected) {
-                            releasePushClientSocket();
+
+                        if (mPushThread.getState() == PushThread.State.Connected) {
+                            mPushThread.releasePushClientSocket(false);
                         }
                         getPushGatewayInformationFromServer();
                     }
@@ -277,7 +200,7 @@ public class PushService extends Service {
                     Log.e(TAG, ">> mPushInterfaceServerAddress is empty !!!");
                 }
             } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
-                sendSatusChangedBroadcastMessage();
+                mPushThread.sendSatusChangedBroadcastMessage();
             }
 //            else if (action.equals(ACTION_PAUSE)) processPauseRequest();
 //            else if (action.equals(ACTION_SKIP)) processSkipRequest();
@@ -296,114 +219,19 @@ public class PushService extends Service {
     }
 
     private void getPushGatewayInformationFromServer() {
-        if (mState != State.Stopped) {
-            Log.d(TAG, "getPushGatewayInformationFromServer() is not stopped!!");
-            return;
-        }
-        if (!NetworkUtils.isConnected(this)) {
-            if (mTcpThread != null) {
-                releasePushClientSocket();
-            }
-            return;
-        }
+        mPushThread.releasePushClientSocket(false);
 
-        if (mTcpThread != null) {
-            releasePushClientSocket();
-        }
         String prefName = getApplicationContext().getPackageName() + "_preferences";
         SharedPreferences prefs = getSharedPreferences(prefName, Context.MODE_PRIVATE);
 
-        mState = State.IfRetrieving;
+        mPushThread.setState(PushThread.State.IfRetrieving);
         mIfTask = new GetPushInterfaceTask(this, mHandler, mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
         mIfTask.execute();
-    }
-
-    private void startPushClientSocket(final PushInterfaceData ifaceData) {
-        if (ifaceData == null || !PushConstants.RESULT_OK.equals(ifaceData.resultCode)) {
-            // send status changed
-
-            // set next retry handler message.
-
-            return;
-        }
-        mTcpThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mTcpClient = new TcpClient(mContext, ifaceData, new TcpClient.OnMessageReceived() {
-                        @Override
-                        public void messageReceived(PushBaseData data) {
-                            Log.d(TAG, ">> TcpClient received from server = " + data.getMessageType());
-                            Message msg = new Message();
-                            msg.what = PushConstants.HANDLER_MESSAGE_RECEIVE_PUSH_DATA;
-                            msg.obj = data;
-                            mHandler.sendMessage(msg);
-                        }
-
-                        @Override
-                        public void connectionClosed() {
-                            Log.e(TAG, ">> TcpClient closed !!!!!");
-                            if (mTcpThread != null && mTcpThread.isAlive()) {
-                                mTcpThread.interrupt();
-                            }
-                        }
-
-                        @Override
-                        public void onConnectionError() {
-                            Log.e(TAG, ">> TcpClient onConnectionError received !!");
-                            if (mTcpThread != null && mTcpThread.isAlive()) {
-                                mTcpThread.interrupt();
-                            }
-                        }
-
-                        @Override
-                        public void onConnected() {
-                            Log.i(TAG, ">> TcpClient onConnected received !!");
-                            mState = State.Connected;
-                            sendSatusChangedBroadcastMessage();
-                        }
-                    });
-                    mTcpClient.run();
-                } finally {
-                    Log.d(TAG, ">> TCP client thread is ended..");
-                    releasePushClientSocket();
-                }
-            }
-        });
-        mTcpThread.start();
-    }
-
-    private void releasePushClientSocket() {
-        if (mTcpClient != null) {
-            mTcpClient.stopClient();
-        }
-        mTcpClient = null;
-        if (mTcpThread != null && mTcpThread.isAlive()) {
-            mTcpThread.interrupt();
-        }
-        mTcpThread = null;
-        mState = State.Stopped;
-        sendSatusChangedBroadcastMessage();
-
-        if (NetworkUtils.isConnected(mContext)) {
-            mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_RETRY_MESSAGE, MILLISECONDS * mNextRetryPeriodTerm);
-        }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    private void sendSatusChangedBroadcastMessage() {
-        Log.d(TAG, "Send Broadcasting message action = " + PushConstants.ACTION_PUSH_STATUS_CHANGED);
-        Intent intent = new Intent(PushConstants.ACTION_PUSH_STATUS_CHANGED);
-        if (mState == State.Connected) {
-            intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_CONNECTED);
-        } else {
-            intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-        }
-        sendBroadcast(intent);
     }
 
     /** Updates the notification. */
@@ -492,6 +320,9 @@ public class PushService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mBroadcastReceiver, intentFilter);
+
+        mPushThread = new PushThread(this, mHandler, null);
+        new Thread(mPushThread).start();
 
         mContext = this;
     }

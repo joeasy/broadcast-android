@@ -27,6 +27,8 @@ import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -43,11 +45,14 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
+import com.nbplus.vbroadlauncher.callback.OnLauncherFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.data.PushPayloadData;
 import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PreferredLocation;
 
+import com.nbplus.vbroadlauncher.fragment.LauncherBroadcastFragment;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.fragment.RegisterFragment;
 import com.nbplus.vbroadlauncher.location.FetchAddressIntentService;
@@ -65,7 +70,8 @@ import io.vov.vitamio.LibsChecker;
 
 public class HomeLauncherActivity extends BaseActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, ResultCallback<LocationSettingsResult> {
+        LocationListener, ResultCallback<LocationSettingsResult>,
+        OnLauncherFragmentInteractionListener {
 
     // LogCat tag
     private static final String TAG = HomeLauncherActivity.class.getSimpleName();
@@ -83,7 +89,7 @@ public class HomeLauncherActivity extends BaseActivity
 
     protected Location mLastLocation;
     private Locale mCurrentLocale;
-
+    private FrameLayout mBroadcastFramelayout;
     /**
      * The formatted location address.
      */
@@ -332,6 +338,10 @@ public class HomeLauncherActivity extends BaseActivity
          * 서버정보가 없거나 숏컷정보가 없다면 회원등록이나 설정에 문제가 있다.
          * 회원등록 페이지를 호출한다.
          */
+        mBroadcastFramelayout = (FrameLayout) findViewById(R.id.realtimeBroadcastFragment);
+        if (mBroadcastFramelayout != null) {
+            mBroadcastFramelayout.setVisibility(View.GONE);
+        }
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Bundle bundle;
@@ -791,4 +801,49 @@ public class HomeLauncherActivity extends BaseActivity
         }
     }
     */
+
+    /**
+     * 실시간방송 재생 - 사용자가 취소할 수 없도록...
+     * @param data
+     */
+    @Override
+    public void playBroadcast(PushPayloadData data) {
+        if (data == null) {
+            return;
+        }
+        Log.d(TAG, "playBroadcast() type = " + data.getServiceType());
+
+        // fake home key event.
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                | Intent.FLAG_ACTIVITY_FORWARD_RESULT
+                | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
+                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        startActivity(intent);
+
+        // show fragment.
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        if (mBroadcastFramelayout != null) {
+            mBroadcastFramelayout.setVisibility(View.VISIBLE);
+        }
+        LauncherBroadcastFragment launcherBroadcastFragment = LauncherBroadcastFragment.newInstance(data);
+        fragmentTransaction.replace(R.id.realtimeBroadcastFragment, launcherBroadcastFragment);
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void popStackBroadcastFragment() {
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+                if (mBroadcastFramelayout != null) {
+                    mBroadcastFramelayout.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
 }

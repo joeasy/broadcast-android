@@ -43,6 +43,13 @@
     <dimen name="radio_play_control_progress_width">128dp</dimen>
 
     <!-- broadcast fragment-->
-    <dimen name="window_width">350dp</dimen>
-    <dimen name="title_height">64dp</dimen>
+    <dimen name="broadcast_text_window_width">642dp</dimen>
+    <dimen name="broadcast_audio_window_height">194dp</dimen>
+    <dimen name="broadcast_audio_window_width">350dp</dimen>
+    <dimen name="broadcast_title_height">64dp</dimen>
+    <dimen name="broadcast_x_padding">22dp</dimen>
+    <dimen name="broadcast_y_padding">22dp</dimen>
+    <dimen name="broadcast_text_body_height">318dp</dimen>
+    <dimen name="broadcast_audio_body_height">128dp</dimen>
+    <dimen name="broadcast_text_font_size">16dp</dimen>
 </resources>

@@ -66,7 +66,6 @@
     <string name="emergency_call_success_message">Sending emergency call is succeeded.</string>
     <string name="emergency_call_fail_message">Sending emergency call is failed. Call direct or retry sending.</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">Load</string>
     <string name="title_activity_show_application">ShowApplicationActivity</string>
 
@@ -75,5 +74,8 @@
     <string name="title_activity_calendar">CalendarActivity</string>
     <string name="title_activity_broadcast_webview">Village Broadcast</string>
 
+    <string name="title_text_broadcast">Text Broadcast</string>
+    <string name="title_audio_broadcast">Audio broadcast is playing.</string>
+    <string name="toast_tts_error">TTS play error...</string>
 
 </resources>

@@ -59,7 +59,6 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     PageIndicator mIndicator;
     private ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelItems = new ArrayList<>();
     ShortcutData mShortcutData;
-    ProgressDialogFragment mProgressDialogFragment;
     SettingsContentObserver mSettingsContentObserver;
 
     RelativeLayout mActivityLayout;
@@ -527,18 +526,6 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     @Override
     public Bundle getMusicPlayingStatus() {
         return mCurrentPlayingStatus;
-    }
-
-    private void showProgressDialog() {
-        dismissProgressDialog();
-        mProgressDialogFragment = ProgressDialogFragment.newInstance();
-        mProgressDialogFragment.show(getSupportFragmentManager(), "radio_progress_dialog");
-    }
-    private void dismissProgressDialog() {
-        if (mProgressDialogFragment != null) {
-            mProgressDialogFragment.dismiss();
-            mProgressDialogFragment = null;
-        }
     }
 
     public void setOnRadioActivityInteractionListener(OnRadioActivityInteractionListener l) {

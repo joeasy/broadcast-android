@@ -55,7 +55,6 @@ public class MusicIntentReceiver extends BroadcastReceiver {
                     context.startService(musicServiceIntent);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                    // TODO: ensure that doing this in rapid succession actually plays the
                     // previous song
                     musicServiceIntent.setAction(MusicService.ACTION_REWIND);
                     context.startService(musicServiceIntent);

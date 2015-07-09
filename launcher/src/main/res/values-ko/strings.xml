@@ -66,7 +66,6 @@
     <string name="emergency_call_success_message">긴급호출 메시지를 전송하였습니다.</string>
     <string name="emergency_call_fail_message">긴급호출 메시지 전송에 실패하였습니다.\n다시 시도해 주시거나 직접 전화를 시도해 주세요.</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="test_register_url_load">불러오기</string>
     <string name="title_activity_show_application">ShowApplicationActivity</string>
 
@@ -75,4 +74,7 @@
     <string name="title_activity_calendar">CalendarActivity</string>
     <string name="title_activity_broadcast_webview">마을방송 서비스</string>
 
+    <string name="title_text_broadcast">문자 방송</string>
+    <string name="title_audio_broadcast">실시간 방송이 진행중입니다.</string>
+    <string name="toast_tts_error">문자방송 재생중 오류가 발생했습니다.</string>
 </resources>

@@ -128,20 +128,21 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
     @Override
     protected void onPostExecute(PushInterfaceData result) {
 
-        // TODO : sample data
-        if (result == null || !PushConstants.RESULT_OK.equals(result.resultCode)) {
-            result = new PushInterfaceData();
-            result.resultCode = PushConstants.RESULT_OK;
-            result.sessionKey = "P7V80283M";
-            result.deviceAuthKey = "1OWE2RTYU";
-            result.interfaceServerAddress = "175.207.46.132";
-            result.interfaceServerPort = "7002";
-            result.keepAliveSeconds = "30";
-        } /*else {
+        // sample data
+//        if (result == null || !PushConstants.RESULT_OK.equals(result.resultCode)) {
+//            result = new PushInterfaceData();
+//            result.resultCode = PushConstants.RESULT_OK;
+//            result.sessionKey = "P7V80283M";
+//            result.deviceAuthKey = "1OWE2RTYU";
+//            result.interfaceServerAddress = "175.207.46.132";
+//            result.interfaceServerPort = "7002";
+//            result.keepAliveSeconds = "30";
+//        }
+        /*else {
             result.interfaceServerAddress = "192.168.77.111";
             result.interfaceServerPort = "7005";
         }*/
-        // end of TODO : sample data
+        // end of sample data
 
         if (mHandler != null) {
             Message message = new Message();

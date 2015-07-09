@@ -16,6 +16,7 @@ import android.view.WindowManager;
 
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
+import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
 
 import java.util.Locale;
 
@@ -28,6 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
     protected TextToSpeech mText2Speech;
     protected OnText2SpeechListener mcheckText2SpeechLister = null;
 
+    ProgressDialogFragment mProgressDialogFragment;
     private PowerManager.WakeLock mCpuWakeLock;
     private int mDefaultWindowFlags = -1;
 
@@ -174,5 +176,23 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
 
     public void setPushServiceStatus(int pushServiceStatus) {
         this.mPushServiceStatus = pushServiceStatus;
+    }
+
+    public void showProgressDialog() {
+        dismissProgressDialog();
+        mProgressDialogFragment = ProgressDialogFragment.newInstance();
+        mProgressDialogFragment.show(getSupportFragmentManager(), "progress_dialog");
+    }
+    public void dismissProgressDialog() {
+        if (mProgressDialogFragment != null) {
+            mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dismissProgressDialog();
     }
 }

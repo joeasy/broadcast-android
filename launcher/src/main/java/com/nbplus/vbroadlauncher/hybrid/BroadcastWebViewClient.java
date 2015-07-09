@@ -54,6 +54,12 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     TextToSpeechHandler mText2SpeechHandler = null;
     String mText2SpeechPlayText = null;
 
+    public boolean isClosingByWebApp() {
+        return mIsClosingByWebApp;
+    }
+
+    private boolean mIsClosingByWebApp = false;
+
     private static final int HANDLER_MESSAGE_START_TTS = 1;
     private static final int HANDLER_MESSAGE_DONE_TTS = 2;
     private static final int HANDLER_MESSAGE_ERROR_TTS = 3;
@@ -295,6 +301,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         Intent i = new Intent(mContext, MusicService.class);
         i.setAction(MusicService.ACTION_PLAY);
         mContext.startService(i);
+        mIsClosingByWebApp = true;
         mContext.finish();
     }
 

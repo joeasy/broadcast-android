@@ -68,7 +68,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
         }
         switch (msg.what) {
             case HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE :
-                if (mWebViewClient != null) {
+                if (mWebViewClient != null && !mWebViewClient.isClosingByWebApp()) {
                     mWebViewClient.onCloseWebApplicationByUser();
                 }
                 break;
