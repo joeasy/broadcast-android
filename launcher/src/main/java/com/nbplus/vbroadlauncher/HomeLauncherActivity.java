@@ -5,9 +5,11 @@ package com.nbplus.vbroadlauncher;
  */
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.Message;
 import android.provider.Settings;
@@ -64,6 +66,7 @@ import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import io.vov.vitamio.LibsChecker;
@@ -213,7 +216,6 @@ public class HomeLauncherActivity extends BaseActivity
         setContentView(R.layout.activity_home_launcher);
 
         mCurrentLocale = getResources().getConfiguration().locale;
-
         if (BuildConfig.DEBUG) {
             Point p = DisplayUtils.getScreenSize(this);
             Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
@@ -252,6 +254,22 @@ public class HomeLauncherActivity extends BaseActivity
 
                 return;
             }
+        }
+
+        if (isMyLauncherDefault()) {
+            Log.d(TAG, "isMyLauncherDefault() == true");
+            // fake home key event.
+            Intent fakeIntent = new Intent();
+            fakeIntent.setAction(Intent.ACTION_MAIN);
+            fakeIntent.addCategory(Intent.CATEGORY_HOME);
+            fakeIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                    | Intent.FLAG_ACTIVITY_FORWARD_RESULT
+                    | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
+                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            startActivity(fakeIntent);
+        } else {
+            Log.d(TAG, "isMyLauncherDefault() == false");
+            resetPreferredLauncherAndOpenChooser();
         }
 
         // 앱이 설치후 실행하면.. 런처설정시에 기존액티비티가 살아있는 상태로 새로운 액티비티가 실행된다.
@@ -845,5 +863,49 @@ public class HomeLauncherActivity extends BaseActivity
                 }
             }
         });
+    }
+
+    protected boolean isMyLauncherDefault() {
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
+        filter.addCategory(Intent.CATEGORY_HOME);
+
+        List<IntentFilter> filters = new ArrayList<IntentFilter>();
+        filters.add(filter);
+
+        final String myPackageName = getPackageName();
+        List<ComponentName> activities = new ArrayList<ComponentName>();
+        final PackageManager packageManager = (PackageManager) getPackageManager();
+
+        // You can use name of your package here as third argument
+        packageManager.getPreferredActivities(filters, activities, null);
+
+        for (ComponentName activity : activities) {
+            if (myPackageName.equals(activity.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    protected void resetPreferredLauncherAndOpenChooser() {
+        PackageManager packageManager = getPackageManager();
+        ComponentName componentName = new ComponentName(this, HomeLauncherActivity.class);
+        packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+//        Intent selector = new Intent(Intent.ACTION_MAIN);
+//        selector.addCategory(Intent.CATEGORY_HOME);
+//        selector.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(selector);
+
+
+//        Intent fakeIntent = new Intent();
+//        fakeIntent.setAction(Intent.ACTION_MAIN);
+//        fakeIntent.addCategory(Intent.CATEGORY_HOME);
+//        fakeIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+//                | Intent.FLAG_ACTIVITY_FORWARD_RESULT
+//                | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
+//                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//        startActivity(fakeIntent);
+
+        packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
     }
 }

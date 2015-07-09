@@ -199,14 +199,22 @@ public class RegisterWebViewClient extends BasicWebViewClient {
 
     // progress bar
     private void showProgressDialog() {
-        dismissProgressDialog();
-        mProgressDialogFragment = ProgressDialogFragment.newInstance();
-        mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        try {
+            dismissProgressDialog();
+            mProgressDialogFragment = ProgressDialogFragment.newInstance();
+            mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
     private void dismissProgressDialog() {
-        if (mProgressDialogFragment != null) {
-            mProgressDialogFragment.dismiss();
-            mProgressDialogFragment = null;
+        try {
+            if (mProgressDialogFragment != null) {
+                mProgressDialogFragment.dismiss();
+                mProgressDialogFragment = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
