@@ -64,7 +64,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
      */
     @JavascriptInterface
     public void setServerInformation(String data) {
-        Log.d(TAG, ">> setApplicationData() received = " + data);
+        Log.d(TAG, ">> setServerInformation() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();

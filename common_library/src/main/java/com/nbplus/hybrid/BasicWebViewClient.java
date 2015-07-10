@@ -16,6 +16,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -73,6 +74,50 @@ public class BasicWebViewClient extends WebViewClient {
 //                // or
 //                // request.deny();
 //            }
+        }
+        public boolean onJsAlert(WebView view, String url, String message, final android.webkit.JsResult result) {
+            new AlertDialog.Builder(mContext)
+                    //.setTitle(MopDef.STR_WEB_ALERT_TITLE)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok,
+                            new AlertDialog.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    result.confirm();
+                                }
+                            })
+                    .setCancelable(false)
+                    .create()
+                    .show();
+
+            return true;
+        }
+
+        @Override
+        public boolean onJsConfirm(WebView view, String url,
+                                   String message, final JsResult result) {
+
+            new AlertDialog.Builder(mContext)
+                    //.setTitle(MopDef.STR_WEB_ALERT_TITLE)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+
+                                public void onClick(DialogInterface dialog, int which) {
+                                    result.confirm();
+                                }
+                            })
+                    .setNegativeButton(android.R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    result.cancel();
+                                }
+                            })
+                    .create()
+                    .show();
+
+            return true;
         }
     }
 
