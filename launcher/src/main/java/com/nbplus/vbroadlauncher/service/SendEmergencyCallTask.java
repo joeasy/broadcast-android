@@ -7,6 +7,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
@@ -25,17 +28,18 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
     protected BaseApiResult doInBackground(Void... params) {
 
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
-        RadioChannelInfo response = null;
+        BaseApiResult response = null;
 
         Uri.Builder builder = Uri.parse(mServerPath).buildUpon();
-        builder.appendQueryParameter("DEVICE_ID", LauncherSettings.getInstance(mContext).getDeviceID());
+        //builder.appendQueryParameter("DEVICE_ID", LauncherSettings.getInstance(mContext).getDeviceID());
         String url = builder.toString();
 
+        String strRequestBody = String.format("{\"DEVICE_ID\" : \"%s\"}", LauncherSettings.getInstance(mContext).getDeviceID());
         int retryCount = 0;
         while (retryCount < 3) {        // retry 3 times
             RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
 
-            GsonRequest request = new GsonRequest(Request.Method.GET, url, null, BaseApiResult.class, future, future);
+            GsonRequest request = new GsonRequest(Request.Method.POST, url, strRequestBody, BaseApiResult.class, future, future);
             requestQueue.add(request);
 
             try {

@@ -21,8 +21,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c0603288-8d3a-481e-8f1c-d2f395fd9131" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" afterPath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java" afterPath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/EmergencyCallTask.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="vbroadcast.iws" />
@@ -86,81 +88,15 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.4">
-              <caret line="20" column="25" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BroadcastWebViewClient.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.3703704">
-              <caret line="77" column="45" selection-start-line="77" selection-start-column="45" selection-end-line="77" selection-end-column="45" />
-              <folding>
-                <element signature="docComment;method#setServerInformation#0;class#BroadcastWebViewClient#0" expanded="true" />
-                <element signature="docComment;method#registerGcm#0;class#BroadcastWebViewClient#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="LauncherSettings.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.962963">
-              <caret line="409" column="0" selection-start-line="408" selection-start-column="0" selection-end-line="409" selection-end-column="0" />
+            <state vertical-scroll-proportion="-6.259259">
+              <caret line="339" column="30" selection-start-line="339" selection-start-column="30" selection-end-line="339" selection-end-column="30" />
               <folding>
                 <element signature="e#12886#12887#0" expanded="true" />
                 <element signature="e#12917#12918#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LauncherSettings.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/preference/LauncherSettings.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="242" column="2" selection-start-line="242" selection-start-column="2" selection-end-line="242" selection-end-column="2" />
-              <folding>
-                <element signature="e#4325#4326#0" expanded="true" />
-                <element signature="e#4356#4357#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HomeLauncherActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.814815">
-              <caret line="511" column="39" selection-start-line="511" selection-start-column="39" selection-end-line="511" selection-end-column="39" />
-              <folding>
-                <element signature="docComment;field#REQUEST_CHECK_SETTINGS#0;class#HomeLauncherActivity#0" expanded="true" />
-                <element signature="e#7013#8581#0" expanded="true" />
-                <element signature="e#8580#8581#0" expanded="true" />
-                <element signature="e#12467#12705#0" expanded="true" />
-                <element signature="e#12704#12705#0" expanded="true" />
-                <element signature="e#20286#20287#0" expanded="true" />
-                <element signature="e#20317#20318#0" expanded="true" />
-                <element signature="e#35332#35346#0" expanded="true" />
-                <element signature="e#35489#35504#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ShowApplicationActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/ShowApplicationActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.962963">
-              <caret line="223" column="17" selection-start-line="223" selection-start-column="17" selection-end-line="223" selection-end-column="17" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -178,15 +114,16 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BasicWebViewClient.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="BasicWebViewClient.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.8704104">
-              <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+            <state vertical-scroll-proportion="-13.259259">
+              <caret line="100" column="40" selection-start-line="100" selection-start-column="40" selection-end-line="100" selection-end-column="40" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#2909#3151#0" expanded="true" />
                 <element signature="e#3150#3151#0" expanded="true" />
+                <element signature="e#3682#3929#0" expanded="true" />
                 <element signature="e#3928#3929#0" expanded="true" />
                 <element signature="e#4023#4311#0" expanded="true" />
                 <element signature="e#4310#4311#0" expanded="true" />
@@ -199,11 +136,71 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BroadcastWebViewActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java">
+      <file leaf-file-name="SendEmergencyCallTask.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="54" column="9" selection-start-line="54" selection-start-column="9" selection-end-line="54" selection-end-column="9" />
+              <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-13.2">
+              <caret line="37" column="31" selection-start-line="37" selection-start-column="31" selection-end-line="37" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.09677419">
+              <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BaseApiResult.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/BaseApiResult.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="14" column="17" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GsonRequest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="85" column="3" selection-start-line="85" selection-start-column="3" selection-end-line="85" selection-end-column="3" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PushService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="115" column="4" selection-start-line="115" selection-start-column="4" selection-end-line="115" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GetPushInterfaceTask.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/GetPushInterfaceTask.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -6144,8 +6141,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/vbroadlistener/src/main/res/layout/dialogfragment_progress.xml" />
-        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/OnBootReceiver.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastPushReceiver.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/AndroidManifest.xml" />
@@ -6185,8 +6180,6 @@
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/RadioChannelInfo.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/widget/WeatherView.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/layout/fragment_text_broadcast.xml" />
-        <option value="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastWebViewActivity.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/RegisterWebViewClient.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/layout/weather_view.xml" />
@@ -6195,6 +6188,10 @@
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java" />
         <option value="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/EmergencyCallTask.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
       </list>
     </option>
   </component>
@@ -8099,7 +8096,7 @@
       <recent name="org.basdroid.volley" />
     </key>
   </component>
-  <component name="RunManager" selected="Android Application.vbroadlistener">
+  <component name="RunManager" selected="Android Application.launcher">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -8355,18 +8352,18 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298307" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32947975" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.48251748" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.482" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.482" sideWeight="0.4979568" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2130031" sideWeight="0.4858757" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3226773" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.322" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30712074" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25497752" sideWeight="0.5074946" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.57342654" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.573" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -8449,33 +8446,17 @@
           <option name="timeStamp" value="97" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java</url>
-          <line>336</line>
+          <url>file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java</url>
+          <line>77</line>
           <properties />
-          <option name="timeStamp" value="100" />
+          <option name="timeStamp" value="102" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="101" />
+      <option name="time" value="103" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnActivityInteractionListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="13" column="19" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnRadioFragmentInteractionListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="22" column="17" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnRadioActivityInteractionListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -8683,14 +8664,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="91" column="17" selection-start-line="91" selection-start-column="17" selection-end-line="91" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushThread.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -8768,14 +8741,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/GetPushInterfaceTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="98" column="46" selection-start-line="98" selection-start-column="46" selection-end-line="98" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/RegisterWebViewClient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -8806,38 +8771,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.64">
-          <caret line="37" column="51" selection-start-line="37" selection-start-column="51" selection-end-line="37" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.4">
-          <caret line="20" column="25" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="54" column="9" selection-start-line="54" selection-start-column="9" selection-end-line="54" selection-end-column="9" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.962963">
-          <caret line="409" column="0" selection-start-line="408" selection-start-column="0" selection-end-line="409" selection-end-column="0" />
-          <folding>
-            <element signature="e#12886#12887#0" expanded="true" />
-            <element signature="e#12917#12918#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -8902,12 +8840,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8704104">
-          <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+        <state vertical-scroll-proportion="-13.259259">
+          <caret line="100" column="40" selection-start-line="100" selection-start-column="40" selection-end-line="100" selection-end-column="40" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2909#3151#0" expanded="true" />
             <element signature="e#3150#3151#0" expanded="true" />
+            <element signature="e#3682#3929#0" expanded="true" />
             <element signature="e#3928#3929#0" expanded="true" />
             <element signature="e#4023#4311#0" expanded="true" />
             <element signature="e#4310#4311#0" expanded="true" />
@@ -8916,6 +8855,73 @@
             <element signature="docComment;method#toast#0;class#BasicWebViewClient#0" expanded="true" />
             <element signature="docComment;method#closeWebApplication#0;class#BasicWebViewClient#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="115" column="4" selection-start-line="115" selection-start-column="4" selection-end-line="115" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/GetPushInterfaceTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.259259">
+          <caret line="339" column="30" selection-start-line="339" selection-start-column="30" selection-end-line="339" selection-end-column="30" />
+          <folding>
+            <element signature="e#12886#12887#0" expanded="true" />
+            <element signature="e#12917#12918#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/BaseApiResult.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="17" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="85" column="3" selection-start-line="85" selection-start-column="3" selection-end-line="85" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-13.2">
+          <caret line="37" column="31" selection-start-line="37" selection-start-column="31" selection-end-line="37" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09677419">
+          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
