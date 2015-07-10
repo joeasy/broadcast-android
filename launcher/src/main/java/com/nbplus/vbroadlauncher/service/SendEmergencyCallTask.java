@@ -35,8 +35,8 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
         String url = builder.toString();
 
         String strRequestBody = String.format("{\"DEVICE_ID\" : \"%s\"}", LauncherSettings.getInstance(mContext).getDeviceID());
-        int retryCount = 0;
-        while (retryCount < 3) {        // retry 3 times
+//        int retryCount = 0;
+//        while (retryCount < 3) {        // retry 3 times
             RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
 
             GsonRequest request = new GsonRequest(Request.Method.POST, url, strRequestBody, BaseApiResult.class, future, future);
@@ -44,7 +44,7 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
 
             try {
                 response = future.get(); // this will block (forever)
-                break;
+//                break;
             } catch (InterruptedException e) {
                 // exception handling
                 e.printStackTrace();
@@ -52,8 +52,8 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
                 // exception handling
                 e.printStackTrace();
             }
-            retryCount++;
-        }
+//            retryCount++;
+//        }
         return response;
     }
 

@@ -102,8 +102,8 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
         Gson gson = new GsonBuilder().create();
         String strRequestBody = gson.toJson(requestBody, new TypeToken<GetPushInterfaceRequestBody>(){}.getType());
 
-        int retryCount = 0;
-        while (retryCount < 3) {        // retry 3 times
+//        int retryCount = 0;
+//        while (retryCount < 3) {        // retry 3 times
             RequestFuture<PushInterfaceData> future = RequestFuture.newFuture();
 
             GsonRequest request = new GsonRequest(Request.Method.POST, url, strRequestBody, PushInterfaceData.class, future, future);
@@ -112,7 +112,7 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
             try {
                 response = future.get(); // this will block (forever)
                 Thread.sleep(1000);
-                break;
+//                break;
             } catch (InterruptedException e) {
                 // exception handling
                 e.printStackTrace();
@@ -120,8 +120,8 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
                 // exception handling
                 e.printStackTrace();
             }
-            retryCount++;
-        }
+//            retryCount++;
+//        }
         return response;
     }
 

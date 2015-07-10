@@ -32,8 +32,8 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
         builder.appendQueryParameter("DEVICE_ID", LauncherSettings.getInstance(mContext).getDeviceID());
         String url = builder.toString();
 
-        int retryCount = 0;
-        while (retryCount < 3) {        // retry 3 times
+//        int retryCount = 0;
+//        while (retryCount < 3) {        // retry 3 times
             RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
 
             GsonRequest request = new GsonRequest(Request.Method.GET, url, null, RadioChannelInfo.class, future, future);
@@ -42,7 +42,7 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
             try {
                 response = future.get(); // this will block (forever)
                 Thread.sleep(1000);
-                break;
+//                break;
             } catch (InterruptedException e) {
                 // exception handling
                 e.printStackTrace();
@@ -50,9 +50,8 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
                 // exception handling
                 e.printStackTrace();
             }
-            retryCount++;
-            continue;
-        }
+//            retryCount++;
+//        }
         return (BaseApiResult)response;
     }
 
