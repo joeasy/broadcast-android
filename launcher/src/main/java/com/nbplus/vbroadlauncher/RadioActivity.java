@@ -2,6 +2,7 @@ package com.nbplus.vbroadlauncher;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
@@ -13,6 +14,7 @@ import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -101,15 +103,40 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
             case Constants.HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK :
                 RadioChannelInfo data = (RadioChannelInfo)msg.obj;
 
-                if (Constants.RESULT_OK.equals(data.getResultCode())) {
+                dismissProgressDialog();
+                if (data != null && Constants.RESULT_OK.equals(data.getResultCode())) {
                     mRadioChannelItems = data.getRadioChannelList();
                     if (mRadioChannelItems == null) {
                         mRadioChannelItems = new ArrayList<>();
                     }
+                } else {
+                    if (mRadioChannelItems == null) {
+                        mRadioChannelItems = new ArrayList<>();
+                    }
+
+                    if (data == null) {
+                        data = new RadioChannelInfo();
+                        data.setResultMessage(getString(R.string.server_connection_error));
+                    }
+
+                    Intent i = new Intent(this, MusicService.class);
+                    i.setAction(MusicService.ACTION_STOP);
+                    i.putExtra(MusicService.EXTRA_MUSIC_FORCE_STOP, true);
+                    startService(i);
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                    alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            //finish();
+                        }
+                    });
+                    alert.setMessage(data.getResultMessage());
+                    alert.show();
                 }
 
                 setupRadioChannelPager();
-                dismissProgressDialog();
                 break;
             case Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT :
                 Intent i = new Intent(this, MusicService.class);
@@ -233,7 +260,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     }
 
     private void setupRadioChannelPager() {
-        if (mRadioChannelItems.size() > 0) {
+        if (mRadioChannelItems.size() >= 0) {
             ArrayList<RadioGridFragment> viewPagerFragments = new ArrayList<>();
 
             int pages = mRadioChannelItems.size() / Constants.RADIO_CHANNEL_GRIDVIEW_SIZE;
@@ -243,6 +270,10 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
                 pages++;
             }
 
+            if (pages == 0) {
+                pages = 1;
+            }
+
             // create fragment
             for (int i = 0; i < pages; i++) {
                 int start = i * Constants.RADIO_CHANNEL_GRIDVIEW_SIZE;
@@ -250,7 +281,11 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
                 if (end > mRadioChannelItems.size()) {
                     end = mRadioChannelItems.size();
                 }
-                ArrayList<RadioChannelInfo.RadioChannel> subList = new ArrayList<>(mRadioChannelItems.subList(start, end));
+
+                ArrayList<RadioChannelInfo.RadioChannel> subList = new ArrayList<>();
+                if (end > 0) {
+                    subList = new ArrayList<>(mRadioChannelItems.subList(start, end));
+                }
 
                 viewPagerFragments.add(RadioGridFragment.newInstance(i, subList));
             }

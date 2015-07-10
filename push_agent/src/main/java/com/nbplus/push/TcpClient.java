@@ -388,8 +388,13 @@ public class TcpClient {
                             if (bodyLen > 0) {
                                 messageBytes = new byte[bodyLen];
                                 mDataIn.read(messageBytes, 0, bodyLen);
-
-                                mInterfaceData.keepAliveSeconds = new String(messageBytes);
+                                int i;
+                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
+                                if (i == 0) {
+                                    mInterfaceData.keepAliveSeconds = "30";     // defaults
+                                } else {
+                                    mInterfaceData.keepAliveSeconds = new String(messageBytes, 0, i, "utf-8");
+                                }
                                 setKeepAliveHandler();
                             }
                             sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_CHANGE_RESPONSE, msgId, -1));
@@ -464,7 +469,8 @@ public class TcpClient {
                             }
 
                             sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE, receivedData.getMessageId(), ((PushMessageData) receivedData).getCorrelator()));
-                            if (receivedData != null && mMessageListener != null) {
+
+                            if (receivedData != null && !StringUtils.isEmptyString(((PushMessageData) receivedData).getPayload()) && mMessageListener != null) {
                                 //call the method messageReceived from MyActivity class
                                 mMessageListener.messageReceived(receivedData);
                             }

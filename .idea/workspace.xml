@@ -21,11 +21,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c0603288-8d3a-481e-8f1c-d2f395fd9131" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" afterPath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/data/PushConstants.java" afterPath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/data/PushConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java" afterPath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushThread.java" afterPath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushThread.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java" afterPath="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/layout/fragment_radio_grid.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/layout/fragment_radio_grid.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="vbroadcast.iws" />
@@ -89,99 +91,83 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BasicWebViewClient.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-10.148149">
-              <caret line="245" column="0" selection-start-line="245" selection-start-column="0" selection-end-line="245" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#2909#3151#0" expanded="true" />
-                <element signature="e#3150#3151#0" expanded="true" />
-                <element signature="e#3682#3929#0" expanded="true" />
-                <element signature="e#3928#3929#0" expanded="true" />
-                <element signature="e#4023#4311#0" expanded="true" />
-                <element signature="e#4310#4311#0" expanded="true" />
-                <element signature="e#4447#4448#0" expanded="true" />
-                <element signature="e#4478#4479#0" expanded="true" />
-                <element signature="docComment;method#toast#0;class#BasicWebViewClient#0" expanded="true" />
-                <element signature="docComment;method#closeWebApplication#0;class#BasicWebViewClient#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GetRadioChannelTask.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GetRadioChannelTask.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.93877554">
+              <caret line="596" column="0" selection-start-line="596" selection-start-column="0" selection-end-line="596" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PushThread.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushThread.java">
+      <file leaf-file-name="InstalledApplicationTask.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/InstalledApplicationTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.592592">
-              <caret line="192" column="16" selection-start-line="192" selection-start-column="16" selection-end-line="192" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RadioActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-14.925926">
+              <caret line="289" column="49" selection-start-line="289" selection-start-column="49" selection-end-line="289" selection-end-column="49" />
               <folding>
-                <element signature="e#6768#6769#0" expanded="true" />
-                <element signature="e#6813#6814#0" expanded="true" />
+                <element signature="e#4911#5199#0" expanded="true" />
+                <element signature="e#5198#5199#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PushConstants.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/data/PushConstants.java">
+      <file leaf-file-name="RadioGridFragment.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="35" column="32" selection-start-line="35" selection-start-column="32" selection-end-line="35" selection-end-column="32" />
+              <caret line="81" column="55" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TcpClient.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java">
+      <file leaf-file-name="radio_grid_view.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/radio_grid_view.xml">
+          <provider editor-type-id="android-designer">
+            <state />
+          </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-74.37037">
-              <caret line="274" column="11" selection-start-line="274" selection-start-column="11" selection-end-line="274" selection-end-column="11" />
+            <state vertical-scroll-proportion="-0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PushService.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5399568">
-              <caret line="101" column="21" selection-start-line="101" selection-start-column="21" selection-end-line="101" selection-end-column="21" />
-              <folding>
-                <element signature="e#4751#5113#0" expanded="true" />
-                <element signature="e#5112#5113#0" expanded="true" />
-              </folding>
-            </state>
+      <file leaf-file-name="fragment_radio_grid.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/fragment_radio_grid.xml">
+          <provider editor-type-id="android-designer">
+            <state />
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GetPushInterfaceTask.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/GetPushInterfaceTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="116" column="37" selection-start-line="116" selection-start-column="37" selection-end-line="116" selection-end-column="37" />
+            <state vertical-scroll-proportion="-4.5172415">
+              <caret line="25" column="17" selection-start-line="25" selection-start-column="17" selection-end-line="25" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SendEmergencyCallTask.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java">
+      <file leaf-file-name="weather_view.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/weather_view.xml">
+          <provider editor-type-id="android-designer">
+            <state />
+          </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
+            <state vertical-scroll-proportion="-11.206897">
+              <caret line="35" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -190,8 +176,8 @@
       <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.2">
-              <caret line="37" column="31" selection-start-line="37" selection-start-column="31" selection-end-line="37" selection-end-column="31" />
+            <state vertical-scroll-proportion="-12.6">
+              <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -200,8 +186,18 @@
       <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-10.2">
-              <caret line="19" column="112" selection-start-line="19" selection-start-column="112" selection-end-line="19" selection-end-column="112" />
+            <state vertical-scroll-proportion="-15.6">
+              <caret line="81" column="63" selection-start-line="81" selection-start-column="63" selection-end-line="81" selection-end-column="63" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TcpClient.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-1.5185186">
+              <caret line="455" column="12" selection-start-line="455" selection-start-column="12" selection-end-line="455" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -6142,9 +6138,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/OnBootReceiver.java" />
-        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastPushReceiver.java" />
-        <option value="$PROJECT_DIR$/launcher/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/values/colors.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/layout/activity_home_launcher.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnActivityInteractionListener.java" />
@@ -6158,7 +6151,6 @@
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnLauncherActivityInteractionListener.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnLauncherFragmentInteractionListener.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BaseActivity.java" />
-        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/layout/fragment_audio_broadcast.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/values/dimens.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/values-xhdpi/dimens.xml" />
@@ -6186,13 +6178,17 @@
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/EmergencyCallTask.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" />
-        <option value="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
         <option value="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
         <option value="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushThread.java" />
-        <option value="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java" />
         <option value="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/data/PushConstants.java" />
         <option value="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java" />
+        <option value="$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
+        <option value="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/res/layout/fragment_radio_grid.xml" />
       </list>
     </option>
   </component>
@@ -6210,8 +6206,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="215" />
-    <option name="y" value="23" />
+    <option name="x" value="202" />
+    <option name="y" value="50" />
     <option name="width" value="1657" />
     <option name="height" value="1116" />
   </component>
@@ -8341,7 +8337,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="215" y="23" width="1657" height="1116" extended-state="0" />
+    <frame x="202" y="50" width="1657" height="1116" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32967034" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -8447,101 +8443,17 @@
           <option name="timeStamp" value="97" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java</url>
-          <line>77</line>
+          <url>file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java</url>
+          <line>62</line>
           <properties />
-          <option name="timeStamp" value="102" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java</url>
-          <line>77</line>
-          <properties />
-          <option name="timeStamp" value="103" />
+          <option name="timeStamp" value="104" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="104" />
+      <option name="time" value="105" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnLauncherFragmentInteractionListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/PushPayloadData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33197555">
-          <caret line="46" column="18" selection-start-line="46" selection-start-column="18" selection-end-line="46" selection-end-column="18" />
-          <folding>
-            <element signature="e#1037#1038#0" expanded="false" />
-            <element signature="e#1071#1072#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="29" column="13" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="56" column="28" selection-start-line="56" selection-start-column="28" selection-end-line="56" selection-end-column="28" />
-          <folding>
-            <element signature="e#20358#20359#0" expanded="false" />
-            <element signature="e#20390#20391#0" expanded="false" />
-            <element signature="e#21727#21728#0" expanded="false" />
-            <element signature="e#21771#21772#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BaseActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="190" column="5" selection-start-line="190" selection-start-column="5" selection-end-line="190" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/fragment_launcher.xml">
-      <provider selected="true" editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/fragment_audio_broadcast.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.7586207">
-          <caret line="15" column="29" selection-start-line="15" selection-start-column="29" selection-end-line="15" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-xhdpi/dimens.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="47" column="45" selection-start-line="47" selection-start-column="17" selection-end-line="47" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-w820dp/dimens.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -8743,17 +8655,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/weather_view.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.172414">
-          <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -8769,24 +8670,6 @@
           <folding>
             <element signature="e#4325#4326#0" expanded="true" />
             <element signature="e#4356#4357#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.814815">
-          <caret line="511" column="39" selection-start-line="511" selection-start-column="39" selection-end-line="511" selection-end-column="39" />
-          <folding>
-            <element signature="docComment;field#REQUEST_CHECK_SETTINGS#0;class#HomeLauncherActivity#0" expanded="false" />
-            <element signature="e#7013#8581#0" expanded="false" />
-            <element signature="e#8580#8581#0" expanded="false" />
-            <element signature="e#12467#12705#0" expanded="false" />
-            <element signature="e#12704#12705#0" expanded="false" />
-            <element signature="e#20286#20287#0" expanded="false" />
-            <element signature="e#20317#20318#0" expanded="false" />
-            <element signature="e#35332#35346#0" expanded="false" />
-            <element signature="e#35489#35504#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -8815,8 +8698,8 @@
         <state vertical-scroll-proportion="-5.703704">
           <caret line="60" column="35" selection-start-line="60" selection-start-column="32" selection-end-line="60" selection-end-column="35" />
           <folding>
-            <element signature="e#2017#2018#0" expanded="true" />
-            <element signature="e#2058#2059#0" expanded="true" />
+            <element signature="e#2017#2018#0" expanded="false" />
+            <element signature="e#2058#2059#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -8826,8 +8709,8 @@
         <state vertical-scroll-proportion="-6.259259">
           <caret line="339" column="30" selection-start-line="339" selection-start-column="30" selection-end-line="339" selection-end-column="30" />
           <folding>
-            <element signature="e#12886#12887#0" expanded="true" />
-            <element signature="e#12917#12918#0" expanded="true" />
+            <element signature="e#12886#12887#0" expanded="false" />
+            <element signature="e#12917#12918#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -8840,34 +8723,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="85" column="3" selection-start-line="85" selection-start-column="3" selection-end-line="85" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.2">
-          <caret line="37" column="31" selection-start-line="37" selection-start-column="31" selection-end-line="37" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.2">
-          <caret line="19" column="112" selection-start-line="19" selection-start-column="112" selection-end-line="19" selection-end-column="112" />
           <folding />
         </state>
       </provider>
@@ -8892,22 +8751,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-74.37037">
-          <caret line="274" column="11" selection-start-line="274" selection-start-column="11" selection-end-line="274" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/data/PushConstants.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -8921,8 +8764,8 @@
         <state vertical-scroll-proportion="-9.592592">
           <caret line="192" column="16" selection-start-line="192" selection-start-column="16" selection-end-line="192" selection-end-column="16" />
           <folding>
-            <element signature="e#6768#6769#0" expanded="true" />
-            <element signature="e#6813#6814#0" expanded="true" />
+            <element signature="e#6768#6769#0" expanded="false" />
+            <element signature="e#6813#6814#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -8937,12 +8780,147 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/PushService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5399568">
-          <caret line="101" column="21" selection-start-line="101" selection-start-column="21" selection-end-line="101" selection-end-column="21" />
+        <state vertical-scroll-proportion="-4.5925927">
+          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
           <folding>
-            <element signature="e#4751#5113#0" expanded="true" />
-            <element signature="e#5112#5113#0" expanded="true" />
+            <element signature="e#4751#5113#0" expanded="false" />
+            <element signature="e#5112#5113#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="97" column="13" selection-start-line="97" selection-start-column="13" selection-end-line="97" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BaseActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="181" column="32" selection-start-line="181" selection-start-column="32" selection-end-line="181" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="306" column="0" selection-start-line="296" selection-start-column="0" selection-end-line="306" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/data/PushInterfaceData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6122449">
+          <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/TcpClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.5185186">
+          <caret line="455" column="12" selection-start-line="455" selection-start-column="12" selection-end-line="455" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/InstalledApplicationTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-15.6">
+          <caret line="81" column="63" selection-start-line="81" selection-start-column="63" selection-end-line="81" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.6">
+          <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/activity_radio.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/radio_grid_view.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-14.925926">
+          <caret line="289" column="49" selection-start-line="289" selection-start-column="49" selection-end-line="289" selection-end-column="49" />
+          <folding>
+            <element signature="e#4911#5199#0" expanded="true" />
+            <element signature="e#5198#5199#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="81" column="55" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/weather_view.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-11.206897">
+          <caret line="35" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/fragment_radio_grid.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.5172415">
+          <caret line="25" column="17" selection-start-line="25" selection-start-column="17" selection-end-line="25" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/GetRadioChannelTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.93877554">
+          <caret line="596" column="0" selection-start-line="596" selection-start-column="0" selection-end-line="596" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -88,6 +88,7 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
         }
 
         mAdapter = new RadioGridViewAdapter(getActivity(), mRadioChannelList, this);
+        mGridLayout.setEmptyView(v.findViewById(R.id.empty_list_view));
         mAdapter.setPlayingItems(b);
         mGridLayout.setAdapter(mAdapter);
         mGridLayout.setOnItemClickListener(this);

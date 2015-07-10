@@ -78,4 +78,6 @@
     <string name="title_audio_broadcast">Audio broadcast is playing.</string>
     <string name="toast_tts_error">TTS play error...</string>
 
+    <string name="server_connection_error">Can not connect to server. Check your service</string>
+    <string name="empty_radio_channel_list">There is no available radio channels.</string>
 </resources>
