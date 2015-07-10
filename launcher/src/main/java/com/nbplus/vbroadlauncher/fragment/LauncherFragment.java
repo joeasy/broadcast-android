@@ -147,8 +147,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 break;
 
             case Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
-                Log.d(TAG, "HANDLER_MESSAGE_PUSH_STATUS_CHANGED received !!!");
                 int status = msg.arg1;
+                Log.d(TAG, "HANDLER_MESSAGE_PUSH_STATUS_CHANGED received. status = " + status);
                 if (status == PushConstants.PUSH_STATUS_VALUE_CONNECTED) {
                     mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_on);
                 } else {

@@ -98,7 +98,12 @@ public class PushService extends Service {
                     mPushThread.startPushClientSocket(data);
                 } else {
                     if (mPushThread.getState() == PushThread.State.Connected) {
+                        Log.d(TAG, "Close previous connection !!!. and retry.");
                         mPushThread.releasePushClientSocket(NetworkUtils.isConnected(this));
+                    } else {
+                        Log.d(TAG, "retry HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA!!!. after 1 min..");
+                        mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
+                        mHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
                     }
                 }
                 break;
@@ -192,7 +197,20 @@ public class PushService extends Service {
                         if (mPushThread.getState() == PushThread.State.Connected) {
                             mPushThread.releasePushClientSocket(false);
                         }
+                        Log.d(TAG, "mPushInterfaceServerAddress is (re)setted!!! getPushGatewayInformationFromServer()");
                         getPushGatewayInformationFromServer();
+                    } else {
+                        if (mPushThread.getState() == PushThread.State.IfRetrieving) {
+                            if (mIfTask != null) {
+                                mIfTask.cancel(true);
+                            }
+                            mIfTask = null;
+                        }
+
+                        if (mPushThread.getState() != PushThread.State.Connected) {
+                            Log.d(TAG, "mPushThread.getState() != PushThread.State.Connected!!! getPushGatewayInformationFromServer()");
+                            getPushGatewayInformationFromServer();
+                        }
                     }
                 } else {
                     Log.e(TAG, ">> mPushInterfaceServerAddress is empty !!!");

@@ -127,7 +127,6 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
 
     @Override
     protected void onPostExecute(PushInterfaceData result) {
-
         // sample data
 //        if (result == null || !PushConstants.RESULT_OK.equals(result.resultCode)) {
 //            result = new PushInterfaceData();

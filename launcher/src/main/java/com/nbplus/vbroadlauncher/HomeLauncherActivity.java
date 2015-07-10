@@ -269,7 +269,7 @@ public class HomeLauncherActivity extends BaseActivity
             startActivity(fakeIntent);
         } else {
             Log.d(TAG, "isMyLauncherDefault() == false");
-            resetPreferredLauncherAndOpenChooser();
+            //resetPreferredLauncherAndOpenChooser();
         }
 
         // 앱이 설치후 실행하면.. 런처설정시에 기존액티비티가 살아있는 상태로 새로운 액티비티가 실행된다.
