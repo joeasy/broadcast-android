@@ -225,7 +225,7 @@ public class BasicWebViewClient extends WebViewClient {
             // phone call
             if (!PhoneState.hasPhoneCallAbility(mContext)) {
                 Log.d(TAG, ">> This device has not phone call ability !!!");
-                return false;
+                return true;
             }
 
             mContext.startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse(url)));
@@ -242,13 +242,13 @@ public class BasicWebViewClient extends WebViewClient {
         } else if (url.startsWith("geo:")) {
             Intent searchAddress = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             mContext.startActivity(searchAddress);
-        }
-        else {
+        } else {
             // 새로운 URL로 이동시 현재 웹뷰 안에서 로딩되도록 한다.
             view.loadUrl(url);
             return true;
         }
-        return true;    }
+        return true;
+    }
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {

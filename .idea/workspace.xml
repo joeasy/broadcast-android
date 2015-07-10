@@ -21,10 +21,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c0603288-8d3a-481e-8f1c-d2f395fd9131" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/EmergencyCallTask.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" afterPath="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" afterPath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="vbroadcast.iws" />
@@ -114,11 +111,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BasicWebViewClient.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="BasicWebViewClient.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.259259">
-              <caret line="100" column="40" selection-start-line="100" selection-start-column="40" selection-end-line="100" selection-end-column="40" />
+            <state vertical-scroll-proportion="0.7861771">
+              <caret line="242" column="14" selection-start-line="242" selection-start-column="14" selection-end-line="242" selection-end-column="14" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#2909#3151#0" expanded="true" />
@@ -156,11 +153,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="true">
+      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.09677419">
-              <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+            <state vertical-scroll-proportion="-10.2">
+              <caret line="19" column="112" selection-start-line="19" selection-start-column="112" selection-end-line="19" selection-end-column="112" />
               <folding />
             </state>
           </provider>
@@ -6187,11 +6184,11 @@
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/preference/LauncherSettings.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java" />
-        <option value="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/EmergencyCallTask.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/SendEmergencyCallTask.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml" />
+        <option value="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
       </list>
     </option>
   </component>
@@ -8341,7 +8338,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="215" y="23" width="1657" height="1116" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32967034" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32867134" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -8355,7 +8352,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.482" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.482" sideWeight="0.4979568" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.482" sideWeight="0.4979568" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2130031" sideWeight="0.4858757" order="0" side_tool="false" content_ui="combo" />
@@ -8795,15 +8792,15 @@
         <state vertical-scroll-proportion="-11.814815">
           <caret line="511" column="39" selection-start-line="511" selection-start-column="39" selection-end-line="511" selection-end-column="39" />
           <folding>
-            <element signature="docComment;field#REQUEST_CHECK_SETTINGS#0;class#HomeLauncherActivity#0" expanded="true" />
-            <element signature="e#7013#8581#0" expanded="true" />
-            <element signature="e#8580#8581#0" expanded="true" />
-            <element signature="e#12467#12705#0" expanded="true" />
-            <element signature="e#12704#12705#0" expanded="true" />
-            <element signature="e#20286#20287#0" expanded="true" />
-            <element signature="e#20317#20318#0" expanded="true" />
-            <element signature="e#35332#35346#0" expanded="true" />
-            <element signature="e#35489#35504#0" expanded="true" />
+            <element signature="docComment;field#REQUEST_CHECK_SETTINGS#0;class#HomeLauncherActivity#0" expanded="false" />
+            <element signature="e#7013#8581#0" expanded="false" />
+            <element signature="e#8580#8581#0" expanded="false" />
+            <element signature="e#12467#12705#0" expanded="false" />
+            <element signature="e#12704#12705#0" expanded="false" />
+            <element signature="e#20286#20287#0" expanded="false" />
+            <element signature="e#20317#20318#0" expanded="false" />
+            <element signature="e#35332#35346#0" expanded="false" />
+            <element signature="e#35489#35504#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -8834,26 +8831,6 @@
           <folding>
             <element signature="e#2017#2018#0" expanded="true" />
             <element signature="e#2058#2059#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.259259">
-          <caret line="100" column="40" selection-start-line="100" selection-start-column="40" selection-end-line="100" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2909#3151#0" expanded="true" />
-            <element signature="e#3150#3151#0" expanded="true" />
-            <element signature="e#3682#3929#0" expanded="true" />
-            <element signature="e#3928#3929#0" expanded="true" />
-            <element signature="e#4023#4311#0" expanded="true" />
-            <element signature="e#4310#4311#0" expanded="true" />
-            <element signature="e#4447#4448#0" expanded="true" />
-            <element signature="e#4478#4479#0" expanded="true" />
-            <element signature="docComment;method#toast#0;class#BasicWebViewClient#0" expanded="true" />
-            <element signature="docComment;method#closeWebApplication#0;class#BasicWebViewClient#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -8919,9 +8896,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/res/values-ko/strings.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.09677419">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+        <state vertical-scroll-proportion="-10.2">
+          <caret line="19" column="112" selection-start-line="19" selection-start-column="112" selection-end-line="19" selection-end-column="112" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7861771">
+          <caret line="242" column="14" selection-start-line="242" selection-start-column="14" selection-end-line="242" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2909#3151#0" expanded="true" />
+            <element signature="e#3150#3151#0" expanded="true" />
+            <element signature="e#3682#3929#0" expanded="true" />
+            <element signature="e#3928#3929#0" expanded="true" />
+            <element signature="e#4023#4311#0" expanded="true" />
+            <element signature="e#4310#4311#0" expanded="true" />
+            <element signature="e#4447#4448#0" expanded="true" />
+            <element signature="e#4478#4479#0" expanded="true" />
+            <element signature="docComment;method#toast#0;class#BasicWebViewClient#0" expanded="true" />
+            <element signature="docComment;method#closeWebApplication#0;class#BasicWebViewClient#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
