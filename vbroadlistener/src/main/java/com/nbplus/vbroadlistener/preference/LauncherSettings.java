@@ -24,6 +24,8 @@ import java.util.Random;
  */
 public class LauncherSettings implements Parcelable {
 
+    // 맥어드레스 기반 40바이트 디바이스 UUID
+    String deviceID;
     // 마을정보
     @SerializedName("vill_code")
     String villageCode;
@@ -83,6 +85,7 @@ public class LauncherSettings implements Parcelable {
         this.prefs = context.getSharedPreferences(VBROADCAST_PREFERENCE_NAME, Context.MODE_PRIVATE);
 
         // load from preferences..
+        this.deviceID = prefs.getString(KEY_VBROADCAST_DEVICE_ID, "");
         this.isCompletedSetup = prefs.getBoolean(KEY_VBROADCAST_IS_COMPLETED_SETUP, false);
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
@@ -102,6 +105,15 @@ public class LauncherSettings implements Parcelable {
         }
 
         this.serverInformation = (VBroadcastServer)getPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, new TypeToken<VBroadcastServer>(){}.getType());
+    }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+        prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
     }
 
     public boolean isCompletedSetup() {
@@ -211,6 +223,7 @@ public class LauncherSettings implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.deviceID);
         dest.writeString(this.villageCode);
         dest.writeString(this.villageName);
         dest.writeByte(isExclusive ? (byte) 1 : (byte) 0);
@@ -221,6 +234,7 @@ public class LauncherSettings implements Parcelable {
     }
 
     private LauncherSettings(Parcel in) {
+        this.deviceID = in.readString();
         this.villageCode = in.readString();
         this.villageName = in.readString();
         this.isExclusive = in.readByte() != 0;

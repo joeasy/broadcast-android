@@ -477,7 +477,6 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, ">> Launcher onResume()");
         Intent intent = new Intent(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -501,12 +500,10 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, ">> Launcher onPause()");
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d(TAG, ">>> mGoogleApiClient connected.. Update location");
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
@@ -514,7 +511,7 @@ public class HomeLauncherActivity extends BaseActivity
         // Once connected with google api, get the location
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location == null) {
-            Log.d(TAG, "Connected: Can't get location !!!");
+            Log.d(TAG, "Connected: But can't get location !!!");
         } else {
             onLocationChanged(location);
         }

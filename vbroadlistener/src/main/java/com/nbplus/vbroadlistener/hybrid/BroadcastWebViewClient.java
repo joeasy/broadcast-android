@@ -20,6 +20,7 @@ import com.nbplus.vbroadlistener.data.VBroadcastServer;
 import com.nbplus.vbroadlistener.gcm.RegistrationIntentService;
 import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
+import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -43,7 +44,12 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
     @Override
     @JavascriptInterface
     public String getDeviceId() {
-        return null;
+        if (StringUtils.isEmptyString(LauncherSettings.getInstance(mContext).getDeviceID())) {
+            String deviceID = DeviceUtils.getDeviceIdByMacAddress(mContext);
+            LauncherSettings.getInstance(mContext).setDeviceID(deviceID);
+        }
+
+        return LauncherSettings.getInstance(mContext).getDeviceID();
     }
 
     @JavascriptInterface
