@@ -229,7 +229,6 @@ public class BasicWebViewClient extends WebViewClient {
             }
 
             mContext.startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse(url)));
-            return true;
         } else if (url.startsWith("mailto:")) {
             url = url.replaceFirst("mailto:", "");
             url = url.trim();
@@ -238,14 +237,12 @@ public class BasicWebViewClient extends WebViewClient {
             i.setType("plain/text").putExtra(Intent.EXTRA_EMAIL, new String[]{url});
 
             mContext.startActivity(i);
-            return true;
         } else if (url.startsWith("geo:")) {
             Intent searchAddress = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             mContext.startActivity(searchAddress);
         } else {
             // 새로운 URL로 이동시 현재 웹뷰 안에서 로딩되도록 한다.
             view.loadUrl(url);
-            return true;
         }
         return true;
     }

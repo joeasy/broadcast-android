@@ -56,8 +56,6 @@ public class PushService extends Service {
 
     Context mContext = null;
 
-    private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
-    private static final int HANDLER_MESSAGE_RETRY_MESSAGE = 0x02;
     private PushServiceHandler mHandler = new PushServiceHandler(this);
     // 핸들러 객체 만들기
     private static class PushServiceHandler extends Handler {
@@ -81,9 +79,9 @@ public class PushService extends Service {
             return;
         }
         switch (msg.what) {
-            case HANDLER_MESSAGE_RETRY_MESSAGE :
+            case PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE :
+                Log.d(TAG, "HANDLER_MESSAGE_RETRY_MESSAGE received !!!");
                 if (NetworkUtils.isConnected(this)) {
-                    Log.d(TAG, "HANDLER_MESSAGE_RETRY_MESSAGE received !!!");
                     getPushGatewayInformationFromServer();
                 }
                 break;
@@ -95,6 +93,7 @@ public class PushService extends Service {
                 mIfTask = null;
 
                 PushInterfaceData data = (PushInterfaceData)msg.obj;
+                Log.d(TAG, "result = " + ((data != null) ? data.resultCode : null) + ", data = " + data);
                 if (data != null && PushConstants.RESULT_OK.equals(data.resultCode)) {
                     mPushThread.startPushClientSocket(data);
                 } else {
@@ -102,9 +101,8 @@ public class PushService extends Service {
                         mPushThread.releasePushClientSocket(NetworkUtils.isConnected(this));
                     }
                 }
-                msg = null;
                 break;
-            case HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
+            case PushConstants.HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
 
                 if (NetworkUtils.isConnected(this)) {
@@ -117,7 +115,7 @@ public class PushService extends Service {
                     if (mPushThread.getState() != PushThread.State.Stopped) {
                         mPushThread.releasePushClientSocket(false);
                     }
-                    mHandler.removeMessages(HANDLER_MESSAGE_RETRY_MESSAGE);
+                    mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                 }
                 break;
         }
@@ -129,7 +127,7 @@ public class PushService extends Service {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
+                mHandler.sendEmptyMessage(PushConstants.HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
             }
         }
 

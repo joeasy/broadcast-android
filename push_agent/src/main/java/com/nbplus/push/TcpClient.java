@@ -42,9 +42,9 @@ public class TcpClient {
     PushInterfaceData mInterfaceData;
     Context mContext;
 
-    private static final int HANDLER_MESSAGE_CHECK_KEEP_ALIVE = 01;
-    private static final int HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION = 02;
-    private static final int HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE = 03;
+    private static final int HANDLER_MESSAGE_CHECK_KEEP_ALIVE = 1;
+    private static final int HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION = 2;
+    private static final int HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE = 3;
     private TcpClientHandler mHandler;
     int mKeepAliveCheckSeconds = 0;
 
@@ -270,6 +270,8 @@ public class TcpClient {
 
         if (mHandler != null) {
             mHandler.removeMessages(HANDLER_MESSAGE_CHECK_KEEP_ALIVE);
+            mHandler.removeMessages(HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION);
+            mHandler.removeMessages(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE);
             mHandler = null;
         }
         mInterfaceData = null;

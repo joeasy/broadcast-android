@@ -176,7 +176,6 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
             mTcpClient = new TcpClient(mContext, mIfaceData, this);
             mTcpClient.run();
         } finally {
-            Log.d(TAG, ">> TCP client thread is ended..");
             releasePushClientSocket();
         }
     }
@@ -202,6 +201,8 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
         }
 
         if (retry && NetworkUtils.isConnected(mContext)) {
+            Log.d(TAG, "sendEmptyMessageDelayed PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE");
+            mServiceHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
             mServiceHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
         }
     }

@@ -39,5 +39,6 @@ public class PushConstants {
     public static final int HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA = 1001;
     public static final int HANDLER_MESSAGE_RETRY_MESSAGE = 1002;
     public static final int HANDLER_MESSAGE_SEND_PUSH_STATUS = 1003;
+    public static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 1004;
     public static final int HANDLER_MESSAGE_RECEIVE_PUSH_DATA = 10001;
 }
