@@ -214,6 +214,13 @@ public class TcpClient {
             message = null;
             return;
         }
+
+        // TODO : for interface test
+//        if (/*message[0] == PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST || */message[0] == PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST) {
+//            Log.e(TAG, "Keep alive skip test....");
+//            return;
+//        }
+
         if (mDataOut != null) {
             try {
                 mDataOut.write(message);
@@ -221,7 +228,7 @@ public class TcpClient {
                 if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST) {
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION, 60 * 1000);
                 } else if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST) {
-                    mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE, 10 * 1000);
+                    mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE, 60 * 1000);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -384,7 +391,7 @@ public class TcpClient {
                         case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_CHANGE_REQUEST :
                             Log.d(TAG, "PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_CHANGE_REQUEST received !!");
                             msgId = mDataIn.readInt();
-                            bodyLen = mDataIn.readInt();           // skip body length.
+                            bodyLen = mDataIn.readInt();
                             if (bodyLen > 0) {
                                 messageBytes = new byte[bodyLen];
                                 mDataIn.read(messageBytes, 0, bodyLen);
@@ -455,12 +462,14 @@ public class TcpClient {
                                 ((PushMessageData) receivedData).setAlert("");
                             }
                             // payload
-                            if (receivedData.getBodyLength() > 0) {
-                                messageBytes = new byte[receivedData.getBodyLength()];
+                            // correlator 4byte
+                            int excludePayloadLen = PushBaseData.MAX_REPEAT_KEY_LENGTH + PushBaseData.MAX_ALERT_LENGTH + PushBaseData.MAX_APP_ID_LENGTH + 4;
+                            if (receivedData.getBodyLength() - excludePayloadLen > 0) {
+                                messageBytes = new byte[receivedData.getBodyLength() - excludePayloadLen];
                                 Arrays.fill(messageBytes, (byte) 0);
-                                readBytes = mDataIn.read(messageBytes, 0, receivedData.getBodyLength());
+                                readBytes = mDataIn.read(messageBytes, 0, receivedData.getBodyLength() - excludePayloadLen);
                                 if (readBytes > 0) {
-                                    ((PushMessageData) receivedData).setPayload(new String(messageBytes, 0, receivedData.getBodyLength(), "utf-8"));
+                                    ((PushMessageData) receivedData).setPayload(new String(messageBytes, 0, receivedData.getBodyLength() - excludePayloadLen, "utf-8"));
                                 } else {
                                     ((PushMessageData) receivedData).setPayload("");
                                 }
@@ -478,7 +487,7 @@ public class TcpClient {
                         case PushConstants.PUSH_MESSAGE_TYPE_APP_UPDATE_REQUEST :
                             Log.d(TAG, "PushConstants.PUSH_MESSAGE_TYPE_APP_UPDATE_REQUEST received !! do nothing.. ");
                             msgId = mDataIn.readInt();
-                            mDataIn.skipBytes(104);
+                            mDataIn.skipBytes(204);
                             sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE, msgId, -1));
                             break;
                         case PushConstants.PUSH_MESSAGE_TYPE_PUSH_AGENT_UPDATE_REQUEST :

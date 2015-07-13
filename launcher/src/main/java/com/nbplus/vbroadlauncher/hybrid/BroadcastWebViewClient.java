@@ -369,9 +369,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     // progress bar
     private void showProgressDialog() {
-        dismissProgressDialog();
-        mProgressDialogFragment = ProgressDialogFragment.newInstance();
-        mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        try {
+            dismissProgressDialog();
+            mProgressDialogFragment = ProgressDialogFragment.newInstance();
+            mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     private void dismissProgressDialog() {
         try {
