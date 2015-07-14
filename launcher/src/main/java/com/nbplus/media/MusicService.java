@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.RadioActivity;
+import com.nbplus.vbroadlauncher.data.Constants;
 
 import org.basdroid.common.StringUtils;
 
@@ -128,11 +129,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     // Wifi lock that we hold when streaming files from the internet, in order to prevent the
     // device from shutting off the Wifi radio
     WifiLock mWifiLock;
-
-    // The ID we use for the notification (the onscreen alert that appears at the notification
-    // area at the top of the screen as an icon -- and as text as well if the user expands the
-    // notification area).
-    final int NOTIFICATION_ID = 2001;
 
     // Our instance of our MusicRetriever, which handles scanning for media and
     // providing titles and URIs as we need.
@@ -362,7 +358,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         // stop being a foreground service
         stopForeground(true);
         if (mNotificationManager != null) {
-            mNotificationManager.cancel(NOTIFICATION_ID);
+            mNotificationManager.cancel(Constants.RADIO_NOTIFICATION_ID);
         }
         // stop and release the Media Player, if it's available
         if (releaseMediaPlayer && mPlayer != null) {
@@ -643,7 +639,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 //        mNotification.setLatestEventInfo(getApplicationContext(), "MusicPlayer", text, pi);
 
         setRemoteViews();
-        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+        mNotificationManager.notify(Constants.RADIO_NOTIFICATION_ID, mNotification);
     }
 
     /**
@@ -668,7 +664,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             mNotification.flags |= Notification.FLAG_NO_CLEAR;
             mNotification.defaults |= Notification.DEFAULT_LIGHTS;
 
-            startForeground(NOTIFICATION_ID, mNotification);
+            startForeground(Constants.RADIO_NOTIFICATION_ID, mNotification);
 
         } else if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
             mBuilder.setSmallIcon(R.drawable.ic_launcher)
@@ -681,7 +677,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             mNotification = mBuilder.build();
             mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
             mNotification.defaults |= Notification.DEFAULT_LIGHTS;
-            startForeground(NOTIFICATION_ID, mNotification);
+            startForeground(Constants.RADIO_NOTIFICATION_ID, mNotification);
         }
     }
 

@@ -121,6 +121,10 @@ public class BroadcastWebViewActivity extends BaseActivity {
         WebView webView = (WebView)findViewById(R.id.webview);
         mWebViewClient = new BroadcastWebViewClient(this, webView);
 
+        Intent intent = new Intent(this, RegistrationIntentService.class);
+        intent.setAction(Constants.REGISTER_GCM);
+        this.startService(intent);
+
         String url = null;
         VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
         if (serverInfo != null && serverInfo.getDocServer() != null) {

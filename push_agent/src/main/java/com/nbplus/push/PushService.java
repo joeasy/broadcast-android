@@ -180,7 +180,7 @@ public class PushService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = (intent != null) ? intent.getAction() : null;
         Log.d(TAG, "onStartCommand in service.. action = " + action);
-        if (action != null && action instanceof String) {
+        if (action != null) {
             if (action.equals(PushConstants.ACTION_START_SERVICE)) {
                 String pushInterfaceServerAddress = intent.getStringExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS);
                 if (!StringUtils.isEmptyString(pushInterfaceServerAddress)) {
@@ -218,12 +218,6 @@ public class PushService extends Service {
             } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
                 mPushThread.sendSatusChangedBroadcastMessage();
             }
-//            else if (action.equals(ACTION_PAUSE)) processPauseRequest();
-//            else if (action.equals(ACTION_SKIP)) processSkipRequest();
-//            else if (action.equals(ACTION_STOP)) processStopRequest(intent);
-//            else if (action.equals(ACTION_REWIND)) processRewindRequest();
-//            else if (action.equals(ACTION_URL)) processAddRequest(intent);
-//            else if (action.equals(ACTION_PLAYING_STATUS)) broadcastPlayingStaus();
         } else {
 
         }

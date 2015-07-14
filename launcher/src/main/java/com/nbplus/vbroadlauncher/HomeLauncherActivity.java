@@ -47,12 +47,8 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnLauncherFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.data.PushPayloadData;
-import com.nbplus.vbroadlauncher.data.ShowAllLaunchAppsInfo;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.nbplus.vbroadlauncher.data.PreferredLocation;
 
 import com.nbplus.vbroadlauncher.fragment.LauncherBroadcastFragment;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
@@ -73,8 +69,7 @@ import io.vov.vitamio.LibsChecker;
 
 public class HomeLauncherActivity extends BaseActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, ResultCallback<LocationSettingsResult>,
-        OnLauncherFragmentInteractionListener {
+        LocationListener, ResultCallback<LocationSettingsResult> {
 
     // LogCat tag
     private static final String TAG = HomeLauncherActivity.class.getSimpleName();
@@ -164,19 +159,19 @@ public class HomeLauncherActivity extends BaseActivity
                     finish();
                 }
                 break;
-            case Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
-            case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
-                setPushServiceStatus(msg.arg1);
-                boolean isProcessed = false;
-                if (mActivityInteractionListener != null) {
-                    for (OnActivityInteractionListener listener : mActivityInteractionListener) {
-                        isProcessed = listener.onPushReceived(msg);
-                    }
-                }
-                if (isProcessed == false) {
-                    Log.e(TAG, ">> Why... 이런경우에는 어떻게 해야 하는거냐????");
-                }
-                break;
+//            case Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
+//            case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
+//                setPushServiceStatus(msg.arg1);
+//                boolean isProcessed = false;
+//                if (mActivityInteractionListener != null) {
+//                    for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+//                        isProcessed = listener.onPushReceived(msg);
+//                    }
+//                }
+//                if (isProcessed == false) {
+//                    Log.e(TAG, ">> Why... 이런경우에는 어떻게 해야 하는거냐????");
+//                }
+//                break;
         }
     }
 
@@ -194,18 +189,18 @@ public class HomeLauncherActivity extends BaseActivity
                 msg.what = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING;
                 msg.obj = intent.getLongExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, 0);
                 mHandler.sendMessage(msg);
-            } else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
+            }/* else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
                 Message msg = new Message();
-                msg.what = Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
+                msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
                 mHandler.sendMessage(msg);
             } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
                 Message msg = new Message();
-                msg.what = Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
+                msg.what = HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
                 msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
                 mHandler.sendMessage(msg);
-            }
+            } */
         }
     };
 
@@ -278,10 +273,11 @@ public class HomeLauncherActivity extends BaseActivity
         filter.addAction(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
-        filter = new IntentFilter();
-        filter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
-        filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
-        registerReceiver(mBroadcastReceiver, filter);
+        // 프래그먼트가 직접 처리하자.
+//        filter = new IntentFilter();
+//        filter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
+//        filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
+//        registerReceiver(mBroadcastReceiver, filter);
 
         Intent intent = new Intent(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
         mActivityRunningTime = System.currentTimeMillis();
@@ -493,8 +489,9 @@ public class HomeLauncherActivity extends BaseActivity
             mText2Speech.shutdown();
         }
         mText2Speech = null;
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-        unregisterReceiver(mBroadcastReceiver);
+        //unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -805,62 +802,17 @@ public class HomeLauncherActivity extends BaseActivity
 
         String action = intent.getAction();
         Log.d(TAG, "onNewIntent.. action = " + action);
-        if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action) || PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
-            setPushServiceStatus(intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
-
-            if (mActivityInteractionListener != null) {
-                for (OnActivityInteractionListener listener : mActivityInteractionListener) {
-                    listener.onPushReceived(intent);
-                }
-            }
-        }
+//        if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action) || PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
+    //            setPushServiceStatus(intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+//
+//            if (mActivityInteractionListener != null) {
+//                for (OnActivityInteractionListener listener : mActivityInteractionListener) {
+//                    listener.onPushReceived(intent);
+//                }
+//            }
+//        }
     }
     */
-
-    /**
-     * 실시간방송 재생 - 사용자가 취소할 수 없도록...
-     * @param data
-     */
-    @Override
-    public void playBroadcast(PushPayloadData data) {
-        if (data == null) {
-            return;
-        }
-        Log.d(TAG, "playBroadcast() type = " + data.getServiceType());
-
-        // fake home key event.
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                | Intent.FLAG_ACTIVITY_FORWARD_RESULT
-                | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
-                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        startActivity(intent);
-
-        // show fragment.
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        if (mBroadcastFramelayout != null) {
-            mBroadcastFramelayout.setVisibility(View.VISIBLE);
-        }
-        LauncherBroadcastFragment launcherBroadcastFragment = LauncherBroadcastFragment.newInstance(data);
-        fragmentTransaction.replace(R.id.realtimeBroadcastFragment, launcherBroadcastFragment);
-        fragmentTransaction.commit();
-    }
-
-    @Override
-    public void popStackBroadcastFragment() {
-        runOnUiThread(new Runnable(){
-            @Override
-            public void run() {
-                if (mBroadcastFramelayout != null) {
-                    mBroadcastFramelayout.setVisibility(View.GONE);
-                }
-            }
-        });
-    }
 
     protected boolean isMyLauncherDefault() {
         final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
