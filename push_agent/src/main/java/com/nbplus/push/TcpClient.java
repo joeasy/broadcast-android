@@ -215,12 +215,6 @@ public class TcpClient {
             return;
         }
 
-        // TODO : for interface test
-//        if (/*message[0] == PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST || */message[0] == PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST) {
-//            Log.e(TAG, "Keep alive skip test....");
-//            return;
-//        }
-
         if (mDataOut != null) {
             try {
                 mDataOut.write(message);
@@ -328,16 +322,8 @@ public class TcpClient {
                 //receives the message which the server sends back
                 mDataIn = new DataInputStream(mPushSocket.getInputStream());
                 byte[] messageBytes;
-                // send login name
-                //sendMessage(Constants.LOGIN_NAME + PreferencesManager.getInstance().getUserName());
-                //sendMessage("Hi");
-                //in this while the client listens for the messages sent by the server
 
                 mHandler = new TcpClientHandler(Looper.getMainLooper(), this);
-//                if (mMessageListener != null) {
-//                    //call the method messageReceived from MyActivity class
-//                    mMessageListener.onConnected();
-//                }
                 sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_CONNECTION_REQUEST));
 
                 while (mRun) {

@@ -103,8 +103,6 @@ public class RegisterWebViewClient extends BasicWebViewClient {
                         }
                     }
 
-//                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
-//                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
                     LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 

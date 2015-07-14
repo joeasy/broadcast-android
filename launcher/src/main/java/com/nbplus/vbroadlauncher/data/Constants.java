@@ -108,4 +108,7 @@ public class Constants {
     public static final String ACTION_SET_VILLAGE_NAME = "com.nbplus.vbroadlauncher.intent.action.SET_VILLAGE_NAME";
     public static final String EXTRA_BROADCAST_PAYLOAD_DATA = "EXTRA_BROADCAST_PAYLOAD_DATA";
 
+    // push notification ID
+    public static final int PUSH_NOTIFICATION_ALARM_ID = 1001;
+    public static final int RADIO_NOTIFICATION_ID = 2001;
 }

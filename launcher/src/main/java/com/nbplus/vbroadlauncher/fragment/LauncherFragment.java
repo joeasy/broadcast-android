@@ -51,7 +51,6 @@ import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnLauncherFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PushPayloadData;
@@ -97,11 +96,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private GridLayout mMainShortcutGridLayout;
     private GridLayout mShorcutGridLayout;
 
-    private OnLauncherFragmentInteractionListener mOnLauncherFragmentInteractionListener = null;
-
     private LauncherFragmentHandler mHandler;
 
-    private static final int PUSH_NOTIFICATION_ID = 1001;
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
     private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
     private static final int HANDLER_MESSAGE_SET_VILLAGE_NAME = 0x03;
@@ -156,74 +152,21 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
                 break;
             case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
-                String data = (String)msg.obj;
-                Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + data);
-
-                if (data == null || StringUtils.isEmptyString(data)) {
+                PushPayloadData payloadData = (PushPayloadData)msg.obj;
+                if (payloadData == null) {
                     Log.d(TAG, "empty push message string !!");
                     return;
                 }
 
-                PushPayloadData payloadData = null;
-                try {
-                    Gson gson = new GsonBuilder().create();
-                    payloadData = gson.fromJson(data, new TypeToken<PushPayloadData>(){}.getType());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (payloadData != null) {
-                    String type = payloadData.getServiceType();
-                    switch (type) {
-                        // 방송알림
-                        case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
-                        case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
-                        case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
-                            boolean isOutdoor = LauncherSettings.getInstance(getActivity()).isOutdoorMode();
-                            if (isOutdoor) {        // 외출모드에서는 재생하지 않음.
-                                View btnShortcut = null;
-                                for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
-                                    ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
-                                    String[] pushType = shortcut.getPushType();
-                                    if (pushType != null && pushType.length > 0 && Arrays.asList(pushType).indexOf(type) >= 0) {
-                                        btnShortcut = shortcut.getLauncherButton();
-                                        break;
-                                    }
-                                }
-
-                                // push notification badge 를 보여준다.
-                                if (btnShortcut != null) {
-                                    TextView badgeView = (TextView) btnShortcut.findViewById(R.id.launcher_menu_badge);
-                                    if (badgeView != null) {
-                                        badgeView.setVisibility(View.VISIBLE);
-                                        playNotificationAlarm(R.string.notification_broadcast_push);
-                                    }
-                                }
-                            } else {
-                                ((BaseActivity)getActivity()).acquireCpuWakeLock();
-                                playNotificationAlarm(R.string.notification_broadcast_push);
-
-                                boolean isRealTime = Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(payloadData.getServiceType());
-                                if (isRealTime) {
-                                    if (mOnLauncherFragmentInteractionListener != null) {
-                                        mOnLauncherFragmentInteractionListener.playBroadcast(payloadData);
-                                    }
-                                } else {
-                                    // TODO : 실시간음성이 아닌경우도.... ??
-                                    if (mOnLauncherFragmentInteractionListener != null) {
-                                        mOnLauncherFragmentInteractionListener.playBroadcast(payloadData);
-                                    }
-                                }
-                            }
-
-                            break;
-                        // 긴급호출메시지
-                        case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
-                            break;
-                        // 주민투표
-                        case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
-                        // 공동구매
-                        case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
+                Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + payloadData.getServiceType());
+                String type = payloadData.getServiceType();
+                switch (type) {
+                    // 방송알림
+                    case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
+                    case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
+                    case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
+                        boolean isOutdoor = LauncherSettings.getInstance(getActivity()).isOutdoorMode();
+                        if (isOutdoor) {        // 외출모드에서는 재생하지 않음.
                             View btnShortcut = null;
                             for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
                                 ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
@@ -233,32 +176,43 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                                     break;
                                 }
                             }
-
                             // push notification badge 를 보여준다.
                             if (btnShortcut != null) {
-                                TextView badgeView = (TextView)btnShortcut.findViewById(R.id.launcher_menu_badge);
+                                TextView badgeView = (TextView) btnShortcut.findViewById(R.id.launcher_menu_badge);
                                 if (badgeView != null) {
                                     badgeView.setVisibility(View.VISIBLE);
-                                    int strId = Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL.equals(payloadData.getServiceType())
-                                            ? R.string.notification_inhabitant_push : R.string.notification_cooperative_buying_push;
-                                    playNotificationAlarm(strId);
                                 }
                             }
-                            break;
-                        // IOT DEVICE 제어(스마트홈 서비스)
-                        case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
-                            break;
-                        // IOT DEVICE 제어(스마트홈 서비스)
-                        case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :
-                            break;
-                        // IOT DEVICE 제어(스마트홈 서비스)
-                        case Constants.PUSH_PAYLOAD_TYPE_FIND_PASSWORD :
-                            break;
+                        }
 
-                        default:
-                            Log.d(TAG, "Unknown push payload type !!!");
-                            break;
-                    }
+                        break;
+                    // 긴급호출메시지
+                    case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
+                        break;
+                    // 주민투표
+                    case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
+                    // 공동구매
+                    case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
+                        View btnShortcut = null;
+                        for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
+                            ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
+                            String[] pushType = shortcut.getPushType();
+                            if (pushType != null && pushType.length > 0 && Arrays.asList(pushType).indexOf(type) >= 0) {
+                                btnShortcut = shortcut.getLauncherButton();
+                                break;
+                            }
+                        }
+                        // push notification badge 를 보여준다.
+                        if (btnShortcut != null) {
+                            TextView badgeView = (TextView)btnShortcut.findViewById(R.id.launcher_menu_badge);
+                            if (badgeView != null) {
+                                badgeView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        break;
+                    default:
+                        Log.d(TAG, "Unknown push payload type !!!");
+                        break;
                 }
                 break;
 
@@ -301,18 +255,18 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
             } else if (Constants.ACTION_SET_VILLAGE_NAME.equals(action)) {
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_SET_VILLAGE_NAME);
-            } /* else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
+            } else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
                 Message msg = new Message();
-                msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
+                msg.what = Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
                 mHandler.sendMessage(msg);
             } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
                 Message msg = new Message();
-                msg.what = HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
+                msg.what = Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-                msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+                msg.obj = intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
                 mHandler.sendMessage(msg);
-            } */
+            }
         }
     };
 
@@ -524,15 +478,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         final int MAX_ROW_NUM = 3;
 
         int shortcutNum = shortcutDatas.size() > (columnNum * MAX_ROW_NUM) ? (columnNum * MAX_ROW_NUM) : shortcutDatas.size();
-        // draw shortcut button
-//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_width);
-//        float btnWidthPx = DisplayUtils.pxFromDp(getActivity(), dp);
-//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_height);
-//        float btnHeightPx = DisplayUtils.pxFromDp(getActivity(), dp);
-//
-//        dp = DisplayUtils.getDimension(getActivity(), R.dimen.ic_nav_btn_drawable_padding);
-//        float drawablePadding = DisplayUtils.pxFromDp(getActivity(), dp);
-//
         dp = DisplayUtils.getDimension(getActivity(), R.dimen.launcher_ic_menu_shortcut_font_size);
         float btnFontPx = DisplayUtils.pxFromDp(getActivity(), dp);
 
@@ -549,11 +494,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             }
 
             btnLayout.setBackgroundResource(data.getIconBackResId());
-
-//            GridLayout.LayoutParams lp = (GridLayout.LayoutParams)btnLayout.getLayoutParams();
-//            lp.width = (int)btnWidthPx;
-//            lp.height = (int) btnHeightPx;
-//            btnLayout.setLayoutParams(lp);
 
             TextView label = (TextView)btnLayout.findViewById(R.id.menu_item_label);
             label.setText(data.getName());
@@ -590,17 +530,16 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         try {
             Log.d(TAG, "LauncherFragment onAttach()");
             ((HomeLauncherActivity)getActivity()).registerActivityInteractionListener(this);
-            mOnLauncherFragmentInteractionListener = (OnLauncherFragmentInteractionListener)activity;
 
             // check network status
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-//            intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
-//            intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
 
             intentFilter = new IntentFilter();
             intentFilter.addAction(Constants.ACTION_SET_VILLAGE_NAME);
+            intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
+            intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, intentFilter);
 
             mHandler = new LauncherFragmentHandler(this);
@@ -614,7 +553,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     public void onDetach() {
         super.onDetach();
 
-        mOnLauncherFragmentInteractionListener = null;
         getActivity().unregisterReceiver(mBroadcastReceiver);
         ((HomeLauncherActivity)getActivity()).unRegisterActivityInteractionListener(this);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
@@ -744,9 +682,6 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         ShortcutData data = (ShortcutData) view.getTag();
         VBroadcastServer serverData = LauncherSettings.getInstance(getActivity()).getServerInformation();
 
-        Log.d(TAG, ">>> Clicked = " + data.getName());
-        Log.d(TAG, ">>> Open URL = " + serverData.getDocServer() + data.getPath());
-
         Intent intent;
 
         if (!NetworkUtils.isConnected(getActivity())) {
@@ -842,15 +777,5 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         }
     }
 
-    private void playNotificationAlarm(int textResId) {
-        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
-        builder.setSound(soundUri);
-        notificationManager.notify(PUSH_NOTIFICATION_ID, builder.build());
-
-        Toast.makeText(getActivity(), textResId, Toast.LENGTH_SHORT).show();
-    }
 
 }

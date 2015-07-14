@@ -58,6 +58,8 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
         int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
 
+        mText2Speech.setSpeechRate(0.7f);
+        mText2Speech.setPitch(0.8f);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "messageID");
@@ -78,7 +80,6 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
                     null,
                     "TTS_UTTERANCE_ID");
         }
-        mText2Speech.setSpeechRate(1.3f);
     }
 
     public void stop() {

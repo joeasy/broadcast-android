@@ -8,6 +8,7 @@ import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -181,7 +182,12 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
     public void showProgressDialog() {
         dismissProgressDialog();
         mProgressDialogFragment = ProgressDialogFragment.newInstance();
-        mProgressDialogFragment.show(getSupportFragmentManager(), "progress_dialog");
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(mProgressDialogFragment, "progress_dialog");
+        transaction.commitAllowingStateLoss();
+        // for java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+        //mProgressDialogFragment.show(getSupportFragmentManager(), "progress_dialog");
     }
     public void dismissProgressDialog() {
         if (mProgressDialogFragment != null) {

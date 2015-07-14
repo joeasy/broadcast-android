@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:allowBackup="true"
@@ -110,14 +111,21 @@
                 <data android:scheme="package"  />
             </intent-filter>
         </receiver>
-        <!--<receiver-->
-            <!--android:name=".BroadcastPushReceiver"-->
-            <!--android:enabled="true">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.nbplus.pushservice.intent.action.PUSH_STATUS_CHANGED" />-->
-                <!--<action android:name="com.nbplus.pushservice.intent.action.PUSH_MESSAGE_RECEIVED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver
+            android:name=".BroadcastPushReceiver"
+            android:exported="false"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.nbplus.pushservice.intent.action.PUSH_STATUS_CHANGED" />
+                <action android:name="com.nbplus.pushservice.intent.action.PUSH_MESSAGE_RECEIVED" />
+            </intent-filter>
+        </receiver>
+        <!-- broadcast popup service -->
+        <service android:exported="false" android:name=".service.BroadcastChatHeadService">
+            <intent-filter>
+                <action android:name="com.nbplus.pushservice.intent.action.PUSH_MESSAGE_RECEIVED" />
+            </intent-filter>
+        </service>
 
     </application>
 

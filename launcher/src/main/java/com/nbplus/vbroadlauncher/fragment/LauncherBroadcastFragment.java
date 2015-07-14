@@ -19,7 +19,6 @@ import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
-import com.nbplus.vbroadlauncher.callback.OnLauncherFragmentInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PushPayloadData;
@@ -41,7 +40,6 @@ public class LauncherBroadcastFragment extends Fragment implements TextToSpeechH
     private static final String TAG = LauncherBroadcastFragment.class.getSimpleName();
 
     PushPayloadData mBroadcastData;
-    OnLauncherFragmentInteractionListener mActivityInteractionListener;
 
     // for audio broadcast
     WebView mWebView;
@@ -137,7 +135,6 @@ public class LauncherBroadcastFragment extends Fragment implements TextToSpeechH
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mActivityInteractionListener = (OnLauncherFragmentInteractionListener)activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -146,7 +143,6 @@ public class LauncherBroadcastFragment extends Fragment implements TextToSpeechH
 
     @Override
     public void onDetach() {
-        mActivityInteractionListener = null;
         super.onDetach();
     }
 
@@ -172,7 +168,6 @@ public class LauncherBroadcastFragment extends Fragment implements TextToSpeechH
     }
 
     private void popStack() {
-        mActivityInteractionListener.popStackBroadcastFragment();
         getActivity().getFragmentManager().popBackStack();
     }
 }
