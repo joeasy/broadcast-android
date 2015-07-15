@@ -107,6 +107,10 @@ public class Constants {
     public static final String EXTRA_LAUNCHER_ACTIVITY_RUNNING = "EXTRA_LAUNCHER_ACTIVITY_RUNNING";
     public static final String ACTION_SET_VILLAGE_NAME = "com.nbplus.vbroadlauncher.intent.action.SET_VILLAGE_NAME";
     public static final String EXTRA_BROADCAST_PAYLOAD_DATA = "EXTRA_BROADCAST_PAYLOAD_DATA";
+    public static final String EXTRA_BROADCAST_PAYLOAD_INDEX = "EXTRA_BROADCAST_PAYLOAD_INDEX";
+    public static final String ACTION_BROADCAST_CHATHEAD_VIEW_DETACHED = "com.nbplus.vbroadlauncher.intent.action.BROADCAST_CHATHEAD_VIEW_DETACHED";
+    public static final String ACTION_SHOW_NOTIFICATION_CONTENTS = "com.nbplus.vbroadcast.action.SHOW_NOTIFICATION_CONTENTS";
+    public static final String EXTRA_SHOW_NOTIFICATION_CONTENTS = "EXTRA_SHOW_NOTIFICATION_CONTENTS";
 
     // push notification ID
     public static final int PUSH_NOTIFICATION_ALARM_ID = 1001;

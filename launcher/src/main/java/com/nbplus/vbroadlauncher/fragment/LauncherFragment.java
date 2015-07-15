@@ -250,6 +250,9 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Broadcast message received !!!");
+            if (mHandler == null) {
+                return;
+            }
             final String action = intent.getAction();
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
@@ -264,7 +267,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Message msg = new Message();
                 msg.what = Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-                msg.obj = intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+                msg.obj = intent.getParcelableExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA);
                 mHandler.sendMessage(msg);
             }
         }

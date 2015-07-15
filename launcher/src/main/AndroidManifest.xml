@@ -62,6 +62,24 @@
             >
         </activity>
         <activity
+            android:name=".RealtimeBroadcastProxyActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/NBPlusTheme.NoActionBar.Translucent"
+            android:screenOrientation="sensorLandscape"
+            android:label="@string/title_activity_broadcast_webview"
+            >
+        </activity>
+        <activity
+            android:name=".RealtimeBroadcastActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/NBPlusTheme.NoActionBar.Translucent"
+            android:screenOrientation="sensorLandscape"
+            android:label="@string/title_activity_broadcast_webview"
+            >
+        </activity>
+        <activity
             android:name=".RadioActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="sensorLandscape"

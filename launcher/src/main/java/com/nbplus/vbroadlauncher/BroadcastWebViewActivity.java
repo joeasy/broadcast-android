@@ -107,8 +107,14 @@ public class BroadcastWebViewActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
         Intent i = getIntent();
-        mShortcutData = i.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
-        String url = mShortcutData.getDomain() + mShortcutData.getPath();
+        String url = null;
+        if (i != null && Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(getIntent().getAction())) {
+            url = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
+        } else {
+            mShortcutData = i.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
+            url = mShortcutData.getDomain() + mShortcutData.getPath();
+        }
+
         if (url.indexOf("?") > 0) {
             url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
             url += ("&APPID=" + getApplicationContext().getPackageName());
@@ -117,37 +123,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url += ("&APPID=" + getApplicationContext().getPackageName());
         }
         mWebViewClient.loadUrl(url);
-
-        // test view
-//        final EditText editText = (EditText)findViewById(R.id.et_test_url);
-//        editText.setText(url);
-//        Button button = (Button)findViewById(R.id.btn_test_load);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String url = editText.getText().toString();
-//                if (StringUtils.isEmptyString(url)) {
-//                    return;
-//                }
-//
-//                if (url.indexOf("?") > 0) {
-//                    if (!url.contains("UUID=")) {
-//                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-//                    }
-//                    if (!url.contains("APPID=")) {
-//                        url += ("&APPID=" + getApplicationContext().getPackageName());
-//                    }
-//                } else {
-//                    if (!url.contains("UUID=")) {
-//                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-//                    }
-//                    if (!url.contains("APPID=")) {
-//                        url += ("&APPID=" + getApplicationContext().getPackageName());
-//                    }
-//                }
-//                mWebViewClient.loadUrl(url);
-//            }
-//        });
         setContentViewByOrientation();
     }
 
@@ -171,14 +146,16 @@ public class BroadcastWebViewActivity extends BaseActivity {
         if (mWebViewClient != null) {
             Log.d(TAG, "Prev url is = " + mWebViewClient.getWebView().getUrl());
         }
-        mShortcutData = intent.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
-        mWebViewClient.loadUrl(mShortcutData.getDomain() + mShortcutData.getPath());
+        String url = null;
+        if (intent != null && Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(getIntent().getAction())) {
+            url = intent.getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
+        } else {
+            mShortcutData = intent.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
+            url = mShortcutData.getDomain() + mShortcutData.getPath();
+        }
 
-        // test view
-//        final EditText editText = (EditText)findViewById(R.id.et_test_url);
-//        editText.setText(mShortcutData.getDomain() + mShortcutData.getPath());
-
-        Log.d(TAG, ">> reset url = " + mShortcutData.getDomain() + mShortcutData.getPath());
+        mWebViewClient.loadUrl(url);
+        Log.d(TAG, ">> reset url = " + url);
     }
 
     /**

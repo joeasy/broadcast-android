@@ -19,5 +19,8 @@ public class Constants {
 
     public static final String REGISTER_GCM = "com.nbplus.vbroadcast.action.REGISTER_GCM";
     public static final String UNREGISTER_GCM = "com.nbplus.vbroadcast.action.UNREGISTER_GCM";
+    public static final String ACTION_SHOW_NOTIFICATION_CONTENTS = "com.nbplus.vbroadcast.action.SHOW_NOTIFICATION_CONTENTS";
+    public static final String EXTRA_SHOW_NOTIFICATION_CONTENTS = "EXTRA_SHOW_NOTIFICATION_CONTENTS";
 
+    public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
 }

@@ -270,7 +270,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     @JavascriptInterface
     public void onPauseBroadcastMediaStream() {
-        Log.d(TAG, ">> registerPushApplication() called");
+        Log.d(TAG, ">> onPauseBroadcastMediaStream() called");
         if (mBroadcastPlayState == BroadcastPlayState.VOICE_PLAYING) {
             mBroadcastPlayState = BroadcastPlayState.VOICE_PAUSED;
         }
@@ -310,13 +310,20 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         mContext.finish();
     }
 
-    // not support
+
+    /**
+     * GCM 등록
+     * @return boolean
+     */
     @JavascriptInterface
     public boolean registerGcm() {
         return false;
     }
 
-    // not support
+    /**
+     * GCM 해제
+     * @return boolean
+     */
     @JavascriptInterface
     public boolean unRegisterGcm() {
         return false;
@@ -332,16 +339,27 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * 아래에서 불리는 자바스크립트 function 들은 웹앱에서 구현이 되어 있어야 한다.
      *
      */
+    /**
+     * GCM 등록 토큰 전달
+     * @param gcmRegToken 토큰
+     */
     public void onRegistered(String gcmRegToken) {
         // do not anything
         //mWebView.loadUrl("javascript:window.onRegistered(" + gcmRegToken + ");");
     }
 
+    /**
+     * GCM 해제 결과
+     */
     public void onUnRegistered() {
         // do not anything
         //mWebView.loadUrl("javascript:window.onUnRegistered();");
     }
 
+    /**
+     * 검색된 IoT device 목록 전달
+     * @param iotDevices device list
+     */
     public void onUpdateIoTDevices(String iotDevices) {
         mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
     }
@@ -363,8 +381,6 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         Intent i = new Intent(mContext, MusicService.class);
         i.setAction(MusicService.ACTION_PLAY);
         mContext.startService(i);
-
-        mContext.finish();
     }
 
     // progress bar

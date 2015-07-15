@@ -1,4 +1,4 @@
-package com.nbplus.vbroadlauncher.data;
+package com.nbplus.vbroadlistener.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

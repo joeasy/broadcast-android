@@ -21,6 +21,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.nbplus.media.MusicService;
+
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
 import org.basdroid.common.R;
@@ -30,8 +32,8 @@ import org.basdroid.common.StringUtils;
 /**
  * Created by basagee on 2015. 4. 30..
  */
-public class ChatHeadWebViewClient extends WebViewClient {
-    private static final String TAG = ChatHeadWebViewClient.class.getSimpleName();
+public class RealtimeBroadcastWebViewClient extends WebViewClient {
+    private static final String TAG = RealtimeBroadcastWebViewClient.class.getSimpleName();
 
     protected static final String JAVASCRIPT_IF_NAME = "nbplus";
 
@@ -39,6 +41,16 @@ public class ChatHeadWebViewClient extends WebViewClient {
     protected Context mContext;
     protected BroadcastWebChromeClient mWebChromeClient;
     protected boolean mPageLoadSuccess = false;
+    OnRealtimeBroadcastWebViewListener mOnChatHeadWebViewListener;
+    public boolean isClosingByWebApp() {
+        return mIsClosingByWebApp;
+    }
+
+    private boolean mIsClosingByWebApp = false;
+
+    public interface OnRealtimeBroadcastWebViewListener {
+        public void onCloseWebApplication();
+    }
 
     /**
      * Created by basagee on 2015. 4. 30..
@@ -112,9 +124,10 @@ public class ChatHeadWebViewClient extends WebViewClient {
      * @param activity : context
      * @param view : 적용될 웹뷰
      */
-    public ChatHeadWebViewClient(Context activity, WebView view) {
+    public RealtimeBroadcastWebViewClient(Context activity, WebView view, OnRealtimeBroadcastWebViewListener l) {
         mWebView = view;
         mContext = activity;
+        mOnChatHeadWebViewListener = l;
 
         mWebChromeClient = new BroadcastWebChromeClient();
 
@@ -242,6 +255,8 @@ public class ChatHeadWebViewClient extends WebViewClient {
             CookieSyncManager.getInstance().sync();
         }
         mPageLoadSuccess = true;
+
+
     }
 
     @Override
@@ -327,8 +342,33 @@ public class ChatHeadWebViewClient extends WebViewClient {
     public void closeWebApplication() {
         Log.d(TAG, ">> closeWebApplication() called");
         //mContext.finish();
+        Intent i = new Intent(mContext, MusicService.class);
+        i.setAction(MusicService.ACTION_PLAY);
+        mContext.startService(i);
+
+        mIsClosingByWebApp = true;
+        if (mOnChatHeadWebViewListener != null) {
+            mOnChatHeadWebViewListener.onCloseWebApplication();
+        }
     }
 
+    @JavascriptInterface
+    public void onStartBroadcastMediaStream(boolean isTTS, String ttsString) {
+        Log.d(TAG, ">> onStartBroadcastMediaStream() called = " + isTTS + ", tts = " + ttsString);
+        Intent i = new Intent(mContext, MusicService.class);
+        i.setAction(MusicService.ACTION_PAUSE);
+        mContext.startService(i);
+    }
+
+    @JavascriptInterface
+    public void onPauseBroadcastMediaStream() {
+        Log.d(TAG, ">> onPauseBroadcastMediaStream() called");
+    }
+
+    @JavascriptInterface
+    public void onStopBroadcastMediaStream() {
+        Log.d(TAG, ">> onStopBroadcastMediaStream() called");
+    }
     ////////////////////////////////
     /**
      * 아래의 함수들은 자바스크립트를 Native 에서 호출할 필요가 있을때 사용한다.
@@ -351,4 +391,13 @@ public class ChatHeadWebViewClient extends WebViewClient {
             mWebView.loadUrl("javascript:window.onBackPressed();");
         }
     }
+
+    public void onCloseWebApplicationByUser() {
+        mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
+
+        Intent i = new Intent(mContext, MusicService.class);
+        i.setAction(MusicService.ACTION_PLAY);
+        mContext.startService(i);
+    }
+
 }

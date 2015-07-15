@@ -47,6 +47,7 @@
             android:layout_height="@dimen/broadcast_text_body_height"
             android:layout_gravity="center_vertical"
             android:padding="@dimen/broadcast_x_padding"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/radio_activity_label_font_size"
             android:lineSpacingExtra="5dp"

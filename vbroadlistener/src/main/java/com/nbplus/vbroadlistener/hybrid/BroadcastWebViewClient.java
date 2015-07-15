@@ -3,6 +3,10 @@ package com.nbplus.vbroadlistener.hybrid;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -12,6 +16,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
+import com.nbplus.vbroadlistener.BaseActivity;
 import com.nbplus.vbroadlistener.ProgressDialogFragment;
 import com.nbplus.vbroadlistener.R;
 import com.nbplus.vbroadlistener.data.Constants;
@@ -24,22 +29,77 @@ import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 
 /**
  * Created by basagee on 2015. 5. 19..
  */
-public class BroadcastWebViewClient extends BasicWebViewClient {
+public class BroadcastWebViewClient extends BasicWebViewClient implements TextToSpeechHandler.OnUtteranceProgressListener {
     private static final String TAG = BroadcastWebViewClient.class.getSimpleName();
 
     ProgressDialogFragment mProgressDialogFragment;
+    enum BroadcastPlayState {
+        STOPPED,
+        VOICE_PLAYING,
+        VOICE_PAUSED,
+        TTS_PLAYING
+    };
+    BroadcastPlayState mBroadcastPlayState = BroadcastPlayState.STOPPED;
+    TextToSpeechHandler mText2SpeechHandler = null;
+    String mText2SpeechPlayText = null;
+
+    private static final int HANDLER_MESSAGE_START_TTS = 1;
+    private static final int HANDLER_MESSAGE_DONE_TTS = 2;
+    private static final int HANDLER_MESSAGE_ERROR_TTS = 3;
+    private BroadcastWebViewClientHandler mHandler;
+
+    // 핸들러 객체 만들기
+    private static class BroadcastWebViewClientHandler extends Handler {
+        private final WeakReference<BroadcastWebViewClient> mActivity;
+
+        public BroadcastWebViewClientHandler(BroadcastWebViewClient client) {
+            mActivity = new WeakReference<>(client);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            BroadcastWebViewClient client = mActivity.get();
+            if (client != null) {
+                client.handleMessage(msg);
+            }
+        }
+    }
+
+    public void handleMessage(Message msg) {
+        if (msg == null) {
+            return;
+        }
+        Log.d(TAG, "handleMessage tts = " + msg.what);
+        switch (msg.what) {
+            case HANDLER_MESSAGE_START_TTS :
+                dismissProgressDialog();
+                mBroadcastPlayState = BroadcastPlayState.TTS_PLAYING;
+                break;
+            case HANDLER_MESSAGE_DONE_TTS :
+                onCompleteTTSBroadcast();
+                mBroadcastPlayState = BroadcastPlayState.STOPPED;
+                break;
+            case HANDLER_MESSAGE_ERROR_TTS :
+                dismissProgressDialog();
+                mBroadcastPlayState = BroadcastPlayState.STOPPED;
+                onCompleteTTSBroadcast();
+        }
+    }
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
         super(activity, view);
+
+        mHandler = new BroadcastWebViewClientHandler(this);
     }
 
     /**
-     * 원격수신은 device uuid 를 전달하지 않는다.
+     * 디바이스의 UUID 조회. mac address 기반 40bytes SHA-1 value
      */
     @Override
     @JavascriptInterface
@@ -118,6 +178,106 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
     }
 
 
+    @JavascriptInterface
+    public void onStartBroadcastMediaStream(boolean isTTS, String ttsString) {
+        Log.d(TAG, ">> onStartBroadcastMediaStream() called = " + isTTS + ", tts = " + ttsString);
+        if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
+            // stop previous playing tts.
+            if (mText2SpeechHandler != null) {
+                mText2SpeechHandler.stop();
+            }
+        }
+
+        if (isTTS) {
+            // start tts playing
+            mText2SpeechPlayText = ttsString;
+            if (StringUtils.isEmptyString(mText2SpeechPlayText)) {
+                Log.e(TAG, "> do not play tts. is empty string..");
+                return;
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showProgressDialog();
+            }
+            if (mText2SpeechHandler == null) {
+                mText2SpeechHandler = new TextToSpeechHandler(mContext, this);
+                ((BaseActivity)mContext).getText2SpeechObject(new BaseActivity.OnText2SpeechListener() {
+                    @Override
+                    public void onCheckResult(TextToSpeech tts) {
+                        if (tts != null && tts instanceof TextToSpeech) {
+                            mText2SpeechHandler.setTextToSpeechObject(tts);
+                            mText2SpeechHandler.play(mText2SpeechPlayText);
+                            mBroadcastPlayState = BroadcastPlayState.TTS_PLAYING;
+                        } else {
+                            mText2SpeechPlayText = null;
+                            mBroadcastPlayState = BroadcastPlayState.STOPPED;
+                            dismissProgressDialog();
+                        }
+                    }
+                });
+            } else {
+                if (mText2SpeechHandler.getTextToSpeechObject() == null) {
+                    ((BaseActivity)mContext).getText2SpeechObject(new BaseActivity.OnText2SpeechListener() {
+                        @Override
+                        public void onCheckResult(TextToSpeech tts) {
+                            if (tts != null && tts instanceof TextToSpeech) {
+                                mText2SpeechHandler.setTextToSpeechObject(tts);
+                                mText2SpeechHandler.play(mText2SpeechPlayText);
+                                mBroadcastPlayState = BroadcastPlayState.TTS_PLAYING;
+                            } else {
+                                mText2SpeechPlayText = null;
+                                mBroadcastPlayState = BroadcastPlayState.STOPPED;
+                                dismissProgressDialog();
+                            }
+                        }
+                    });
+                } else {
+                    mText2SpeechHandler.play(mText2SpeechPlayText);
+                    mBroadcastPlayState = BroadcastPlayState.TTS_PLAYING;
+
+                }
+            }
+        }
+    }
+
+    @JavascriptInterface
+    public void onPauseBroadcastMediaStream() {
+        Log.d(TAG, ">> onPauseBroadcastMediaStream() called");
+        if (mBroadcastPlayState == BroadcastPlayState.VOICE_PLAYING) {
+            mBroadcastPlayState = BroadcastPlayState.VOICE_PAUSED;
+        }
+    }
+
+    @JavascriptInterface
+    public void onStopBroadcastMediaStream() {
+        Log.d(TAG, ">> onStopBroadcastMediaStream() called");
+
+        if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
+            // stop previous playing tts.
+            mText2SpeechPlayText = null;
+            mText2SpeechHandler.stop();
+        }
+        mBroadcastPlayState = BroadcastPlayState.STOPPED;
+    }
+
+    /**
+     * 어플리케이션 또는 현재 액티비티를 종료한다.
+     */
+    @Override
+    @JavascriptInterface
+    public void closeWebApplication() {
+        Log.d(TAG, ">> closeWebApplication() called");
+
+        if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
+            // stop previous playing tts.
+            mText2SpeechPlayText = null;
+            mText2SpeechHandler.finalize();
+        }
+        mBroadcastPlayState = BroadcastPlayState.STOPPED;
+        mContext.finish();
+    }
+
+
     /**
      * GCM 등록
      * @return boolean
@@ -177,21 +337,41 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
      * @param iotDevices device list
      */
     public void onUpdateIoTDevices(String iotDevices) {
-        mWebView.loadUrl("javascript:window.onRegistered('" + iotDevices + "');");
+        mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
+    }
+
+    public void onCompleteTTSBroadcast() {
+        mWebView.loadUrl("javascript:window.onCompleteTTSBroadcast();");
+    }
+
+    public void onCloseWebApplicationByUser() {
+        mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
+
+        if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
+            // stop previous playing tts.
+            mText2SpeechPlayText = null;
+            mText2SpeechHandler.finalize();
+        }
+        mBroadcastPlayState = BroadcastPlayState.STOPPED;
+        mContext.finish();
     }
 
     // progress bar
     private void showProgressDialog() {
-        dismissProgressDialog();
-        mProgressDialogFragment = ProgressDialogFragment.newInstance();
-        mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        try {
+            dismissProgressDialog();
+            mProgressDialogFragment = ProgressDialogFragment.newInstance();
+            mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     private void dismissProgressDialog() {
         try {
             if (mProgressDialogFragment != null) {
                 mProgressDialogFragment.dismiss();
-                mProgressDialogFragment = null;
             }
+            mProgressDialogFragment = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -212,13 +392,28 @@ public class BroadcastWebViewClient extends BasicWebViewClient {
     public void onPageFinished(WebView view, String url) {
         this.dismissProgressDialog();
         super.onPageFinished(view, url);
-
-        Log.d(TAG, ">> line number = " + getLineNumber());
-        Log.d(TAG, ">> getApplicationPackageName = " + getApplicationPackageName());
     }
 
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
+    }
+
+    @Override
+    public void onStart(String s) {
+        Log.d(TAG, "TTS onStart()");
+        mHandler.sendEmptyMessage(HANDLER_MESSAGE_START_TTS);
+    }
+
+    @Override
+    public void onDone(String s) {
+        Log.d(TAG, "TTS onDone()");
+        mHandler.sendEmptyMessage(HANDLER_MESSAGE_DONE_TTS);
+    }
+
+    @Override
+    public void onError(String utteranceId, int errorCode) {
+        Log.d(TAG, "TTS onError()");
+        mHandler.sendEmptyMessage(HANDLER_MESSAGE_ERROR_TTS);
     }
 }

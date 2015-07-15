@@ -79,30 +79,16 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
                 PushMessageData data = new PushMessageData();
                 data.setMessageType(PushConstants.PUSH_MESSAGE_TYPE_PUSH_REQUEST);
                 data.setMessageId(1);
-//                data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
-//                        "\"MESSAGE\":\"" +
-//                        "누구에게나 결함은 있단다.\n" + "그리고 고치려고 해도\n" + "때로 자기 힘으로는 어쩔 수 없는 결함도 있지.\n" +
-//                        "집이 가난하다거나 다리가 부자유스러운 것은\n" +
-//                        "그 아이로서도 어쩔 수 없는 부분이다.\n" +
-//                        "네가 머리를 감는데도 \n" +
-//                        "머리 냄새가 나는 것과 똑같이.\n" +
-//                        "우리 모두는 저마다 모양이 다른 결함들을 \n" +
-//                        "지니고 산단다.\n" +
-//                        "하지만 결함이 때로는 고마운 것이 되기도 한단다. \n" +
-//                        "세상일이란, \n" +
-//                        "이해하려고 노력해서 이해할 수 있는 것도 있지만\n" +
-//                        "이해하려고 애쓰지 않아도 \n" +
-//                        "저절로 이해할 수 있는 것이 있더라.\n" +
-//                        "그건 자기 결함 때문에 괴로움을 겪어 봤거나\n" +
-//                        "자기 결함을 숨기지 않고 인정하는 사람이라면\n" +
-//                        "가질 수 있는 이해심이지.\n" +
-//                        "너의 머리 냄새가 \n" +
-//                        "다른 사람을 쉽게 이해할 수 있는\n" +
-//                        "아주 고마운 것이 되기를 엄마는 진정으로 바란다.\n" +
-//
-//                        "\", \"SERVICE_TYPE\":\"02\"}");
                 data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
-                        "\"MESSAGE\":\"http://daum.net\", \"SERVICE_TYPE\":\"01\"}");
+                        "\"MESSAGE\":\"" +
+                        "누구에게나 결함은 있단다.\n" + "그리고 고치려고 해도\n" + "때로 자기 힘으로는 어쩔 수 없는 결함도 있지.\n" +
+                        "너의 머리 냄새가 \n" +
+                        "다른 사람을 쉽게 이해할 수 있는\n" +
+                        "아주 고마운 것이 되기를 엄마는 진정으로 바란다.\n" +
+
+                        "\", \"SERVICE_TYPE\":\"02\"}");
+//                data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
+//                        "\"MESSAGE\":\"http://daum.net\", \"SERVICE_TYPE\":\"01\"}");
                 testMsg.obj = data;
 
                 //mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 60 * 1000);
@@ -115,20 +101,14 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
                     Log.d(TAG, "empty push message data !!");
                     return;
                 }
-                String payloadData = pushData.getPayload();
-                if (payloadData != null && !StringUtils.isEmptyString(payloadData))  {
-                    Log.d(TAG, "Send broadcast payload to app !!!");
+                Log.d(TAG, "Send broadcast payload to app !!!");
 
-                    Intent intent = new Intent();
-                    intent.setAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
-                    intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE,
-                            getState() == State.Connected ? PushConstants.PUSH_STATUS_VALUE_DISCONNECTED : PushConstants.PUSH_STATUS_VALUE_CONNECTED);
-                    intent.putExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA, payloadData);
-                    mContext.sendBroadcast(intent);
-                } else {
-                    Log.d(TAG, "Empty payload data !!!");
-                }
-
+                Intent intent = new Intent();
+                intent.setAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
+                intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE,
+                        getState() == State.Connected ? PushConstants.PUSH_STATUS_VALUE_DISCONNECTED : PushConstants.PUSH_STATUS_VALUE_CONNECTED);
+                intent.putExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA, pushData);
+                mContext.sendBroadcast(intent);
                 break;
         }
     }
@@ -257,7 +237,7 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
     public void run() {
         try {
             mWifiLock = ((WifiManager) mContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "push_wifi_lock");
-            ///mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 30 * 1000);
+            mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 20 * 1000);
 
             while (!Thread.currentThread().isInterrupted()) {
                 switch (mPushThreadCommand) {

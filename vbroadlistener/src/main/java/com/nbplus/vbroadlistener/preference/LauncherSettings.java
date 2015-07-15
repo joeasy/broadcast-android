@@ -39,6 +39,8 @@ public class LauncherSettings implements Parcelable {
     public static int[] portWallpaperResource;
     private int wallpaperId = -1;
 
+    boolean isCheckedTTSEngine;
+
     // 서버정보
     @SerializedName("svc_domain")
     VBroadcastServer serverInformation;
@@ -75,6 +77,7 @@ public class LauncherSettings implements Parcelable {
     public static final String KEY_VBROADCAST_SHORTCUT = "key_shortcut";
     public static final String KEY_WALLPAPER_RESOURCE_ID = "key_wallpaper_resource_id";
     public static final String KEY_VBROADCAST_IS_OUTDOOR_MODE = "key_is_outdoor_mode";
+    public static final String KEY_IS_CHECKED_TTS = "key_is_checked_tts";
 
     private Context context;
     private SharedPreferences prefs;
@@ -90,6 +93,7 @@ public class LauncherSettings implements Parcelable {
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
+        this.isCheckedTTSEngine = prefs.getBoolean(KEY_IS_CHECKED_TTS, false);
         int wallpaperId = prefs.getInt(KEY_WALLPAPER_RESOURCE_ID, -1);
 
         landWallpaperResource = new int[]{ R.drawable.ic_bg_main_land };
@@ -114,6 +118,15 @@ public class LauncherSettings implements Parcelable {
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;
         prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+    }
+
+    public boolean isCheckedTTSEngine() {
+        return isCheckedTTSEngine;
+    }
+
+    public void setIsCheckedTTSEngine(boolean isCheckedTTSEngine) {
+        this.isCheckedTTSEngine = isCheckedTTSEngine;
+        prefs.edit().putBoolean(KEY_IS_CHECKED_TTS, this.isCheckedTTSEngine).apply();
     }
 
     public boolean isCompletedSetup() {

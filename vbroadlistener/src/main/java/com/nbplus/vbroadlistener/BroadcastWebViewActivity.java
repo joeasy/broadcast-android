@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -121,78 +122,37 @@ public class BroadcastWebViewActivity extends BaseActivity {
         WebView webView = (WebView)findViewById(R.id.webview);
         mWebViewClient = new BroadcastWebViewClient(this, webView);
 
-        Intent intent = new Intent(this, RegistrationIntentService.class);
-        intent.setAction(Constants.REGISTER_GCM);
-        this.startService(intent);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Constants.REGISTRATION_COMPLETE));
+
+        String fromNotiUrl = null;
+        if (getIntent() != null && Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(getIntent().getAction())) {
+            fromNotiUrl = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
+        }
 
         String url = null;
         VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
-        if (serverInfo != null && serverInfo.getDocServer() != null) {
+        if (!StringUtils.isEmptyString(fromNotiUrl)) {
+            url = fromNotiUrl;
+        } else if (serverInfo != null && serverInfo.getDocServer() != null) {
             url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
         } else {
             url = LauncherSettings.getInstance(this).getRegisterAddress();
         }
+
+        url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
         if (url.indexOf("?") > 0) {
 //            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
             url += ("&APPID=" + getApplicationContext().getPackageName());
         } else {
 //            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+//            url += ("&APPID=" + getApplicationContext().getPackageName());
             url += ("?APPID=" + getApplicationContext().getPackageName());
         }
         mWebViewClient.loadUrl(url);
 
-        // test view
-        /*
-        final EditText editText = (EditText)findViewById(R.id.et_test_url);
-        editText.setText(url);
-        Button button = (Button)findViewById(R.id.btn_test_load);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = editText.getText().toString();
-                if (StringUtils.isEmptyString(url)) {
-                    return;
-                }
-                if (url.indexOf("?") > 0) {
-//                    if (!url.contains("UUID=")) {
-//                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-//                    }
-                    if (!url.contains("APPID=")) {
-                        url += ("&APPID=" + getApplicationContext().getPackageName());
-                    }
-                } else {
-//                    if (!url.contains("UUID=")) {
-//                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(BroadcastWebViewActivity.this));
-//                    }
-                    if (!url.contains("APPID=")) {
-                        url += ("?APPID=" + getApplicationContext().getPackageName());
-                    }
-                }
-                mWebViewClient.loadUrl(url);
-            }
-        });
-        */
         setContentViewByOrientation();
-
         checkPlayServices();
-    }
-
-    /**
-     * Handle onNewIntent() to inform the fragment manager that the
-     * state is not saved.  If you are handling new intents and may be
-     * making changes to the fragment state, you want to be sure to call
-     * through to the super-class here first.  Otherwise, if your state
-     * is saved but the activity is not stopped, you could get an
-     * onNewIntent() call which happens before onResume() and trying to
-     * perform fragment operations at that point will throw IllegalStateException
-     * because the fragment manager thinks the state is still saved.
-     *
-     * @param intent
-     */
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        Log.d(TAG, "BroadcastWebViewActivity onNewIntent()");
     }
 
     /**
@@ -210,7 +170,12 @@ public class BroadcastWebViewActivity extends BaseActivity {
         super.onDestroy();
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         Log.d(TAG, "BroadcastWebViewActivity onDestroy()");
-    }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
+ }
 
     /**
      * Dispatch onResume() to fragments.  Note that for better inter-operation
@@ -224,8 +189,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Constants.REGISTRATION_COMPLETE));
     }
 
     /**
@@ -234,7 +197,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
 
     @Override
@@ -279,6 +241,31 @@ public class BroadcastWebViewActivity extends BaseActivity {
         super.onStop();
         if (mWebViewClient != null) {
             //mWebViewClient.stopMediaStream();
+        }
+    }
+
+    public void getText2SpeechObject(OnText2SpeechListener l) {
+        this.mcheckText2SpeechLister = l;
+
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA :
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    // check korean
+                    mText2Speech = new TextToSpeech(this, this);
+                } else {
+                    Log.d(TAG, "여기서 제대로 설정안했다면 관두자.... 사용자 맘인데...");
+                    showText2SpeechAlertDialog();
+
+                    LauncherSettings.getInstance(this).setIsCheckedTTSEngine(true);
+                }
+                break;
         }
     }
 }

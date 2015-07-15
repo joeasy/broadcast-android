@@ -50,7 +50,6 @@ import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
-import com.nbplus.vbroadlauncher.fragment.LauncherBroadcastFragment;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.fragment.RegisterFragment;
 import com.nbplus.vbroadlauncher.location.FetchAddressIntentService;

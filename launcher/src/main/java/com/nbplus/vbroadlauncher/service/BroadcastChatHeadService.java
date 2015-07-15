@@ -7,22 +7,21 @@ import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.PushPayloadData;
-import com.nbplus.vbroadlauncher.hybrid.ChatHeadWebViewClient;
+import com.nbplus.vbroadlauncher.hybrid.RealtimeBroadcastWebViewClient;
 import com.nbplus.vbroadlauncher.hybrid.TextToSpeechHandler;
 
 import org.basdroid.common.DeviceUtils;
@@ -32,7 +31,7 @@ import java.util.Locale;
 /**
  * Created by basagee on 2015. 7. 14..
  */
-public class BroadcastChatHeadService extends Service implements TextToSpeech.OnInitListener, TextToSpeechHandler.OnUtteranceProgressListener {
+public class BroadcastChatHeadService extends Service implements TextToSpeech.OnInitListener, TextToSpeechHandler.OnUtteranceProgressListener, RealtimeBroadcastWebViewClient.OnRealtimeBroadcastWebViewListener {
     private static final String TAG = BroadcastChatHeadService.class.getSimpleName();
 
     private WindowManager windowManager;
@@ -44,7 +43,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
 
     // for audio broadcast
     WebView mWebView;
-    ChatHeadWebViewClient mWebViewClient;
+    RealtimeBroadcastWebViewClient mWebViewClient;
 
     // for text broadcast
     TextView mTextView;
@@ -77,11 +76,12 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
             return;
         }
 
-        mBroadcastData = intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+        mBroadcastData = intent.getParcelableExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA);
         if (mBroadcastData == null) {
             Log.d(TAG, "Broadcast data is not found!!!");
             return;
         }
+        long mBroadcastIndex = intent.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1);
         String pushType = mBroadcastData.getServiceType();
         if (!Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(pushType) &&
                 !Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(pushType) &&
@@ -90,7 +90,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
             return;
         }
         if (mIsPlaying && mChatHead != null) {
-            removeChatHead();
+            removeChatHead(true);
         }
 
         mIsPlaying = true;
@@ -116,7 +116,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
         } else {
             // 실시간, 일반음성방송
             mWebView = (WebView)mChatHead.findViewById(R.id.webview);
-            mWebViewClient = new ChatHeadWebViewClient(this, mWebView);
+            mWebViewClient = new RealtimeBroadcastWebViewClient(this, mWebView, this);
             mWebViewClient.setBackgroundTransparent();
 
             String url = mBroadcastData.getMessage();
@@ -129,6 +129,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
             }
             mWebViewClient.loadUrl(url);
         }
+        mChatHead.setTag(mBroadcastIndex);
 
 //        mChatHead.findViewById(R.id.btn_dismiss).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -148,10 +149,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
          FLAG_NOT_TOUCH_MODAL << I found this one to be quite important. Without it,
          focus is given to the overlay and soft-key (home, menu, etc.) presses are not passed to the activity below.
          */
-        int flag = WindowManager.LayoutParams.TYPE_PHONE/*
-                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON*/;
+        int flag = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
 
         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT, flag, 0, PixelFormat.TRANSLUCENT);
@@ -195,16 +193,33 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
         acquireCpuWakeLock();
     }
 
-    public void removeChatHead() {
-        if (mChatHead != null) {
-            windowManager.removeView(mChatHead);
-        }
+    public void removeChatHead(boolean isForceByOther) {
+        Log.d(TAG, "removeChatHead()");
+
         if (mText2Speech != null) {
             mText2Speech.shutdown();
         }
         mText2Speech = null;
+        mText2SpeechHandler = null;
+
+        if (mWebViewClient != null && isForceByOther) {
+            mWebViewClient.onCloseWebApplicationByUser();
+        }
+        mWebViewClient = null;
+        mWebView = null;
 
         releaseCpuLock();
+
+        if (mChatHead != null) {
+            windowManager.removeView(mChatHead);
+            long broadcastIdx = (long)mChatHead.getTag();
+            if (broadcastIdx > 0) {
+                Intent i = new Intent();
+                i.setAction(Constants.ACTION_BROADCAST_CHATHEAD_VIEW_DETACHED);
+                i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, broadcastIdx);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+            }
+        }
         mChatHead = null;
         mIsPlaying = false;
     }
@@ -212,7 +227,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
     @Override
     public void onDestroy() {
         super.onDestroy();
-        removeChatHead();
+        removeChatHead(false);
     }
 
     // TTS
@@ -252,14 +267,14 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
     @Override
     public void onDone(String s) {
         Log.d(TAG, "TTS onDone()");
-        removeChatHead();
+        removeChatHead(false);
     }
 
     @Override
     public void onError(String utteranceId, int errorCode) {
         Log.d(TAG, "TTS onError()");
         Toast.makeText(this, R.string.toast_tts_error, Toast.LENGTH_SHORT).show();
-        removeChatHead();
+        removeChatHead(false);
     }
 
     public void acquireCpuWakeLock() {
@@ -286,4 +301,8 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
         }
     }
 
+    @Override
+    public void onCloseWebApplication() {
+        removeChatHead(false);
+    }
 }
