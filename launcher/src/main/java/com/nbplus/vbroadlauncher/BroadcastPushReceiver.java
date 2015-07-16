@@ -167,7 +167,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSound(soundUri);
 
-        builder.setSmallIcon(R.drawable.ic_icon_sms);
+        builder.setSmallIcon(R.drawable.ic_launcher);
         builder.setWhen(System.currentTimeMillis());
         //builder.setNumber(10);
 

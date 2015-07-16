@@ -65,7 +65,6 @@ public class AppPagerAdapter extends FragmentPagerAdapter {
      */
     @Override
     public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
 
         int appSize = ShowAllLaunchAppsInfo.getInstance().getCount();
         int appPerPage = ShowAllLaunchAppsInfo.getMaxPageItemSize(mContext);
@@ -74,6 +73,7 @@ public class AppPagerAdapter extends FragmentPagerAdapter {
         int remainder = appSize % appPerPage;
 
         mPageCount = remainder > 0 ? quotient + 1 : quotient;
+        super.notifyDataSetChanged();
     }
 
     @Override
