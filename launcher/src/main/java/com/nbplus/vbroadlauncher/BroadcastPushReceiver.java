@@ -143,15 +143,6 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                     Log.d(TAG, "Unknown push payload type !!!");
                     break;
             }
-
-//
-//            ComponentName componentName = new ComponentName(context.getPackageName(), HomeLauncherActivity.class.getName());
-//            Intent i = new Intent();
-//            i.setComponent(componentName);
-//            i.setAction(action);
-//            i.putExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA, intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA));
-//            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            context.startActivity(i);
         }
     }
 
@@ -175,7 +166,8 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSound(soundUri);
-        builder.setSmallIcon(R.drawable.ic_launcher);
+
+        builder.setSmallIcon(R.drawable.ic_icon_sms);
         builder.setWhen(System.currentTimeMillis());
         //builder.setNumber(10);
 

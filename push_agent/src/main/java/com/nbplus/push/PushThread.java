@@ -78,23 +78,23 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
 
                 PushMessageData data = new PushMessageData();
                 data.setMessageType(PushConstants.PUSH_MESSAGE_TYPE_PUSH_REQUEST);
-                data.setAlert("이건 패스워드 찾기입니다.");
+                data.setAlert("이건 시스템장애 푸시입니다. ");
                 data.setMessageId(1);
-                data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
-                        "\"MESSAGE\":\"http://www.daum.net" +
-
-                        "\", \"SERVICE_TYPE\":\"08\"}");
-
 //                data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
-//                        "\"MESSAGE\":\"" +
-//                        "누구에게나 결함은 있단다.\n" + "그리고 고치려고 해도\n" + "때로 자기 힘으로는 어쩔 수 없는 결함도 있지.\n" +
-//                        "너의 머리 냄새가 \n" +
-//                        "다른 사람을 쉽게 이해할 수 있는\n" +
-//                        "아주 고마운 것이 되기를 엄마는 진정으로 바란다.\n" +
+//                        "\"MESSAGE\":\"http://www.daum.net" +
 //
-//                        "\", \"SERVICE_TYPE\":\"02\"}");
+//                        "\", \"SERVICE_TYPE\":\"08\"}");
 //                data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
 //                        "\"MESSAGE\":\"http://daum.net\", \"SERVICE_TYPE\":\"01\"}");
+
+                data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
+                        "\"MESSAGE\":\"" +
+                        "누구에게나 결함은 있단다.\n" + "그리고 고치려고 해도\n" + "때로 자기 힘으로는 어쩔 수 없는 결함도 있지.\n" +
+                        "너의 머리 냄새가 \n" +
+                        "다른 사람을 쉽게 이해할 수 있는\n" +
+                        "아주 고마운 것이 되기를 엄마는 진정으로 바란다.\n" +
+
+                        "\", \"SERVICE_TYPE\":\"07\"}");
                 testMsg.obj = data;
 
                 //mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 60 * 1000);
