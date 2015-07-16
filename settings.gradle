@@ -1,2 +1,2 @@
-include ':launcher', ':push_agent', ':common_library', ':iot_gateway', ':calendar_library', ':vbroadlistener', ':vitamio'
+include ':launcher', ':push_agent', ':common_library', ':iot_gateway', ':calendar_library', ':vbroadlistener', ':vitamio', ':myapplication', ':vbroadcreator'
 include ':viewpager_indicator'
