@@ -122,6 +122,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         String type = payloadData.getServiceType();
         payloadData.setAlertMessage(alert);
+        payloadData.setMessageId(messageId);
         switch (type) {
             // 방송알림
             case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :

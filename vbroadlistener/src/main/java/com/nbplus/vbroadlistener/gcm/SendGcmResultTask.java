@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -23,6 +24,7 @@ import java.util.concurrent.ExecutionException;
  * Created by basagee on 2015. 6. 2..
  */
 public class SendGcmResultTask  extends AsyncTask<Void, Void, BaseApiResult> {
+    private static final String TAG = SendGcmResultTask.class.getSimpleName();
     protected Context mContext;
     protected String mServerPath;
     protected String mMessageId;
@@ -58,6 +60,7 @@ public class SendGcmResultTask  extends AsyncTask<Void, Void, BaseApiResult> {
 
         try {
             response = future.get(); // this will block (forever)
+            Log.d(TAG, "GCM result send success..");
         } catch (InterruptedException e) {
             // exception handling
             e.printStackTrace();
