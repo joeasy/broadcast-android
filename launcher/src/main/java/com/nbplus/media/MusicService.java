@@ -652,6 +652,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         mRemoteViews = new RemoteViews(getPackageName(), R.layout.music_notification);
         setRemoteViews();
         mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_notification_radio);
 
         CharSequence ticker = text;
         int apiVersion = Build.VERSION.SDK_INT;

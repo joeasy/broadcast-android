@@ -143,15 +143,15 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
 
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.BROADCAST_EVENT_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                showNotification(this, Constants.BROADCAST_EVENT_NOTIFICATION_ID, 0, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
             // 긴급호출메시지
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
                 if (StringUtils.isEmptyString(payloadData.getMessage())) {
-                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, null);
+                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, null);
                 } else {
                     // bigText 사용시
-                    showNotification(this, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, PackageUtils.getApplicationName(this),
+                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
                             payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, null);
                 }
                 break;
@@ -170,7 +170,7 @@ public class MyGcmListenerService extends GcmListenerService {
                     }
                 }
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.INHABITANT_POLL_EVENT_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                showNotification(this, Constants.INHABITANT_POLL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
                 // 공동구매
             case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
@@ -187,10 +187,11 @@ public class MyGcmListenerService extends GcmListenerService {
                     }
                 }
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.COOPERATIVE_BUYING_EVENT_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                showNotification(this, Constants.COOPERATIVE_BUYING_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
             // IOT DEVICE 제어(스마트홈 서비스)
             case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
+                // 원격제어는무시한다.
                 break;
             // IOT DEVICE 제어(스마트홈 서비스)
             case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :
@@ -199,13 +200,13 @@ public class MyGcmListenerService extends GcmListenerService {
 //                    showNotification(context, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, PackageUtils.getApplicationName(context), payloadData.getAlertMessage(), null, pi);
 
                 // bigText 사용시
-                showNotification(this, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, PackageUtils.getApplicationName(this),
+                showNotification(this, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
                         payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, null);
                 break;
             // IOT DEVICE 제어(스마트홈 서비스)
             case Constants.PUSH_PAYLOAD_TYPE_FIND_PASSWORD :
                 pi = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(payloadData.getMessage()));
-                showNotification(this, Constants.PW_FIND_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                showNotification(this, Constants.PW_FIND_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
 
             default:
@@ -235,17 +236,21 @@ public class MyGcmListenerService extends GcmListenerService {
         Toast.makeText(context, textResId, Toast.LENGTH_SHORT).show();
     }
 
-    private void showNotification(Context context, int notificationId, String title, String contentText, String ticker, Intent intent) {
-        showNotification(context, notificationId, title, contentText, null, null, null, ticker, intent);
+    private void showNotification(Context context, int notificationId, int smallIconId, String title, String contentText, String ticker, Intent intent) {
+        showNotification(context, notificationId, smallIconId, title, contentText, null, null, null, ticker, intent);
     }
-    private void showNotification(Context context, int notificationId, String title, String contentText, String bigTitle, String bigContentText, String summaryText, String ticker, Intent intent) {
+    private void showNotification(Context context, int notificationId, int smallIconId, String title, String contentText, String bigTitle, String bigContentText, String summaryText, String ticker, Intent intent) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSound(soundUri);
 
-        builder.setSmallIcon(R.drawable.ic_launcher);
+        if (smallIconId == 0) {
+            builder.setSmallIcon(R.mipmap.ic_launcher);
+        } else {
+            builder.setSmallIcon(R.drawable.ic_notification_noti);
+        }
         builder.setWhen(System.currentTimeMillis());
         //builder.setNumber(10);
 

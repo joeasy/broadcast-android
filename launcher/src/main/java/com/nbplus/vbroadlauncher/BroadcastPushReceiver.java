@@ -84,14 +84,14 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
                     } else {
-                        boolean useServiceChatHead = false;
+                        /*boolean useServiceChatHead = false;
 
                         if (useServiceChatHead) {
                             i = new Intent(context, RealtimeBroadcastProxyActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                             context.startActivity(i);
-                        } else {
+                        } else*/ {
                             i = new Intent(context, RealtimeBroadcastActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
@@ -167,7 +167,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSound(soundUri);
 
-        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setSmallIcon(R.drawable.ic_notification_noti);
         builder.setWhen(System.currentTimeMillis());
         //builder.setNumber(10);
 
