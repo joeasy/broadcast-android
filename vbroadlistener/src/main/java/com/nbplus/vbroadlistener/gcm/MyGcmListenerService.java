@@ -211,6 +211,15 @@ public class MyGcmListenerService extends GcmListenerService {
                 Log.d(TAG, "Unknown push payload type !!!");
                 break;
         }
+
+        VBroadcastServer server = LauncherSettings.getInstance(this).getServerInformation();
+        if (server != null && !StringUtils.isEmptyString(server.getApiServer())) {
+            SendGcmResultTask task = new SendGcmResultTask();
+            if (task != null) {
+                task.setSendGcmResultData(this, server.getApiServer() + Constants.API_GCM_SEND_RESULT_CONTEXT_PATH, payloadData.getMessageId());
+                task.execute();
+            }
+        }
     }
     // [END receive_message]
 

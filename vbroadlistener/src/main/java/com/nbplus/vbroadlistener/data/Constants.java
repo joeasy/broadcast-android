@@ -53,4 +53,6 @@ public class Constants {
     public static final String BROADCAST_LIST_CONTEXT_PATH = "/broadcasting/broadcasting/getBroadcastingList.rmc";
     public static final String INHABITANT_POLL_LIST_CONTEXT_PATH = "/participation/residentvote/getResidentVoteList.rmc";
     public static final String COOPERATIVE_BUYING_LIST_CONTEXT_PATH = "/participation/groupPurchase/getGroupPurchaseList.rmc";
+
+    public static final String API_GCM_SEND_RESULT_CONTEXT_PATH = "/is/api/appRequest/RegistPushRequestResult";
 }

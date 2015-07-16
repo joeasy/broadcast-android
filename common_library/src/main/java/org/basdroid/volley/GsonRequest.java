@@ -62,6 +62,7 @@ public class GsonRequest<T> extends Request<T> {
             isJsonBody = true;
             this.mRequestBody = (String)requestBody;
         } else if (requestBody instanceof Map) {
+            isJsonBody = false;
             this.mRequestBodyParams = (Map)requestBody;
         }
         mGson = new Gson();
