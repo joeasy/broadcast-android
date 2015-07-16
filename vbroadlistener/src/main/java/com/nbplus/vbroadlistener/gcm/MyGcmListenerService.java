@@ -146,7 +146,13 @@ public class MyGcmListenerService extends GcmListenerService {
                 break;
             // 긴급호출메시지
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
-                showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, null);
+                if (StringUtils.isEmptyString(payloadData.getMessage())) {
+                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, null);
+                } else {
+                    // bigText 사용시
+                    showNotification(this, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, PackageUtils.getApplicationName(this),
+                            payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, null);
+                }
                 break;
             // 주민투표
             case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
