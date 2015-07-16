@@ -140,7 +140,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = LauncherSettings.getInstance(this).getRegisterAddress();
         }
 
-        url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
         if (url.indexOf("?") > 0) {
 //            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
             url += ("&APPID=" + getApplicationContext().getPackageName());

@@ -65,4 +65,8 @@ public class PackageUtils {
         intent.setData(Uri.parse("market://search?q=" + query));
         context.startActivity(intent);
     }
+    public static String getApplicationName(Context context) {
+        int stringId = context.getApplicationInfo().labelRes;
+        return context.getString(stringId);
+    }
 }

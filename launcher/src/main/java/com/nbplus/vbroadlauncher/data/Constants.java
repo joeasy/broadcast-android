@@ -115,4 +115,6 @@ public class Constants {
     // push notification ID
     public static final int PUSH_NOTIFICATION_ALARM_ID = 1001;
     public static final int RADIO_NOTIFICATION_ID = 2001;
+    public static final int PW_FIND_NOTIFICATION_ID = 2002;
+    public static final int SYSTEM_ADMIN_NOTIFICATION_ID = 2003;
 }
