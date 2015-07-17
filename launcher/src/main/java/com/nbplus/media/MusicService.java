@@ -652,13 +652,12 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         mRemoteViews = new RemoteViews(getPackageName(), R.layout.music_notification);
         setRemoteViews();
         mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_notification_radio);
 
         CharSequence ticker = text;
         int apiVersion = Build.VERSION.SDK_INT;
 
         if (apiVersion < Build.VERSION_CODES.HONEYCOMB) {
-            mNotification = new Notification(R.drawable.ic_launcher, ticker, System.currentTimeMillis());
+            mNotification = new Notification(R.drawable.ic_notification_radio, ticker, System.currentTimeMillis());
             mNotification.contentView = mRemoteViews;
             //mNotification.contentIntent = pendIntent;
 
@@ -668,7 +667,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             startForeground(Constants.RADIO_NOTIFICATION_ID, mNotification);
 
         } else if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
-            mBuilder.setSmallIcon(R.drawable.ic_launcher)
+            mBuilder.setSmallIcon(R.drawable.ic_notification_radio)
                     .setAutoCancel(false)
                     .setOngoing(true)
                     //.setContentIntent(pendIntent)

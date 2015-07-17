@@ -29,7 +29,7 @@ public class RadioGridViewAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<RadioChannelInfo.RadioChannel> mRadioChannelList;
     private View.OnClickListener mClickListener;
-    private long mPlayingItemIdx = -1;
+    private String mPlayingItemUrl = null;
 
     public static class RadioViewHolder {
         public Button channelButton;
@@ -67,7 +67,7 @@ public class RadioGridViewAdapter extends BaseAdapter {
             } else {
                 viewHolder.channelButton.setText(radioChannel.channelName);
             }
-            if (radioChannel.index == mPlayingItemIdx) {
+            if (!StringUtils.isEmptyString(radioChannel.channelUrl) && radioChannel.channelUrl.equals(mPlayingItemUrl)) {
                 viewHolder.channelButton.setBackgroundResource(R.drawable.ic_radio_channel_pressed);
                 viewHolder.channelButton.setClickable(false);
                 //convertView.setClickable();
@@ -105,12 +105,12 @@ public class RadioGridViewAdapter extends BaseAdapter {
             if (state == MusicService.State.Paused || state == MusicService.State.Playing) {
                 MusicRetriever.Item item = b.getParcelable(MusicService.EXTRA_MUSIC_ITEM);
                 if (item != null) {
-                    mPlayingItemIdx = item.getId();
+                    mPlayingItemUrl = item.getUrl();
                 } else {
-                    mPlayingItemIdx = -1;
+                    mPlayingItemUrl = null;
                 }
             } else {
-                mPlayingItemIdx = -1;
+                mPlayingItemUrl = null;
             }
         }
     }

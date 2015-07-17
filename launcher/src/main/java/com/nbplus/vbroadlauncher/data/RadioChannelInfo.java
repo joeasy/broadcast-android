@@ -39,9 +39,6 @@ public class RadioChannelInfo extends BaseApiResult {
         @SerializedName("URL")
         public String channelUrl;
 
-        // 재생위치를 기억하기 위한 index.
-        public int index;
-
         @Override
         public int describeContents() {
             return 0;
@@ -52,7 +49,6 @@ public class RadioChannelInfo extends BaseApiResult {
             dest.writeString(this.channelName);
             dest.writeString(this.channelImage);
             dest.writeString(this.channelUrl);
-            dest.writeInt(this.index);
         }
 
         public RadioChannel() {
@@ -62,7 +58,6 @@ public class RadioChannelInfo extends BaseApiResult {
             this.channelName = in.readString();
             this.channelImage = in.readString();
             this.channelUrl = in.readString();
-            this.index = in.readInt();
         }
 
         public static final Parcelable.Creator<RadioChannel> CREATOR = new Parcelable.Creator<RadioChannel>() {

@@ -550,7 +550,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
         if (channel != null) {
             Intent i = new Intent(this, MusicService.class);
             i.setAction(MusicService.ACTION_URL);
-            MusicRetriever.Item item = new MusicRetriever.Item(0, channel.index, null, channel.channelName, null, channel.channelUrl, 0);
+            MusicRetriever.Item item = new MusicRetriever.Item(0, -1, null, channel.channelName, null, channel.channelUrl, 0);
             i.putExtra(MusicService.EXTRA_MUSIC_ITEM, item);
             startService(i);
 

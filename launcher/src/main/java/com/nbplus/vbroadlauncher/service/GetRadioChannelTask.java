@@ -16,6 +16,7 @@ import org.basdroid.volley.GsonRequest;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -59,109 +60,8 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
     protected void onPostExecute(BaseApiResult result) {
 
         // TODO : sample data
-//        RadioChannelInfo testResult = new RadioChannelInfo();
-//        testResult.setResultCode("0000");
-//        testResult.setResultMessage("Success");
-//
-//         items = new ArrayList<>();
+//        ArrayList<RadioChannelInfo.RadioChannel> items = new ArrayList<>();
 //        RadioChannelInfo.RadioChannel item = new RadioChannelInfo.RadioChannel();
-/**
-        item.channelName = "KBS 제1라디오 강릉국";
-        item.channelUrl = "mms://121.189.147.12:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제1라디오 원주국";
-        item.channelUrl = "mms://220.73.75.151:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제1라디오 진주국";
-        item.channelUrl = "mms://121.177.203.174:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제1라디오 부산총국";
-        item.channelUrl = "mms://121.177.203.174:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제1라디오 광주총국";
-        item.channelUrl = "mms://210.115.221.31/KJ1R";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제1라디오 춘천총국";
-        item.channelUrl = "mms://210.115.222.69/CC1R";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제2라디오 부산총국";
-        item.channelUrl = "mms://218.36.204.144:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 제2라디오 광주총국";
-        item.channelUrl = "mms://210.115.221.31/KJ2R";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS Classic FM (1FM) 강릉국";
-        item.channelUrl = "mms://121.189.147.49:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS Classic FM (1FM) 원주국";
-        item.channelUrl = "mms://220.73.75.152:8080";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 음악FM 부산총국";
-        item.channelUrl = "mms://218.36.204.144:8080/";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "KBS 음악FM 광주총국";
-        item.channelUrl = "mms://210.115.221.31/KJMUSICFM";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "World Radio (국제방송) CH1";
-        item.channelUrl = "mms://live.kbs.gscdn.com/world_rki1";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "World Radio (국제방송) CH2";
-        item.channelUrl = "mms://live.kbs.gscdn.com/world_rki2";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "World Radio (국제방송) Music";
-        item.channelUrl = "mms://live.kbs.gscdn.com/world_rki3";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "MBC 표준FM 부산";
-        item.channelUrl = "mms://58.231.196.73/busanmbc-am-onair-20120228";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "MBC 표준FM 대구";
-        item.channelUrl = "mms://vod1.dgmbc.com/amlive";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "MBC 표준FM 광주";
-        item.channelUrl = "mms://211.117.193.99/gjmbcamlive";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
-        item.channelName = "MBC 표준FM 대전";
-        item.channelUrl = "mms://VOD.tjmbc.co.kr/0becb_am";
-        items.add(item);
-
-        item = new RadioChannelInfo.RadioChannel();
- */
 //        item.channelName = "MBC 표준FM 전주";
 //        item.channelUrl = "mms://210.105.237.100/mbcam";
 //        items.add(item);
@@ -571,20 +471,12 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://aod.wbsi.kr/wbs983";
 //        items.add(item);
 //
-//        testResult.setRadioChannelList(items);
-//        result = testResult;
+//        ((RadioChannelInfo)result).setResultCode("0000");
+//        ((RadioChannelInfo)result).setRadioChannelList(items);
 
         // end of TODO : sample data
 
         // TODO ;; remove later....
-        if (result != null) {
-            ArrayList<RadioChannelInfo.RadioChannel> items = ((RadioChannelInfo)result).getRadioChannelList();
-            if (items != null) {
-                for (int i = 0; i < items.size(); i++) {
-                    items.get(i).index = i;
-                }
-            }
-        }
 
         if (mHandler != null) {
             Message message = new Message();

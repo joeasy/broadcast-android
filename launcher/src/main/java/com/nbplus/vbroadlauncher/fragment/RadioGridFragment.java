@@ -138,7 +138,6 @@ public class RadioGridFragment extends Fragment implements AdapterView.OnItemCli
         RadioChannelInfo.RadioChannel channel = (RadioChannelInfo.RadioChannel)viewHolder.radioChannel;
 
         viewHolder.channelButton.setSelected(true);
-        Log.d(TAG, ">> clicked radio channel index = " + channel.index);
         Log.d(TAG, ">> clicked radio channel name = " + channel.channelName + ", url = " + channel.channelUrl);
 
         if (mListener != null) {
