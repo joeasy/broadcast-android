@@ -33,51 +33,80 @@
             android:layout_gravity="center_vertical"
             />
 
+        <LinearLayout android:id="@+id/ic_nav_outdoor"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      style="@android:style/Widget.Button"
+                      android:clickable="true"
+                      android:background="@drawable/ic_btn_nav_color"
+                      >
         <ImageView
             android:src="@drawable/ic_nav_line"
             android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/btn_outdoor"
+        <TextView
+            android:id="@+id/tv_outdoor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/btn_outdoor"
             android:textColor="@color/btn_color_absentia_off"
             android:textAllCaps="false"
+            android:clickable="false"
             android:textSize="@dimen/launcher_top_nav_menu_font_size"
             android:background="@android:color/transparent"
             android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
             android:drawableLeft="@drawable/ic_nav_absentia_off"
             android:drawablePadding="@dimen/ic_nav_btn_drawable_padding"/>
+        </LinearLayout>
 
+        <LinearLayout android:id="@+id/ic_nav_apps"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      style="@android:style/Widget.Button"
+                      android:clickable="true"
+                      android:background="@drawable/ic_btn_nav_color"
+            >
         <ImageView
             android:src="@drawable/ic_nav_line"
             android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/btn_show_apps"
+        <TextView
+            android:id="@+id/tv_show_apps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/btn_show_apps"
             android:textColor="@color/white"
             android:textAllCaps="false"
+            android:clickable="false"
             android:textSize="@dimen/launcher_top_nav_menu_font_size"
             android:background="@android:color/transparent"
             android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
             android:drawableLeft="@drawable/ic_nav_apps"
             android:drawablePadding="@dimen/ic_nav_btn_drawable_padding"/>
 
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/ic_nav_show_map"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      style="@android:style/Widget.Button"
+                      android:clickable="true"
+                      android:background="@drawable/ic_btn_nav_color"
+            >
         <ImageView
             android:src="@drawable/ic_nav_line"
             android:paddingRight="@dimen/launcher_top_nav_padding_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/btn_show_map"
+        <TextView
+            android:id="@+id/tv_show_map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -85,9 +114,11 @@
             android:textColor="@color/white"
             android:textAllCaps="false"
             android:textSize="@dimen/launcher_top_nav_menu_font_size"
+            android:clickable="false"
             android:background="@android:color/transparent"
             android:drawableLeft="@drawable/ic_nav_sitemap"
             android:drawablePadding="@dimen/ic_nav_btn_drawable_padding"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- launcher main layer -->

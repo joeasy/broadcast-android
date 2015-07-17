@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlistener.R;
 import com.nbplus.vbroadlistener.data.VBroadcastServer;
 
+import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.reflect.Type;
@@ -41,6 +42,10 @@ public class LauncherSettings implements Parcelable {
 
     boolean isCheckedTTSEngine;
 
+    String gcmToken;
+    boolean gcmRegisteredStatus;
+    boolean gcmSentToServerStatus;
+
     // 서버정보
     @SerializedName("svc_domain")
     VBroadcastServer serverInformation;
@@ -65,7 +70,7 @@ public class LauncherSettings implements Parcelable {
         return uniqueInstance;
     }
 
-    public static final String VBROADCAST_PREFERENCE_NAME = "vbroadcast_preference";
+    public static final String VBROADCAST_PREFERENCE_NAME = "vbroadcast_listener_preference";
     public static final String KEY_VBROADCAST_VILLAGE_CODE = "key_village_code";
     public static final String KEY_VBROADCAST_VILLAGE_NAME = "key_village_name";
     public static final String KEY_VBROADCAST_IS_COMPLETED_SETUP = "key_is_completed_setup";
@@ -79,6 +84,10 @@ public class LauncherSettings implements Parcelable {
     public static final String KEY_VBROADCAST_IS_OUTDOOR_MODE = "key_is_outdoor_mode";
     public static final String KEY_IS_CHECKED_TTS = "key_is_checked_tts";
 
+    public static final String KEY_GCM_REGISTERED_STATUS = "key_gcmRegisteredStatus";
+    public static final String KEY_SENT_TOKEN_TO_SERVER = "key_sentTokenToServer";
+    public static final String KEY_GCM_TOKEN_VALUE = "key_gcmTokenValue";
+
     private Context context;
     private SharedPreferences prefs;
     private Gson gson;
@@ -89,11 +98,21 @@ public class LauncherSettings implements Parcelable {
 
         // load from preferences..
         this.deviceID = prefs.getString(KEY_VBROADCAST_DEVICE_ID, "");
+        if (StringUtils.isEmptyString(this.deviceID)) {
+            String deviceID = DeviceUtils.getDeviceIdByMacAddress(context);
+            prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+        }
+
         this.isCompletedSetup = prefs.getBoolean(KEY_VBROADCAST_IS_COMPLETED_SETUP, false);
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
         this.isCheckedTTSEngine = prefs.getBoolean(KEY_IS_CHECKED_TTS, false);
+
+        this.gcmToken = prefs.getString(KEY_GCM_TOKEN_VALUE, "");
+        this.gcmRegisteredStatus = prefs.getBoolean(KEY_GCM_REGISTERED_STATUS, false);
+        this.gcmSentToServerStatus = prefs.getBoolean(KEY_SENT_TOKEN_TO_SERVER, false);
+
         int wallpaperId = prefs.getInt(KEY_WALLPAPER_RESOURCE_ID, -1);
 
         landWallpaperResource = new int[]{ R.drawable.ic_bg_main_land };
@@ -109,6 +128,33 @@ public class LauncherSettings implements Parcelable {
         }
 
         this.serverInformation = (VBroadcastServer)getPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, new TypeToken<VBroadcastServer>(){}.getType());
+    }
+
+    public String getGcmToken() {
+        return gcmToken;
+    }
+
+    public void setGcmToken(String gcmToken) {
+        this.gcmToken = gcmToken;
+        prefs.edit().putString(KEY_GCM_TOKEN_VALUE, gcmToken).apply();
+    }
+
+    public boolean isGcmRegisteredStatus() {
+        return gcmRegisteredStatus;
+    }
+
+    public void setGcmRegisteredStatus(boolean gcmRegisteredStatus) {
+        this.gcmRegisteredStatus = gcmRegisteredStatus;
+        prefs.edit().putBoolean(KEY_GCM_REGISTERED_STATUS, gcmRegisteredStatus).apply();
+    }
+
+    public boolean isGcmSentToServerStatus() {
+        return gcmSentToServerStatus;
+    }
+
+    public void setGcmSentToServerStatus(boolean gcmSentToServerStatus) {
+        this.gcmSentToServerStatus = gcmSentToServerStatus;
+        prefs.edit().putBoolean(KEY_SENT_TOKEN_TO_SERVER, gcmSentToServerStatus).apply();
     }
 
     public String getDeviceID() {

@@ -71,8 +71,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
         }
         switch (msg.what) {
             case Constants.HANDLER_MESSAGE_UPDATE_GCM_DEVICE_TOKEN :
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                String deviceToken = sharedPreferences.getString(Constants.GCM_TOKEN_VALUE, "");
+                String deviceToken = LauncherSettings.getInstance(this).getGcmToken();
 
                 if (mWebViewClient != null) {
                     mWebViewClient.onRegistered(deviceToken);
@@ -97,13 +96,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     mHandler.sendEmptyMessage(Constants.HANDLER_MESSAGE_UPDATE_GCM_DEVICE_TOKEN);
                 }
 
-//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//            boolean sentToken = sharedPreferences.getBoolean(Constants.SENT_TOKEN_TO_SERVER, false);
-//            if (sentToken) {
-//                mInformationTextView.setText(getString(R.string.gcm_send_message));
-//            } else {
-//                mInformationTextView.setText(getString(R.string.token_error_message));
-//            }
             } else if (Constants.UNREGISTER_GCM.equals(action)) {
                 // web에서 처리한다.
                 if (mHandler != null) {
@@ -123,15 +115,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
         WebView webView = (WebView)findViewById(R.id.webview);
         mWebViewClient = new BroadcastWebViewClient(this, webView);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean sentToken = sharedPreferences.getBoolean(Constants.SENT_TOKEN_TO_SERVER, false);
-        if (sentToken) {
-            Toast.makeText(this, getString(R.string.gcm_send_message), Toast.LENGTH_LONG);
-            Log.d(TAG, ">>> already sent....");
-        } else {
-            Toast.makeText(this, getString(R.string.token_error_message), Toast.LENGTH_LONG);
-            Log.d(TAG, ">>> not sent....");
-        }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Constants.REGISTRATION_COMPLETE));
 

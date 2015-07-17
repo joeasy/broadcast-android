@@ -8,9 +8,6 @@ public class Constants {
     // GCM Sender ID
     public static final String GCM_SENDER_ID = "356837636067";
 
-    public static final String GCM_REGISTERED_STATUS = "gcmRegisteredStatus";
-    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
-    public static final String GCM_TOKEN_VALUE = "gcmTokenValue";
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
     public static final String UNREGISTRATION_COMPLETE = "unRegistrationComplete";
 
@@ -18,6 +15,7 @@ public class Constants {
     public static final int HANDLER_MESSAGE_UNREGISTER_GCM = 1002;
 
     public static final String REGISTER_GCM = "com.nbplus.vbroadcast.action.REGISTER_GCM";
+    public static final String UPDATE_GCM = "com.nbplus.vbroadcast.action.UPDATE_GCM";
     public static final String UNREGISTER_GCM = "com.nbplus.vbroadcast.action.UNREGISTER_GCM";
     public static final String ACTION_SHOW_NOTIFICATION_CONTENTS = "com.nbplus.vbroadcast.action.SHOW_NOTIFICATION_CONTENTS";
     public static final String EXTRA_SHOW_NOTIFICATION_CONTENTS = "EXTRA_SHOW_NOTIFICATION_CONTENTS";
@@ -55,4 +53,7 @@ public class Constants {
     public static final String COOPERATIVE_BUYING_LIST_CONTEXT_PATH = "/participation/groupPurchase/getGroupPurchaseList.rmc";
 
     public static final String API_GCM_SEND_RESULT_CONTEXT_PATH = "/is/api/appRequest/RegistPushRequestResult";
+    public static final String API_GCM_TOKEN_UPDATE_CONTEXT_PATH = "/is/api/appRequest/UpdatePushInfo";
+
+    public static final String API_RESP_OK = "0000";
 }

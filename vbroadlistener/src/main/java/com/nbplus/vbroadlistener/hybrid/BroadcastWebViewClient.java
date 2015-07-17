@@ -104,11 +104,6 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @Override
     @JavascriptInterface
     public String getDeviceId() {
-        if (StringUtils.isEmptyString(LauncherSettings.getInstance(mContext).getDeviceID())) {
-            String deviceID = DeviceUtils.getDeviceIdByMacAddress(mContext);
-            LauncherSettings.getInstance(mContext).setDeviceID(deviceID);
-        }
-
         return LauncherSettings.getInstance(mContext).getDeviceID();
     }
 

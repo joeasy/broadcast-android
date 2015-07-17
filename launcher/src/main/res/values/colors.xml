@@ -19,5 +19,6 @@
     <color name="title_seperator">#a4a4a4</color>
     <color name="activity_radio_background">#ffded6cd</color>
     <color name="dimmed_background">#e6000000</color>
+    <color name="ic_btn_nav_pressed">#6e8fd2</color>
 
 </resources>

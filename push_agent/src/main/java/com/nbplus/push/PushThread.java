@@ -243,7 +243,7 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
     public void run() {
         try {
             mWifiLock = ((WifiManager) mContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "push_wifi_lock");
-            mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 20 * 1000);
+            //mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 20 * 1000);
 
             while (!Thread.currentThread().isInterrupted()) {
                 switch (mPushThreadCommand) {

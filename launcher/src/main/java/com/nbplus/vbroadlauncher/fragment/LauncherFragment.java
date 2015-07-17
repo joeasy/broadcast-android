@@ -84,9 +84,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
     ProgressDialogFragment mProgressDialogFragment;
     private ImageView mPushServiceStatus;
-    private Button mOutdoorMode;
-    private Button mServiceTreeMap;
-    private Button mApplicationsView;
+    private LinearLayout mOutdoorMode;
+    private TextView mOutdoorText;
+
+    private LinearLayout mServiceTreeMap;
+    private LinearLayout mApplicationsView;
     private TextView mVillageName;
     private TextClock mTextClock;
     private WeatherView mWeatherView;
@@ -328,7 +330,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
         mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
 
-        mApplicationsView = (Button)v.findViewById(R.id.btn_show_apps);
+        mApplicationsView = (LinearLayout)v.findViewById(R.id.ic_nav_apps);
         mApplicationsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -337,7 +339,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
-        mServiceTreeMap = (Button)v.findViewById(R.id.btn_show_map);
+        mServiceTreeMap = (LinearLayout)v.findViewById(R.id.ic_nav_show_map);
         mServiceTreeMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -362,13 +364,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 startActivity(intent);
             }
         });
-        mOutdoorMode = (Button)v.findViewById(R.id.btn_outdoor);
+        mOutdoorMode = (LinearLayout)v.findViewById(R.id.ic_nav_outdoor);
+        mOutdoorText = (TextView) v.findViewById(R.id.tv_outdoor);
         if (LauncherSettings.getInstance(getActivity()).isOutdoorMode()) {
-            mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
-            mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
+            mOutdoorText.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
+            mOutdoorText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
         } else {
-            mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
-            mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
+            mOutdoorText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+            mOutdoorText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
         }
         mOutdoorMode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -377,24 +380,21 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
                 if (LauncherSettings.getInstance(getActivity()).isOutdoorMode()) {
                     LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(false);
-                    mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
-                    mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+                    mOutdoorText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
+                    mOutdoorText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
 
                     toast = Toast.makeText(getActivity(), R.string.outdoor_mode_off, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
                 } else {
                     LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(true);
-                    mOutdoorMode.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
-                    mOutdoorMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
+                    mOutdoorText.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
+                    mOutdoorText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
 
                     toast = Toast.makeText(getActivity(), R.string.outdoor_mode_on, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
                 }
-
-                // 서버에????
-
             }
         });
 

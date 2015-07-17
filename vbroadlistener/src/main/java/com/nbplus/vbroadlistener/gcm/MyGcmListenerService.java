@@ -110,12 +110,6 @@ public class MyGcmListenerService extends GcmListenerService {
         Intent pi;
         String moveUrl;
 
-        try {
-            alert = URLDecoder.decode(alert, "utf-8");
-            payload = URLDecoder.decode(payload, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
         PushPayloadData payloadData = null;
         try {
             Gson gson = new GsonBuilder().create();
