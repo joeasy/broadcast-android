@@ -19,6 +19,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -122,6 +123,15 @@ public class BroadcastWebViewActivity extends BaseActivity {
         WebView webView = (WebView)findViewById(R.id.webview);
         mWebViewClient = new BroadcastWebViewClient(this, webView);
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean sentToken = sharedPreferences.getBoolean(Constants.SENT_TOKEN_TO_SERVER, false);
+        if (sentToken) {
+            Toast.makeText(this, getString(R.string.gcm_send_message), Toast.LENGTH_LONG);
+            Log.d(TAG, ">>> already sent....");
+        } else {
+            Toast.makeText(this, getString(R.string.token_error_message), Toast.LENGTH_LONG);
+            Log.d(TAG, ">>> not sent....");
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Constants.REGISTRATION_COMPLETE));
 
