@@ -2,6 +2,7 @@ package com.nbplus.hybrid;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
+import android.webkit.MimeTypeMap;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -27,7 +30,11 @@ import android.widget.Toast;
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
 import org.basdroid.common.R;
+import org.basdroid.common.StorageUtils;
 import org.basdroid.common.StringUtils;
+
+import java.io.File;
+import java.util.Arrays;
 
 
 /**
@@ -42,6 +49,7 @@ public class BasicWebViewClient extends WebViewClient {
     protected Activity mContext;
     protected BroadcastWebChromeClient mWebChromeClient;
     protected boolean mPageLoadSuccess = false;
+    protected DownloadManager mDownloadManager;
 
     /**
      * Created by basagee on 2015. 4. 30..
@@ -134,6 +142,8 @@ public class BasicWebViewClient extends WebViewClient {
         mWebView = view;
         mContext = activity;
 
+        // This will handle downloading. It requires Gingerbread, though
+        mDownloadManager = (DownloadManager) mContext.getSystemService(mContext.DOWNLOAD_SERVICE);
         mWebChromeClient = new BroadcastWebChromeClient();
 
         // Enable remote debugging via chrome://inspect
@@ -219,8 +229,70 @@ public class BasicWebViewClient extends WebViewClient {
         }
     }
 
+    private static final String[] DOCUMENT_MIMETYPE = new String[]{
+            "application/pdf",
+            "application/msword",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+            "application/vnd.ms-excel",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.openxmlformats-officedocument.presentationml.template",
+            "application/vnd.openxmlformats-officedocument.presentationml.slideshow"
+    };
+    // url = file path or whatever suitable URL you want.
+    public String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
+
+    public boolean isDocumentMimeType(String url) {
+        String mimeType = getMimeType(url);
+        if (!StringUtils.isEmptyString(mimeType) && Arrays.asList(DOCUMENT_MIMETYPE).contains(mimeType)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        // for excel download
+        if (isDocumentMimeType(url)) {
+            Log.d(TAG, "This url is document mimetype = " + url);
+            if (StorageUtils.isExternalStorageWritable()) {
+                Uri source = Uri.parse(url);
+
+                // Make a new request pointing to the mp3 url
+                DownloadManager.Request request = new DownloadManager.Request(source);
+                // Use the same file name for the destination
+                File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), source.getLastPathSegment());
+                request.setDestinationUri(Uri.fromFile(destinationFile));
+                // Add it to the manager
+                mDownloadManager.enqueue(request);
+                Toast.makeText(mContext, R.string.downloads_requested, Toast.LENGTH_SHORT).show();
+            } else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //closeWebApplication();
+                    }
+                });
+                builder.setMessage(R.string.downloads_path_check);
+                builder.show();
+            }
+            return true;
+        }
+
         if (url.startsWith("tel:")) {
             // phone call
             if (!PhoneState.hasPhoneCallAbility(mContext)) {

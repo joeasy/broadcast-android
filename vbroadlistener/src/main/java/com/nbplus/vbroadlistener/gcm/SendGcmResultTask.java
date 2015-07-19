@@ -45,7 +45,7 @@ public class SendGcmResultTask  extends AsyncTask<Void, Void, BaseApiResult> {
         String url = builder.toString();
 
         if (StringUtils.isEmptyString(LauncherSettings.getInstance(mContext).getDeviceID())) {
-            String deviceID = DeviceUtils.getDeviceIdByMacAddress(mContext);
+            String deviceID = LauncherSettings.getInstance(mContext).getDeviceID();
             LauncherSettings.getInstance(mContext).setDeviceID(deviceID);
         }
 

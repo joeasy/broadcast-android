@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,43 +81,15 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
 
         String url = LauncherSettings.getInstance(getActivity()).getRegisterAddress();
         if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+            url += ("&UUID=" + LauncherSettings.getInstance(getActivity()).getDeviceID());
             url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
         } else {
-            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
+            url += ("?UUID=" + LauncherSettings.getInstance(getActivity()).getDeviceID());
             url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
         }
-        mWebViewClient.loadUrl(url);
 
-        // test view
-//        final EditText editText = (EditText)v.findViewById(R.id.et_test_url);
-//        editText.setText(url);
-//        Button button = (Button)v.findViewById(R.id.btn_test_load);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String url = editText.getText().toString();
-//                if (StringUtils.isEmptyString(url)) {
-//                    return;
-//                }
-//                if (url.indexOf("?") > 0) {
-//                    if (!url.contains("UUID=")) {
-//                        url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
-//                    }
-//                    if (!url.contains("APPID=")) {
-//                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
-//                    }
-//                } else {
-//                    if (!url.contains("UUID=")) {
-//                        url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(getActivity()));
-//                    }
-//                    if (!url.contains("APPID=")) {
-//                        url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
-//                    }
-//                }
-//                mWebViewClient.loadUrl(url);
-//            }
-//        });
+        url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
+        mWebViewClient.loadUrl(url);
         return v;
     }
 

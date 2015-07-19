@@ -14,4 +14,6 @@
     <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
 
     <string name="webview_page_loading_error">페이지 불러오기가 실패하였습니다. 확인 후 다시 시도해 주세요.</string>
+    <string name="downloads_path_check">SD 카드에 저장을 할 수 없습니다. 확인 후 다시 시도해 주시기 바랍니다.</string>
+    <string name="downloads_requested">\"다운로드\" 폴더에서 결과를 확인하시기 바랍니다.</string>
 </resources>

@@ -21,23 +21,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c0603288-8d3a-481e-8f1c-d2f395fd9131" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/calendar_library/.gitignore" afterPath="$PROJECT_DIR$/calendar_library/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/.gitignore" afterPath="$PROJECT_DIR$/common_library/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/iot_gateway/.gitignore" afterPath="$PROJECT_DIR$/iot_gateway/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/.gitignore" afterPath="$PROJECT_DIR$/launcher/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/push_agent/.gitignore" afterPath="$PROJECT_DIR$/push_agent/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadcreator/.gitignore" afterPath="$PROJECT_DIR$/vbroadcreator/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadlistener/.gitignore" afterPath="$PROJECT_DIR$/vbroadlistener/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/calendar_library/calendar_library.iml" afterPath="$PROJECT_DIR$/calendar_library/calendar_library.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/common_library.iml" afterPath="$PROJECT_DIR$/common_library/common_library.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/iot_gateway/iot_gateway.iml" afterPath="$PROJECT_DIR$/iot_gateway/iot_gateway.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/launcher.iml" afterPath="$PROJECT_DIR$/launcher/launcher.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common_library/src/main/java/org/basdroid/common/StorageUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" afterPath="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/BroadcastChatHeadService.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/BroadcastChatHeadService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastWebViewActivity.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastWebViewActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java" afterPath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/BroadcastWebViewClient.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/BroadcastWebViewClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RealtimeBroadcastActivity.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RealtimeBroadcastActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RegisterFragment.java" afterPath="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RegisterFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/RegistrationIntentService.java" afterPath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/RegistrationIntentService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/SendGcmResultTask.java" afterPath="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/SendGcmResultTask.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/push_agent/push_agent.iml" afterPath="$PROJECT_DIR$/push_agent/push_agent.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vbroadlistener/vbroadlistener.iml" afterPath="$PROJECT_DIR$/vbroadlistener/vbroadlistener.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/viewpager_indicator/viewpager_indicator.iml" afterPath="$PROJECT_DIR$/viewpager_indicator/viewpager_indicator.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vitamio/vitamio.iml" afterPath="$PROJECT_DIR$/vitamio/vitamio.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/common_library/src/main/res/values/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_library/src/main/res/values-ko/strings.xml" afterPath="$PROJECT_DIR$/common_library/src/main/res/values-ko/strings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="vbroadcast.iws" />
@@ -101,101 +99,53 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.gradle">
+      <file leaf-file-name="BasicWebViewClient.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.92730844">
+              <caret line="297" column="9" selection-start-line="297" selection-start-column="9" selection-end-line="297" selection-end-column="9" />
+              <folding>
+                <element signature="e#10962#10990#0" expanded="true" />
+                <element signature="e#11170#11375#0" expanded="true" />
+                <element signature="e#11374#11375#0" expanded="true" />
+                <element signature="e#11413#11442#0" expanded="true" />
+                <element signature="e#14387#14590#0" expanded="true" />
+                <element signature="e#14589#14590#0" expanded="true" />
+                <element signature="e#14628#14663#0" expanded="true" />
+                <element signature="e#15086#15087#0" expanded="true" />
+                <element signature="e#15153#15154#0" expanded="true" />
+                <element signature="e#15413#15414#0" expanded="true" />
+                <element signature="e#15476#15477#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common_library/src/main/res/values-ko/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-1.8">
+              <caret line="3" column="28" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common_library/src/main/res/values/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-10.8">
+              <caret line="18" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RegisterFragment.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RegisterFragment.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.31358886">
-              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launcher/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/iot_gateway/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common_library/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/calendar_library/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/push_agent/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vbroadcreator/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vbroadlistener/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.0">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launcher/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -6699,18 +6649,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RealtimeBroadcastActivity.java" />
-        <option value="$PROJECT_DIR$/common_library/src/main/java/org/basdroid/common/PackageUtils.java" />
-        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/Constants.java" />
-        <option value="$PROJECT_DIR$/vbroad_creator/src/main/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/vbroad_creator/build.gradle" />
-        <option value="$PROJECT_DIR$/vbroad_creator/src/main/java/com/nbplus/vbroadcreator/MainActivity.java" />
-        <option value="$PROJECT_DIR$/vbroadcreator/src/main/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/vbroadcreator/src/main/res/values-v19/styles.xml" />
-        <option value="$PROJECT_DIR$/vbroadcreator/src/main/res/values/styles.xml" />
-        <option value="$PROJECT_DIR$/vbroadcreator/src/main/java/com/nbplus/vbroadcreator/Constant.java" />
-        <option value="$PROJECT_DIR$/vbroadcreator/src/main/java/com/nbplus/vbroadcreator/MainActivity.java" />
-        <option value="$PROJECT_DIR$/vbroadcreator/src/main/res/values-ko/strings.xml" />
         <option value="$PROJECT_DIR$/vbroadcreator/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/res/values-ko/strings.xml" />
         <option value="$PROJECT_DIR$/settings.gradle" />
@@ -6718,7 +6656,6 @@
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/ShowApplicationActivity.java" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/data/BaseApiResult.java" />
         <option value="$PROJECT_DIR$/common_library/src/main/java/org/basdroid/volley/GsonRequest.java" />
-        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/SendGcmResultTask.java" />
         <option value="$PROJECT_DIR$/vbroadcreator/build.gradle" />
         <option value="$PROJECT_DIR$/iot_gateway/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastPushReceiver.java" />
@@ -6733,9 +6670,7 @@
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/MyGcmListenerService.java" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/hybrid/BroadcastWebViewClient.java" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/data/Constants.java" />
-        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/RegistrationIntentService.java" />
         <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/preference/LauncherSettings.java" />
-        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/RadioChannelInfo.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RadioActivity.java" />
         <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RadioGridFragment.java" />
@@ -6750,6 +6685,21 @@
         <option value="$PROJECT_DIR$/vbroadcreator/.gitignore" />
         <option value="$PROJECT_DIR$/vbroadlistener/.gitignore" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RealtimeBroadcastActivity.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/BroadcastChatHeadService.java" />
+        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java" />
+        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/RegistrationIntentService.java" />
+        <option value="$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/SendGcmResultTask.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/BroadcastWebViewClient.java" />
+        <option value="$PROJECT_DIR$/common_library/src/main/java/org/basdroid/common/ExternalStorageUtils.java" />
+        <option value="$PROJECT_DIR$/common_library/src/main/java/org/basdroid/common/StorageUtils.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastWebViewActivity.java" />
+        <option value="$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RegisterFragment.java" />
+        <option value="$PROJECT_DIR$/common_library/src/main/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/common_library/src/main/res/values-ko/strings.xml" />
+        <option value="$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java" />
       </list>
     </option>
   </component>
@@ -6767,8 +6717,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="409" />
-    <option name="y" value="40" />
+    <option name="x" value="582" />
+    <option name="y" value="42" />
     <option name="width" value="1763" />
     <option name="height" value="1198" />
   </component>
@@ -6811,8 +6761,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -6842,6 +6791,110 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hybrid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlistener" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -7010,6 +7063,82 @@
               <option name="myItemId" value="nbplus" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlauncher" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fragment" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="launcher" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nbplus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadlauncher" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="launcher" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nbplus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -7067,12 +7196,148 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="common_library" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common_library" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basdroid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common_library" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basdroid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common_library" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hybrid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common_library" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vbroadcast" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="calendar_library" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -7093,13 +7358,12 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="recentsLimit" value="5" />
-    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="059eede2" />
-    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Nexus_5_API_21_x86" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="YT910YGVMQ" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Nexus_5_API_22_x86" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
     <property name="settings.editor.selected.configurable" value="project.propDebugger" />
@@ -7391,28 +7655,28 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="409" y="40" width="1763" height="1198" extended-state="0" />
+    <frame x="582" y="42" width="1763" height="1198" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32967034" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902032" sideWeight="0.4979663" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32763818" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2130031" sideWeight="0.5141243" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.47959185" sideWeight="0.5020432" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3724584" sideWeight="0.5020337" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298307" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.48140705" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4805915" sideWeight="0.4979663" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42051756" sideWeight="0.4979568" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.50369686" sideWeight="0.49564207" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19233005" sideWeight="0.4858757" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30712074" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25497752" sideWeight="0.5074946" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37286434" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3724584" sideWeight="0.4979663" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -7420,7 +7684,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32947975" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3246231" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32439926" sideWeight="0.49447995" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -7465,133 +7729,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="137" />
+      <option name="time" value="144" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/media/MusicService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="672" column="32" selection-start-line="672" selection-start-column="32" selection-end-line="672" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <marker date="1437293543000" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/media/MusicRetriever.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="103" column="15" selection-start-line="103" selection-start-column="13" selection-end-line="103" selection-end-column="15" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#989#990#0" expanded="false" />
-            <element signature="e#1026#1027#0" expanded="false" />
-            <element signature="e#3400#3401#0" expanded="false" />
-            <element signature="e#3439#3440#0" expanded="false" />
-            <element signature="e#4278#4279#0" expanded="false" />
-            <element signature="e#4311#4312#0" expanded="false" />
-            <element signature="e#4348#4349#0" expanded="false" />
-            <element signature="e#4385#4386#0" expanded="false" />
-            <element signature="e#4421#4422#0" expanded="false" />
-            <element signature="e#4457#4458#0" expanded="false" />
-            <element signature="e#4493#4494#0" expanded="false" />
-            <element signature="e#4529#4530#0" expanded="false" />
-            <element signature="e#4566#4567#0" expanded="false" />
-            <element signature="e#4605#4606#0" expanded="false" />
-            <element signature="e#4905#4906#0" expanded="false" />
-            <element signature="e#4940#4941#0" expanded="false" />
-            <element signature="e#4973#4974#0" expanded="false" />
-            <element signature="e#5007#5008#0" expanded="false" />
-            <element signature="e#5066#5067#0" expanded="false" />
-            <element signature="e#5098#5099#0" expanded="false" />
-            <element signature="e#5937#5938#0" expanded="false" />
-            <element signature="e#5992#5993#0" expanded="false" />
-            <element signature="e#6040#6041#0" expanded="false" />
-            <element signature="e#6093#6094#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/callback/OnActivityInteractionListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2173913">
-          <caret line="12" column="15" selection-start-line="12" selection-start-column="15" selection-end-line="12" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/viewpager_indicator/src/main/java/com/viewpagerindicator/PageIndicator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/ShowApplicationActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.5185184">
-          <caret line="55" column="9" selection-start-line="55" selection-start-column="9" selection-end-line="55" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadlistener/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="35" column="22" selection-start-line="14" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadcreator/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common_library/src/main/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/iot_gateway/src/main/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="72" selection-start-line="4" selection-start-column="72" selection-end-line="4" selection-end-column="72" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastWebViewActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="122" column="72" selection-start-line="122" selection-start-column="32" selection-end-line="122" selection-end-column="72" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadlistener/build/generated/source/r/debug/org/basdroid/common/R.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36026937">
-          <caret line="482" column="32" selection-start-line="482" selection-start-column="32" selection-end-line="482" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/res/drawable-xxhdpi/ic_launcher.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.47412008">
-          <caret line="3912" column="33" selection-start-line="3912" selection-start-column="33" selection-end-line="3912" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3726708">
@@ -7604,7 +7746,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -7613,18 +7754,10 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="9" column="35" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launcher/src/main/res/layout/activity_show_application.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
       <provider editor-type-id="android-designer">
@@ -7635,7 +7768,6 @@
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
       <provider selected="true" editor-type-id="android-designer">
@@ -7646,7 +7778,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.379311">
           <caret line="104" column="40" selection-start-line="104" selection-start-column="40" selection-end-line="104" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
       <provider editor-type-id="android-designer">
@@ -7668,6 +7799,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="58" column="18" selection-start-line="58" selection-start-column="18" selection-end-line="58" selection-end-column="18" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -7675,6 +7807,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="37" column="11" selection-start-line="37" selection-start-column="11" selection-end-line="37" selection-end-column="11" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -7710,37 +7843,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="122" column="0" selection-start-line="122" selection-start-column="0" selection-end-line="122" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/RegistrationIntentService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/preference/LauncherSettings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="189" column="0" selection-start-line="189" selection-start-column="0" selection-end-line="189" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#11082#11083#0" expanded="false" />
-            <element signature="e#11139#11140#0" expanded="false" />
-            <marker date="1437293543000" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="132" column="16" selection-start-line="132" selection-start-column="16" selection-end-line="132" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <marker date="1437293543000" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -7756,33 +7859,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="103" column="15" selection-start-line="103" selection-start-column="13" selection-end-line="103" selection-end-column="15" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#989#990#0" expanded="false" />
-            <element signature="e#1026#1027#0" expanded="false" />
-            <element signature="e#3400#3401#0" expanded="false" />
-            <element signature="e#3439#3440#0" expanded="false" />
-            <element signature="e#4278#4279#0" expanded="false" />
-            <element signature="e#4311#4312#0" expanded="false" />
-            <element signature="e#4348#4349#0" expanded="false" />
-            <element signature="e#4385#4386#0" expanded="false" />
-            <element signature="e#4421#4422#0" expanded="false" />
-            <element signature="e#4457#4458#0" expanded="false" />
-            <element signature="e#4493#4494#0" expanded="false" />
-            <element signature="e#4529#4530#0" expanded="false" />
-            <element signature="e#4566#4567#0" expanded="false" />
-            <element signature="e#4605#4606#0" expanded="false" />
-            <element signature="e#4905#4906#0" expanded="false" />
-            <element signature="e#4940#4941#0" expanded="false" />
-            <element signature="e#4973#4974#0" expanded="false" />
-            <element signature="e#5007#5008#0" expanded="false" />
-            <element signature="e#5066#5067#0" expanded="false" />
-            <element signature="e#5098#5099#0" expanded="false" />
-            <element signature="e#5937#5938#0" expanded="false" />
-            <element signature="e#5992#5993#0" expanded="false" />
-            <element signature="e#6040#6041#0" expanded="false" />
-            <element signature="e#6093#6094#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -7790,10 +7866,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="144" column="9" selection-start-line="144" selection-start-column="9" selection-end-line="144" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <marker date="1437293543000" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -7811,10 +7883,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="654" column="0" selection-start-line="654" selection-start-column="0" selection-end-line="654" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <marker date="1437293543000" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -7830,14 +7898,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.6">
           <caret line="28" column="14" selection-start-line="28" selection-start-column="14" selection-end-line="28" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/BroadcastChatHeadService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="103.2">
-          <caret line="16" column="30" selection-start-line="16" selection-start-column="30" selection-end-line="16" selection-end-column="30" />
           <folding />
         </state>
       </provider>
@@ -7858,7 +7918,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
+    <entry file="file://$PROJECT_DIR$/launcher/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -7866,7 +7926,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/launcher/build.gradle">
+    <entry file="file://$PROJECT_DIR$/vbroadlistener/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.0">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.31358886">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -7876,41 +7950,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/launcher/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0">
+        <state vertical-scroll-proportion="0.13066202">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/iot_gateway/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0">
+        <state vertical-scroll-proportion="0.13066202">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/common_library/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0">
+        <state vertical-scroll-proportion="0.13066202">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/calendar_library/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0">
+        <state vertical-scroll-proportion="0.13066202">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/push_agent/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0">
+        <state vertical-scroll-proportion="0.13066202">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -7918,23 +7987,220 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-3.0">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/RealtimeBroadcastActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="172" column="83" selection-start-line="172" selection-start-column="83" selection-end-line="172" selection-end-column="83" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vbroadlistener/.gitignore">
+    <entry file="file://$PROJECT_DIR$/push_agent/src/main/java/com/nbplus/push/GetPushInterfaceTask.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0">
-          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="93" column="40" selection-start-line="93" selection-start-column="40" selection-end-line="93" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/BroadcastWebViewActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="149" column="7" selection-start-line="149" selection-start-column="7" selection-end-line="149" selection-end-column="7" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/SendGcmResultTask.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.31358886">
-          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="47" column="67" selection-start-line="47" selection-start-column="67" selection-end-line="47" selection-end-column="67" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2697#2698#0" expanded="false" />
+            <element signature="e#2732#2733#0" expanded="false" />
+            <element signature="e#2804#2805#0" expanded="false" />
+            <element signature="e#2847#2848#0" expanded="false" />
+            <element signature="e#3122#3123#0" expanded="false" />
+            <element signature="e#3168#3169#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/preference/LauncherSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="104" column="0" selection-start-line="100" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#5360#5361#0" expanded="false" />
+            <element signature="e#5391#5392#0" expanded="false" />
+            <element signature="e#5596#5597#0" expanded="false" />
+            <element signature="e#5638#5639#0" expanded="false" />
+            <element signature="e#5908#5909#0" expanded="false" />
+            <element signature="e#5952#5953#0" expanded="false" />
+            <element signature="e#6218#6219#0" expanded="false" />
+            <element signature="e#6249#6250#0" expanded="false" />
+            <element signature="e#6456#6457#0" expanded="false" />
+            <element signature="e#6497#6498#0" expanded="false" />
+            <element signature="e#6753#6754#0" expanded="false" />
+            <element signature="e#6792#6793#0" expanded="false" />
+            <element signature="e#7048#7049#0" expanded="false" />
+            <element signature="e#7082#7083#0" expanded="false" />
+            <element signature="e#7316#7317#0" expanded="false" />
+            <element signature="e#7350#7351#0" expanded="false" />
+            <element signature="e#7575#7576#0" expanded="false" />
+            <element signature="e#7609#7610#0" expanded="false" />
+            <element signature="e#7838#7839#0" expanded="false" />
+            <element signature="e#7879#7880#0" expanded="false" />
+            <element signature="e#8033#8034#0" expanded="false" />
+            <element signature="e#8067#8068#0" expanded="false" />
+            <element signature="e#8298#8299#0" expanded="false" />
+            <element signature="e#8338#8339#0" expanded="false" />
+            <element signature="e#9842#9843#0" expanded="false" />
+            <element signature="e#9866#9867#0" expanded="false" />
+            <element signature="e#11082#11083#0" expanded="false" />
+            <element signature="e#11139#11140#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/BroadcastWebViewClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="116" column="33" selection-start-line="116" selection-start-column="33" selection-end-line="116" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2017#2018#0" expanded="false" />
+            <element signature="e#2058#2059#0" expanded="false" />
+            <element signature="e#12393#12394#0" expanded="false" />
+            <element signature="e#12421#12422#0" expanded="false" />
+            <element signature="e#12537#12538#0" expanded="false" />
+            <element signature="e#12565#12566#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/org/basdroid/common/StorageUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="23" column="33" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vbroadlistener/src/main/java/com/nbplus/vbroadlistener/gcm/RegistrationIntentService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="189" column="53" selection-start-line="189" selection-start-column="53" selection-end-line="189" selection-end-column="53" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#1961#1962#0" expanded="false" />
+            <element signature="e#1987#1988#0" expanded="false" />
+            <element signature="docComment;method#sendRegistrationToServer#0;class#RegistrationIntentService#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/data/LauncherSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="135" column="31" selection-start-line="135" selection-start-column="31" selection-end-line="135" selection-end-column="31" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/HomeLauncherActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="305" column="0" selection-start-line="305" selection-start-column="0" selection-end-line="305" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/BroadcastWebViewActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="125" column="0" selection-start-line="125" selection-start-column="0" selection-end-line="125" selection-end-column="0" />
+          <folding>
+            <element signature="docComment;class#BroadcastWebViewActivity#0" expanded="false" />
+            <element signature="docComment;method#onNewIntent#0;class#BroadcastWebViewActivity#0" expanded="false" />
+            <element signature="docComment;method#onBackPressed#0;class#BroadcastWebViewActivity#0" expanded="false" />
+            <element signature="docComment;method#onPause#0;class#BroadcastWebViewActivity#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/hybrid/RegisterWebViewClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="58" column="16" selection-start-line="58" selection-start-column="16" selection-end-line="58" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/service/BroadcastChatHeadService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="127" column="83" selection-start-line="127" selection-start-column="83" selection-end-line="127" selection-end-column="83" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launcher/src/main/java/com/nbplus/vbroadlauncher/fragment/RegisterFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.8">
+          <caret line="18" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/res/values-ko/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.8">
+          <caret line="3" column="28" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_library/src/main/java/com/nbplus/hybrid/BasicWebViewClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.92730844">
+          <caret line="297" column="9" selection-start-line="297" selection-start-column="9" selection-end-line="297" selection-end-column="9" />
+          <folding>
+            <element signature="e#10962#10990#0" expanded="true" />
+            <element signature="e#11170#11375#0" expanded="true" />
+            <element signature="e#11374#11375#0" expanded="true" />
+            <element signature="e#11413#11442#0" expanded="true" />
+            <element signature="e#14387#14590#0" expanded="true" />
+            <element signature="e#14589#14590#0" expanded="true" />
+            <element signature="e#14628#14663#0" expanded="true" />
+            <element signature="e#15086#15087#0" expanded="true" />
+            <element signature="e#15153#15154#0" expanded="true" />
+            <element signature="e#15413#15414#0" expanded="true" />
+            <element signature="e#15476#15477#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

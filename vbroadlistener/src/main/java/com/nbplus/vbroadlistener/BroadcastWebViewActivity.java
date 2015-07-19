@@ -134,12 +134,12 @@ public class BroadcastWebViewActivity extends BaseActivity {
         }
 
         if (url.indexOf("?") > 0) {
-//            url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+            url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
             url += ("&APPID=" + getApplicationContext().getPackageName());
         } else {
-//            url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
-//            url += ("&APPID=" + getApplicationContext().getPackageName());
-            url += ("?APPID=" + getApplicationContext().getPackageName());
+            url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+            url += ("&APPID=" + getApplicationContext().getPackageName());
+//            url += ("?APPID=" + getApplicationContext().getPackageName());
         }
         mWebViewClient.loadUrl(url);
 

@@ -234,19 +234,19 @@ public class HomeLauncherActivity extends BaseActivity
                 Log.d(TAG, "DisplayUtils.getDisplayInches() bigger than 6.5");
             } else {
                 // smaller device
-                Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                alert.setMessage(R.string.alert_phone_message);
-                alert.show();
-
-                return;
+//                Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
+//                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                        finish();
+//                    }
+//                });
+//                alert.setMessage(R.string.alert_phone_message);
+//                alert.show();
+//
+//                return;
             }
         }
 
@@ -271,12 +271,6 @@ public class HomeLauncherActivity extends BaseActivity
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
-
-        // 프래그먼트가 직접 처리하자.
-//        filter = new IntentFilter();
-//        filter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
-//        filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
-//        registerReceiver(mBroadcastReceiver, filter);
 
         Intent intent = new Intent(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
         mActivityRunningTime = System.currentTimeMillis();
@@ -311,11 +305,6 @@ public class HomeLauncherActivity extends BaseActivity
             defaultLocation.setLatitude(37.488201);
 
             LauncherSettings.getInstance(this).setPreferredUserLocation(defaultLocation);
-        }
-
-        if (StringUtils.isEmptyString(LauncherSettings.getInstance(this).getDeviceID())) {
-            String deviceID = DeviceUtils.getDeviceIdByMacAddress(this);
-            LauncherSettings.getInstance(this).setDeviceID(deviceID);
         }
 
         Log.d(TAG, "SET Device ID = " + LauncherSettings.getInstance(this).getDeviceID());
