@@ -101,6 +101,7 @@ public class LauncherSettings implements Parcelable {
         if (StringUtils.isEmptyString(this.deviceID)) {
             String deviceID = DeviceUtils.getDeviceIdByMacAddress(context);
             prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+            this.deviceID = deviceID;
         }
 
         this.isCompletedSetup = prefs.getBoolean(KEY_VBROADCAST_IS_COMPLETED_SETUP, false);
