@@ -88,7 +88,6 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
             url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
         }
 
-        url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
         mWebViewClient.loadUrl(url);
         return v;
     }

@@ -158,19 +158,6 @@ public class HomeLauncherActivity extends BaseActivity
                     finish();
                 }
                 break;
-//            case Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED :
-//            case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
-//                setPushServiceStatus(msg.arg1);
-//                boolean isProcessed = false;
-//                if (mActivityInteractionListener != null) {
-//                    for (OnActivityInteractionListener listener : mActivityInteractionListener) {
-//                        isProcessed = listener.onPushReceived(msg);
-//                    }
-//                }
-//                if (isProcessed == false) {
-//                    Log.e(TAG, ">> Why... 이런경우에는 어떻게 해야 하는거냐????");
-//                }
-//                break;
         }
     }
 
@@ -188,18 +175,7 @@ public class HomeLauncherActivity extends BaseActivity
                 msg.what = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING;
                 msg.obj = intent.getLongExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, 0);
                 mHandler.sendMessage(msg);
-            }/* else if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
-                Message msg = new Message();
-                msg.what = HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
-                msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-                mHandler.sendMessage(msg);
-            } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
-                Message msg = new Message();
-                msg.what = HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
-                msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
-                msg.obj = intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
-                mHandler.sendMessage(msg);
-            } */
+            }
         }
     };
 
@@ -234,19 +210,19 @@ public class HomeLauncherActivity extends BaseActivity
                 Log.d(TAG, "DisplayUtils.getDisplayInches() bigger than 6.5");
             } else {
                 // smaller device
-//                Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
-//                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                        finish();
-//                    }
-//                });
-//                alert.setMessage(R.string.alert_phone_message);
-//                alert.show();
-//
-//                return;
+                Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+                alert.setMessage(R.string.alert_phone_message);
+                alert.show();
+
+                return;
             }
         }
 

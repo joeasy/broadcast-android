@@ -3,6 +3,7 @@
 *.iws
 *.ipr
 .idea/
+.idea/*.xml
 /local.properties
 /.idea/libraries
 .DS_Store
