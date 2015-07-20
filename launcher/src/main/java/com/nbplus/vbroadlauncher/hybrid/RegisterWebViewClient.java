@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
+import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -25,12 +26,8 @@ import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
-import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
 
 import org.basdroid.common.StringUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Created by basagee on 2015. 5. 19..

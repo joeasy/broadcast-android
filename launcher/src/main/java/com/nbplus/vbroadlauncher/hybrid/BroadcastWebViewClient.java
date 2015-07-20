@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
 import com.nbplus.media.MusicService;
+import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.BaseActivity;
@@ -27,15 +27,11 @@ import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
-import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
-import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
-import java.net.URLEncoder;
 
 /**
  * Created by basagee on 2015. 5. 19..

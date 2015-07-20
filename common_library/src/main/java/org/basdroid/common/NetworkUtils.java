@@ -2,6 +2,7 @@ package org.basdroid.common;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
@@ -286,4 +287,26 @@ public class NetworkUtils {
         return "";
     }
 
+    public static String getDefaultWifiGatewayAddress(Context context) {
+        if (!isConnectedWifi(context)) {
+            return null;
+        }
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) {
+            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+            if (dhcpInfo != null) {
+                return convertIntegerToStringIpAddress(dhcpInfo.gateway);
+            }
+        }
+
+        return null;
+    }
+
+    private static String convertIntegerToStringIpAddress(int i) {
+        return ((i >> 24 ) & 0xFF ) + "." +
+                ((i >> 16 ) & 0xFF) + "." +
+                ((i >> 8 ) & 0xFF) + "." +
+                ( i & 0xFF) ;
+    }
 }

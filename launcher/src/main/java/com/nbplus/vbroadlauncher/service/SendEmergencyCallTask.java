@@ -75,8 +75,6 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
 
     @Override
     protected void onPreExecute() {
-        //progress = ProgressDialog.show(AllAppsActivity.this, null,
-        //        "Loading application info...");
         super.onPreExecute();
     }
 

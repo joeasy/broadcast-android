@@ -43,6 +43,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.push.PushService;
 import com.nbplus.vbroadlauncher.BaseActivity;

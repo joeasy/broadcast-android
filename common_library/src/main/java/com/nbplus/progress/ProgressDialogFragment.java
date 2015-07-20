@@ -1,4 +1,4 @@
-package com.nbplus.vbroadlauncher.fragment;
+package com.nbplus.progress;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -6,8 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.KeyEvent;
 
-import com.nbplus.vbroadlauncher.R;
-import com.nbplus.vbroadlauncher.widget.ProgressDialog;
+import org.basdroid.common.R;
 
 /**
  * Created by basagee on 2015. 6. 23..

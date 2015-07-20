@@ -1,4 +1,4 @@
-package com.nbplus.vbroadlistener;
+package com.nbplus.progress;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import org.basdroid.common.R;
 
 /**
  * Created by basagee on 2015. 6. 23..

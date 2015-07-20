@@ -1,6 +1,5 @@
 package com.nbplus.vbroadlauncher;
 
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,9 +14,9 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.nbplus.vbroadlauncher.fragment.ProgressDialogFragment;
 
 import java.util.Locale;
 

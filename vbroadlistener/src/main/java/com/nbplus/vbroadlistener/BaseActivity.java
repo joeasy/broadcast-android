@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
 import java.util.Locale;

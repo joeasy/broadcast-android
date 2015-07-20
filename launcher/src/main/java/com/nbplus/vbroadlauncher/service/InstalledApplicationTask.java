@@ -12,7 +12,6 @@ import com.nbplus.vbroadlauncher.data.Constants;
  * Created by basagee on 2015. 6. 2..
  */
 public class InstalledApplicationTask extends AsyncTask<Void, Void, Void> {
-    //private ProgressDialog progress = null;
     private Context mContext;
     private Handler mHandler;
 
@@ -48,8 +47,6 @@ public class InstalledApplicationTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPreExecute() {
-        //progress = ProgressDialog.show(AllAppsActivity.this, null,
-        //        "Loading application info...");
         super.onPreExecute();
     }
 
