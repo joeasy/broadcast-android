@@ -192,7 +192,7 @@ public class RegistrationIntentService extends IntentService {
         url = builder.toString();
 
         if (StringUtils.isEmptyString(LauncherSettings.getInstance(this).getDeviceID())) {
-            String deviceID = DeviceUtils.getDeviceIdByMacAddress(this);
+            String deviceID = LauncherSettings.getInstance(this).getDeviceID();
             LauncherSettings.getInstance(this).setDeviceID(deviceID);
         }
 

@@ -14,6 +14,7 @@ import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.RadioActivity;
 import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
 
+import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -109,6 +110,11 @@ public class LauncherSettings implements Parcelable {
 
         // load from preferences..
         this.deviceID = prefs.getString(KEY_VBROADCAST_DEVICE_ID, "");
+        if (StringUtils.isEmptyString(this.deviceID)) {
+            String deviceID = DeviceUtils.getDeviceIdByMacAddress(context);
+            prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+        }
+
         this.isCompletedSetup = prefs.getBoolean(KEY_VBROADCAST_IS_COMPLETED_SETUP, false);
         this.isExclusive = prefs.getBoolean(KEY_VBROADCAST_IS_EXCLUSIVE_DEVICE, false);
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");

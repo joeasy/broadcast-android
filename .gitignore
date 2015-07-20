@@ -1,4 +1,8 @@
 .gradle
+*.iml
+*.iws
+*.ipr
+.idea/
 /local.properties
 /.idea/libraries
 .DS_Store

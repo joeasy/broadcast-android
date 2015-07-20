@@ -167,10 +167,10 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
             String url = mBroadcastData.getMessage();
             if (url.indexOf("?") > 0) {
-                url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+                url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
                 url += ("&APPID=" + getApplicationContext().getPackageName());
             } else {
-                url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+                url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
                 url += ("&APPID=" + getApplicationContext().getPackageName());
             }
             mWebViewClient.loadUrl(url);

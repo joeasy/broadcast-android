@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PushPayloadData;
 import com.nbplus.vbroadlauncher.hybrid.RealtimeBroadcastWebViewClient;
 import com.nbplus.vbroadlauncher.hybrid.TextToSpeechHandler;
@@ -121,10 +122,10 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
 
             String url = mBroadcastData.getMessage();
             if (url.indexOf("?") > 0) {
-                url += ("&UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+                url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
                 url += ("&APPID=" + getApplicationContext().getPackageName());
             } else {
-                url += ("?UUID=" + DeviceUtils.getDeviceIdByMacAddress(this));
+                url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
                 url += ("&APPID=" + getApplicationContext().getPackageName());
             }
             mWebViewClient.loadUrl(url);

@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/VbroadLauncher.iml" filepath="$PROJECT_DIR$/VbroadLauncher.iml" />
       <module fileurl="file://$PROJECT_DIR$/calendar_library/calendar_library.iml" filepath="$PROJECT_DIR$/calendar_library/calendar_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/common_library/common_library.iml" filepath="$PROJECT_DIR$/common_library/common_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/iot_gateway/iot_gateway.iml" filepath="$PROJECT_DIR$/iot_gateway/iot_gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/launcher/launcher.iml" filepath="$PROJECT_DIR$/launcher/launcher.iml" />
       <module fileurl="file://$PROJECT_DIR$/push_agent/push_agent.iml" filepath="$PROJECT_DIR$/push_agent/push_agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vbroadcast.iml" filepath="$PROJECT_DIR$/vbroadcast.iml" />
       <module fileurl="file://$PROJECT_DIR$/vbroadcreator/vbroadcreator.iml" filepath="$PROJECT_DIR$/vbroadcreator/vbroadcreator.iml" />
       <module fileurl="file://$PROJECT_DIR$/vbroadlistener/vbroadlistener.iml" filepath="$PROJECT_DIR$/vbroadlistener/vbroadlistener.iml" />
       <module fileurl="file://$PROJECT_DIR$/viewpager_indicator/viewpager_indicator.iml" filepath="$PROJECT_DIR$/viewpager_indicator/viewpager_indicator.iml" />
