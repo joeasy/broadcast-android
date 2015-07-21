@@ -230,7 +230,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     } else {
-                        toast = Toast.makeText(getActivity(), R.string.emergency_call_fail_message, Toast.LENGTH_SHORT);
+                        toast = Toast.makeText(getActivity(), result.getResultMessage(), Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }

@@ -13,15 +13,14 @@ import com.nbplus.push.data.PushInterfaceData;
 import com.nbplus.push.data.PushMessageData;
 
 import org.basdroid.common.NetworkUtils;
-import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
 
 /**
  * Created by basagee on 2015. 7. 9..
  */
-public class PushThread implements Runnable, TcpClient.OnMessageReceived {
-    private static final String TAG = PushThread.class.getName();
+public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
+    private static final String TAG = PushRunnable.class.getName();
 
     // indicates the state our service:
     public enum State {
@@ -52,15 +51,15 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
     private PushThreadHandler mHandler = new PushThreadHandler(this);
     // 핸들러 객체 만들기
     private static class PushThreadHandler extends Handler {
-        private final WeakReference<PushThread> mThread;
+        private final WeakReference<PushRunnable> mThread;
 
-        public PushThreadHandler(PushThread pushThread) {
-            mThread = new WeakReference<>(pushThread);
+        public PushThreadHandler(PushRunnable pushRunnable) {
+            mThread = new WeakReference<>(pushRunnable);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            PushThread service = mThread.get();
+            PushRunnable service = mThread.get();
             if (service != null) {
                 service.handleMessage(msg);
             }
@@ -119,7 +118,7 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
         }
     }
 
-    public PushThread(Context context, Handler handler, final PushInterfaceData ifaceData) {
+    public PushRunnable(Context context, Handler handler, final PushInterfaceData ifaceData) {
         this.mContext = context;
         this.mIfaceData = ifaceData;
         this.mServiceHandler = handler;
@@ -162,7 +161,12 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
             if (mIfaceData == null) {
                 Log.i(TAG, "Invalid interface server data !!!");
             }
-            mTcpClient = new TcpClient(mContext, mIfaceData, this);
+
+            if (mTcpClient == null) {
+                mTcpClient = new TcpClient(/*mContext, */mIfaceData, this);
+            } else {
+                mTcpClient.setInterfaceServer(mIfaceData);
+            }
             mTcpClient.run();
         } finally {
             releasePushClientSocket();
@@ -176,7 +180,7 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
         if (mTcpClient != null) {
             mTcpClient.stopClient();
         }
-        mTcpClient = null;
+//        mTcpClient = null;
 //                    if (mTcpThread != null && mTcpThread.isAlive()) {
 //                        mTcpThread.interrupt();
 //                    }
@@ -236,6 +240,7 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
 
         if (mWifiLock != null) {
             mWifiLock.acquire();
+            Log.i(TAG, ">> mWifiLock.acquire() called !!");
         }
     }
 
@@ -248,7 +253,7 @@ public class PushThread implements Runnable, TcpClient.OnMessageReceived {
             while (!Thread.currentThread().isInterrupted()) {
                 switch (mPushThreadCommand) {
                     case StartPushClient:
-                        Log.i(TAG, "PushThread run() check mPushThreadCommand == StartPushClient");
+                        Log.i(TAG, "PushRunnable run() check mPushThreadCommand == StartPushClient");
                         mPushThreadCommand = ThreadCommand.StopPushClient;
                         runTcpClient();
                         break;

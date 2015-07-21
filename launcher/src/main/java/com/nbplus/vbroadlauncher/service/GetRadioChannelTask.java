@@ -62,9 +62,86 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
         // TODO : sample data
 //        ArrayList<RadioChannelInfo.RadioChannel> items = new ArrayList<>();
 //        RadioChannelInfo.RadioChannel item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "MBC 표준FM 전주";
+//        item.channelName = "KBS 1FM(클래식FM)";
+//        item.channelUrl = "rtsp://kbs-radio.gscdn.com/tunein_1fm/_definst_/tunein_1fm.stream";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "KBS 1라디오(해피FM)";
+//        item.channelUrl = "rtsp://kbs-radio.gscdn.com/tunein_1fm/_definst_/tunein_1radio.stream";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "KBS 2라디오(해피FM)";
+//        item.channelUrl = "rtsp://kbs-radio.gscdn.com/tunein_1fm/_definst_/tunein_2radio.stream";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "KBS 2FM(쿨FM)";
+//        item.channelUrl = "rtsp://kbs-radio.gscdn.com/tunein_2fm/_definst_/tunein_2fm.stream";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "MBC 표준FM";
 //        item.channelUrl = "mms://210.105.237.100/mbcam";
 //        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "MBC FM4U";
+//        item.channelUrl = "mms://210.105.237.100/mbcfm";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "SBS 파워FM";
+//        item.channelUrl = "mms://114.108.140.39/magicfm_live";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "YTN1";
+//        item.channelUrl = "rtmp://183.111.25.94:1935/live/_definst_/fmlive_0624_1.sdp";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "TBS 교통FM";
+//        item.channelUrl = "mms://115.84.165.160/fmlive";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "TBN";
+//        item.channelUrl = "mms://210.96.79.102/Junju";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "CBS 표준FM";
+//        item.channelUrl = "mms://112.173.165.6/radio";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "CBS 음악FM";
+//        item.channelUrl = "mms://media.biointernet.com/fm1021";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "극동방송 FM";
+//        item.channelUrl = "mms://live.febc.net/LiveFm";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "BBS 부산";
+//        item.channelUrl = "mms://218.146.253.176/bbsradiolive";
+//        items.add(item);
+//
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "WBS 서울";
+//        item.channelUrl = "mms://aod.wbsi.kr/wbs897";
+//        items.add(item);
+
+//        item = new RadioChannelInfo.RadioChannel();
+//        item.channelName = "YTN2";
+//        item.channelUrl = "rtmp://112.175.248.34:1935/live/_definst_/fmlive_0624_1.sdp";
+//        items.add(item);
+
+
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "MBC 표준FM 춘천";
@@ -131,15 +208,7 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://211.117.193.99/gjmbcfmlive";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "MBC FM4U 대전";
-//        item.channelUrl = "mms://VOD.tjmbc.co.kr/0becb_FM";
-//        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "MBC FM4U 전주";
-//        item.channelUrl = "mms://210.105.237.100/mbcfm";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "MBC FM4U 춘천";
@@ -201,10 +270,6 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://218.146.252.66/Iive_FM";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "SBS 파워FM 전주";
-//        item.channelUrl = "mms://114.108.140.39/magicfm_live";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "SBS 파워FM 청주";
@@ -216,30 +281,18 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://121.254.230.3/FMLIVE";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "EBS FM 라디오";
-//        item.channelUrl = "mms://ebslive.nefficient.com/ebswmalive";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "iFM 경인방송";
 //        item.channelUrl = "mms://www.sunnyfm.co.kr/itv";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "TBS 교통FM";
-//        item.channelUrl = "mms://115.84.165.160/fmlive";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "TBS 영어FM";
 //        item.channelUrl = "mms://115.84.165.160/efmlive";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "TBN 서울";
-//        item.channelUrl = "mms://210.96.79.102/Seoul";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "TBN 부산";
@@ -281,25 +334,12 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://210.96.79.102/Ulsan";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "국악방송";
-//        item.channelUrl = "mms://gugakfm.ktics.co.kr/gugakfm";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "Busan eFM";
 //        item.channelUrl = "mms://115.68.15.116/efm";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "YTN";
-//        item.channelUrl = "mms://ytninternet.co.kr/ytnradio";
-//        items.add(item);
-//
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "CBS 표준FM 서울";
-//        item.channelUrl = "mms://gswidget.cbs.co.kr/cbs981";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "CBS 표준FM 대구";
@@ -377,14 +417,10 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "극동방송 서울AM";
+//        item.channelName = "극동방송 AM";
 //        item.channelUrl = "mms://live.febc.net/LiveAm";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "극동방송 서울FM";
-//        item.channelUrl = "mms://live.febc.net/LiveFm";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "극동방송 제주";
@@ -421,20 +457,12 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://livegj.febc.net/ipradio";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "BBS 부산";
-//        item.channelUrl = "mms://218.146.253.176/bbsradiolive";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "BBS 대구";
 //        item.channelUrl = "mms://bbs5114.codns.com/dgbbslive";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "PBC 광주";
-//        item.channelUrl = "mms://183.105.65.21/onair";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "PBC 부산";
@@ -446,10 +474,6 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 //        item.channelUrl = "mms://junsan52.cafe24.com/junsan52_live";
 //        items.add(item);
 //
-//        item = new RadioChannelInfo.RadioChannel();
-//        item.channelName = "WBS 서울";
-//        item.channelUrl = "mms://aod.wbsi.kr/wbs897";
-//        items.add(item);
 //
 //        item = new RadioChannelInfo.RadioChannel();
 //        item.channelName = "WBS 전북";

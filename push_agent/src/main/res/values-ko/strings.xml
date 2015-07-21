@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="push_name">마을방송 푸시</string>
+    <string name="push_noti_body">마을방송 푸시서비스가 실행중입니다.</string>
+</resources>

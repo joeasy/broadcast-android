@@ -37,27 +37,12 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
 
     protected Context mContext;
     protected Handler mHandler;
-    protected String mServerPath;
+    protected RequestFuture<PushInterfaceData> mRequestFuture;
 
-    public GetPushInterfaceTask(Context context, Handler handler, String path) {
+    public GetPushInterfaceTask(Context context, Handler handler, final RequestFuture<PushInterfaceData> requestFuture) {
         this.mContext = context;
         this.mHandler = handler;
-        this.mServerPath = path;
-    }
-
-    class GetPushInterfaceRequestBody {
-        @SerializedName("DEVICE_ID")
-        public String deviceId;
-        @SerializedName("DEVICE_TYPE")
-        public String deviceType;
-        @SerializedName("VERSION")
-        public String pushVersion;
-        @SerializedName("MAKER")
-        public String vendor;
-        @SerializedName("MODEL")
-        public String model;
-        @SerializedName("OS")
-        public String os;
+        this.mRequestFuture = requestFuture;
     }
 
     @Override
@@ -76,73 +61,21 @@ public class GetPushInterfaceTask extends AsyncTask<Void, Void, PushInterfaceDat
 
     @Override
     protected PushInterfaceData doInBackground(Void... voids) {
-        RequestQueue requestQueue = Volley.newRequestQueue(mContext);
         PushInterfaceData response = null;
-
-        String prefName = mContext.getApplicationContext().getPackageName() + "_preferences";
-        SharedPreferences prefs = mContext.getSharedPreferences(prefName, Context.MODE_PRIVATE);
-
-        // load from preferences..
-        String deviceId = prefs.getString(PushConstants.KEY_DEVICE_ID, "");
-        if (StringUtils.isEmptyString(deviceId)) {
-            deviceId = DeviceUtils.getDeviceIdByMacAddress(mContext);
-            prefs.edit().putString(PushConstants.KEY_DEVICE_ID, deviceId).apply();
+        try {
+            response = mRequestFuture.get(); // this will block (forever)
+        } catch (InterruptedException e) {
+            // exception handling
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // exception handling
+            e.printStackTrace();
         }
-        String url = mServerPath;
-
-        GetPushInterfaceRequestBody requestBody = new GetPushInterfaceRequestBody();
-        requestBody.deviceId = deviceId;
-        requestBody.os = Build.VERSION.RELEASE;
-        requestBody.pushVersion = Integer.toString(BuildConfig.VERSION_CODE);
-        requestBody.vendor = Build.MANUFACTURER;
-        requestBody.model = DeviceUtils.getDeviceName();
-        requestBody.os = Build.ID + " " + Build.VERSION.RELEASE;
-        requestBody.deviceType = "android";
-
-        Gson gson = new GsonBuilder().create();
-        String strRequestBody = gson.toJson(requestBody, new TypeToken<GetPushInterfaceRequestBody>(){}.getType());
-
-//        int retryCount = 0;
-//        while (retryCount < 3) {        // retry 3 times
-            RequestFuture<PushInterfaceData> future = RequestFuture.newFuture();
-
-            GsonRequest request = new GsonRequest(Request.Method.POST, url, strRequestBody, PushInterfaceData.class, future, future);
-            requestQueue.add(request);
-
-            try {
-                response = future.get(); // this will block (forever)
-                Thread.sleep(1000);
-//                break;
-            } catch (InterruptedException e) {
-                // exception handling
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                // exception handling
-                e.printStackTrace();
-            }
-//            retryCount++;
-//        }
         return response;
     }
 
     @Override
     protected void onPostExecute(PushInterfaceData result) {
-        // sample data
-//        if (result == null || !PushConstants.RESULT_OK.equals(result.resultCode)) {
-//            result = new PushInterfaceData();
-//            result.resultCode = PushConstants.RESULT_OK;
-//            result.sessionKey = "P7V80283M";
-//            result.deviceAuthKey = "1OWE2RTYU";
-//            result.interfaceServerAddress = "175.207.46.132";
-//            result.interfaceServerPort = "7002";
-//            result.keepAliveSeconds = "30";
-//        }
-        /*else {
-            result.interfaceServerAddress = "192.168.77.111";
-            result.interfaceServerPort = "7005";
-        }*/
-        // end of sample data
-
         if (mHandler != null) {
             Message message = new Message();
             message.what = PushConstants.HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA;

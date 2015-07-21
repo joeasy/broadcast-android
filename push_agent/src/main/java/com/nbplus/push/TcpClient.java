@@ -20,7 +20,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -40,7 +42,7 @@ public class TcpClient {
     private DataInputStream mDataIn;
 
     PushInterfaceData mInterfaceData;
-    Context mContext;
+//    Context mContext;
 
     private static final int HANDLER_MESSAGE_CHECK_KEEP_ALIVE = 1;
     private static final int HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION = 2;
@@ -100,9 +102,13 @@ public class TcpClient {
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TcpClient(Context context, PushInterfaceData data, OnMessageReceived listener) {
+    public TcpClient(/*Context context, */PushInterfaceData data, OnMessageReceived listener) {
         mMessageListener = listener;
-        mContext = context;
+//        mContext = context;
+        this.mInterfaceData = data;
+    }
+
+    public void setInterfaceServer(PushInterfaceData data) {
         this.mInterfaceData = data;
     }
 
@@ -140,25 +146,6 @@ public class TcpClient {
                     Arrays.fill(fillZero, (byte)0);
                     byteBuffer.put(fillZero, 0, 20 - length);
                 }
-                /**
-                 *  removed.. interface 0.7
-                 *
-                if (NetworkUtils.isConnectedWifi(mContext)) {
-                    byteBuffer.put("WF".getBytes(), 0, 2);
-                } else {
-                    if (NetworkUtils.isLTE(mContext)) {
-                        byteBuffer.put("4G".getBytes(), 0, 2);
-                    } else {
-                        byteBuffer.put("3G".getBytes(), 0, 2);
-                    }
-                }
-                fillZero = new byte[18];
-                Arrays.fill(fillZero, (byte) 0);
-                byteBuffer.put(fillZero, 0, 18);
-
-                String version = String.format("%05d", BuildConfig.VERSION_CODE);
-                byteBuffer.put(version.getBytes(), 0, 5);
-                */
                 mConnectionRequestId = mRequestMessageId;
                 mRequestMessageId++;
 
@@ -247,6 +234,7 @@ public class TcpClient {
                 e.printStackTrace();
             }
         }
+        mPushSocket = null;
 
         if (mDataOut != null) {
             try {
@@ -257,7 +245,7 @@ public class TcpClient {
             }
         }
 
-        mMessageListener = null;
+//        mMessageListener = null;
         if (mDataIn != null) {
             try {
                 mDataIn.close();
@@ -307,12 +295,20 @@ public class TcpClient {
                 }
                 return;
             }
-            InetAddress serverAddr = InetAddress.getByName(mInterfaceData.interfaceServerAddress);
+
+
+            final InetAddress serverAddr = InetAddress.getByName(mInterfaceData.interfaceServerAddress);
+            int port = Integer.parseInt(mInterfaceData.interfaceServerPort);
+            final SocketAddress socketAddress = new InetSocketAddress(serverAddr, port);
             Log.d(TAG, "C: Connecting...");
 
-            //create a socket to make the connection with the server
-            int port = Integer.parseInt(mInterfaceData.interfaceServerPort);
-            mPushSocket = new Socket(serverAddr, port);
+            if (mPushSocket == null) {
+                //create a socket to make the connection with the server
+                mPushSocket = new Socket();
+                mPushSocket.setReuseAddress(true);
+                mPushSocket.setKeepAlive(true);
+            }
+            mPushSocket.connect(socketAddress);
 
             try {
                 Log.i(TAG, "inside try catch");
@@ -525,7 +521,7 @@ public class TcpClient {
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
                 mPushSocket.close();
-                mPushSocket = null;
+//                mPushSocket = null;
             }
         } catch (Exception e) {
             Log.e(TAG, "C: Error", e);

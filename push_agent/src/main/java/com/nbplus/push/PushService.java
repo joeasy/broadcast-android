@@ -10,22 +10,28 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Parcelable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
 
-import com.nbplus.push.data.PushBaseData;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.push.data.PushInterfaceData;
-import com.nbplus.push.data.PushMessageData;
 
+import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
+import org.basdroid.volley.GsonRequest;
 
 import java.lang.ref.WeakReference;
 
@@ -48,11 +54,34 @@ public class PushService extends Service {
     Notification mNotification = null;
     NotificationCompat.Builder mBuilder;
 
-    PushThread mPushThread;
+    Thread mPushThread;
+    PushRunnable mPushRunnable;
 
     String mPushInterfaceServerAddress = null;
     final String PUSH_IF_CONTEXT = "/is/api/appRequest/SessionRequest";
+
+    /**
+     * start : push interface variables
+     */
+    RequestFuture<PushInterfaceData> mGwRequestFuture = null;
+    String mRequestBody;
+    RequestQueue mRequestQueue;
     GetPushInterfaceTask mIfTask = null;
+    class GetPushInterfaceRequestBody {
+        @SerializedName("DEVICE_ID")
+        public String deviceId;
+        @SerializedName("DEVICE_TYPE")
+        public String deviceType;
+        @SerializedName("VERSION")
+        public String pushVersion;
+        @SerializedName("MAKER")
+        public String vendor;
+        @SerializedName("MODEL")
+        public String model;
+        @SerializedName("OS")
+        public String os;
+    }
+    // end
 
     Context mContext = null;
 
@@ -95,11 +124,11 @@ public class PushService extends Service {
                 PushInterfaceData data = (PushInterfaceData)msg.obj;
                 Log.d(TAG, "result = " + ((data != null) ? data.resultCode : null) + ", data = " + data);
                 if (data != null && PushConstants.RESULT_OK.equals(data.resultCode)) {
-                    mPushThread.startPushClientSocket(data);
+                    mPushRunnable.startPushClientSocket(data);
                 } else {
-                    if (mPushThread.getState() == PushThread.State.Connected) {
+                    if (mPushRunnable.getState() == PushRunnable.State.Connected) {
                         Log.d(TAG, "Close previous connection !!!. and retry.");
-                        mPushThread.releasePushClientSocket(NetworkUtils.isConnected(this));
+                        mPushRunnable.releasePushClientSocket(NetworkUtils.isConnected(this));
                     } else {
                         Log.d(TAG, "retry HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA!!!. after 1 min..");
                         mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
@@ -117,8 +146,8 @@ public class PushService extends Service {
                     }
                 } else {
                     Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED network is disconnected !!!");
-                    if (mPushThread.getState() != PushThread.State.Stopped) {
-                        mPushThread.releasePushClientSocket(false);
+                    if (mPushRunnable.getState() != PushRunnable.State.Stopped) {
+                        mPushRunnable.releasePushClientSocket(false);
                     }
                     mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                 }
@@ -187,28 +216,28 @@ public class PushService extends Service {
                     if (mPushInterfaceServerAddress == null || !pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
                         mPushInterfaceServerAddress = pushInterfaceServerAddress;
 
-                        if (mPushThread.getState() == PushThread.State.IfRetrieving) {
+                        if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
                             if (mIfTask != null) {
                                 mIfTask.cancel(true);
                             }
                             mIfTask = null;
                         }
 
-                        if (mPushThread.getState() == PushThread.State.Connected) {
-                            mPushThread.releasePushClientSocket(false);
+                        if (mPushRunnable.getState() == PushRunnable.State.Connected) {
+                            mPushRunnable.releasePushClientSocket(false);
                         }
                         Log.d(TAG, "mPushInterfaceServerAddress is (re)setted!!! getPushGatewayInformationFromServer()");
                         getPushGatewayInformationFromServer();
                     } else {
-                        if (mPushThread.getState() == PushThread.State.IfRetrieving) {
+                        if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
                             if (mIfTask != null) {
                                 mIfTask.cancel(true);
                             }
                             mIfTask = null;
                         }
 
-                        if (mPushThread.getState() != PushThread.State.Connected) {
-                            Log.d(TAG, "mPushThread.getState() != PushThread.State.Connected!!! getPushGatewayInformationFromServer()");
+                        if (mPushRunnable.getState() != PushRunnable.State.Connected) {
+                            Log.d(TAG, "mPushRunnable.getState() != PushRunnable.State.Connected!!! getPushGatewayInformationFromServer()");
                             getPushGatewayInformationFromServer();
                         }
                     }
@@ -216,7 +245,7 @@ public class PushService extends Service {
                     Log.e(TAG, ">> mPushInterfaceServerAddress is empty !!!");
                 }
             } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
-                mPushThread.sendSatusChangedBroadcastMessage();
+                mPushRunnable.sendSatusChangedBroadcastMessage();
             }
         } else {
 
@@ -228,33 +257,59 @@ public class PushService extends Service {
         return Service.START_REDELIVER_INTENT;//super.onStartCommand(intent, flags, startId);
     }
 
+    /**
+     * 1 번만 생성되도록... 최대한메모리를줄이기 위해서.
+     * @param url
+     */
+    private void initPushGatewayTaskSettings(final String url) {
+        if (mRequestBody == null) {
+            String prefName = mContext.getApplicationContext().getPackageName() + "_preferences";
+            SharedPreferences prefs = mContext.getSharedPreferences(prefName, Context.MODE_PRIVATE);
+
+            // load from preferences..
+            String deviceId = prefs.getString(PushConstants.KEY_DEVICE_ID, "");
+            if (StringUtils.isEmptyString(deviceId)) {
+                deviceId = DeviceUtils.getDeviceIdByMacAddress(mContext);
+                prefs.edit().putString(PushConstants.KEY_DEVICE_ID, deviceId).apply();
+            }
+
+            GetPushInterfaceRequestBody reqBodyObj = new GetPushInterfaceRequestBody();
+            reqBodyObj.deviceId = deviceId;
+            reqBodyObj.os = Build.VERSION.RELEASE;
+            reqBodyObj.pushVersion = Integer.toString(BuildConfig.VERSION_CODE);
+            reqBodyObj.vendor = Build.MANUFACTURER;
+            reqBodyObj.model = DeviceUtils.getDeviceName();
+            reqBodyObj.os = Build.ID + " " + Build.VERSION.RELEASE;
+            reqBodyObj.deviceType = "android";
+
+            Gson gson = new GsonBuilder().create();
+            mRequestBody = gson.toJson(reqBodyObj, new TypeToken<GetPushInterfaceRequestBody>(){}.getType());
+        }
+
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(mContext);
+
+            mGwRequestFuture = RequestFuture.newFuture();
+            GsonRequest request = new GsonRequest(Request.Method.POST, url, mRequestBody, PushInterfaceData.class, mGwRequestFuture, mGwRequestFuture);
+            mRequestQueue.add(request);
+        }
+    }
+
     private void getPushGatewayInformationFromServer() {
-        mPushThread.releasePushClientSocket(false);
+        mPushRunnable.releasePushClientSocket(false);
 
         String prefName = getApplicationContext().getPackageName() + "_preferences";
         SharedPreferences prefs = getSharedPreferences(prefName, Context.MODE_PRIVATE);
 
-        mPushThread.setState(PushThread.State.IfRetrieving);
-        mIfTask = new GetPushInterfaceTask(this, mHandler, mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
+        mPushRunnable.setState(PushRunnable.State.IfRetrieving);
+        initPushGatewayTaskSettings(mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
+        mIfTask = new GetPushInterfaceTask(this, mHandler, mGwRequestFuture);
         mIfTask.execute();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    /** Updates the notification. */
-    void updateNotification(String text) {
-//        Intent i = new Intent(getApplicationContext(), RadioActivity.class);
-//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-//                i,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
-//        mNotification.setLatestEventInfo(getApplicationContext(), "MusicPlayer", text, pi);
-
-        setRemoteViews();
-        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
     }
 
     /**
@@ -264,61 +319,22 @@ public class PushService extends Service {
      */
     void setUpAsForeground() {
         // notification's layout
-//        mRemoteViews = new RemoteViews(getPackageName(), R.layout.music_notification);
-//        setRemoteViews();
-//        mBuilder = new NotificationCompat.Builder(this);
-//
-//        CharSequence ticker = text;
-//        int apiVersion = Build.VERSION.SDK_INT;
-//
-//        if (apiVersion < Build.VERSION_CODES.HONEYCOMB) {
-//            mNotification = new Notification(R.drawable.ic_launcher, ticker, System.currentTimeMillis());
-//            mNotification.contentView = mRemoteViews;
-//            //mNotification.contentIntent = pendIntent;
-//
-//            mNotification.flags |= Notification.FLAG_NO_CLEAR;
-//            mNotification.defaults |= Notification.DEFAULT_LIGHTS;
-//
-//            startForeground(NOTIFICATION_ID, mNotification);
-//
-//        } else if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
-//            mBuilder.setSmallIcon(R.drawable.ic_launcher)
-//                    .setAutoCancel(false)
-//                    .setOngoing(true)
-//                            //.setContentIntent(pendIntent)
-//                    .setContent(mRemoteViews)
-//                    .setTicker(ticker);
-//
-//            mNotification = mBuilder.build();
-//            mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
-//            mNotification.defaults |= Notification.DEFAULT_LIGHTS;
-//            startForeground(NOTIFICATION_ID, mNotification);
-//        }
-    }
+        mBuilder = new NotificationCompat.Builder(this);
 
-    private void setRemoteViews() {
-//        if (mPlayingItem != null) {
-//            mRemoteViews.setTextViewText(R.id.play_title, mPlayingItem.getTitle());
-//        } else {
-//            mRemoteViews.setTextViewText(R.id.play_title, getString(R.string.activity_radio_default_title));
-////            mRemoteViews.setViewVisibility(R.id.play_time, View.GONE);
-//        }
-//
-//        // toggle playback
-//        Intent intent = new Intent(this, PushAgentService.class);
-//        intent.setAction(PushAgentService.ACTION_TOGGLE_PLAYBACK);
-//        PendingIntent pi = PendingIntent.getService(this, 0, intent, 0);
-//        mRemoteViews.setOnClickPendingIntent(R.id.ic_media_control_play, pi);
-//        if (mState == State.Paused) {
-//            mRemoteViews.setImageViewResource(R.id.ic_media_control_play, R.drawable.ic_btn_radio_play_selector);
-//        } else {
-//            mRemoteViews.setImageViewResource(R.id.ic_media_control_play, R.drawable.ic_btn_radio_pause_selector);
-//        }
-//        // stop button
-//        intent = new Intent(this, com.nbplus.media.MusicService.class);
-//        intent.setAction(com.nbplus.media.MusicService.ACTION_STOP);
-//        pi = PendingIntent.getService(this, 0, intent, 0);
-//        mRemoteViews.setOnClickPendingIntent(R.id.ic_media_control_stop, pi);
+        CharSequence ticker = getString(R.string.push_noti_body);
+        int apiVersion = Build.VERSION.SDK_INT;
+
+        mBuilder.setSmallIcon(R.drawable.ic_notification_push)
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .setContentTitle(getString(R.string.push_name))
+                .setContentText(ticker)
+                .setTicker(ticker);
+
+        mNotification = mBuilder.build();
+        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+        mNotification.defaults |= Notification.DEFAULT_LIGHTS;
+        startForeground(NOTIFICATION_ID, mNotification);
     }
 
     @Override
@@ -331,8 +347,15 @@ public class PushService extends Service {
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mBroadcastReceiver, intentFilter);
 
-        mPushThread = new PushThread(this, mHandler, null);
-        new Thread(mPushThread).start();
+        setUpAsForeground();
+        mPushRunnable = new PushRunnable(this, mHandler, null);
+
+        if (mPushThread != null) {
+            mPushThread.interrupt();
+        }
+
+        mPushThread = new Thread(mPushRunnable);
+        mPushThread.start();
 
         mContext = this;
     }
@@ -342,6 +365,13 @@ public class PushService extends Service {
         super.onDestroy();
         Log.d(TAG, "PushService onDestroy()......");
         unregisterReceiver(mBroadcastReceiver);
+        stopForeground(true);
+        if (mPushRunnable != null) {
+            mPushRunnable.releasePushClientSocket(false);
+        }
+        if (mPushThread != null) {
+            mPushThread.interrupt();
+        }
         mHandler = null;
     }
 }
