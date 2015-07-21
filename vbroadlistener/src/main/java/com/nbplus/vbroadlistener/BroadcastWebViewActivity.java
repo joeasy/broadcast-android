@@ -141,6 +141,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url += ("&APPID=" + getApplicationContext().getPackageName());
 //            url += ("?APPID=" + getApplicationContext().getPackageName());
         }
+        //url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
         mWebViewClient.loadUrl(url);
 
         setContentViewByOrientation();
