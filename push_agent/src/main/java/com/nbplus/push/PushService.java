@@ -341,6 +341,7 @@ public class PushService extends Service {
                 .setOngoing(true)
                 .setContentTitle(getString(R.string.push_name))
                 .setContentText(ticker)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setTicker(ticker);
 
         mNotification = mBuilder.build();

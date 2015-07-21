@@ -663,6 +663,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
             mNotification.flags |= Notification.FLAG_NO_CLEAR;
             mNotification.defaults |= Notification.DEFAULT_LIGHTS;
+            mNotification.priority = Notification.PRIORITY_MAX;
 
             startForeground(Constants.RADIO_NOTIFICATION_ID, mNotification);
 
@@ -672,6 +673,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                     .setOngoing(true)
                     //.setContentIntent(pendIntent)
                     .setContent(mRemoteViews)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setTicker(ticker);
 
             mNotification = mBuilder.build();
