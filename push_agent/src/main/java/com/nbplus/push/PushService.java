@@ -298,9 +298,7 @@ public class PushService extends Service {
 
     private void getPushGatewayInformationFromServer() {
         mPushRunnable.releasePushClientSocket(false);
-
-        String prefName = getApplicationContext().getPackageName() + "_preferences";
-        SharedPreferences prefs = getSharedPreferences(prefName, Context.MODE_PRIVATE);
+        mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
 
         mPushRunnable.setState(PushRunnable.State.IfRetrieving);
         initPushGatewayTaskSettings(mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
