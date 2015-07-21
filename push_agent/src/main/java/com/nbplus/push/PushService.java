@@ -220,46 +220,49 @@ public class PushService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = (intent != null) ? intent.getAction() : null;
         Log.d(TAG, "onStartCommand in service.. action = " + action);
-        if (action != null) {
-            if (action.equals(PushConstants.ACTION_START_SERVICE)) {
-                String pushInterfaceServerAddress = intent.getStringExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS);
-                if (!StringUtils.isEmptyString(pushInterfaceServerAddress)) {
-                    if (mPushInterfaceServerAddress == null || !pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
-                        mPushInterfaceServerAddress = pushInterfaceServerAddress;
+        if (action == null) {
+            return Service.START_REDELIVER_INTENT;
+        }
+        if (action.equals(PushConstants.ACTION_START_SERVICE)) {
+            String pushInterfaceServerAddress = intent.getStringExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS);
+            if (!StringUtils.isEmptyString(pushInterfaceServerAddress)) {
+                if (mPushInterfaceServerAddress == null || !pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
+                    mPushInterfaceServerAddress = pushInterfaceServerAddress;
 
-                        if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
-                            if (mIfTask != null) {
-                                mIfTask.cancel(true);
-                            }
-                            mIfTask = null;
+                    if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
+                        if (mIfTask != null) {
+                            mIfTask.cancel(true);
                         }
-
-                        if (mPushRunnable.getState() == PushRunnable.State.Connected) {
-                            mPushRunnable.releasePushClientSocket(false);
-                        }
-                        Log.d(TAG, "mPushInterfaceServerAddress is (re)setted!!! getPushGatewayInformationFromServer()");
-                        getPushGatewayInformationFromServer();
-                    } else {
-                        if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
-                            if (mIfTask != null) {
-                                mIfTask.cancel(true);
-                            }
-                            mIfTask = null;
-                        }
-
-                        if (mPushRunnable.getState() != PushRunnable.State.Connected) {
-                            Log.d(TAG, "mPushRunnable.getState() != PushRunnable.State.Connected!!! getPushGatewayInformationFromServer()");
-                            getPushGatewayInformationFromServer();
-                        }
+                        mIfTask = null;
                     }
-                } else {
-                    Log.e(TAG, ">> mPushInterfaceServerAddress is empty !!!");
-                }
-            } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
-                mPushRunnable.sendSatusChangedBroadcastMessage();
-            }
-        } else {
 
+                    if (mPushRunnable.getState() == PushRunnable.State.Connected) {
+                        mPushRunnable.releasePushClientSocket(false);
+                    }
+                    Log.d(TAG, "mPushInterfaceServerAddress is (re)setted!!! getPushGatewayInformationFromServer()");
+                    getPushGatewayInformationFromServer();
+                } else {
+                    if (pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
+                        Log.d(TAG, ">> Same address... do not anything...");
+                        return Service.START_REDELIVER_INTENT;
+                    }
+//                        if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
+//                            if (mIfTask != null) {
+//                                mIfTask.cancel(true);
+//                            }
+//                            mIfTask = null;
+//                        }
+//
+//                        if (mPushRunnable.getState() != PushRunnable.State.Connected) {
+//                            Log.d(TAG, "mPushRunnable.getState() != PushRunnable.State.Connected!!! getPushGatewayInformationFromServer()");
+//                            getPushGatewayInformationFromServer();
+//                        }
+                }
+            } else {
+                Log.e(TAG, ">> mPushInterfaceServerAddress is empty !!!");
+            }
+        } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
+            mPushRunnable.sendSatusChangedBroadcastMessage();
         }
 
         /**

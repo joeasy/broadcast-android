@@ -41,6 +41,7 @@ import com.nbplus.vbroadlauncher.data.YahooQueryForecastResult;
 import com.nbplus.vbroadlauncher.data.YahooQueryGeocodeResult;
 
 import org.basdroid.common.DisplayUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.volley.GsonRequest;
 
 import java.io.UnsupportedEncodingException;
@@ -1444,6 +1445,7 @@ public class WeatherView extends LinearLayout {
 
     public void onNetworkConnected() {
         Log.d(TAG, "onNetworkConnected() called......");
+
         long currMs = System.currentTimeMillis();
         // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
         if ((currMs - mLastUpdated) > 1000 * 60 * 60) {

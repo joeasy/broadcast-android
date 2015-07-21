@@ -99,6 +99,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private GridLayout mMainShortcutGridLayout;
     private GridLayout mShorcutGridLayout;
 
+    boolean mLastNetworkStatus = false;
+
     private LauncherFragmentHandler mHandler;
 
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
@@ -131,8 +133,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         switch (msg.what) {
             case HANDLER_MESSAGE_CONNECTIVITY_CHANGED:
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
+                final boolean networkStatus = NetworkUtils.isConnected(getActivity());
+                if (mLastNetworkStatus == networkStatus) {
+                    Log.d(TAG, ">> current and previous are same status. ignore it...");
+                    return;
+                }
+                mLastNetworkStatus = networkStatus;
 
-                if (NetworkUtils.isConnected(getActivity())) {
+                if (mLastNetworkStatus) {
                     mWeatherView.onNetworkConnected();
                     // start push agent service
                     VBroadcastServer serverInfo = LauncherSettings.getInstance(getActivity()).getServerInformation();
@@ -299,6 +307,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         getActivity().setTitle("LauncherFragment");
+        mLastNetworkStatus = NetworkUtils.isConnected(getActivity());
 
         if (!LauncherSettings.getInstance(getActivity()).isCheckedTTSEngine()) {
             Intent checkIntent = new Intent();
