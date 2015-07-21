@@ -20,7 +20,7 @@ import java.lang.ref.WeakReference;
  * Created by basagee on 2015. 7. 9..
  */
 public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
-    private static final String TAG = PushRunnable.class.getName();
+    private static final String TAG = PushRunnable.class.getSimpleName();
 
     // indicates the state our service:
     public enum State {

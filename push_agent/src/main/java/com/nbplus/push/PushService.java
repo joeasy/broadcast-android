@@ -53,6 +53,7 @@ public class PushService extends Service {
     NotificationManager mNotificationManager;
     Notification mNotification = null;
     NotificationCompat.Builder mBuilder;
+    boolean mLastConnectionStatus = false;
 
     Thread mPushThread;
     PushRunnable mPushRunnable;
@@ -110,6 +111,10 @@ public class PushService extends Service {
         switch (msg.what) {
             case PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE :
                 Log.d(TAG, "HANDLER_MESSAGE_RETRY_MESSAGE received !!!");
+                if (mPushRunnable.getState() == PushRunnable.State.Connected) {
+                    Log.d(TAG, ">> Already reconnected. ignore retry message !!!");
+                    return;
+                }
                 if (NetworkUtils.isConnected(this)) {
                     mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                     getPushGatewayInformationFromServer();
@@ -139,8 +144,13 @@ public class PushService extends Service {
                 break;
             case PushConstants.HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
+                final boolean isConnected = NetworkUtils.isConnected(this);
+                if (mLastConnectionStatus == isConnected) {
+                    return;
+                }
 
-                if (NetworkUtils.isConnected(this)) {
+                mLastConnectionStatus = isConnected;
+                if (mLastConnectionStatus) {
                     Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED network is connected !!!");
                     if (!StringUtils.isEmptyString(mPushInterfaceServerAddress)) {
                         getPushGatewayInformationFromServer();
@@ -345,6 +355,8 @@ public class PushService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mBroadcastReceiver, intentFilter);
+
+        mLastConnectionStatus = NetworkUtils.isConnected(this);
 
         setUpAsForeground();
         mPushRunnable = new PushRunnable(this, mHandler, null);
