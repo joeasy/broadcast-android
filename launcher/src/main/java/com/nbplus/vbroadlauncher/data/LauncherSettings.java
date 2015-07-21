@@ -121,12 +121,6 @@ public class LauncherSettings implements Parcelable {
         this.villageCode = prefs.getString(KEY_VBROADCAST_VILLAGE_CODE, "");
         this.villageName = prefs.getString(KEY_VBROADCAST_VILLAGE_NAME, "");
         this.isCheckedTTSEngine = prefs.getBoolean(KEY_IS_CHECKED_TTS, false);
-//        try {
-//            this.villageName = new String(this.villageName.getBytes("ISO-8859-1"), "UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//
-//            e.printStackTrace();
-//        }
         int wallpaperId = prefs.getInt(KEY_WALLPAPER_RESOURCE_ID, -1);
 
         this.isOutdoorMode = prefs.getBoolean(KEY_VBROADCAST_IS_OUTDOOR_MODE, false);

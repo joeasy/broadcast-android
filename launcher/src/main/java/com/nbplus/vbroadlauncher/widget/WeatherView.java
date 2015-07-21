@@ -252,13 +252,12 @@ public class WeatherView extends LinearLayout {
             mAttached = true;
 
             registerReceiver();
-            // onNetworkConnected() 가 호출되므로...
-//            if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
-//                Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
-//                getContext().sendBroadcast(intent);
-//            } else {
-//                setAlarm(System.currentTimeMillis() + 5000, Constants.WEATHER_SERVICE_DEFAULT_TIMER);
-//            }
+            if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
+                Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+                getContext().sendBroadcast(intent);
+            } else {
+                setAlarm(System.currentTimeMillis() + 5000, Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+            }
         }
     }
 
