@@ -111,6 +111,7 @@ public class PushService extends Service {
             case PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE :
                 Log.d(TAG, "HANDLER_MESSAGE_RETRY_MESSAGE received !!!");
                 if (NetworkUtils.isConnected(this)) {
+                    mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                     getPushGatewayInformationFromServer();
                 }
                 break;

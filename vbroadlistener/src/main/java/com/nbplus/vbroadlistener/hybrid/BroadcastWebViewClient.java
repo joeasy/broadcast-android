@@ -276,6 +276,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      */
     @JavascriptInterface
     public boolean registerGcm() {
+        Log.d(TAG, ">> call registerGcm()");
         // Start IntentService to register this application with GCM.
         Intent intent = new Intent(mContext, RegistrationIntentService.class);
         intent.setAction(Constants.REGISTER_GCM);
@@ -289,6 +290,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      */
     @JavascriptInterface
     public boolean unRegisterGcm() {
+        Log.d(TAG, ">> call unRegisterGcm()");
         // Start IntentService to register this application with GCM.
         Intent intent = new Intent(mContext, RegistrationIntentService.class);
         intent.setAction(Constants.UNREGISTER_GCM);

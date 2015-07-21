@@ -148,6 +148,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         this.mIfaceData = data;
         if (this.mIfaceData != null) {
             releasePushClientSocket(false);
+            mServiceHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
             mPushThreadCommand = ThreadCommand.StartPushClient;
         }
     }

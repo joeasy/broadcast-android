@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Broadcast Push</string>
+    <string name="push_name">Broadcast Push</string>
     <string name="push_noti_body">Push service is running!</string>
 </resources>
