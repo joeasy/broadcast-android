@@ -17,6 +17,7 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.RequestFuture;
@@ -305,6 +306,7 @@ public class PushService extends Service {
 
             mGwRequestFuture = RequestFuture.newFuture();
             GsonRequest request = new GsonRequest(Request.Method.POST, url, mRequestBody, PushInterfaceData.class, mGwRequestFuture, mGwRequestFuture);
+            request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));
             mRequestQueue.add(request);
         }
     }

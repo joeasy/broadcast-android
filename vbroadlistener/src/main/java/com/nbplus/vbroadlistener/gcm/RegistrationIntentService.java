@@ -27,6 +27,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.RequestFuture;
@@ -203,6 +204,7 @@ public class RegistrationIntentService extends IntentService {
         RequestFuture<BaseApiResult> future = RequestFuture.newFuture();
 
         GsonRequest request = new GsonRequest(Request.Method.POST, url, strRequestBody, BaseApiResult.class, future, future);
+        request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));
         requestQueue.add(request);
 
         try {

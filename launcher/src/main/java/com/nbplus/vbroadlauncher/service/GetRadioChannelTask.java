@@ -3,6 +3,7 @@ package com.nbplus.vbroadlauncher.service;
 import android.net.Uri;
 import android.os.Message;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.RequestFuture;
@@ -38,6 +39,7 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
             RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
 
             GsonRequest request = new GsonRequest(Request.Method.GET, url, null, RadioChannelInfo.class, future, future);
+            request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));
             requestQueue.add(request);
 
             try {
