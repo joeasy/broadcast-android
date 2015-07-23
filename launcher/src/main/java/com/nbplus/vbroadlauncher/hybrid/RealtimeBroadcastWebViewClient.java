@@ -1,5 +1,7 @@
 package com.nbplus.vbroadlauncher.hybrid;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,9 +67,18 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
         @Override
         public void onPermissionRequest(final PermissionRequest request) {
             // Show a grant or deny dialog to the user
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                request.grant(request.getResources());
-            }
+            ((Activity)mContext).runOnUiThread(new Runnable() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void run() {
+                    Log.d(TAG, "onPermissionRequest() grant !!!");
+                    //if(request.getOrigin().toString().equals("https://apprtc-m.appspot.com/")) {
+                    request.grant(request.getResources());
+                    //} else {
+                    //    request.deny();
+                    //}
+                }
+            });
         }
         public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
             new AlertDialog.Builder(mContext)

@@ -247,7 +247,7 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
         } else {
             int result = mText2Speech.setLanguage(Locale.KOREA);
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e(TAG, String.format("TextToSpeech.setLanguage(%d) fail!", Locale.KOREA));
+                Log.e(TAG, String.format("TextToSpeech.setLanguage(%s) fail!", Locale.KOREA.getDisplayName()));
 
                 // TODO : 문자방송실패 팝업????
                 mText2Speech.shutdown();

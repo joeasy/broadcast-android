@@ -477,8 +477,14 @@ public class WeatherView extends LinearLayout {
                 calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
             }
             int newHour = (hour - 1) < 0 ? 24 + (hour - 1) : (hour - 1);
+            if (mForecastGribRetry == 2) {
+                newHour = (newHour - 1) < 0 ? 24 + (newHour - 1) : (newHour - 1);
+            }
             url += "&" + "base_time=" + ((newHour) < 10 ? "0" + newHour : newHour) + "00";
         } else {
+            if (mForecastGribRetry == 2) {
+                hour = (hour - 1) < 0 ? 24 + (hour - 1) : (hour - 1);
+            }
             url += "&" + "base_time=" + ((hour) < 10 ? "0" + hour : hour) + "00";
         }
 
@@ -514,6 +520,10 @@ public class WeatherView extends LinearLayout {
                     mForecastGribRetry = 0;
                     Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
                     updateForecastGribWeatherView();
+                    if (mForecastGribItems == null) {
+                        // TODO : 한번도못가져왔다. ??
+
+                    }
                 } else {                // retry
                     Log.d(TAG, ">> 재시도를한다.  retry count = " + mForecastSpaceDataRetry);
                     updateForecastGrib(1);

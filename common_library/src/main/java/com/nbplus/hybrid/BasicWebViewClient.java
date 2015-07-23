@@ -68,6 +68,7 @@ public class BasicWebViewClient extends WebViewClient {
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void run() {
+                    Log.d(TAG, "onPermissionRequest() grant");
                     //if(request.getOrigin().toString().equals("https://apprtc-m.appspot.com/")) {
                         request.grant(request.getResources());
                     //} else {

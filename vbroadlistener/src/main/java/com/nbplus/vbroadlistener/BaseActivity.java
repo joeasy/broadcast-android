@@ -82,7 +82,7 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
         } else {
             int result = mText2Speech.setLanguage(Locale.KOREA);
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e(TAG, String.format("TextToSpeech.setLanguage(%d) fail!", Locale.KOREA));
+                Log.e(TAG, String.format("TextToSpeech.setLanguage(%s) fail!", Locale.KOREA.getDisplayName()));
                 Log.d(TAG, "여기서 제대로 설정안했다면 관두자.... 사용자 맘인데...");
                 if (mcheckText2SpeechLister != null) {
                     mcheckText2SpeechLister.onCheckResult(null);

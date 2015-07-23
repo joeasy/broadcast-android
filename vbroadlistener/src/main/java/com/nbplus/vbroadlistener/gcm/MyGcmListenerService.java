@@ -146,7 +146,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
 
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.BROADCAST_EVENT_NOTIFICATION_ID, 0, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                showNotification(this, Constants.BROADCAST_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_radio, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
             // 긴급호출메시지
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
@@ -252,7 +252,7 @@ public class MyGcmListenerService extends GcmListenerService {
         if (smallIconId == 0) {
             builder.setSmallIcon(R.mipmap.ic_launcher);
         } else {
-            builder.setSmallIcon(R.drawable.ic_notification_noti);
+            builder.setSmallIcon(smallIconId);
         }
         builder.setWhen(System.currentTimeMillis());
         //builder.setNumber(10);
