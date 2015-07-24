@@ -384,7 +384,7 @@ public class BasicWebViewClient extends WebViewClient {
      */
     @JavascriptInterface
     public String getDeviceId() {
-        return DeviceUtils.getDeviceIdByAndroidID(mContext);
+        return DeviceUtils.getDeviceIdByMacAddress(mContext);
     }
 
     @JavascriptInterface

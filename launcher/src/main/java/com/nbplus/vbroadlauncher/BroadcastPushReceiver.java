@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -84,6 +85,12 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
                     } else {
+                        if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type) || Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(type)) {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                                Toast.makeText(context, R.string.notification_broadcast_not_support, Toast.LENGTH_SHORT);
+                                break;
+                            }
+                        }
                         /*boolean useServiceChatHead = false;
 
                         if (useServiceChatHead) {

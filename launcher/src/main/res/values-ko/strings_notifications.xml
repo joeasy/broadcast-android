@@ -25,4 +25,5 @@
     <string name="notification_broadcast_push">새로운 방송 알림이 도착하였습니다.</string>
     <string name="notification_inhabitant_push">새로운 주민투표 알림이 도착하였습니다.</string>
     <string name="notification_cooperative_buying_push">새로운 공동구매 알림이 도착하였습니다.</string>
+    <string name="notification_broadcast_not_support">이 태블릿에서는 실시간 음성방송이 지원되지 않습니다.</string>
 </resources>

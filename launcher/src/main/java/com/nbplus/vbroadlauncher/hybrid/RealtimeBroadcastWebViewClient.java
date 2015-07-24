@@ -24,6 +24,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.nbplus.media.MusicService;
+import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
@@ -314,7 +315,7 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
      */
     @JavascriptInterface
     public String getDeviceId() {
-        return DeviceUtils.getDeviceIdByAndroidID(mContext);
+        return LauncherSettings.getInstance(mContext).getDeviceID();
     }
 
     @JavascriptInterface
