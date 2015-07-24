@@ -66,6 +66,7 @@ public class ShowApplicationActivity extends BaseActivity {
                 mAppPagerAdapter.notifyDataSetChanged();
                 mIndicator.notifyDataSetChanged();
 
+                dismissProgressDialog();
                 if (mActivityInteractionListener != null) {
                     for (OnActivityInteractionListener listener : mActivityInteractionListener) {
                         listener.onDataChanged();
@@ -108,6 +109,7 @@ public class ShowApplicationActivity extends BaseActivity {
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         filter.addDataScheme("package");
 
+        showProgressDialog();
         registerReceiver(mPackageInstallReceiver, filter);
         mLoadAsyncTask = new InstalledApplicationTask(this, mHandler);
         mLoadAsyncTask.execute();
@@ -130,10 +132,6 @@ public class ShowApplicationActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 Log.d(TAG, ">> page selected position = " + position);
-//                AppGridFragment fragment = (AppGridFragment)mViewPager.getActiveFragment(getSupportFragmentManager(), position);
-//                if (fragment != null) {
-//                    fragment.updateGridLayout();
-//                }
             }
 
             @Override
