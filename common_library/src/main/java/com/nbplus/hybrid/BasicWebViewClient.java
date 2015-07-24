@@ -415,6 +415,7 @@ public class BasicWebViewClient extends WebViewClient {
         Log.d(TAG, "getLineNumber() called");
 
         String phoneNumberStr = PhoneState.getLineNumber1(mContext);
+        Log.d(TAG, ">>> PhoneState.getLineNumber1 = " + phoneNumberStr);
         if (StringUtils.isEmptyString(phoneNumberStr)) {
             return null;
         }
@@ -424,6 +425,10 @@ public class BasicWebViewClient extends WebViewClient {
             Phonenumber.PhoneNumber phoneNumberProto;
             try {
                 phoneNumberProto = phoneUtil.parse(phoneNumberStr, "");
+                Log.d(TAG, ">>> phoneNumberProto.getCountryCode() = " + phoneNumberProto.getCountryCode());
+                Log.d(TAG, ">>> phoneNumberProto.getNationalNumber() = " + phoneNumberProto.getNationalNumber());
+                Log.d(TAG, ">>> phoneUtil.format() = " + phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+                Log.d(TAG, ">>> phoneUtil.format().replace = " + phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL).replace("-", "").replace(" ", "").replace("(", "").replace(")", ""));
                 return phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL).replace("-", "").replace(" ", "").replace("(", "").replace(")", "");
             } catch (NumberParseException e) {
                 Log.e(TAG, "NumberParseException was thrown: " + e.toString());
