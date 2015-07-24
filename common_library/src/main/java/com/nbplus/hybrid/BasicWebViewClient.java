@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
@@ -26,6 +27,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
@@ -407,8 +412,27 @@ public class BasicWebViewClient extends WebViewClient {
 
     @JavascriptInterface
     public String getLineNumber() {
-        Log.d(TAG, "" + PhoneState.getLineNumber1(mContext));
-        return PhoneState.getLineNumber1(mContext);
+        Log.d(TAG, "getLineNumber() called");
+
+        String phoneNumberStr = PhoneState.getLineNumber1(mContext);
+        if (StringUtils.isEmptyString(phoneNumberStr)) {
+            return null;
+        }
+
+        if (PhoneNumberUtils.isGlobalPhoneNumber(phoneNumberStr)) {
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            Phonenumber.PhoneNumber phoneNumberProto;
+            try {
+                phoneNumberProto = phoneUtil.parse(phoneNumberStr, "");
+                return phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL).replace("-", "").replace(" ", "").replace("(", "").replace(")", "");
+            } catch (NumberParseException e) {
+                Log.e(TAG, "NumberParseException was thrown: " + e.toString());
+            }
+
+            return null;
+        } else {
+            return phoneNumberStr;
+        }
     }
 
     /**
