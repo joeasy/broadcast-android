@@ -150,6 +150,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 break;
             // 긴급호출메시지
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
+                Log.d(TAG, ">> Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL = " + payloadData.getAlertMessage());
                 if (StringUtils.isEmptyString(payloadData.getMessage())) {
                     showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, null);
                 } else {

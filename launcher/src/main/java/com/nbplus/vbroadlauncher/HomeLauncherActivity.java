@@ -253,9 +253,9 @@ public class HomeLauncherActivity extends BaseActivity
         intent.putExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, mActivityRunningTime);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-        if (!NetworkUtils.isConnected(this)) {
-            showNetworkConnectionAlertDialog();
-        }
+//        if (!NetworkUtils.isConnected(this)) {
+//            showNetworkConnectionAlertDialog();
+//        }
 
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {
