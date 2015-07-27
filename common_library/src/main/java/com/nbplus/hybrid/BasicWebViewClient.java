@@ -424,17 +424,12 @@ public class BasicWebViewClient extends WebViewClient {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
             Phonenumber.PhoneNumber phoneNumberProto;
             try {
-                phoneNumberProto = phoneUtil.parse(phoneNumberStr, "");
-                Log.d(TAG, ">>> phoneNumberProto.getCountryCode() = " + phoneNumberProto.getCountryCode());
-                Log.d(TAG, ">>> phoneNumberProto.getNationalNumber() = " + phoneNumberProto.getNationalNumber());
-                Log.d(TAG, ">>> phoneUtil.format() = " + phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
-                Log.d(TAG, ">>> phoneUtil.format().replace = " + phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL).replace("-", "").replace(" ", "").replace("(", "").replace(")", ""));
+                phoneNumberProto = phoneUtil.parse(phoneNumberStr, "KR");
                 return phoneUtil.format(phoneNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL).replace("-", "").replace(" ", "").replace("(", "").replace(")", "");
             } catch (NumberParseException e) {
                 Log.e(TAG, "NumberParseException was thrown: " + e.toString());
+                return phoneNumberStr;
             }
-
-            return null;
         } else {
             return phoneNumberStr;
         }
