@@ -4,44 +4,34 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
 import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.nbplus.vbroadlistener.data.Constants;
 import com.nbplus.vbroadlistener.data.VBroadcastServer;
-import com.nbplus.vbroadlistener.gcm.RegistrationIntentService;
 import com.nbplus.vbroadlistener.hybrid.BroadcastWebViewClient;
 import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
-import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 
 /**
  * Created by basagee on 2015. 5. 28..
  */
-public class BroadcastWebViewActivity extends BaseActivity {
-    private static final String TAG = BroadcastWebViewActivity.class.getSimpleName();
+public class GcmPushWebViewActivity extends BaseActivity {
+    private static final String TAG = GcmPushWebViewActivity.class.getSimpleName();
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     BroadcastWebViewClient mWebViewClient;
@@ -50,15 +40,15 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
     // 핸들러 객체 만들기
     private static class RadioActivityHandler extends Handler {
-        private final WeakReference<BroadcastWebViewActivity> mActivity;
+        private final WeakReference<GcmPushWebViewActivity> mActivity;
 
-        public RadioActivityHandler(BroadcastWebViewActivity activity) {
+        public RadioActivityHandler(GcmPushWebViewActivity activity) {
             mActivity = new WeakReference<>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            BroadcastWebViewActivity activity = mActivity.get();
+            GcmPushWebViewActivity activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
             }

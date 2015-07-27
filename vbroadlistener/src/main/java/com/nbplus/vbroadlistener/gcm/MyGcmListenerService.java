@@ -35,6 +35,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlistener.BroadcastWebViewActivity;
+import com.nbplus.vbroadlistener.GcmPushWebViewActivity;
 import com.nbplus.vbroadlistener.R;
 import com.nbplus.vbroadlistener.data.Constants;
 import com.nbplus.vbroadlistener.data.PushPayloadData;
@@ -107,8 +108,8 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.d(TAG, "MessagID: " + messageId);
 
         String payload = data.getString(Constants.GCM_DATA_KEY_PAYLOAD);
-        Intent pi;
-        String moveUrl;
+        Intent pi = null;
+        String moveUrl = null;
 
         PushPayloadData payloadData = null;
         try {
@@ -131,7 +132,7 @@ public class MyGcmListenerService extends GcmListenerService {
             case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
             case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
             case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
-                pi = new Intent(this, BroadcastWebViewActivity.class);
+                pi = new Intent(this, GcmPushWebViewActivity.class);
                 pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
 
                 if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
@@ -152,16 +153,17 @@ public class MyGcmListenerService extends GcmListenerService {
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
                 Log.d(TAG, ">> Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL = " + payloadData.getAlertMessage());
                 if (StringUtils.isEmptyString(payloadData.getMessage())) {
-                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, null);
+                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 } else {
                     // bigText 사용시
+                    Log.d(TAG, ">> Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL bigText = " + payloadData.getMessage());
                     showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
-                            payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, null);
+                            payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, pi);
                 }
                 break;
             // 주민투표
             case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
-                pi = new Intent(this, BroadcastWebViewActivity.class);
+                pi = new Intent(this, GcmPushWebViewActivity.class);
                 pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
                 if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
                     moveUrl = payloadData.getMessage();
@@ -178,7 +180,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 break;
                 // 공동구매
             case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
-                pi = new Intent(this, BroadcastWebViewActivity.class);
+                pi = new Intent(this, GcmPushWebViewActivity.class);
                 pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
                 if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
                     moveUrl = payloadData.getMessage();
@@ -284,7 +286,8 @@ public class MyGcmListenerService extends GcmListenerService {
         }
 
         if (intent != null) {
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            intent.setFlags(intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
             builder.setContentIntent(pendingIntent);
         }
 
