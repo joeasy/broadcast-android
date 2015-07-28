@@ -25,7 +25,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Patterns;
 import android.widget.Toast;
@@ -35,7 +34,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.nbplus.vbroadlistener.BroadcastWebViewActivity;
-import com.nbplus.vbroadlistener.GcmPushWebViewActivity;
 import com.nbplus.vbroadlistener.R;
 import com.nbplus.vbroadlistener.data.Constants;
 import com.nbplus.vbroadlistener.data.PushPayloadData;
@@ -44,9 +42,6 @@ import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
 import org.basdroid.common.PackageUtils;
 import org.basdroid.common.StringUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 public class MyGcmListenerService extends GcmListenerService {
 
@@ -132,7 +127,7 @@ public class MyGcmListenerService extends GcmListenerService {
             case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
             case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
             case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
-                pi = new Intent(this, GcmPushWebViewActivity.class);
+                pi = new Intent(this, BroadcastWebViewActivity.class);
                 pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
 
                 if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
@@ -163,7 +158,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 break;
             // 주민투표
             case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
-                pi = new Intent(this, GcmPushWebViewActivity.class);
+                pi = new Intent(this, BroadcastWebViewActivity.class);
                 pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
                 if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
                     moveUrl = payloadData.getMessage();
@@ -180,7 +175,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 break;
                 // 공동구매
             case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
-                pi = new Intent(this, GcmPushWebViewActivity.class);
+                pi = new Intent(this, BroadcastWebViewActivity.class);
                 pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
                 if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
                     moveUrl = payloadData.getMessage();

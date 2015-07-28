@@ -144,7 +144,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
         //url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
         Log.d(TAG, ">> Start url = " + url);
         mWebViewClient.loadUrl(url);
-        mWebViewClient.getLineNumber();
 
         setContentViewByOrientation();
         checkPlayServices();
@@ -262,5 +261,48 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 }
                 break;
         }
+    }
+
+    /**
+     * Handle onNewIntent() to inform the fragment manager that the
+     * state is not saved.  If you are handling new intents and may be
+     * making changes to the fragment state, you want to be sure to call
+     * through to the super-class here first.  Otherwise, if your state
+     * is saved but the activity is not stopped, you could get an
+     * onNewIntent() call which happens before onResume() and trying to
+     * perform fragment operations at that point will throw IllegalStateException
+     * because the fragment manager thinks the state is still saved.
+     *
+     * @param intent
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, "onNewIntent()... maybe from notifications");
+        String fromNotiUrl = null;
+        if (intent != null && Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(intent.getAction())) {
+            fromNotiUrl = intent.getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
+        }
+
+        String url = null;
+        VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
+        if (!StringUtils.isEmptyString(fromNotiUrl)) {
+            url = fromNotiUrl;
+        } else if (serverInfo != null && serverInfo.getDocServer() != null) {
+            url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
+        } else {
+            url = LauncherSettings.getInstance(this).getRegisterAddress();
+        }
+
+        if (url.indexOf("?") > 0) {
+            url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+            url += ("&APPID=" + getApplicationContext().getPackageName());
+        } else {
+            url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+            url += ("&APPID=" + getApplicationContext().getPackageName());
+        }
+        Log.d(TAG, ">> Start url = " + url);
+        mWebViewClient.loadUrl(url);
+
+        setContentViewByOrientation();
     }
 }
