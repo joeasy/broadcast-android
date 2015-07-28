@@ -528,6 +528,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, ">>> onDestroy()");
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         getApplicationContext().getContentResolver().unregisterContentObserver(mSettingsContentObserver);

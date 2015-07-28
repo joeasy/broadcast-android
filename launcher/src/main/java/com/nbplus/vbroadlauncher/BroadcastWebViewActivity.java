@@ -123,6 +123,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url += ("&APPID=" + getApplicationContext().getPackageName());
         }
 
+        Log.d(TAG, "start URL = " + url);
         mWebViewClient.loadUrl(url);
         setContentViewByOrientation();
     }

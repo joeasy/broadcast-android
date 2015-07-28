@@ -355,13 +355,13 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
      * @param releaseMediaPlayer Indicates whether the Media Player should also be released or not
      */
     void relaxResources(boolean releaseMediaPlayer) {
-        // stop being a foreground service
-        stopForeground(true);
         if (mNotificationManager != null) {
             mNotificationManager.cancel(Constants.RADIO_NOTIFICATION_ID);
         }
         // stop and release the Media Player, if it's available
         if (releaseMediaPlayer && mPlayer != null) {
+            // stop being a foreground service
+            stopForeground(true);
             mPlayer.reset();
             mPlayer.release();
             mPlayer = null;
@@ -593,8 +593,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         mAudioFocus = AudioFocus.Focused;
 
         // restart media player with new focus settings
-        if (mState == State.Playing)
+        if (mState == State.Playing) {
             configAndStartMediaPlayer();
+            updateNotification(mPlayingItem.getTitle());
+        }
     }
 
     public void onLostAudioFocus(boolean canDuck) {
@@ -603,8 +605,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         mAudioFocus = canDuck ? AudioFocus.NoFocusCanDuck : AudioFocus.NoFocusNoDuck;
 
         // start/restart/pause media player with new focus settings
-        if (mPlayer != null && mPlayer.isPlaying())
+        if (mPlayer != null && mPlayer.isPlaying()) {
             configAndStartMediaPlayer();
+            updateNotification(mPlayingItem.getTitle());
+        }
     }
 
     @Override
@@ -693,7 +697,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         // toggle playback
         Intent intent = new Intent(this, MusicService.class);
         intent.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
-        PendingIntent pi = PendingIntent.getService(this, 0, intent, 0);
+        PendingIntent pi = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteViews.setOnClickPendingIntent(R.id.ic_media_control_play, pi);
         if (mState == State.Paused) {
             mRemoteViews.setImageViewResource(R.id.ic_media_control_play, R.drawable.ic_btn_radio_play_selector);
@@ -703,7 +707,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         // stop button
         intent = new Intent(this, MusicService.class);
         intent.setAction(MusicService.ACTION_STOP);
-        pi = PendingIntent.getService(this, 0, intent, 0);
+        pi = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteViews.setOnClickPendingIntent(R.id.ic_media_control_stop, pi);
     }
 }
