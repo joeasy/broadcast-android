@@ -50,13 +50,14 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
     private static final int HANDLER_BROADCAST_STARTED = 1000;
     private static final int HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE = 1001;
-    private final BroadcastChatHeadProxyActivityHandler mHandler = new BroadcastChatHeadProxyActivityHandler(this);
+    private static final int HANDLER_MESSAGE_SETUP_CURRENT_PLAYING = 1002;
+    private final RealtimeBroadcastActivityHandler mHandler = new RealtimeBroadcastActivityHandler(this);
 
     // 핸들러 객체 만들기
-    private static class BroadcastChatHeadProxyActivityHandler extends Handler {
+    private static class RealtimeBroadcastActivityHandler extends Handler {
         private final WeakReference<RealtimeBroadcastActivity> mActivity;
 
-        public BroadcastChatHeadProxyActivityHandler(RealtimeBroadcastActivity activity) {
+        public RealtimeBroadcastActivityHandler(RealtimeBroadcastActivity activity) {
             mActivity = new WeakReference<>(activity);
         }
 
@@ -74,6 +75,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
             return;
         }
         switch (msg.what) {
+            case HANDLER_MESSAGE_SETUP_CURRENT_PLAYING :
+                LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(mBroadcastData.getServiceType());
+                break;
             case HANDLER_BROADCAST_STARTED :
                 long idx = (long)msg.obj;
                 if (idx > mBroadcastPayloadIdx) {
@@ -158,6 +162,8 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
             mTextView.setHorizontalScrollBarEnabled(false);
             mTextView.setMovementMethod(new ScrollingMovementMethod());
 
+            mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_SETUP_CURRENT_PLAYING, 800);
+
             mText2SpeechHandler = new TextToSpeechHandler(this, this);
             checkText2SpeechAvailable();
         } else {
@@ -199,6 +205,8 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(null);
+
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         if (mText2Speech != null) {
             mText2Speech.shutdown();
@@ -300,6 +308,16 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     @Override
     public void onCloseWebApplication() {
         finish();
+    }
+
+    @Override
+    public void onPageFinished(boolean success) {
+        if (success) {
+            mHandler.sendEmptyMessage(HANDLER_MESSAGE_SETUP_CURRENT_PLAYING);
+        } else {
+            LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(null);
+            finish();
+        }
     }
 
     // tts

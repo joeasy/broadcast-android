@@ -99,7 +99,13 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                             i.setAction(action);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                             context.startActivity(i);
-                        } else*/ {
+                        } else*/
+
+                        String playingType = LauncherSettings.getInstance(context).getCurrentPlayingBroadcastType();
+
+                        if (StringUtils.isEmptyString(playingType) ||
+                                !Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType)) {
+                            // 재생중인것이 없거나... 실시간이 아닌경우. 나중에받은것이 실행
                             i = new Intent(context, RealtimeBroadcastActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             i.setAction(action);
@@ -112,6 +118,27 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                                 context.startActivity(i);
                             } catch (Exception e) {
                                 e.printStackTrace();
+                            }
+                        } else {
+                            // 재생중인 방송이 실시간인데... 새로운 요청도 실시간이면.. 새로운 요청이 우선.
+                            if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType) && Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type)) {
+                                i = new Intent(context, RealtimeBroadcastActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                i.setAction(action);
+                                i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                                i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
+
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                                try {
+                                    //Thread.sleep(30);
+                                    context.startActivity(i);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                // 이미 우선순위높은 방송이 재생중이다.
+                                Log.d(TAG, "이미 우선순위높은 방송이 재생중이다.");
+                                Toast.makeText(context, payloadData.getAlertMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     }

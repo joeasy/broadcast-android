@@ -44,7 +44,7 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
     protected Context mContext;
     protected BroadcastWebChromeClient mWebChromeClient;
     protected boolean mPageLoadSuccess = false;
-    OnRealtimeBroadcastWebViewListener mOnChatHeadWebViewListener;
+    OnRealtimeBroadcastWebViewListener mOnWebViewListener;
     public boolean isClosingByWebApp() {
         return mIsClosingByWebApp;
     }
@@ -53,6 +53,7 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
 
     public interface OnRealtimeBroadcastWebViewListener {
         public void onCloseWebApplication();
+        public void onPageFinished(boolean success);
     }
 
     /**
@@ -139,7 +140,7 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
     public RealtimeBroadcastWebViewClient(Context activity, WebView view, OnRealtimeBroadcastWebViewListener l) {
         mWebView = view;
         mContext = activity;
-        mOnChatHeadWebViewListener = l;
+        mOnWebViewListener = l;
 
         mWebChromeClient = new BroadcastWebChromeClient();
 
@@ -267,8 +268,9 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
             CookieSyncManager.getInstance().sync();
         }
         mPageLoadSuccess = true;
-
-
+        if (mOnWebViewListener != null) {
+            mOnWebViewListener.onPageFinished(true);
+        }
     }
 
     @Override
@@ -303,6 +305,9 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
 
         // Default behaviour
         super.onReceivedError(view, errorCode, description, failingUrl);
+        if (mOnWebViewListener != null) {
+            mOnWebViewListener.onPageFinished(false);
+        }
     }
 
     ////////////////////////////////
@@ -359,8 +364,8 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
         mContext.startService(i);
 
         mIsClosingByWebApp = true;
-        if (mOnChatHeadWebViewListener != null) {
-            mOnChatHeadWebViewListener.onCloseWebApplication();
+        if (mOnWebViewListener != null) {
+            mOnWebViewListener.onCloseWebApplication();
         }
     }
 

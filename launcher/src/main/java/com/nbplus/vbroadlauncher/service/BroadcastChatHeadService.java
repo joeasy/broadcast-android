@@ -306,4 +306,10 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
     public void onCloseWebApplication() {
         removeChatHead(false);
     }
+
+    @Override
+    public void onPageFinished(boolean success) {
+
+    }
+
 }

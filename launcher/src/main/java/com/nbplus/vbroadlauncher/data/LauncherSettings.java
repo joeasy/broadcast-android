@@ -428,4 +428,18 @@ public class LauncherSettings implements Parcelable {
             return new LauncherSettings[size];
         }
     };
+
+    /**
+     * 재생중인 방송 priority 에 따라 종료여부 판단을위해..
+     * 실시간방송이 재생중인 상태에서 일반방송이나 문자방송이 오면 무시하기 위함.
+     */
+    private String currentPlayingBroadcastType = null;
+
+    public void setCurrentPlayingBroadcastType(String type) {
+        currentPlayingBroadcastType = type;
+    }
+
+    public String getCurrentPlayingBroadcastType() {
+        return currentPlayingBroadcastType;
+    }
 }
