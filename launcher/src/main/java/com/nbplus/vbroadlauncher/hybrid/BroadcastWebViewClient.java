@@ -151,18 +151,18 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                         return;
                     } else*/ {
                         //VBroadcastServer serverInfo = settings.getServerInformation();
-                        if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        if (StringUtils.isEmptyString(serverInfo.getDocServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        if (StringUtils.isEmptyString(serverInfo.getPushInterfaceServer())) {
-                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+//                        if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
+//                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+//                            return;
+//                        }
+//                        if (StringUtils.isEmptyString(serverInfo.getDocServer())) {
+//                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+//                            return;
+//                        }
+//                        if (StringUtils.isEmptyString(serverInfo.getPushInterfaceServer())) {
+//                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
+//                            return;
+//                        }
                     }
 
 //                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());

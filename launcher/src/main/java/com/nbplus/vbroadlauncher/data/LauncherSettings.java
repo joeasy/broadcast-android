@@ -319,15 +319,15 @@ public class LauncherSettings implements Parcelable {
 
     public void setServerInformation(VBroadcastServer serverInformation) {
         String addr = serverInformation.getApiServer();
-        if (addr.endsWith("/")) {
+        if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
             addr = addr.substring(0, addr.length() - 2);
         }
         addr = serverInformation.getDocServer();
-        if (addr.endsWith("/")) {
+        if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
             addr = addr.substring(0, addr.length() - 2);
         }
         addr = serverInformation.getPushInterfaceServer();
-        if (addr.endsWith("/")) {
+        if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
             addr = addr.substring(0, addr.length() - 2);
         }
         this.serverInformation = serverInformation;

@@ -260,7 +260,8 @@ public class PushService extends Service {
 //                        }
                 }
             } else {
-                Log.e(TAG, ">> mPushInterfaceServerAddress is empty !!!");
+                Log.e(TAG, ">> mPushInterfaceServerAddress is empty... maybe logout???? !!!");
+                mPushRunnable.releasePushClientSocket(false);
             }
         } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
             mPushRunnable.sendSatusChangedBroadcastMessage();

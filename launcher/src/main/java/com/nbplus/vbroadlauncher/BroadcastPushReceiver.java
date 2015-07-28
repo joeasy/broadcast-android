@@ -96,16 +96,23 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         if (useServiceChatHead) {
                             i = new Intent(context, RealtimeBroadcastProxyActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.setAction(action);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                             context.startActivity(i);
                         } else*/ {
                             i = new Intent(context, RealtimeBroadcastActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.setAction(action);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
                             LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-                            context.startActivity(i);
+                            try {
+                                //Thread.sleep(30);
+                                context.startActivity(i);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 

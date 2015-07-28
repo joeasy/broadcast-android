@@ -76,12 +76,12 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         switch (msg.what) {
             case HANDLER_BROADCAST_STARTED :
                 long idx = (long)msg.obj;
-                if (idx == mBroadcastPayloadIdx) {
-                    Log.d(TAG, "HANDLER_BROADCAST_STARTED, finish... ");
+                if (idx > mBroadcastPayloadIdx) {
+                    Log.d(TAG, "HANDLER_BROADCAST_STARTED, finish..currIdx = " + mBroadcastPayloadIdx + ", newIdx = " + idx);
                     if (mWebViewClient != null) {
                         mWebViewClient.onCloseWebApplicationByUser();
                     }
-                    finish();
+                    //finish();
                 }
             case HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE :
                 if (mWebViewClient != null && !mWebViewClient.isClosingByWebApp()) {
