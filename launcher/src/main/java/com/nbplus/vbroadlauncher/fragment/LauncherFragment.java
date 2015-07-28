@@ -252,6 +252,9 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 if (mVillageName != null) {
                     mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
                 }
+                if (mWeatherView != null) {
+                    mWeatherView.onChangedVillageName();
+                }
                 break;
         }
     }
@@ -790,5 +793,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         }
     }
 
-
+    /**
+     * Called when the fragment is visible to the user and actively running.
+     * This is generally
+     * tied to {@link Activity#onResume() Activity.onResume} of the containing
+     * Activity's lifecycle.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 }
