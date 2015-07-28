@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -224,9 +225,15 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     }
 
     public void checkText2SpeechAvailable() {
-        Intent checkIntent = new Intent();
-        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-        startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
+//        String model = Build.MODEL;
+//        if (model.equals("111")) {
+            Log.d(TAG, "checkText2SpeechAvailable()");
+            Intent checkIntent = new Intent();
+            checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+            startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
+//        } else {
+//            onActivityResult(Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA, TextToSpeech.Engine.CHECK_VOICE_DATA_PASS, null);
+//        }
     }
 
     @Override

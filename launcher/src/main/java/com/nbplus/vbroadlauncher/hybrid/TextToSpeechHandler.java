@@ -62,8 +62,9 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
         mText2Speech.setPitch(1.0f);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             HashMap<String, String> map = new HashMap<String, String>();
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "messageID");
-            mText2Speech.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
+            map.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "REALTIMEBROADCAST_" + System.currentTimeMillis());
+            int setListenerResult = mText2Speech.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
                 @Override
                 public void onUtteranceCompleted(String utteranceId) {
                     if (mProgressListener != null) {

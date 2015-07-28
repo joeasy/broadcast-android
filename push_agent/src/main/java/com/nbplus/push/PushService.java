@@ -364,7 +364,11 @@ public class PushService extends Service {
 
         mLastConnectionStatus = NetworkUtils.isConnected(this);
 
-        setUpAsForeground();
+        /**
+         * 넣지않아도 문제가 없다면...
+         * 2015.07.28
+         */
+        //setUpAsForeground();
         mPushRunnable = new PushRunnable(this, mHandler, null);
 
         if (mPushThread != null) {
@@ -382,7 +386,11 @@ public class PushService extends Service {
         super.onDestroy();
         Log.d(TAG, "PushService onDestroy()......");
         unregisterReceiver(mBroadcastReceiver);
-        stopForeground(true);
+        /**
+         * 넣지않아도 문제가 없다면...
+         * 2015.07.28
+         */
+        //stopForeground(true);
         if (mPushRunnable != null) {
             mPushRunnable.releasePushClientSocket(false);
         }
