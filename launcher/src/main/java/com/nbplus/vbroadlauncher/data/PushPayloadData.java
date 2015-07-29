@@ -13,9 +13,9 @@ public class PushPayloadData implements Parcelable {
     protected String from;
     @SerializedName("ADDRESS")
     protected String address;
-    @SerializedName("LATITUDE")
+    @SerializedName("LAT")
     protected String latitude;
-    @SerializedName("LONGITUDE")
+    @SerializedName("LON")
     protected String longitude;
     @SerializedName("MESSAGE")
     protected String message;

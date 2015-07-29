@@ -11,9 +11,9 @@ import com.google.gson.annotations.SerializedName;
 public class PushPayloadData implements Parcelable {
     @SerializedName("MESSAGE")
     protected String message;
-    @SerializedName("LATITUDE")
+    @SerializedName("LAT")
     protected String latitude;
-    @SerializedName("LONGITUDE")
+    @SerializedName("LON")
     protected String longitude;
     @SerializedName("SERVICE_TYPE")
     protected String serviceType;
