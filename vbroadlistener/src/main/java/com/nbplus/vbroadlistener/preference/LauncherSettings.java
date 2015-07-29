@@ -54,6 +54,7 @@ public class LauncherSettings implements Parcelable {
     String initialPageAddress = "http://175.207.46.132:8080/common/selectServer.rmc";
 
     public static final String firstPageContext = "/login.rmc";
+    public static final String indexPageContext = "/index.rmc";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;

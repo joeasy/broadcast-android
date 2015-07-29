@@ -45,6 +45,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     BroadcastWebViewClient mWebViewClient;
+    boolean isGoogleMapMode = false;
 
     private final RadioActivityHandler mHandler = new RadioActivityHandler(this);
 
@@ -119,33 +120,19 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 new IntentFilter(Constants.REGISTRATION_COMPLETE));
 
         String fromNotiUrl = null;
-        if (getIntent() != null && Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(getIntent().getAction())) {
-            fromNotiUrl = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
+        if (getIntent() != null) {
+            final String action = getIntent().getAction();
+            if (Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(getIntent().getAction())) {
+                fromNotiUrl = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
+            } else if (Constants.ACTION_SHOW_NOTIFICATION_EMERGENCY_CALL.equals(getIntent().getAction())) {
+                final String lat = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LAT);
+                final String lon = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LON);
+                fromNotiUrl = "http://maps.google.com/maps?q=" + lat + "," + lon;
+                isGoogleMapMode = true;
+            }
         }
 
-        String url = null;
-        VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
-        if (!StringUtils.isEmptyString(fromNotiUrl)) {
-            url = fromNotiUrl;
-        } else if (serverInfo != null && serverInfo.getDocServer() != null) {
-            url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
-        } else {
-            url = LauncherSettings.getInstance(this).getRegisterAddress();
-        }
-
-        if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-        } else {
-            url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-//            url += ("?APPID=" + getApplicationContext().getPackageName());
-        }
-        //url = "http://175.207.46.132:8010/web_test/broadcast_test.html";
-        Log.d(TAG, ">> Start url = " + url);
-        mWebViewClient.loadUrl(url);
-
-        setContentViewByOrientation();
+        loadWebView(fromNotiUrl);
         checkPlayServices();
     }
 
@@ -156,7 +143,26 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        mWebViewClient.onBackPressed();
+        if (isGoogleMapMode) {
+            String url = null;
+            VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
+            if (serverInfo != null && serverInfo.getDocServer() != null) {
+                url = serverInfo.getDocServer() + LauncherSettings.indexPageContext;
+            } else {
+                url = LauncherSettings.getInstance(this).getRegisterAddress();
+            }
+            if (url.indexOf("?") > 0) {
+                url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                url += ("&APPID=" + getApplicationContext().getPackageName());
+            } else {
+                url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                url += ("&APPID=" + getApplicationContext().getPackageName());
+            }
+            isGoogleMapMode = false;
+            loadWebView(url);
+        } else {
+            mWebViewClient.onBackPressed();
+        }
     }
 
     @Override
@@ -284,21 +290,29 @@ public class BroadcastWebViewActivity extends BaseActivity {
         }
 
         String url = null;
-        VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
         if (!StringUtils.isEmptyString(fromNotiUrl)) {
             url = fromNotiUrl;
-        } else if (serverInfo != null && serverInfo.getDocServer() != null) {
-            url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
-        } else {
-            url = LauncherSettings.getInstance(this).getRegisterAddress();
         }
 
-        if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-        } else {
-            url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
+        loadWebView(url);
+    }
+
+    private void loadWebView(String url) {
+        if (StringUtils.isEmptyString(url)) {
+            VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
+            if (serverInfo != null && serverInfo.getDocServer() != null) {
+                url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
+            } else {
+                url = LauncherSettings.getInstance(this).getRegisterAddress();
+            }
+
+            if (url.indexOf("?") > 0) {
+                url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                url += ("&APPID=" + getApplicationContext().getPackageName());
+            } else {
+                url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                url += ("&APPID=" + getApplicationContext().getPackageName());
+            }
         }
         Log.d(TAG, ">> Start url = " + url);
         mWebViewClient.loadUrl(url);

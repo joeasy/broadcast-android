@@ -18,6 +18,7 @@ import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.MimeTypeMap;
@@ -64,6 +65,10 @@ public class BasicWebViewClient extends WebViewClient {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             super.onProgressChanged(view, newProgress);
+        }
+
+        public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+            callback.invoke(origin, true, false);
         }
 
         @Override
@@ -161,8 +166,11 @@ public class BasicWebViewClient extends WebViewClient {
 
         mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         WebSettings webSettings = mWebView.getSettings();
+        webSettings.setGeolocationEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        webSettings.setDatabaseEnabled(true);
         // Use WideViewport and Zoom out if there is no viewport defined
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
@@ -174,6 +182,7 @@ public class BasicWebViewClient extends WebViewClient {
             webSettings.setDisplayZoomControls(false);
         }
 
+        webSettings.setAppCacheEnabled(true);
         mWebView.clearCache(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 

@@ -18,7 +18,10 @@ public class Constants {
     public static final String UPDATE_GCM = "com.nbplus.vbroadcast.action.UPDATE_GCM";
     public static final String UNREGISTER_GCM = "com.nbplus.vbroadcast.action.UNREGISTER_GCM";
     public static final String ACTION_SHOW_NOTIFICATION_CONTENTS = "com.nbplus.vbroadcast.action.SHOW_NOTIFICATION_CONTENTS";
+    public static final String ACTION_SHOW_NOTIFICATION_EMERGENCY_CALL = "com.nbplus.vbroadcast.action.SHOW_NOTIFICATION_EMERGENCY_CALL";
     public static final String EXTRA_SHOW_NOTIFICATION_CONTENTS = "EXTRA_SHOW_NOTIFICATION_CONTENTS";
+    public static final String EXTRA_SHOW_NOTIFICATION_EMERGENCY_LAT = "EXTRA_SHOW_NOTIFICATION_EMERGENCY_LAT";
+    public static final String EXTRA_SHOW_NOTIFICATION_EMERGENCY_LON = "EXTRA_SHOW_NOTIFICATION_EMERGENCY_LON";
 
     public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
 

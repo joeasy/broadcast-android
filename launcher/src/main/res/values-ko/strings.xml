@@ -74,7 +74,7 @@
     <string name="title_activity_broadcast_webview">마을방송 서비스</string>
 
     <string name="title_text_broadcast">문자 방송</string>
-    <string name="title_audio_broadcast">실시간 방송이 진행중입니다.</string>
+    <string name="title_audio_broadcast">방송이 진행중입니다.</string>
     <string name="toast_tts_error">문자방송 재생중 오류가 발생했습니다.</string>
 
     <string name="server_connection_error">서버 연결에 실패 하였습니다. 잠시 후 다시 시도해 주시기 바랍니다.</string>

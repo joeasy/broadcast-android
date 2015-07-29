@@ -13,6 +13,10 @@ public class PushPayloadData implements Parcelable {
     protected String from;
     @SerializedName("ADDRESS")
     protected String address;
+    @SerializedName("LATITUDE")
+    protected String latitude;
+    @SerializedName("LONGITUDE")
+    protected String longitude;
     @SerializedName("MESSAGE")
     protected String message;
     @SerializedName("SERVICE_TYPE")
@@ -81,6 +85,22 @@ public class PushPayloadData implements Parcelable {
         this.iotControlDeviceId = iotControlDeviceId;
     }
 
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
     public PushPayloadData() {
     }
 
@@ -93,6 +113,8 @@ public class PushPayloadData implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.from);
         dest.writeString(this.address);
+        dest.writeString(this.latitude);
+        dest.writeString(this.longitude);
         dest.writeString(this.message);
         dest.writeString(this.serviceType);
         dest.writeString(this.iotControlDeviceId);
@@ -103,6 +125,8 @@ public class PushPayloadData implements Parcelable {
     protected PushPayloadData(Parcel in) {
         this.from = in.readString();
         this.address = in.readString();
+        this.latitude = in.readString();
+        this.longitude = in.readString();
         this.message = in.readString();
         this.serviceType = in.readString();
         this.iotControlDeviceId = in.readString();

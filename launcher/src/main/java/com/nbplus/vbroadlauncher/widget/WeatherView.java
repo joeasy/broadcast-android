@@ -458,6 +458,8 @@ public class WeatherView extends LinearLayout {
             currLoc = new Location("stub");
             currLoc.setLongitude(126.929810);
             currLoc.setLatitude(37.488201);
+
+            LauncherSettings.getInstance(getContext()).setPreferredUserLocation(currLoc);
         }
 
         Location gridLoc = convertLocation2Grid(currLoc);

@@ -74,7 +74,7 @@
     <string name="title_activity_broadcast_webview">Village Broadcast</string>
 
     <string name="title_text_broadcast">Text Broadcast</string>
-    <string name="title_audio_broadcast">Audio broadcast is playing.</string>
+    <string name="title_audio_broadcast">Village broadcast is playing.</string>
     <string name="toast_tts_error">TTS play error...</string>
 
     <string name="server_connection_error">Can not connect to server. Check your service</string>

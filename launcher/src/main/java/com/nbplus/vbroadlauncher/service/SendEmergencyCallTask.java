@@ -1,7 +1,9 @@
 package com.nbplus.vbroadlauncher.service;
 
+import android.location.Location;
 import android.net.Uri;
 import android.os.Message;
+import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -25,6 +27,8 @@ import java.util.concurrent.ExecutionException;
  * Created by basagee on 2015. 6. 2..
  */
 public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
+    private static final String TAG = SendEmergencyCallTask.class.getSimpleName();
+
     @Override
     protected BaseApiResult doInBackground(Void... params) {
 
@@ -35,7 +39,19 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
         //builder.appendQueryParameter("DEVICE_ID", LauncherSettings.getInstance(mContext).getDeviceID());
         String url = builder.toString();
 
-        String strRequestBody = String.format("{\"DEVICE_ID\" : \"%s\"}", LauncherSettings.getInstance(mContext).getDeviceID());
+        Location location = LauncherSettings.getInstance(mContext).getPreferredUserLocation();
+        if (location == null) {
+            Log.d(TAG, ">> set default location");
+            location = new Location("stub");
+            location.setLongitude(126.929810);
+            location.setLatitude(37.488201);
+
+            LauncherSettings.getInstance(mContext).setPreferredUserLocation(location);
+        }
+        String strRequestBody = String.format("{\"DEVICE_ID\" : \"%s\", \"LAT\":\"%s\", \"LON\":\"%s\"}",
+                LauncherSettings.getInstance(mContext).getDeviceID(),
+                "" + location.getLatitude(),
+                "" + location.getLongitude());
 //        int retryCount = 0;
 //        while (retryCount < 3) {        // retry 3 times
             RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();

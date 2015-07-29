@@ -147,6 +147,18 @@ public class MyGcmListenerService extends GcmListenerService {
             // 긴급호출메시지
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
                 Log.d(TAG, ">> Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL = " + payloadData.getAlertMessage());
+
+                final String lat = payloadData.getLatitude();
+                final String lon = payloadData.getLongitude();
+
+                if (!StringUtils.isEmptyString(lat) && !StringUtils.isEmptyString(lon)) {
+                    Log.d(TAG, ">> Emergency geocode lat = " + lat + ", lon = " + lon);
+                    pi = new Intent(this, BroadcastWebViewActivity.class);
+                    pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_EMERGENCY_CALL);
+                    pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LAT, lat);
+                    pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LON, lon);
+                }
+
                 if (StringUtils.isEmptyString(payloadData.getMessage())) {
                     showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 } else {

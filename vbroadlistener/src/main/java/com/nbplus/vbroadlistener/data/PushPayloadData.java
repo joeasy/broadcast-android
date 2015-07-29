@@ -9,12 +9,12 @@ import com.google.gson.annotations.SerializedName;
  * Created by basagee on 2015. 6. 29..
  */
 public class PushPayloadData implements Parcelable {
-    @SerializedName("FROM")
-    protected String from;
-    @SerializedName("ADDRESS")
-    protected String address;
     @SerializedName("MESSAGE")
     protected String message;
+    @SerializedName("LATITUDE")
+    protected String latitude;
+    @SerializedName("LONGITUDE")
+    protected String longitude;
     @SerializedName("SERVICE_TYPE")
     protected String serviceType;
     @SerializedName("IOT_DEVICE_ID")
@@ -41,20 +41,20 @@ public class PushPayloadData implements Parcelable {
         this.alertMessage = alertMessage;
     }
 
-    public String getFrom() {
-        return from;
+    public String getLongitude() {
+        return longitude;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
-    public String getAddress() {
-        return address;
+    public String getLatitude() {
+        return latitude;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
     }
 
     public String getMessage() {
@@ -91,9 +91,9 @@ public class PushPayloadData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.from);
-        dest.writeString(this.address);
         dest.writeString(this.message);
+        dest.writeString(this.latitude);
+        dest.writeString(this.longitude);
         dest.writeString(this.serviceType);
         dest.writeString(this.iotControlDeviceId);
         dest.writeString(this.alertMessage);
@@ -101,9 +101,9 @@ public class PushPayloadData implements Parcelable {
     }
 
     protected PushPayloadData(Parcel in) {
-        this.from = in.readString();
-        this.address = in.readString();
         this.message = in.readString();
+        this.latitude = in.readString();
+        this.longitude = in.readString();
         this.serviceType = in.readString();
         this.iotControlDeviceId = in.readString();
         this.alertMessage = in.readString();
