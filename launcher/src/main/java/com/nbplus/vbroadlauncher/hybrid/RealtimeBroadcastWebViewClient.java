@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
@@ -64,6 +65,10 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             super.onProgressChanged(view, newProgress);
+        }
+
+        public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+            callback.invoke(origin, true, false);
         }
 
         @Override
@@ -158,6 +163,9 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
         // Use WideViewport and Zoom out if there is no viewport defined
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            webSettings.setMediaPlaybackRequiresUserGesture(false);
+        }
 
         // Enable pinch to zoom without the zoom buttons
         webSettings.setBuiltInZoomControls(true);
