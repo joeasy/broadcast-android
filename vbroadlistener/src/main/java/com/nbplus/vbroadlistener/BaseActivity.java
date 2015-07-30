@@ -4,7 +4,9 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -15,6 +17,11 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+import com.google.android.gms.location.LocationServices;
 import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
@@ -23,7 +30,7 @@ import java.util.Locale;
 /**
  * Created by basagee on 2015. 6. 24..
  */
-public abstract class BaseActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+public abstract class BaseActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener {
     private static final String TAG = BaseActivity.class.getSimpleName();
 
     protected TextToSpeech mText2Speech;
@@ -32,6 +39,21 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
     ProgressDialogFragment mProgressDialogFragment;
     private PowerManager.WakeLock mCpuWakeLock;
     private int mDefaultWindowFlags = -1;
+
+    /**
+     * Google API client.
+     */
+    private GoogleApiClient mGoogleApiClient;
+
+    /**
+     * Request code for auto Google Play Services error resolution.
+     */
+    protected static final int REQUEST_CODE_RESOLUTION = 1;
+
+    /**
+     * Next available request code.
+     */
+    protected static final int NEXT_AVAILABLE_REQUEST_CODE = 2;
 
     public void showNetworkConnectionAlertDialog() {
         new AlertDialog.Builder(this).setMessage(R.string.alert_network_message)
@@ -183,9 +205,101 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
         }
     }
 
+    /**
+     * Called when activity gets visible. A connection to Drive services need to
+     * be initiated as soon as the activity is visible. Registers
+     * {@code ConnectionCallbacks} and {@code OnConnectionFailedListener} on the
+     * activities itself.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mGoogleApiClient == null) {
+            buildGoogleApiClient();
+        }
+        mGoogleApiClient.connect();
+    }
+
+
+    /**
+     * Creating google api client object
+     * */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
+
+    /**
+     * Called when activity gets invisible. Connection to Drive service needs to
+     * be disconnected as soon as an activity is invisible.
+     */
+    @Override
+    protected void onPause() {
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onPause();
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
         dismissProgressDialog();
+    }
+
+    /**
+     * Called when {@code mGoogleApiClient} is connected.
+     */
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.i(TAG, "GoogleApiClient connected");
+    }
+
+    /**
+     * Called when {@code mGoogleApiClient} is disconnected.
+     */
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i(TAG, "GoogleApiClient connection suspended");
+    }
+
+    /**
+     * Called when {@code mGoogleApiClient} is trying to connect but failed.
+     * Handle {@code result.getResolution()} if there is a resolution is
+     * available.
+     */
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+        if (!result.hasResolution()) {
+            // show the localized error dialog.
+            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this, 0).show();
+            return;
+        }
+        try {
+            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e(TAG, "Exception while starting resolution activity", e);
+        }
+    }
+    /**
+     * Handles resolution callbacks.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_RESOLUTION && resultCode == RESULT_OK) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    /**
+     * Getter for the {@code GoogleApiClient}.
+     */
+    public GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
     }
 }
