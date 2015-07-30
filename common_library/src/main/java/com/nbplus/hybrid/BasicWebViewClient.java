@@ -174,6 +174,9 @@ public class BasicWebViewClient extends WebViewClient {
         // Use WideViewport and Zoom out if there is no viewport defined
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            webSettings.setMediaPlaybackRequiresUserGesture(false);
+        }
 
         // Enable pinch to zoom without the zoom buttons
         webSettings.setBuiltInZoomControls(true);
