@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -16,12 +17,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.vbroadlistener.preference.LauncherSettings;
 
@@ -30,7 +40,9 @@ import java.util.Locale;
 /**
  * Created by basagee on 2015. 6. 24..
  */
-public abstract class BaseActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener {
+public abstract class BaseActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener,
+        LocationListener, ResultCallback<LocationSettingsResult> {
     private static final String TAG = BaseActivity.class.getSimpleName();
 
     protected TextToSpeech mText2Speech;
@@ -49,11 +61,49 @@ public abstract class BaseActivity extends AppCompatActivity implements GoogleAp
      * Request code for auto Google Play Services error resolution.
      */
     protected static final int REQUEST_CODE_RESOLUTION = 1;
-
     /**
-     * Next available request code.
+     * Constant used in the location settings dialog.
      */
-    protected static final int NEXT_AVAILABLE_REQUEST_CODE = 2;
+    protected static final int REQUEST_CHECK_SETTINGS = 2;
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+
+    // Location updates intervals in sec
+    private static int UPDATE_INTERVAL = 10000; // 10 sec
+    private static int FATEST_INTERVAL = 5000; // 5 sec
+    private static int DISPLACEMENT = 1000; // 10 meters
+    // boolean flag to toggle periodic location updates
+    protected boolean mRequestingLocationUpdates = true;
+    private LocationRequest mLocationRequest;
+    /**
+     * Stores the types of location services the client is interested in using. Used for checking
+     * settings to determine if the device has optimal location settings.
+     */
+    protected LocationSettingsRequest mLocationSettingsRequest;
+
+
+    protected Status mCheckLocationSettingStatus = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (checkPlayServices()) {
+            Log.d(TAG, ">>> checkPlayServices() support");
+            // Building the GoogleApi client
+            buildGoogleApiClient();
+            createLocationRequest();
+            buildLocationSettingsRequest();
+
+            //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
+            checkLocationSettings();
+            //}
+            Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
+            if (mGoogleApiClient != null) {
+                mGoogleApiClient.connect();
+            }
+        } else {
+            Log.e(TAG, "Google Play Service is not available !!!!!");
+        }
+    }
 
     public void showNetworkConnectionAlertDialog() {
         new AlertDialog.Builder(this).setMessage(R.string.alert_network_message)
@@ -237,6 +287,7 @@ public abstract class BaseActivity extends AppCompatActivity implements GoogleAp
      */
     @Override
     protected void onPause() {
+        stopLocationUpdates();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
@@ -250,19 +301,131 @@ public abstract class BaseActivity extends AppCompatActivity implements GoogleAp
     }
 
     /**
+     * Method to verify google play services on the device
+     * */
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported Play Service.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Creating location request object
+     * */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT); // 10 meters
+    }
+    /**
+     * Uses a {@link com.google.android.gms.location.LocationSettingsRequest.Builder} to build
+     * a {@link com.google.android.gms.location.LocationSettingsRequest} that is used for checking
+     * if a device has the needed location settings.
+     */
+    protected void buildLocationSettingsRequest() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        mLocationSettingsRequest = builder.build();
+    }
+    /**
+     * Starting the location updates
+     * */
+    protected void startLocationUpdates() {
+        Log.d(TAG, "startLocationUpdates()");
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+    }
+
+    /**
+     * Stopping location updates
+     */
+    protected void stopLocationUpdates() {
+        Log.d(TAG, "stopLocationUpdates()");
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+    }
+
+    /**
+     * Check if the device's location settings are adequate for the app's needs using the
+     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
+     * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
+     */
+    protected void checkLocationSettings() {
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(
+                        mGoogleApiClient,
+                        mLocationSettingsRequest
+                );
+        result.setResultCallback(this);
+    }
+
+    /**
+     * The callback invoked when
+     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
+     * LocationSettingsRequest)} is called. Examines the
+     * {@link com.google.android.gms.location.LocationSettingsResult} object and determines if
+     * location settings are adequate. If they are not, begins the process of presenting a location
+     * settings dialog to the user.
+     */
+    @Override
+    public void onResult(LocationSettingsResult locationSettingsResult) {
+        mCheckLocationSettingStatus = locationSettingsResult.getStatus();
+        switch (mCheckLocationSettingStatus.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                Log.i(TAG, "All location settings are satisfied.");
+                // Once connected with google api, get the location
+//                updateLocaton();
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to" +
+                        "upgrade location settings ");
+
+                try {
+                    // Show the dialog by calling startResolutionForResult(), and check the result
+                    // in onActivityResult().
+                    mCheckLocationSettingStatus.startResolutionForResult(this, REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.i(TAG, "PendingIntent unable to execute request.");
+                }
+                break;
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog " +
+                        "not created.");
+                break;
+        }
+    }
+
+    /**
      * Called when {@code mGoogleApiClient} is connected.
      */
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "GoogleApiClient connected");
+        startLocationUpdates();
     }
 
     /**
      * Called when {@code mGoogleApiClient} is disconnected.
      */
     @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "Connection Suspended");
+        mGoogleApiClient.connect();
     }
 
     /**
@@ -284,6 +447,11 @@ public abstract class BaseActivity extends AppCompatActivity implements GoogleAp
             Log.e(TAG, "Exception while starting resolution activity", e);
         }
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+            Log.d(TAG, ">>> onLocationChanged()");
+    }
     /**
      * Handles resolution callbacks.
      */
@@ -293,6 +461,8 @@ public abstract class BaseActivity extends AppCompatActivity implements GoogleAp
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_RESOLUTION && resultCode == RESULT_OK) {
             mGoogleApiClient.connect();
+        } else {
+            Log.i(TAG, "User chose not to make required location settings changes.");
         }
     }
 
