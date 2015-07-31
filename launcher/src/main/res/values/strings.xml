@@ -19,6 +19,7 @@
     <string name="alert_network_title">Network</string>
     <string name="alert_network_message">Please Check your internet connection and try Again.\n(Contact to your administrator if you need assistance..)</string>
     <string name="alert_network_btn_check_wifi">Check Wi-Fi</string>
+    <string name="alert_wrong_page_url">Invalid web page url. Plese check your administrator.</string>
     <string name="alert_tts_message">TTS Engine is not available. Check your TTS settings.</string>
     <string name="alert_tts_btn_settings">Settings</string>
 

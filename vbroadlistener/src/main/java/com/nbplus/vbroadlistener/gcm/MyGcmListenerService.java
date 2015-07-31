@@ -216,9 +216,16 @@ public class MyGcmListenerService extends GcmListenerService {
                 showNotification(this, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
                         payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, null);
                 break;
-            // IOT DEVICE 제어(스마트홈 서비스)
+            // 비밀번호찾기
             case Constants.PUSH_PAYLOAD_TYPE_FIND_PASSWORD :
-                pi = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(payloadData.getMessage()));
+                pi = new Intent(this, BroadcastWebViewActivity.class);
+                pi.setAction(Constants.ACTION_SHOW_NOTIFICATION_CONTENTS);
+                if (!StringUtils.isEmptyString(payloadData.getMessage()) && Patterns.WEB_URL.matcher(payloadData.getMessage()).matches()) {
+                    moveUrl = payloadData.getMessage();
+                } else {
+                    Log.e(TAG, "wrong password find .... url ");
+                }
+                pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
                 showNotification(this, Constants.PW_FIND_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
 

@@ -3,6 +3,7 @@ package com.nbplus.vbroadlauncher;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -12,8 +13,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -125,6 +128,21 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
         //url="http://175.207.46.132:8010/web_test/audio_autoplay.html";
         Log.d(TAG, "start URL = " + url);
+        if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {
+            Log.e(TAG, "Wrong url ....");
+            new AlertDialog.Builder(this).setMessage(R.string.alert_wrong_page_url)
+                    //.setTitle(R.string.alert_network_title)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.alert_ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    finish();
+                                }
+                            })
+                    .show();
+        } else {
+            mWebViewClient.loadUrl(url);
+        }
         mWebViewClient.loadUrl(url);
         setContentViewByOrientation();
     }
@@ -145,6 +163,10 @@ public class BroadcastWebViewActivity extends BaseActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d(TAG, "BroadcastWebViewActivity onNewIntent()");
+        if (mWebViewClient == null) {
+            Log.e(TAG, "mWebViewClient is null..");
+            return;
+        }
 
         if (mWebViewClient != null) {
             Log.d(TAG, "Prev url is = " + mWebViewClient.getWebView().getUrl());
@@ -157,8 +179,23 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = mShortcutData.getDomain() + mShortcutData.getPath();
         }
 
-        mWebViewClient.loadUrl(url);
+        mWebViewClient.stopPageLoading();
         Log.d(TAG, ">> reset url = " + url);
+        if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {
+            Log.e(TAG, "Wrong url ....");
+            new AlertDialog.Builder(this).setMessage(R.string.alert_wrong_page_url)
+                    //.setTitle(R.string.alert_network_title)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.alert_ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    finish();
+                                }
+                            })
+                    .show();
+        } else {
+            mWebViewClient.loadUrl(url);
+        }
     }
 
     /**

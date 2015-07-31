@@ -384,6 +384,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        Log.d(TAG, "onPageFinished() = " + url);
         this.dismissProgressDialog();
         super.onPageFinished(view, url);
     }
@@ -409,5 +410,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     public void onError(String utteranceId, int errorCode) {
         Log.d(TAG, "TTS onError()");
         mHandler.sendEmptyMessage(HANDLER_MESSAGE_ERROR_TTS);
+    }
+
+    public void stopPageLoading() {
+        Log.d(TAG, "stopPageLoading() = ");
+        this.dismissProgressDialog();
+        if (mWebView != null) {
+            mWebView.stopLoading();
+        }
     }
 }

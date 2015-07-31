@@ -436,4 +436,12 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         Log.d(TAG, "TTS onError()");
         mHandler.sendEmptyMessage(HANDLER_MESSAGE_ERROR_TTS);
     }
+
+    public void stopPageLoading() {
+        Log.d(TAG, "stopPageLoading() = ");
+        this.dismissProgressDialog();
+        if (mWebView != null) {
+            mWebView.stopLoading();
+        }
+    }
 }

@@ -2,18 +2,22 @@ package com.nbplus.vbroadlistener;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -294,6 +298,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = fromNotiUrl;
         }
 
+        mWebViewClient.stopPageLoading();
         loadWebView(url);
     }
 
@@ -314,7 +319,22 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url += ("&APPID=" + getApplicationContext().getPackageName());
         }
         Log.d(TAG, ">> Start url = " + url);
-        mWebViewClient.loadUrl(url);
+
+        if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {
+            Log.e(TAG, "Wrong url ....");
+            new AlertDialog.Builder(this).setMessage(R.string.alert_wrong_page_url)
+                    //.setTitle(R.string.alert_network_title)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.alert_ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    finish();
+                                }
+                            })
+                    .show();
+        } else {
+            mWebViewClient.loadUrl(url);
+        }
 
         setContentViewByOrientation();
     }
