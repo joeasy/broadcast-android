@@ -70,6 +70,10 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         }
     }
 
+    private class BroadcastPushEvent {
+        public long broadcastPayloadIdx;
+        public PushPayloadData payloadData;
+    }
     public void handleMessage(Message msg) {
         if (msg == null) {
             return;
@@ -79,17 +83,37 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                 LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(mBroadcastData.getServiceType());
                 break;
             case HANDLER_BROADCAST_STARTED :
-                long idx = (long)msg.obj;
-                if (idx > mBroadcastPayloadIdx) {
-                    Log.d(TAG, "HANDLER_BROADCAST_STARTED, finish..currIdx = " + mBroadcastPayloadIdx + ", newIdx = " + idx);
-                    if (mWebViewClient != null) {
-                        mWebViewClient.onCloseWebApplicationByUser();
+                BroadcastPushEvent evt = (BroadcastPushEvent)msg.obj;
+
+                if (evt == null || evt.payloadData == null) {
+                    Log.d(TAG, "not broadcast push.... ignore...");
+                    break;
+                }
+                String serviceType = evt.payloadData.getServiceType();
+                if (!Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(serviceType) &&
+                        !Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(serviceType) &&
+                        !Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST.equals(serviceType)) {
+                    Log.d(TAG, "not broadcast push.... ignore...");
+                    break;
+                }
+
+                if (evt.broadcastPayloadIdx > mBroadcastPayloadIdx) {
+                    Log.d(TAG, "HANDLER_BROADCAST_STARTED, finish..currIdx = " + mBroadcastPayloadIdx + ", newIdx = " + evt.broadcastPayloadIdx);
+                    if (Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST.equals(mBroadcastData.getServiceType())) {
+                        finishActivity();
+                    } else {
+                        if (mWebViewClient != null && !mWebViewClient.isClosingByWebApp()) {
+                            mWebViewClient.onCloseWebApplicationByUser();
+                        }
                     }
-                    //finish();
                 }
             case HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE :
-                if (mWebViewClient != null && !mWebViewClient.isClosingByWebApp()) {
-                    mWebViewClient.onCloseWebApplicationByUser();
+                if (Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST.equals(mBroadcastData.getServiceType())) {
+                    finishActivity();
+                } else {
+                    if (mWebViewClient != null && !mWebViewClient.isClosingByWebApp()) {
+                        mWebViewClient.onCloseWebApplicationByUser();
+                    }
                 }
                 break;
         }
@@ -106,7 +130,12 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                 case PushConstants.ACTION_PUSH_MESSAGE_RECEIVED :
                     Message msg = new Message();
                     msg.what = HANDLER_BROADCAST_STARTED;
-                    msg.obj = intent.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1);
+                    BroadcastPushEvent evt = new BroadcastPushEvent();
+
+                    evt.broadcastPayloadIdx = intent.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1);
+                    evt.payloadData = intent.getParcelableExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA);
+
+                    msg.obj = evt;
                     mHandler.sendMessage(msg);
                     break;
                 case Constants.ACTION_BROWSER_ACTIVITY_CLOSE :
@@ -133,17 +162,19 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         Intent intent = getIntent();
         if (intent == null) {
             Log.d(TAG, "empty intent value ...");
-            finish();
+            finishActivity();
             return;
         }
 
         mBroadcastData = intent.getParcelableExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA);
         if (mBroadcastData == null) {
             Log.d(TAG, ">> payload data is null");
-            finish();
+            finishActivity();
             return;
         }
+
         mBroadcastPayloadIdx = intent.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1);
+        Log.d(TAG, ">> onCreate() mBroadcastPayloadIdx= " + mBroadcastPayloadIdx);
 
         hideSystemUI();
 
@@ -199,32 +230,19 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
      */
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause()");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy()");
         super.onDestroy();
-        LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(null);
-
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        if (mText2Speech != null) {
-            mText2Speech.shutdown();
-        }
-        mText2Speech = null;
-        mText2SpeechHandler = null;
-
-        mWebViewClient = null;
-        mWebView = null;
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-
-
-        releaseCpuLock();
-        showSystemUI();
     }
 
     @Override
     protected void onStop() {
+        Log.d(TAG, "onStop()");
         super.onStop();
     }
 
@@ -307,7 +325,8 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
     @Override
     public void onCloseWebApplication() {
-        finish();
+        Log.d(TAG, "onCloseWebApplication()");
+        finishActivity();
     }
 
     @Override
@@ -316,7 +335,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
             mHandler.sendEmptyMessage(HANDLER_MESSAGE_SETUP_CURRENT_PLAYING);
         } else {
             LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(null);
-            finish();
+            finishActivity();
         }
     }
 
@@ -330,13 +349,35 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     @Override
     public void onDone(String s) {
         Log.d(TAG, "TTS onDone()");
-        finish();
+        mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
     }
 
     @Override
     public void onError(String utteranceId, int errorCode) {
         Log.d(TAG, "TTS onError()");
         Toast.makeText(this, R.string.toast_tts_error, Toast.LENGTH_SHORT).show();
+        mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
+    }
+
+    private void finishActivity() {
+        Log.d(TAG, "finishActivity()");
+        LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(null);
+
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
+        mText2SpeechHandler = null;
+        mBroadcastPayloadIdx = -1;
+
+        mWebViewClient = null;
+        mWebView = null;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+
+        releaseCpuLock();
+        showSystemUI();
+
         finish();
     }
 

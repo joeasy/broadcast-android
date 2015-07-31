@@ -112,6 +112,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                             i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
+                            Log.d(TAG, "1. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + i.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
                             LocalBroadcastManager.getInstance(context).sendBroadcast(i);
                             try {
                                 //Thread.sleep(30);
@@ -128,6 +129,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                                 i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                                 i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
+                                Log.d(TAG, "2. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + i.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(i);
                                 try {
                                     //Thread.sleep(30);
@@ -159,6 +161,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                     i.setAction(action);
                     i.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
                     i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                    Log.d(TAG, "3. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + 0);
                     LocalBroadcastManager.getInstance(context).sendBroadcast(i);
                     break;
                 // IOT DEVICE 제어(스마트홈 서비스)

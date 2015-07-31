@@ -76,6 +76,7 @@
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensorLandscape"
+
             android:noHistory="true"
             android:label="@string/title_activity_broadcast_webview"
             >
