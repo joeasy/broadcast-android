@@ -127,7 +127,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      */
     @JavascriptInterface
     public void setServerInfomation(String data) {
-        Log.d(TAG, ">> setApplicationData() received = " + data);
+        Log.d(TAG, ">> setServerInfomation() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
             Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
