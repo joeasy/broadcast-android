@@ -58,7 +58,6 @@
             android:name=".BroadcastWebViewActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|screenSize"
-            android:noHistory="true"
             android:label="@string/title_activity_broadcast_webview"
             >
         </activity>
@@ -67,7 +66,6 @@
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensorLandscape"
-            android:noHistory="true"
             android:label="@string/title_activity_broadcast_webview"
             >
         </activity>
@@ -76,8 +74,6 @@
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensorLandscape"
-
-            android:noHistory="true"
             android:label="@string/title_activity_broadcast_webview"
             >
         </activity>

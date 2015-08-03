@@ -194,6 +194,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
             mTextView.setMovementMethod(new ScrollingMovementMethod());
 
             mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_SETUP_CURRENT_PLAYING, 800);
+            Log.d(TAG, "text broadcast = " + mBroadcastData.getMessage());
 
             mText2SpeechHandler = new TextToSpeechHandler(this, this);
             checkText2SpeechAvailable();

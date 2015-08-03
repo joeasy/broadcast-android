@@ -49,7 +49,6 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
             Log.d(TAG, "Receive.. broadcast ACTION_PUSH_MESSAGE_RECEIVED from push service. re-direct to activity!!!");
 
             PushMessageData data = (PushMessageData)intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
-            Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + data);
             if (data == null || StringUtils.isEmptyString(data.getPayload())) {
                 Log.d(TAG, "empty push message string !!");
                 return;
@@ -69,6 +68,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
             }
 
             String type = payloadData.getServiceType();
+            Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + type);
             payloadData.setAlertMessage(data.getAlert());
             switch (type) {
                 // 방송알림
