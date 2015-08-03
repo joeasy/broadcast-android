@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import com.nbplus.progress.ProgressDialogFragment;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
@@ -56,6 +58,7 @@ public class BasicWebViewClient extends WebViewClient {
     protected BroadcastWebChromeClient mWebChromeClient;
     protected boolean mPageLoadSuccess = false;
     protected DownloadManager mDownloadManager;
+    protected ProgressDialogFragment mProgressDialogFragment;
 
     /**
      * Created by basagee on 2015. 4. 30..
@@ -332,7 +335,9 @@ public class BasicWebViewClient extends WebViewClient {
             mContext.startActivity(searchAddress);
         } else {
             // 새로운 URL로 이동시 현재 웹뷰 안에서 로딩되도록 한다.
+            dismissProgressDialog();
             view.loadUrl(url);
+            showProgressDialog();
         }
         return true;
     }
@@ -476,6 +481,27 @@ public class BasicWebViewClient extends WebViewClient {
             // Use loadUrl("javascript:...") (API Level 1-18)
             // or evaluateJavascript() (API Level 19+) to evaluate your own JavaScript in the context of the currently-loaded Web page
             mWebView.loadUrl("javascript:window.onBackPressed();");
+        }
+    }
+
+    // progress bar
+    protected void showProgressDialog() {
+        try {
+            dismissProgressDialog();
+            mProgressDialogFragment = ProgressDialogFragment.newInstance();
+            mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    protected void dismissProgressDialog() {
+        try {
+            if (mProgressDialogFragment != null) {
+                mProgressDialogFragment.dismiss();
+            }
+            mProgressDialogFragment = null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

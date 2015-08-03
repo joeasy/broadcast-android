@@ -911,7 +911,7 @@ public class WeatherView extends LinearLayout {
                     }
                     if (lastMaxCelsius < currCelsiusVal) {
                         mLastMaxTodayCelsius = item.obsrValue;
-                        mTodayMaxCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
+                        //mTodayMaxCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
                     }
                 } catch (NumberFormatException e) {
                     e.printStackTrace();

@@ -35,8 +35,6 @@ import org.basdroid.common.StringUtils;
 public class RegisterWebViewClient extends BasicWebViewClient {
     private static final String TAG = RegisterWebViewClient.class.getSimpleName();
 
-    ProgressDialogFragment mProgressDialogFragment;
-
     public RegisterWebViewClient(Activity activity, WebView view) {
         super(activity, view);
     }
@@ -189,28 +187,6 @@ public class RegisterWebViewClient extends BasicWebViewClient {
 
     public void onUpdateIoTDevices(String iotDevices) {
         mWebView.loadUrl("javascript:window.onRegistered('" + iotDevices + "');");
-    }
-
-
-    // progress bar
-    private void showProgressDialog() {
-        try {
-            dismissProgressDialog();
-            mProgressDialogFragment = ProgressDialogFragment.newInstance();
-            mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
-    }
-    private void dismissProgressDialog() {
-        try {
-            if (mProgressDialogFragment != null) {
-                mProgressDialogFragment.dismiss();
-                mProgressDialogFragment = null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

@@ -39,7 +39,6 @@ import java.lang.ref.WeakReference;
 public class BroadcastWebViewClient extends BasicWebViewClient implements TextToSpeechHandler.OnUtteranceProgressListener {
     private static final String TAG = BroadcastWebViewClient.class.getSimpleName();
 
-    ProgressDialogFragment mProgressDialogFragment;
     enum BroadcastPlayState {
         STOPPED,
         VOICE_PLAYING,
@@ -374,27 +373,6 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 //        i.setAction(MusicService.ACTION_PLAY);
 //        mContext.startService(i);
         mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
-    }
-
-    // progress bar
-    private void showProgressDialog() {
-        try {
-            dismissProgressDialog();
-            mProgressDialogFragment = ProgressDialogFragment.newInstance();
-            mProgressDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "progress_dialog");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    private void dismissProgressDialog() {
-        try {
-            if (mProgressDialogFragment != null) {
-                mProgressDialogFragment.dismiss();
-            }
-            mProgressDialogFragment = null;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

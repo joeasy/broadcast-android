@@ -145,6 +145,7 @@ public class LauncherSettings implements Parcelable {
         setupLauncherShortcuts(context);//(ArrayList<ShortcutData>)getPrefsJsonObject(KEY_VBROADCAST_SHORTCUT, new TypeToken<ArrayList<ShortcutData>>(){}.getType());
         this.preferredUserLocation = (Location)getPrefsJsonObject(KEY_VBROADCAST_PREFERRED_LOCATION, new TypeToken<Location>(){}.getType());
         this.serverInformation = (VBroadcastServer)getPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, new TypeToken<VBroadcastServer>(){}.getType());
+        this.yahooGeocode = (GeocodeData)getPrefsJsonObject(KEY_VBROADCAST_YAHOO_GEOCODE, new TypeToken<GeocodeData>(){}.getType());
     }
 
     public boolean isCheckedTTSEngine() {
