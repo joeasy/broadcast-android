@@ -363,7 +363,6 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @Override
     public void onPageFinished(WebView view, String url) {
         Log.d(TAG, "onPageFinished() = " + url);
-        this.dismissProgressDialog();
         super.onPageFinished(view, url);
     }
 

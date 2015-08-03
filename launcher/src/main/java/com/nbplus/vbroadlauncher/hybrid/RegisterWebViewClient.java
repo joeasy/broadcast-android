@@ -202,7 +202,6 @@ public class RegisterWebViewClient extends BasicWebViewClient {
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        this.dismissProgressDialog();
         super.onPageFinished(view, url);
     }
 

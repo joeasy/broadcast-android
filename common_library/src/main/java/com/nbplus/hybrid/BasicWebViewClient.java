@@ -354,6 +354,7 @@ public class BasicWebViewClient extends WebViewClient {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             CookieSyncManager.getInstance().sync();
         }
+        dismissProgressDialog();
         mPageLoadSuccess = true;
     }
 
