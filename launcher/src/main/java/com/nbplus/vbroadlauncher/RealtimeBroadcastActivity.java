@@ -376,7 +376,12 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
 
         releaseCpuLock();
-        showSystemUI();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showSystemUI();
+            }
+        });
 
         finish();
     }

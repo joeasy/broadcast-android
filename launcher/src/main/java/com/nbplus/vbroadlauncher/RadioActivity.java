@@ -98,6 +98,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
             return;
         }
         switch (msg.what) {
+            // 라디오목록 가져오기 완료.
             case Constants.HANDLER_MESSAGE_GET_RADIO_CHANNEL_TASK :
                 RadioChannelInfo data = (RadioChannelInfo)msg.obj;
 
@@ -136,6 +137,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
 
                 setupRadioChannelPager();
                 break;
+            // 라디오재생 요청에 대한 타임아웃. 미디어서비스에서 응답시간에 대한 타임아웃
             case Constants.HANDLER_MESSAGE_PLAY_RADIO_CHANNEL_TIMEOUT :
                 Intent i = new Intent(this, MusicService.class);
                 i.setAction(MusicService.ACTION_STOP);
@@ -143,6 +145,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
                 startService(i);
                 break;
 
+            // 볼륨키로 볼륨조절 시
             case HANDLER_MESSAGE_STREAM_MUSIC_VOLUME_CHANGE :
                 int currentVolume = msg.arg1;
                 if (currentVolume <= 0) {
@@ -153,6 +156,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
                 mSeekbar.setProgress(currentVolume);
                 break;
 
+            // 플레이어컨트롤
             case HANDLER_MESSAGE_MUSIC_SERVICE_ACTION :
                 Bundle b = msg.getData();
                 if (b == null) {
@@ -183,6 +187,8 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
 
                 mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_HIDE_PROGRESS_DIALOG, 1500);
                 break;
+
+            // 프로그레스바 제거
             case HANDLER_MESSAGE_HIDE_PROGRESS_DIALOG :
                 dismissProgressDialog();
                 break;
