@@ -362,17 +362,9 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * 시나리오변경.. 웹앱에 이벤트만 보내고.. 웹앱에서 처리후 closeWebApplication() 호출한다.
      */
     public void onCloseWebApplicationByUser() {
-//        if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
-//            // stop previous playing tts.
-//            mText2SpeechPlayText = null;
-//            mText2SpeechHandler.finalize();
-//        }
-//        mBroadcastPlayState = BroadcastPlayState.STOPPED;
-//
-//        Intent i = new Intent(mContext, MusicService.class);
-//        i.setAction(MusicService.ACTION_PLAY);
-//        mContext.startService(i);
-        mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
+        if (!mIsClosingByWebApp) {
+            mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
+        }
     }
 
     @Override

@@ -421,11 +421,9 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
      * 시나리오변경.. 웹앱에 이벤트만 보내고.. 웹앱에서 처리후 closeWebApplication() 호출한다.
      */
     public void onCloseWebApplicationByUser() {
-        mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
-
-//        Intent i = new Intent(mContext, MusicService.class);
-//        i.setAction(MusicService.ACTION_PLAY);
-//        mContext.startService(i);
+        if (!mIsClosingByWebApp) {
+            mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
+        }
     }
 
 }

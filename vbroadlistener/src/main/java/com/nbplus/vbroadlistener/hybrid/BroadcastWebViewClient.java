@@ -44,6 +44,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     BroadcastPlayState mBroadcastPlayState = BroadcastPlayState.STOPPED;
     TextToSpeechHandler mText2SpeechHandler = null;
     String mText2SpeechPlayText = null;
+    boolean mIsClosingByWebApp = false;
 
     private static final int HANDLER_MESSAGE_START_TTS = 1;
     private static final int HANDLER_MESSAGE_DONE_TTS = 2;
@@ -264,6 +265,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
             mText2SpeechPlayText = null;
             mText2SpeechHandler.finalize();
         }
+        mIsClosingByWebApp = true;
+
         mBroadcastPlayState = BroadcastPlayState.STOPPED;
         mContext.finish();
     }
@@ -338,15 +341,17 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     }
 
     public void onCloseWebApplicationByUser() {
-        mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
+        if (!mIsClosingByWebApp) {
+            mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
 
-        if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
-            // stop previous playing tts.
-            mText2SpeechPlayText = null;
-            mText2SpeechHandler.finalize();
+            if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
+                // stop previous playing tts.
+                mText2SpeechPlayText = null;
+                mText2SpeechHandler.finalize();
+            }
+            mBroadcastPlayState = BroadcastPlayState.STOPPED;
+            mContext.finish();
         }
-        mBroadcastPlayState = BroadcastPlayState.STOPPED;
-        mContext.finish();
     }
 
     @Override
