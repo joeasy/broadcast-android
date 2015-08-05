@@ -91,7 +91,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
         super(activity, view);
-
+        mWebView.setWebViewClient(this);
+        mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         mHandler = new BroadcastWebViewClientHandler(this);
     }
 
@@ -400,5 +401,17 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         if (mWebView != null) {
             mWebView.stopLoading();
         }
+    }
+
+    @Override
+    public void loadWebUrl(String url) {
+        if (url.indexOf("?") > 0) {
+            url += ("&UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            url += ("&APPID=" + mContext.getPackageName());
+        } else {
+            url += ("?UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            url += ("&APPID=" + mContext.getPackageName());
+        }
+        mWebView.loadUrl(url);
     }
 }

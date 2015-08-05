@@ -48,7 +48,7 @@ import java.util.Arrays;
 /**
  * Created by basagee on 2015. 4. 30..
  */
-public class BasicWebViewClient extends WebViewClient {
+public abstract class BasicWebViewClient extends WebViewClient {
     private static final String TAG = BasicWebViewClient.class.getSimpleName();
 
     protected static final String JAVASCRIPT_IF_NAME = "nbplus";
@@ -165,9 +165,7 @@ public class BasicWebViewClient extends WebViewClient {
             mWebView.setWebContentsDebuggingEnabled(true);
         }
         mWebView.setWebChromeClient(mWebChromeClient);
-        mWebView.setWebViewClient(this);
 
-        mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setGeolocationEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -237,16 +235,6 @@ public class BasicWebViewClient extends WebViewClient {
             mWebView.setBackgroundDrawable(drawable);
         } else {
             mWebView.setBackground(drawable);
-        }
-    }
-
-    /**
-     * 웹뷰에 페이지 URL 을 설정하고 로드한다.
-     * @param url
-     */
-    public void loadUrl(String url) {
-        if (!StringUtils.isEmptyString(url)) {
-            mWebView.loadUrl(url);
         }
     }
 
@@ -336,11 +324,23 @@ public class BasicWebViewClient extends WebViewClient {
         } else {
             // 새로운 URL로 이동시 현재 웹뷰 안에서 로딩되도록 한다.
             dismissProgressDialog();
-            view.loadUrl(url);
+            loadWebUrl(url);
             showProgressDialog();
         }
         return true;
     }
+
+    public abstract void loadWebUrl(String url);
+    @JavascriptInterface
+    public abstract void updateIoTDevices();
+    @JavascriptInterface
+    public abstract void onUpdateIoTDevices(String iotDevices);
+    @JavascriptInterface
+    public abstract boolean registerGcm();
+    @JavascriptInterface
+    public abstract boolean unRegisterGcm();
+    public abstract void onRegistered(String gcmRegToken);
+    public abstract void onUnRegistered();
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -401,9 +401,7 @@ public class BasicWebViewClient extends WebViewClient {
      * 디바이스의 UUID 조회. 40bytes SHA-1 value
      */
     @JavascriptInterface
-    public String getDeviceId() {
-        return DeviceUtils.getDeviceIdByMacAddress(mContext);
-    }
+    public abstract String getDeviceId();
 
     @JavascriptInterface
     public String getApplicationPackageName() {
@@ -457,10 +455,7 @@ public class BasicWebViewClient extends WebViewClient {
      * 어플리케이션 또는 현재 액티비티를 종료한다.
      */
     @JavascriptInterface
-    public void closeWebApplication() {
-        Log.d(TAG, ">> closeWebApplication() called");
-        mContext.finish();
-    }
+    public abstract void closeWebApplication();
 
     ////////////////////////////////
     /**

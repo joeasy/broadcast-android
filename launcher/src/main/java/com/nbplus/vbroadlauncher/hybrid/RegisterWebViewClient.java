@@ -37,6 +37,8 @@ public class RegisterWebViewClient extends BasicWebViewClient {
 
     public RegisterWebViewClient(Activity activity, WebView view) {
         super(activity, view);
+        mWebView.setWebViewClient(this);
+        mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
     }
 
     /**
@@ -186,7 +188,7 @@ public class RegisterWebViewClient extends BasicWebViewClient {
     }
 
     public void onUpdateIoTDevices(String iotDevices) {
-        mWebView.loadUrl("javascript:window.onRegistered('" + iotDevices + "');");
+        mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
     }
 
     @Override
@@ -216,5 +218,17 @@ public class RegisterWebViewClient extends BasicWebViewClient {
         if (mWebView != null) {
             mWebView.stopLoading();
         }
+    }
+
+    @Override
+    public void loadWebUrl(String url) {
+        if (url.indexOf("?") > 0) {
+            url += ("&UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            url += ("&APPID=" + mContext.getPackageName());
+        } else {
+            url += ("?UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            url += ("&APPID=" + mContext.getPackageName());
+        }
+        mWebView.loadUrl(url);
     }
 }

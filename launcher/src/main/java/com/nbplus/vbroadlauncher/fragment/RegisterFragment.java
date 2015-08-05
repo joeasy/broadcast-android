@@ -80,15 +80,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
         mWebViewClient.setBackgroundTransparent();
 
         String url = LauncherSettings.getInstance(getActivity()).getRegisterAddress();
-        if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + LauncherSettings.getInstance(getActivity()).getDeviceID());
-            url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
-        } else {
-            url += ("?UUID=" + LauncherSettings.getInstance(getActivity()).getDeviceID());
-            url += ("&APPID=" + getActivity().getApplicationContext().getPackageName());
-        }
-
-        mWebViewClient.loadUrl(url);
+        mWebViewClient.loadWebUrl(url);
         return v;
     }
 

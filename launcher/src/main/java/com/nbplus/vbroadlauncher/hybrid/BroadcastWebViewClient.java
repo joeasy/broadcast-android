@@ -100,7 +100,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
         super(activity, view);
-
+        mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
+        mWebView.setWebViewClient(this);
         mHandler = new BroadcastWebViewClientHandler(this);
     }
 
@@ -141,31 +142,6 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                         Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
                     }
-//                    if (StringUtils.isEmptyString(settings.getVillageName())) {
-//                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-                    /*if (settings.getServerInformation() == null) {
-                        Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-                        return;
-                    } else*/ {
-                        //VBroadcastServer serverInfo = settings.getServerInformation();
-//                        if (StringUtils.isEmptyString(serverInfo.getApiServer())) {
-//                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-//                            return;
-//                        }
-//                        if (StringUtils.isEmptyString(serverInfo.getDocServer())) {
-//                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-//                            return;
-//                        }
-//                        if (StringUtils.isEmptyString(serverInfo.getPushInterfaceServer())) {
-//                            Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
-//                            return;
-//                        }
-                    }
-
-//                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
-//                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
                     LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 
@@ -389,6 +365,18 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         return super.shouldOverrideUrlLoading(view, url);
+    }
+
+    @Override
+    public void loadWebUrl(String url) {
+        if (url.indexOf("?") > 0) {
+            url += ("&UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            url += ("&APPID=" + mContext.getPackageName());
+        } else {
+            url += ("?UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            url += ("&APPID=" + mContext.getPackageName());
+        }
+        mWebView.loadUrl(url);
     }
 
     @Override

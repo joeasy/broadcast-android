@@ -118,16 +118,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = mShortcutData.getDomain() + mShortcutData.getPath();
         }
 
-        if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-        } else {
-            url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-        }
-
         //url="http://175.207.46.132:8010/web_test/audio_autoplay.html";
-        Log.d(TAG, "start URL = " + url);
         if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {
             Log.e(TAG, "Wrong url ....");
             new AlertDialog.Builder(this).setMessage(R.string.alert_wrong_page_url)
@@ -140,10 +131,11 @@ public class BroadcastWebViewActivity extends BaseActivity {
                                 }
                             })
                     .show();
+            return;
         } else {
-            mWebViewClient.loadUrl(url);
+            mWebViewClient.loadWebUrl(url);
         }
-        mWebViewClient.loadUrl(url);
+        Log.d(TAG, "start URL = " + url);
         setContentViewByOrientation();
     }
 
@@ -194,7 +186,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
                             })
                     .show();
         } else {
-            mWebViewClient.loadUrl(url);
+            mWebViewClient.loadWebUrl(url);
         }
     }
 

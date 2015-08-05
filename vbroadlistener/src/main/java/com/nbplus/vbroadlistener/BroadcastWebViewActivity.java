@@ -311,15 +311,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 url = LauncherSettings.getInstance(this).getRegisterAddress();
             }
         }
-        if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-        } else {
-            url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-            url += ("&APPID=" + getApplicationContext().getPackageName());
-        }
-        Log.d(TAG, ">> Start url = " + url);
-
         if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {
             Log.e(TAG, "Wrong url ....");
             new AlertDialog.Builder(this).setMessage(R.string.alert_wrong_page_url)
@@ -333,8 +324,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
                             })
                     .show();
         } else {
-            mWebViewClient.loadUrl(url);
+            mWebViewClient.loadWebUrl(url);
         }
+        Log.d(TAG, ">> Start url = " + url);
 
         setContentViewByOrientation();
     }
