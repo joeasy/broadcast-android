@@ -3,4 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="activity_not_found_exception">구글크롬에서 실행되는 앱입니다. 마켓에서 설치하시기 바랍니다.</string>
+    <string name="alert_ok">확인</string>
+    <string name="alert_market">Play Store</string>
 </resources>

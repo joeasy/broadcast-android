@@ -3,4 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="activity_not_found_exception">It runs on Chrome Browser. If you want to install go to market.</string>
+    <string name="alert_ok">OK</string>
+    <string name="alert_market">Play Store</string>
 </resources>
