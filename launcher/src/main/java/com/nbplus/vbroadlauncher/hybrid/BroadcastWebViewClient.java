@@ -321,7 +321,24 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     @JavascriptInterface
     public void updateIoTDevices() {
+        Log.d(TAG, "call updateIoTDevices()");
+        // TODO : IoT  부가장치 연동 테스트
+        mContext.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String data = "{ \"DEVICE_ID\":\"" + LauncherSettings.getInstance(mContext).getDeviceID() +
+                        "\", \"IOT_DEVICE_INFO\" : [" +
+                        "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + System.currentTimeMillis() +
+                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\" }," +
+                        "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + System.currentTimeMillis() +
+                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\" }," +
+                        "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + System.currentTimeMillis() +
+                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\" }]}";
 
+                onUpdateIoTDevices(data);
+            }
+        });
+        // end of TODO
     }
     ////////////////////////////////
     /**
@@ -351,6 +368,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * @param iotDevices device list
      */
     public void onUpdateIoTDevices(String iotDevices) {
+        Log.d(TAG, "call onUpdateIoTDevices() = " + iotDevices);
         mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
     }
 
