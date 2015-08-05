@@ -330,11 +330,11 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                 String data = "{ \"DEVICE_ID\":\"" + LauncherSettings.getInstance(mContext).getDeviceID() +
                         "\", \"IOT_DEVICE_INFO\" : [" +
                         "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + ts +
-                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\" }," +
+                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST01\" }," +
                         "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 1) +
-                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\" }," +
+                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST02\" }," +
                         "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 2) +
-                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\" }]}";
+                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST03\" }]}";
 
                 onUpdateIoTDevices(data);
             }
