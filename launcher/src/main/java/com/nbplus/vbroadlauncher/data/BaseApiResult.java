@@ -13,6 +13,8 @@ public class BaseApiResult implements Parcelable {
     protected String resultCode;
     @SerializedName("RT_MSG")
     protected String resultMessage;
+    @SerializedName("DROID_INTERNAL_DATA")
+    protected Object object;
 
     public String getResultCode() {
         return resultCode;
@@ -20,6 +22,17 @@ public class BaseApiResult implements Parcelable {
     public String getResultMessage() {
         return resultMessage;
     }
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
+
+    public BaseApiResult() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -29,17 +42,16 @@ public class BaseApiResult implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.resultCode);
         dest.writeString(this.resultMessage);
-    }
-
-    public BaseApiResult() {
+        dest.writeParcelable((Parcelable)this.object, flags);
     }
 
     protected BaseApiResult(Parcel in) {
         this.resultCode = in.readString();
         this.resultMessage = in.readString();
+        this.object = in.readParcelable(Object.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<BaseApiResult> CREATOR = new Parcelable.Creator<BaseApiResult>() {
+    public static final Creator<BaseApiResult> CREATOR = new Creator<BaseApiResult>() {
         public BaseApiResult createFromParcel(Parcel source) {
             return new BaseApiResult(source);
         }

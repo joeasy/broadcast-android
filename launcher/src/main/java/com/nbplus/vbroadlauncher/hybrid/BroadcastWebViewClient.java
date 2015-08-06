@@ -17,13 +17,16 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
+import com.nbplus.iotgateway.service.IoTService;
 import com.nbplus.media.MusicService;
 import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.BaseActivity;
+import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.data.IoTDevicesData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
@@ -48,6 +51,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     BroadcastPlayState mBroadcastPlayState = BroadcastPlayState.STOPPED;
     TextToSpeechHandler mText2SpeechHandler = null;
     String mText2SpeechPlayText = null;
+
+    String mIoTDiscoveringUrl = null;
 
     public boolean isClosingByWebApp() {
         return mIsClosingByWebApp;
@@ -273,7 +278,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         i.setAction(MusicService.ACTION_PLAY);
         mContext.startService(i);
         mIsClosingByWebApp = true;
-        mContext.finish();
+        ((BroadcastWebViewActivity)mContext).finishActivity();
     }
 
 
@@ -298,24 +303,39 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @JavascriptInterface
     public void updateIoTDevices() {
         Log.d(TAG, "call updateIoTDevices()");
-        // TODO : IoT  부가장치 연동 테스트
+        // TODO : iot test
+
         mContext.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                long ts = System.currentTimeMillis();
-                String data = "{ \"DEVICE_ID\":\"" + LauncherSettings.getInstance(mContext).getDeviceID() +
-                        "\", \"IOT_DEVICE_INFO\" : [" +
-                        "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + ts +
-                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST01\" }," +
-                        "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 1) +
-                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST02\" }," +
-                        "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 2) +
-                        "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST03\" }]}";
+                // TODO : iot test
+                if (mWebView.getUrl().contains("/iot_test.html")) {
+                    String devicesData = LauncherSettings.getInstance(mContext).getTestIoTDevices();
+                    if (!StringUtils.isEmptyString(devicesData)) {
+                        onUpdateIoTDevices(devicesData);
+                    } else {
+                        long ts = System.currentTimeMillis();
+                        String data = "{ \"DEVICE_ID\":\"" + LauncherSettings.getInstance(mContext).getDeviceID() +
+                                "\", \"IOT_DEVICE_INFO\" : [" +
+                                "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + ts +
+                                "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST01\" }," +
+                                "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 1) +
+                                "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST02\" }," +
+                                "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 2) +
+                                "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST03\" }]}";
+                        onUpdateIoTDevices(data);
+                    }
+                } else {
+                    Intent intent = new Intent(mContext, IoTService.class);
+                    intent.setAction(com.nbplus.iotgateway.data.Constants.ACTION_GET_IOT_DEVICE_LIST);
+                    mContext.startService(intent);
 
-                onUpdateIoTDevices(data);
+                    mIoTDiscoveringUrl = mWebView.getUrl();
+                    showProgressDialog();
+                }
             }
         });
-        // end of TODO
+
     }
     ////////////////////////////////
     /**
@@ -345,7 +365,15 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * @param iotDevices device list
      */
     public void onUpdateIoTDevices(String iotDevices) {
+        dismissProgressDialog();
+//        String currUrl = mWebView.getUrl();
+//        if (StringUtils.isEmptyString(mIoTDiscoveringUrl) || !mIoTDiscoveringUrl.equals(mWebView.getUrl())) {
+//            Log.i(TAG, "call onUpdateIoTDevices(), but don't update ui..");
+//            mIoTDiscoveringUrl = null;
+//            return;
+//        }
         Log.d(TAG, "call onUpdateIoTDevices() = " + iotDevices);
+        mIoTDiscoveringUrl = null;
         mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
     }
 

@@ -25,7 +25,16 @@ import java.util.Random;
 /**
  * Created by basagee on 2015. 5. 18..
  */
-public class LauncherSettings implements Parcelable {
+public class LauncherSettings {
+
+    //TODO :: iot test
+    public String getTestIoTDevices() {
+        return prefs.getString("KEY_TEST_IOT_DEVICES", "");
+    }
+
+    public void setTestIoTDevices(String testIoTDevices) {
+        prefs.edit().putString("KEY_TEST_IOT_DEVICES", testIoTDevices).apply();
+    }
 
     // 맥어드레스 기반 40바이트 디바이스 UUID
     String deviceID;
@@ -63,8 +72,6 @@ public class LauncherSettings implements Parcelable {
     ArrayList<ShortcutData> launcherMainShortcuts = new ArrayList<ShortcutData>();;
 
     @SerializedName("register_address")
-    //String initialPageAddress = "http://175.207.46.132:8010/web_test/test.html";
-    String initialPageAddress = "http://175.207.46.132:8080/common/selectServer.rcc";
 
     // when using singleton
     private volatile static LauncherSettings uniqueInstance;
@@ -200,14 +207,6 @@ public class LauncherSettings implements Parcelable {
     public void setVillageCode(String villageCode) {
         this.villageCode = villageCode;
         prefs.edit().putString(KEY_VBROADCAST_VILLAGE_CODE, this.villageCode).apply();
-    }
-
-    public String getRegisterAddress() {
-        return initialPageAddress;
-    }
-
-    public void setRegisterAddress(String registerAddress) {
-        this.initialPageAddress = registerAddress;
     }
 
     public int getWallpaperId() {
@@ -387,48 +386,6 @@ public class LauncherSettings implements Parcelable {
 
         return obj;
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.deviceID);
-        dest.writeParcelable(this.preferredUserLocation, 0);
-        dest.writeString(this.villageCode);
-        dest.writeString(this.villageName);
-        dest.writeByte(isExclusive ? (byte) 1 : (byte) 0);
-        dest.writeByte(isCompletedSetup ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.wallpaperId);
-        dest.writeParcelable(this.serverInformation, 0);
-        dest.writeSerializable(this.launcherShortcuts);
-        dest.writeString(this.initialPageAddress);
-    }
-
-    private LauncherSettings(Parcel in) {
-        this.deviceID = in.readString();
-        this.preferredUserLocation = in.readParcelable(Location.class.getClassLoader());
-        this.villageCode = in.readString();
-        this.villageName = in.readString();
-        this.isExclusive = in.readByte() != 0;
-        this.isCompletedSetup = in.readByte() != 0;
-        this.wallpaperId = in.readInt();
-        this.serverInformation = in.readParcelable(VBroadcastServer.class.getClassLoader());
-        this.launcherShortcuts = (ArrayList<ShortcutData>) in.readSerializable();
-        this.initialPageAddress = in.readString();
-    }
-
-    public static final Creator<LauncherSettings> CREATOR = new Creator<LauncherSettings>() {
-        public LauncherSettings createFromParcel(Parcel source) {
-            return new LauncherSettings(source);
-        }
-
-        public LauncherSettings[] newArray(int size) {
-            return new LauncherSettings[size];
-        }
-    };
 
     /**
      * 재생중인 방송 priority 에 따라 종료여부 판단을위해..

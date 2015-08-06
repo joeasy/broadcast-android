@@ -4,6 +4,11 @@ package com.nbplus.vbroadlauncher.data;
  * Created by basagee on 2015. 6. 1..
  */
 public class Constants {
+    //  서버정보
+    //public static final String VBROAD_INITIAL_PAGE = "http://175.207.46.132:8010/web_test/test.html";
+    public static final String VBROAD_INITIAL_PAGE = "http://175.207.46.132:8080/common/selectServer.rcc";
+    public static final String API_IOT_UPDATE_DEVICE_LIST = "/is/api/iot/RegistIOTDevice";
+
     public static final int RADIO_CHANNEL_GRIDVIEW_SIZE = 6;
 
     public static final int SUCCESS_RESULT = 0;
@@ -42,6 +47,7 @@ public class Constants {
     public static final int HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK = 3001;
     public static final int HANDLER_MESSAGE_PUSH_STATUS_CHANGED = 4001;
     public static final int HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED = 4002;
+    public static final int HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK = 5001;
 
     public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
 

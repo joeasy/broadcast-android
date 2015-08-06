@@ -55,6 +55,7 @@ public class PushService extends Service {
     Notification mNotification = null;
     NotificationCompat.Builder mBuilder;
     boolean mLastConnectionStatus = false;
+    SharedPreferences mPrefs;
 
     Thread mPushThread;
     PushRunnable mPushRunnable;
@@ -219,16 +220,21 @@ public class PushService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String pushInterfaceServerAddress = null;
         String action = (intent != null) ? intent.getAction() : null;
         Log.d(TAG, "onStartCommand in service.. action = " + action);
         if (action == null) {
-            return Service.START_REDELIVER_INTENT;
+            action = PushConstants.ACTION_START_SERVICE;
+            pushInterfaceServerAddress = mPrefs.getString(PushConstants.PREF_KEY_PUSH_IF_ADDRESS, "");
         }
         if (action.equals(PushConstants.ACTION_START_SERVICE)) {
-            String pushInterfaceServerAddress = intent.getStringExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS);
+            if (intent != null && action != null) {
+                pushInterfaceServerAddress = intent.getStringExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS);
+            }
             if (!StringUtils.isEmptyString(pushInterfaceServerAddress)) {
                 if (mPushInterfaceServerAddress == null || !pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
                     mPushInterfaceServerAddress = pushInterfaceServerAddress;
+                    mPrefs.edit().putString(PushConstants.PREF_KEY_PUSH_IF_ADDRESS, mPushInterfaceServerAddress).apply();
 
                     if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
                         if (mIfTask != null) {
@@ -245,19 +251,8 @@ public class PushService extends Service {
                 } else {
                     if (pushInterfaceServerAddress.equals(mPushInterfaceServerAddress)) {
                         Log.d(TAG, ">> Same address... do not anything...");
-                        return Service.START_REDELIVER_INTENT;
+                        return Service.START_STICKY;
                     }
-//                        if (mPushRunnable.getState() == PushRunnable.State.IfRetrieving) {
-//                            if (mIfTask != null) {
-//                                mIfTask.cancel(true);
-//                            }
-//                            mIfTask = null;
-//                        }
-//
-//                        if (mPushRunnable.getState() != PushRunnable.State.Connected) {
-//                            Log.d(TAG, "mPushRunnable.getState() != PushRunnable.State.Connected!!! getPushGatewayInformationFromServer()");
-//                            getPushGatewayInformationFromServer();
-//                        }
                 }
             } else {
                 Log.e(TAG, ">> mPushInterfaceServerAddress is empty... maybe logout???? !!!");
@@ -270,7 +265,7 @@ public class PushService extends Service {
         /**
          * 항상 실행되도록 한다.
          */
-        return Service.START_REDELIVER_INTENT;//super.onStartCommand(intent, flags, startId);
+        return Service.START_STICKY;//super.onStartCommand(intent, flags, startId);
     }
 
     /**
@@ -357,6 +352,9 @@ public class PushService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "PushService onCreate()......");
+
+        String prefName = getApplicationContext().getPackageName() + "_preferences";
+        mPrefs = getSharedPreferences(prefName, Context.MODE_PRIVATE);
 
         // check network status
         IntentFilter intentFilter = new IntentFilter();

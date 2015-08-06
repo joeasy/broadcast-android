@@ -26,7 +26,7 @@
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden" >
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!-- The following two intent-filters are the key to set homescreen -->
@@ -56,7 +56,7 @@
         </activity>
         <activity
             android:name=".BroadcastWebViewActivity"
-            android:windowSoftInputMode="stateAlwaysHidden"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_broadcast_webview"
             >

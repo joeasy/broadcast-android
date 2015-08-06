@@ -22,18 +22,26 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.nbplus.iotgateway.data.IoTDevice;
 import com.nbplus.media.MusicRetriever;
 import com.nbplus.media.MusicService;
+import com.nbplus.vbroadlauncher.data.BaseApiResult;
+import com.nbplus.vbroadlauncher.data.IoTDevicesData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.ShortcutData;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
+import com.nbplus.vbroadlauncher.service.SendIoTDeviceListTask;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 
 /**
@@ -44,8 +52,11 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
     BroadcastWebViewClient mWebViewClient;
     ShortcutData mShortcutData;
+    Gson mGson;
 
-    private static final int HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE = 0x01;
+    private static final int HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE = 1001;
+    private static final int HANDLER_MESSAGE_UPDATE_IOT_DEVICE_LIST = 1002;
+
     private final BroadcastWebViewActivityHandler mHandler = new BroadcastWebViewActivityHandler(this);
 
     // 핸들러 객체 만들기
@@ -75,6 +86,28 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     mWebViewClient.onCloseWebApplicationByUser();
                 }
                 break;
+            case HANDLER_MESSAGE_UPDATE_IOT_DEVICE_LIST :
+                VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
+                if (serverInfo == null || StringUtils.isEmptyString(serverInfo.getApiServer())) {
+                    Log.e(TAG, "API server domain is not found !!!");
+                    return;
+                }
+                SendIoTDeviceListTask task = new SendIoTDeviceListTask();
+                if (task != null) {
+                    task.setBroadcastApiData(this, mHandler, serverInfo.getApiServer() + Constants.API_IOT_UPDATE_DEVICE_LIST, (String)msg.obj);
+                    task.execute();
+                }
+                break;
+            case Constants.HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK :
+                BaseApiResult result = (BaseApiResult)msg.obj;
+                if (result != null) {
+                    if (!StringUtils.isEmptyString(result.getResultCode())) {
+                        mWebViewClient.onUpdateIoTDevices(result.getResultCode());
+                    } else {
+                        mWebViewClient.onUpdateIoTDevices("1000");      // Open API 코드참조.
+                    }
+                }
+                break;
         }
     }
 
@@ -82,12 +115,38 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
+            final String action = (intent == null) ? "" : intent.getAction();
             Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
             // send handler message
             switch (action) {
                 case Constants.ACTION_BROWSER_ACTIVITY_CLOSE :
                     mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
+                    break;
+                case com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST :
+                    ArrayList<IoTDevice> iotDevicesList = intent.getParcelableArrayListExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_DEVICE_LIST);
+                    if (iotDevicesList == null) {
+                        iotDevicesList = new ArrayList<>();
+                    }
+
+                    IoTDevicesData data = new IoTDevicesData();
+                    data.setDeviceId(LauncherSettings.getInstance(context).getDeviceID());
+                    data.setIotDevices(iotDevicesList);
+
+                    try {
+                        if (mGson == null) {
+                            mGson = new GsonBuilder().create();
+                        }
+                        String json = mGson.toJson(data);
+                        // TODO : iot test
+                        LauncherSettings.getInstance(context).setTestIoTDevices(json);
+
+                        Message msg = new Message();
+                        msg.what = HANDLER_MESSAGE_UPDATE_IOT_DEVICE_LIST;
+                        msg.obj = json;
+                        mHandler.sendMessage(msg);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default :
                     break;
@@ -107,6 +166,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
+        filter.addAction(com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
         Intent i = getIntent();
@@ -127,7 +187,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     .setPositiveButton(R.string.alert_ok,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    finish();
+                                    finishActivity();
                                 }
                             })
                     .show();
@@ -181,7 +241,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     .setPositiveButton(R.string.alert_ok,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    finish();
+                                    finishActivity();
                                 }
                             })
                     .show();
@@ -211,14 +271,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        Log.d(TAG, "BroadcastWebViewActivity onDestroy()");
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-
-        if (mText2Speech != null) {
-            mText2Speech.shutdown();
-        }
-        mText2Speech = null;
     }
 
     @Override
@@ -267,6 +319,19 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 }
                 break;
         }
+    }
+
+    public void finishActivity() {
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        Log.d(TAG, "BroadcastWebViewActivity onDestroy()");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+
+        if (mText2Speech != null) {
+            mText2Speech.shutdown();
+        }
+        mText2Speech = null;
+
+        finish();
     }
 
 }

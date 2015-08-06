@@ -214,7 +214,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
+        String action = (intent != null) ? intent.getAction() : null;
+        Log.d(TAG, "onStartCommand in service.. action = " + action);
+        if (action == null) {
+            return Service.START_NOT_STICKY;
+        }
         if (action != null && action instanceof String) {
             if (action.equals(ACTION_TOGGLE_PLAYBACK)) processTogglePlaybackRequest();
             else if (action.equals(ACTION_PLAY)) processPlayRequest();

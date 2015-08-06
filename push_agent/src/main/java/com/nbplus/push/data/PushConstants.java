@@ -41,4 +41,6 @@ public class PushConstants {
     public static final int HANDLER_MESSAGE_SEND_PUSH_STATUS = 1003;
     public static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 1004;
     public static final int HANDLER_MESSAGE_RECEIVE_PUSH_DATA = 10001;
+
+    public static final String PREF_KEY_PUSH_IF_ADDRESS = "PREF_KEY_PUSH_IF_ADDRESS";
 }

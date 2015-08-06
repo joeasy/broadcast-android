@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
+import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.hybrid.RegisterWebViewClient;
 
@@ -79,7 +80,7 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
         mWebViewClient = new RegisterWebViewClient(getActivity(), webView);
         mWebViewClient.setBackgroundTransparent();
 
-        String url = LauncherSettings.getInstance(getActivity()).getRegisterAddress();
+        String url = Constants.VBROAD_INITIAL_PAGE;
         mWebViewClient.loadWebUrl(url);
         return v;
     }
