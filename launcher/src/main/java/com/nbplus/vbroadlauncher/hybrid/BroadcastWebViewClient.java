@@ -104,7 +104,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     }
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
-        super(activity, view);
+        super(activity, view, activity.getString(R.string.app_name), activity.getString(R.string.app_name));
         mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         mWebView.setWebViewClient(this);
         mHandler = new BroadcastWebViewClientHandler(this);
@@ -366,12 +366,6 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      */
     public void onUpdateIoTDevices(String iotDevices) {
         dismissProgressDialog();
-//        String currUrl = mWebView.getUrl();
-//        if (StringUtils.isEmptyString(mIoTDiscoveringUrl) || !mIoTDiscoveringUrl.equals(mWebView.getUrl())) {
-//            Log.i(TAG, "call onUpdateIoTDevices(), but don't update ui..");
-//            mIoTDiscoveringUrl = null;
-//            return;
-//        }
         Log.d(TAG, "call onUpdateIoTDevices() = " + iotDevices);
         mIoTDiscoveringUrl = null;
         mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
@@ -447,5 +441,12 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         if (mWebView != null) {
             mWebView.stopLoading();
         }
+    }
+
+    public boolean isUpdateIoTDevices() {
+        return !StringUtils.isEmptyString(mIoTDiscoveringUrl);
+    }
+    public void cancelUpdateIoTDevices() {
+        mIoTDiscoveringUrl = null;
     }
 }

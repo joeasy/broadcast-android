@@ -155,6 +155,8 @@ public class IoTService extends Service {
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 break;
             case Constants.ACTION_SEND_IOT_COMMAND :
+                Log.d(TAG, ">> ACTION_SEND_IOT_COMMAND device id = " + intent.getStringExtra(Constants.EXTRA_IOT_SEND_COMM_DEVICE_ID));
+                Log.d(TAG, ">> ACTION_SEND_IOT_COMMAND command = " + intent.getStringExtra(Constants.EXTRA_IOT_SEND_COMM_COMMAND_ID));
                 break;
         }
 

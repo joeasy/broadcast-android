@@ -90,7 +90,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     }
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
-        super(activity, view);
+        super(activity, view, activity.getString(R.string.app_name), activity.getString(R.string.app_name));
         mWebView.setWebViewClient(this);
         mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         mHandler = new BroadcastWebViewClientHandler(this);

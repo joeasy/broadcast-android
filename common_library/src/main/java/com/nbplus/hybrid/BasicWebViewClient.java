@@ -59,6 +59,8 @@ public abstract class BasicWebViewClient extends WebViewClient {
     protected boolean mPageLoadSuccess = false;
     protected DownloadManager mDownloadManager;
     protected ProgressDialogFragment mProgressDialogFragment;
+    protected String mAlertTitleString;
+    protected String mConfirmTitleString;
 
     /**
      * Created by basagee on 2015. 4. 30..
@@ -99,7 +101,7 @@ public abstract class BasicWebViewClient extends WebViewClient {
         }
         public boolean onJsAlert(WebView view, String url, String message, final android.webkit.JsResult result) {
             new AlertDialog.Builder(mContext)
-                    //.setTitle(MopDef.STR_WEB_ALERT_TITLE)
+                    .setTitle(mAlertTitleString)
                     .setMessage(message)
                     .setPositiveButton(android.R.string.ok,
                             new AlertDialog.OnClickListener() {
@@ -119,7 +121,7 @@ public abstract class BasicWebViewClient extends WebViewClient {
                                    String message, final JsResult result) {
 
             new AlertDialog.Builder(mContext)
-                    //.setTitle(MopDef.STR_WEB_ALERT_TITLE)
+                    .setTitle(mConfirmTitleString)
                     .setMessage(message)
                     .setPositiveButton(android.R.string.ok,
                             new DialogInterface.OnClickListener() {
@@ -152,7 +154,7 @@ public abstract class BasicWebViewClient extends WebViewClient {
      * @param activity : context
      * @param view : 적용될 웹뷰
      */
-    public BasicWebViewClient(Activity activity, WebView view) {
+    public BasicWebViewClient(Activity activity, WebView view, String alertTitleString, String confirmTitleString) {
         mWebView = view;
         mContext = activity;
 
@@ -203,6 +205,18 @@ public abstract class BasicWebViewClient extends WebViewClient {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             mWebView.getSettings().setTextZoom(100);
+        }
+
+        if (StringUtils.isEmptyString(alertTitleString)) {
+            mAlertTitleString = activity.getString(R.string.default_webview_alert_title);
+        } else {
+            mAlertTitleString = alertTitleString;
+        }
+
+        if (StringUtils.isEmptyString(confirmTitleString)) {
+            mConfirmTitleString = activity.getString(R.string.default_webview_confirm_title);
+        } else {
+            mConfirmTitleString = confirmTitleString;
         }
     }
 

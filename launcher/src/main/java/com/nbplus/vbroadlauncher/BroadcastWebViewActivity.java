@@ -94,12 +94,14 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 }
                 SendIoTDeviceListTask task = new SendIoTDeviceListTask();
                 if (task != null) {
+                    Log.d(TAG, "Device list = " + msg.obj);
                     task.setBroadcastApiData(this, mHandler, serverInfo.getApiServer() + Constants.API_IOT_UPDATE_DEVICE_LIST, (String)msg.obj);
                     task.execute();
                 }
                 break;
             case Constants.HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK :
                 BaseApiResult result = (BaseApiResult)msg.obj;
+                Log.d(TAG, "Device list reg result = " + result.getResultCode());
                 if (result != null) {
                     if (!StringUtils.isEmptyString(result.getResultCode())) {
                         mWebViewClient.onUpdateIoTDevices(result.getResultCode());
@@ -123,6 +125,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
                     break;
                 case com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST :
+                    if (mWebViewClient == null || !mWebViewClient.isUpdateIoTDevices()) {
+                        return;
+                    }
                     ArrayList<IoTDevice> iotDevicesList = intent.getParcelableArrayListExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_DEVICE_LIST);
                     if (iotDevicesList == null) {
                         iotDevicesList = new ArrayList<>();
@@ -328,6 +333,11 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
         if (mText2Speech != null) {
             mText2Speech.shutdown();
+        }
+
+        if (mWebViewClient != null) {
+            mWebViewClient.cancelUpdateIoTDevices();
+            mWebViewClient = null;
         }
         mText2Speech = null;
 

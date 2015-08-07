@@ -19,6 +19,8 @@ public class Constants {
 
     public static final String EXTRA_IOT_GATEWAY_DATA = "EXTRA_IOT_GATEWAY_DATA";
     public static final String EXTRA_IOT_DEVICE_LIST = "EXTRA_IOT_DEVICE_LIST";
+    public static final String EXTRA_IOT_SEND_COMM_DEVICE_ID = "EXTRA_IOT_SEND_COMM_DEVICE_ID";
+    public static final String EXTRA_IOT_SEND_COMM_COMMAND_ID = "EXTRA_IOT_SEND_COMM_COMMAND_ID";
     // from App to service
     public static final String EXTRA_IOT_GATEWAY_CONNECTION_INFO = "EXTRA_IOT_DEVICE_LIST";
 

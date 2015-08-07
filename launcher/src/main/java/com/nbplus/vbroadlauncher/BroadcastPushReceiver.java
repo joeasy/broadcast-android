@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.nbplus.iotgateway.data.IoTDevice;
+import com.nbplus.iotgateway.service.IoTService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.push.data.PushMessageData;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -40,7 +42,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
         if (intent == null) {
             return;
         }
-        Intent i, pi;
+        Intent pi;
 
         String action = intent.getAction();
         if (PushConstants.ACTION_PUSH_STATUS_CHANGED.equals(action)) {
@@ -79,11 +81,11 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                     playNotificationAlarm(context, R.string.notification_broadcast_push);
                     if (isOutdoor) {        // 외출모드에서는 재생하지 않음.
                         Log.d(TAG, "Broadcast notification.. isOutdoor mode... ");
-                        i = new Intent();
-                        i.setAction(action);
-                        i.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
-                        i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                        pi = new Intent();
+                        pi.setAction(action);
+                        pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+                        pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
                     } else {
                         if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type) || Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(type)) {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -106,34 +108,34 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         if (StringUtils.isEmptyString(playingType) ||
                                 !Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType)) {
                             // 재생중인것이 없거나... 실시간이 아닌경우. 나중에받은것이 실행
-                            i = new Intent(context, RealtimeBroadcastActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            i.setAction(action);
-                            i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
-                            i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
+                            pi = new Intent(context, RealtimeBroadcastActivity.class);
+                            pi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            pi.setAction(action);
+                            pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                            pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
-                            Log.d(TAG, "1. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + i.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
-                            LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                            Log.d(TAG, "1. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
                             try {
                                 //Thread.sleep(30);
-                                context.startActivity(i);
+                                context.startActivity(pi);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         } else {
                             // 재생중인 방송이 실시간인데... 새로운 요청도 실시간이면.. 새로운 요청이 우선.
                             if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType) && Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type)) {
-                                i = new Intent(context, RealtimeBroadcastActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                i.setAction(action);
-                                i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
-                                i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
+                                pi = new Intent(context, RealtimeBroadcastActivity.class);
+                                pi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                pi.setAction(action);
+                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
-                                Log.d(TAG, "2. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + i.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
-                                LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                                Log.d(TAG, "2. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
                                 try {
                                     //Thread.sleep(30);
-                                    context.startActivity(i);
+                                    context.startActivity(pi);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -157,17 +159,28 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                             ? R.string.notification_inhabitant_push : R.string.notification_cooperative_buying_push;
                     playNotificationAlarm(context, strId);
 
-                    i = new Intent();
-                    i.setAction(action);
-                    i.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
-                    i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                    pi = new Intent();
+                    pi.setAction(action);
+                    pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+                    pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                     Log.d(TAG, "3. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + 0);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
                     break;
                 // IOT DEVICE 제어(스마트홈 서비스)
                 case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
+                    pi = new Intent(context, IoTService.class);
+                    pi.setAction(com.nbplus.iotgateway.data.Constants.ACTION_SEND_IOT_COMMAND);
+                    pi.putExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_SEND_COMM_DEVICE_ID, payloadData.getIotControlDeviceId());
+                    pi.putExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_SEND_COMM_COMMAND_ID, payloadData.getMessage());
+
+                    Log.d(TAG, "startService >> ACTION_SEND_IOT_COMMAND");
+                    try {
+                        context.startService(pi);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
-                // IOT DEVICE 제어(스마트홈 서비스)
+                // PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION
                 case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :
                     // 브라우저실행시...
 //                    pi = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(payloadData.getMessage()));

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CommonLibrary</string>
+    <string name="default_webview_alert_title">알림</string>
+    <string name="default_webview_confirm_title">확인</string>
     <string name="action_settings">Settings</string>
     <string name="no_geocoder_available">No geocoder available</string>
 
