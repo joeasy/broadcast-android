@@ -105,8 +105,9 @@ public class MyGcmListenerService extends GcmListenerService {
         String payload = data.getString(Constants.GCM_DATA_KEY_PAYLOAD);
         Intent pi = null;
         String moveUrl = null;
+        int notificationId = 0;
 
-        PushPayloadData payloadData = null;
+                PushPayloadData payloadData = null;
         try {
             Gson gson = new GsonBuilder().create();
             payloadData = gson.fromJson(payload, new TypeToken<PushPayloadData>(){}.getType());
@@ -122,6 +123,12 @@ public class MyGcmListenerService extends GcmListenerService {
         String type = payloadData.getServiceType();
         payloadData.setAlertMessage(alert);
         payloadData.setMessageId(messageId);
+
+        /**
+         * 2014. 08. 08
+         * 비밀번호찾기를 제외한 나머지 알림은 최신 + 이전 알림까지 확인할 수 있도록
+         * Notification을 별개로 띄운다.
+         */
         switch (type) {
             // 방송알림
             case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
@@ -141,8 +148,20 @@ public class MyGcmListenerService extends GcmListenerService {
                     }
                 }
 
+                Log.d(TAG, ">>> Broadcast noti push url = " + moveUrl);
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.BROADCAST_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_radio, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+
+                //notificationId = Constants.BROADCAST_EVENT_NOTIFICATION_ID;
+                try {
+                    notificationId += Integer.parseInt(payloadData.getMessageId());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    notificationId = Constants.BROADCAST_EVENT_NOTIFICATION_ID;
+                }
+                Log.d(TAG, ">>> notificationId = " + notificationId);
+                pi.putExtra("xxx", notificationId);
+
+                showNotification(this, notificationId, R.drawable.ic_notification_radio, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
             // 긴급호출메시지
             case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
@@ -159,12 +178,22 @@ public class MyGcmListenerService extends GcmListenerService {
                     pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LON, lon);
                 }
 
+                pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
+
+                //notificationId = Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID;
+                try {
+                    notificationId += Integer.parseInt(payloadData.getMessageId());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    notificationId = Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID;
+                }
+
                 if (StringUtils.isEmptyString(payloadData.getMessage())) {
-                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                    showNotification(this, notificationId, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 } else {
                     // bigText 사용시
                     Log.d(TAG, ">> Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL bigText = " + payloadData.getMessage());
-                    showNotification(this, Constants.EMERGENCY_CALL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
+                    showNotification(this, notificationId, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
                             payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, pi);
                 }
                 break;
@@ -182,8 +211,16 @@ public class MyGcmListenerService extends GcmListenerService {
                         moveUrl = server.getDocServer() + Constants.INHABITANT_POLL_LIST_CONTEXT_PATH;
                     }
                 }
+                //notificationId = Constants.INHABITANT_POLL_EVENT_NOTIFICATION_ID;
+                try {
+                    notificationId += Integer.parseInt(payloadData.getMessageId());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    notificationId = Constants.INHABITANT_POLL_EVENT_NOTIFICATION_ID;
+                }
+
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.INHABITANT_POLL_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                showNotification(this, notificationId, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
                 // 공동구매
             case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
@@ -200,20 +237,35 @@ public class MyGcmListenerService extends GcmListenerService {
                     }
                 }
                 pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
-                showNotification(this, Constants.COOPERATIVE_BUYING_EVENT_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
+                //notificationId = Constants.COOPERATIVE_BUYING_EVENT_NOTIFICATION_ID;
+                try {
+                    notificationId += Integer.parseInt(payloadData.getMessageId());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    notificationId = Constants.COOPERATIVE_BUYING_EVENT_NOTIFICATION_ID;
+                }
+                showNotification(this, notificationId, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
             // IOT DEVICE 제어(스마트홈 서비스)
             case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
                 // 원격제어는무시한다.
                 break;
-            // IOT DEVICE 제어(스마트홈 서비스)
+            // 관리자용이란다.
             case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :
                 // 브라우저실행시...
 //                    pi = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(payloadData.getMessage()));
 //                    showNotification(context, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, PackageUtils.getApplicationName(context), payloadData.getAlertMessage(), null, pi);
 
+                pi.putExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS, moveUrl);
+                //notificationId = Constants.SYSTEM_ADMIN_NOTIFICATION_ID;
+                try {
+                    notificationId += Integer.parseInt(payloadData.getMessageId());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    notificationId = Constants.SYSTEM_ADMIN_NOTIFICATION_ID;
+                }
                 // bigText 사용시
-                showNotification(this, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
+                showNotification(this, notificationId, R.drawable.ic_notification_noti, PackageUtils.getApplicationName(this),
                         payloadData.getAlertMessage(), PackageUtils.getApplicationName(this), payloadData.getMessage(), null, null, null);
                 break;
             // 비밀번호찾기
@@ -301,7 +353,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         if (intent != null) {
             intent.setFlags(intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
         }
 
