@@ -19,6 +19,7 @@ import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
@@ -35,6 +36,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.nbplus.progress.ProgressDialogFragment;
 
+import org.apache.http.util.EncodingUtils;
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.PhoneState;
 import org.basdroid.common.R;
@@ -218,6 +220,17 @@ public abstract class BasicWebViewClient extends WebViewClient {
         } else {
             mConfirmTitleString = confirmTitleString;
         }
+
+        mWebView.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                mContext.startActivity(intent);
+
+            }
+        });
     }
 
     public void setBackgroundResource(int resId) {
@@ -290,7 +303,7 @@ public abstract class BasicWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         // for excel download
-        if (isDocumentMimeType(url)) {
+        if (isDocumentMimeType(url) || url.endsWith(".pcc")) {
             Log.d(TAG, "This url is document mimetype = " + url);
             if (StorageUtils.isExternalStorageWritable()) {
                 Uri source = Uri.parse(url);
@@ -342,6 +355,15 @@ public abstract class BasicWebViewClient extends WebViewClient {
             showProgressDialog();
         }
         return true;
+    }
+
+    @JavascriptInterface
+    public void postUrl(String url, String data) {
+        Intent intent = new Intent(Intent.ACTION_VIEW)
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .setPackage("com.android.chrome")           // open only chrome
+                .setData(Uri.parse(url));
+        mContext.startActivity(intent);
     }
 
     public abstract void loadWebUrl(String url);

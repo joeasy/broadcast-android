@@ -300,6 +300,12 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = fromNotiUrl;
         }
 
+        if (StringUtils.isEmptyString(url)) {
+            if (mWebViewClient != null && !StringUtils.isEmptyString(mWebViewClient.getWebView().getUrl())) {
+                // 이미실행되었던 이력이 있으면 그대로 놔둔다.
+                return;
+            }
+        }
         mWebViewClient.stopPageLoading();
         loadWebView(url);
     }

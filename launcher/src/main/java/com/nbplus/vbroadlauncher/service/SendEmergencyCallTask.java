@@ -8,6 +8,7 @@ import android.util.Log;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -20,6 +21,9 @@ import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 
 import org.basdroid.volley.GsonRequest;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -32,7 +36,17 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
     @Override
     protected BaseApiResult doInBackground(Void... params) {
 
-        RequestQueue requestQueue = Volley.newRequestQueue(mContext);
+        RequestQueue requestQueue = Volley.newRequestQueue(mContext, new HurlStack() {
+            @Override
+            protected HttpURLConnection createConnection(URL url) throws IOException {
+                HttpURLConnection connection = super.createConnection(url);
+                // Fix for bug in Android runtime(!!!):
+                // https://code.google.com/p/android/issues/detail?id=24672
+                connection.setRequestProperty("Accept-Encoding", "");
+
+                return connection;
+            }
+        });
         BaseApiResult response = null;
 
         Uri.Builder builder = Uri.parse(mServerPath).buildUpon();

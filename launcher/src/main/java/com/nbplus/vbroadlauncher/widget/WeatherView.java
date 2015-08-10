@@ -27,6 +27,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -44,7 +45,10 @@ import org.basdroid.common.DisplayUtils;
 import org.basdroid.common.NetworkUtils;
 import org.basdroid.volley.GsonRequest;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -447,7 +451,17 @@ public class WeatherView extends LinearLayout {
      */
     public void updateForecastGrib(int pageNo) {
         if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
+            mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
         }
         String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_GRIB + "?";
         url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
@@ -537,7 +551,18 @@ public class WeatherView extends LinearLayout {
     }
     public void updateForecastTimeData(int pageNo) {
         if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
+            mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
+
         }
         String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_TIMEDATA + "?";
         url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
@@ -616,7 +641,18 @@ public class WeatherView extends LinearLayout {
      */
     public void updateForecastSpaceData(int pageNo) {
         if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
+            mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
+
         }
         String url = Constants.WEATHER_SERVER_PREFIX + Constants.WEATHER_SERVICE_SPACEDATA + "?";
         url += Constants.WEATHER_PARAM_TYPE + "&" + Constants.WEATHER_PARAM_SERVICE_KEY + Constants.WEATHER_OPEN_API_KEY;
@@ -1131,7 +1167,17 @@ public class WeatherView extends LinearLayout {
 
     public void updateYahooGeocode() {
         if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
+            mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
         }
 
         Location location = LauncherSettings.getInstance(getContext()).getPreferredUserLocation();
@@ -1182,7 +1228,17 @@ public class WeatherView extends LinearLayout {
      */
     public void updateYahooForecast() {
         if (mWeatherRequestQueue == null) {
-            mWeatherRequestQueue = Volley.newRequestQueue(getContext());
+            mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
         }
 
         GeocodeData geoCode = LauncherSettings.getInstance(getContext()).getGeocodeData();

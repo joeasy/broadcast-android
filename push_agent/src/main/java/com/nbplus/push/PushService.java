@@ -20,6 +20,7 @@ import android.util.Log;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -34,7 +35,10 @@ import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 import org.basdroid.volley.GsonRequest;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class PushService extends Service {
     private static final String TAG = PushService.class.getName();
@@ -298,7 +302,17 @@ public class PushService extends Service {
         }
 
         if (mRequestQueue == null) {
-            mRequestQueue = Volley.newRequestQueue(mContext);
+            mRequestQueue = Volley.newRequestQueue(mContext, new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
 
             mGwRequestFuture = RequestFuture.newFuture();
             GsonRequest request = new GsonRequest(Request.Method.POST, url, mRequestBody, PushInterfaceData.class, mGwRequestFuture, mGwRequestFuture);
