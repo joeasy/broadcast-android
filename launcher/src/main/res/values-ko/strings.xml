@@ -51,8 +51,8 @@
     <string name="shortcut_addr_additional_function">/addfunction/iotdata/getIotDataList.rcc</string>
     <string name="shortcut_addr_official_address">/addfunction/publicoffice/getPublicOfficeList.rcc</string>
     <string name="shortcut_addr_smart_home">/addfunction/smarthome/getSmartHomeList.rcc</string>
-    <!--<string name="shortcut_addr_my_information">/iot_test.html</string>-->
-    <string name="shortcut_addr_my_information">/myinfo/myinfo/getMyinfoDetail.rcc</string>
+    <string name="shortcut_addr_my_information">/iot_test.html</string>
+    <!--<string name="shortcut_addr_my_information">/myinfo/myinfo/getMyinfoDetail.rcc</string>-->
 
     <string name="weather_title">%1$s 현재날씨</string>
     <string name="celsius">%1$s°C</string>
