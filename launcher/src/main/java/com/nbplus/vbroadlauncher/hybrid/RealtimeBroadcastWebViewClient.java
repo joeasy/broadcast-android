@@ -51,6 +51,7 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
     }
 
     private boolean mIsClosingByWebApp = false;
+    private boolean mIsRadioPauseByWeb = false;
 
     public interface OnRealtimeBroadcastWebViewListener {
         public void onCloseWebApplication();
@@ -367,9 +368,13 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
     public void closeWebApplication() {
         Log.d(TAG, ">> closeWebApplication() called");
         //mContext.finish();
-        Intent i = new Intent(mContext, MusicService.class);
-        i.setAction(MusicService.ACTION_PLAY);
-        mContext.startService(i);
+
+        if (mIsRadioPauseByWeb) {
+            mIsRadioPauseByWeb = false;
+            Intent i = new Intent(mContext, MusicService.class);
+            i.setAction(MusicService.ACTION_PLAY);
+            mContext.startService(i);
+        }
 
         mIsClosingByWebApp = true;
         if (mOnWebViewListener != null) {
@@ -380,6 +385,7 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
     @JavascriptInterface
     public void onStartBroadcastMediaStream(boolean isTTS, String ttsString) {
         Log.d(TAG, ">> onStartBroadcastMediaStream() called = " + isTTS + ", tts = " + ttsString);
+        mIsRadioPauseByWeb = true;
         Intent i = new Intent(mContext, MusicService.class);
         i.setAction(MusicService.ACTION_PAUSE);
         mContext.startService(i);

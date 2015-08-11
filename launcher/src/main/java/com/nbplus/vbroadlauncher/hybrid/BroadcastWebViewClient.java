@@ -65,6 +65,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     private static final int HANDLER_MESSAGE_ERROR_TTS = 3;
     private BroadcastWebViewClientHandler mHandler;
 
+    private boolean mIsRadioPauseByWeb = false;
+
     // 핸들러 객체 만들기
     private static class BroadcastWebViewClientHandler extends Handler {
         private final WeakReference<BroadcastWebViewClient> mActivity;
@@ -178,6 +180,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         Log.d(TAG, ">> onStartBroadcastMediaStream() called = " + isTTS + ", tts = " + ttsString);
         Intent i = new Intent(mContext, MusicService.class);
         i.setAction(MusicService.ACTION_PAUSE);
+        mIsRadioPauseByWeb = true;
         mContext.startService(i);
 
         if (mBroadcastPlayState == BroadcastPlayState.TTS_PLAYING) {
@@ -274,10 +277,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         }
         mBroadcastPlayState = BroadcastPlayState.STOPPED;
 
-        Intent i = new Intent(mContext, MusicService.class);
-        i.setAction(MusicService.ACTION_PLAY);
-        mContext.startService(i);
-        mIsClosingByWebApp = true;
+        if (mIsRadioPauseByWeb) {
+            mIsRadioPauseByWeb = false;
+            Intent i = new Intent(mContext, MusicService.class);
+            i.setAction(MusicService.ACTION_PLAY);
+            mContext.startService(i);
+            mIsClosingByWebApp = true;
+        }
         ((BroadcastWebViewActivity)mContext).finishActivity();
     }
 
