@@ -20,6 +20,8 @@ import android.util.Log;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
@@ -321,14 +323,93 @@ public class PushService extends Service {
         }
     }
 
+    /**
+     * volley connection ENETUNREACH 가 유독 여기에서만발생..
+     * async로 처리해서 테스트해보자.
+     * @param url
+     */
+    private static int mApiRetryCount = 0;
+
+    private void getFromServer(final String url) {
+        if (mRequestBody == null) {
+            String prefName = mContext.getApplicationContext().getPackageName() + "_preferences";
+            SharedPreferences prefs = mContext.getSharedPreferences(prefName, Context.MODE_PRIVATE);
+
+            // load from preferences..
+            String deviceId = prefs.getString(PushConstants.KEY_DEVICE_ID, "");
+            if (StringUtils.isEmptyString(deviceId)) {
+                deviceId = DeviceUtils.getDeviceIdByMacAddress(mContext);
+                prefs.edit().putString(PushConstants.KEY_DEVICE_ID, deviceId).apply();
+            }
+
+            GetPushInterfaceRequestBody reqBodyObj = new GetPushInterfaceRequestBody();
+            reqBodyObj.deviceId = deviceId;
+            reqBodyObj.os = Build.VERSION.RELEASE;
+            reqBodyObj.pushVersion = Integer.toString(BuildConfig.VERSION_CODE);
+            reqBodyObj.vendor = Build.MANUFACTURER;
+            reqBodyObj.model = DeviceUtils.getDeviceName();
+            reqBodyObj.os = Build.ID + " " + Build.VERSION.RELEASE;
+            reqBodyObj.deviceType = "android";
+
+            Gson gson = new GsonBuilder().create();
+            mRequestBody = gson.toJson(reqBodyObj, new TypeToken<GetPushInterfaceRequestBody>(){}.getType());
+        }
+
+        RequestQueue requestQueue = Volley.newRequestQueue(mContext, new HurlStack() {
+            @Override
+            protected HttpURLConnection createConnection(URL url) throws IOException {
+                HttpURLConnection connection = super.createConnection(url);
+                // Fix for bug in Android runtime(!!!):
+                // https://code.google.com/p/android/issues/detail?id=24672
+                connection.setRequestProperty("Accept-Encoding", "");
+
+                return connection;
+            }
+        });
+        final GsonRequest gsonRequest = new GsonRequest(Request.Method.POST, url, mRequestBody, PushInterfaceData.class, new Response.Listener<PushInterfaceData>() {
+
+            @Override
+            public void onResponse(PushInterfaceData response) {
+                Log.d(TAG, ">>> get PushInterfaceData success !!!");
+                mApiRetryCount = 0;
+
+                Message message = new Message();
+                message.what = PushConstants.HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA;
+                message.obj = response;
+                mHandler.sendMessage(message);
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, ">>> get PushInterfaceData error");
+//                mApiRetryCount++;
+//                if (mApiRetryCount > 3) {     // retry 3 times
+//                    mApiRetryCount = 0;
+//                    Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
+//                } else {                // retry
+//                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mApiRetryCount);
+//
+//                    Message message = new Message();
+//                    message.what = PushConstants.HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA;
+//                    message.obj = null;
+//                    mHandler.sendMessage(message);
+//                }
+            }
+        });
+        gsonRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));
+        requestQueue.add(gsonRequest);
+    }
+
     private void getPushGatewayInformationFromServer() {
         mPushRunnable.releasePushClientSocket(false);
         mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
 
         mPushRunnable.setState(PushRunnable.State.IfRetrieving);
-        initPushGatewayTaskSettings(mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
-        mIfTask = new GetPushInterfaceTask(this, mHandler, mGwRequestFuture);
-        mIfTask.execute();
+        //initPushGatewayTaskSettings(mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
+        getFromServer(mPushInterfaceServerAddress + PUSH_IF_CONTEXT);
+        //mIfTask = new GetPushInterfaceTask(this, mHandler, mGwRequestFuture);
+        //mIfTask.execute();
     }
 
     @Override

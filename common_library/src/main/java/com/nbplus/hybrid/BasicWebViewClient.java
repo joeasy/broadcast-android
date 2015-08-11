@@ -303,7 +303,7 @@ public abstract class BasicWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         // for excel download
-        if (isDocumentMimeType(url) || url.endsWith(".pcc")) {
+        if (isDocumentMimeType(url)) {
             Log.d(TAG, "This url is document mimetype = " + url);
             if (StorageUtils.isExternalStorageWritable()) {
                 Uri source = Uri.parse(url);

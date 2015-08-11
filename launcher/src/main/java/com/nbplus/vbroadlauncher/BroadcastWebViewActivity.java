@@ -262,7 +262,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        mWebViewClient.onBackPressed();
+        if (mWebViewClient != null) {
+            mWebViewClient.onBackPressed();
+        }
     }
 
     /**

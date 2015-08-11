@@ -166,7 +166,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
             isGoogleMapMode = false;
             loadWebView(url);
         } else {
-            mWebViewClient.onBackPressed();
+            if (mWebViewClient != null) {
+                mWebViewClient.onBackPressed();
+            }
         }
     }
 

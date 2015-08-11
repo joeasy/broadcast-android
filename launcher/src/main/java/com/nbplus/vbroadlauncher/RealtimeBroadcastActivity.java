@@ -223,7 +223,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        mWebViewClient.onBackPressed();
+        if (mWebViewClient != null) {
+            mWebViewClient.onBackPressed();
+        }
     }
 
     /**
