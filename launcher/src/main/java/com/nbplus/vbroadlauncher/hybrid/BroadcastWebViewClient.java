@@ -123,6 +123,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     @JavascriptInterface
     public void setVillageName(String villageName) {
+        Log.d(TAG, "setVillageName... = " + villageName);
         if (!StringUtils.isEmptyString(villageName)) {
             LauncherSettings.getInstance(mContext).setVillageName(villageName);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.ACTION_SET_VILLAGE_NAME));

@@ -2,14 +2,17 @@ package com.nbplus.vbroadlauncher;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +32,8 @@ import com.nbplus.vbroadlauncher.service.BroadcastChatHeadService;
 import org.basdroid.common.DeviceUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -387,6 +392,42 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         });
 
         finish();
+    }
+
+    static boolean userInteraction = false;
+    @Override
+    public void showText2SpeechAlertDialog() {
+        final AlertDialog dialog = new AlertDialog.Builder(this).setMessage(R.string.alert_tts_message)
+                //.setTitle(R.string.alert_network_title)
+                .setCancelable(true)
+                .setNegativeButton(R.string.alert_tts_btn_settings,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                userInteraction = true;
+                                Intent ttsIntent = new Intent();
+                                ttsIntent.setAction(Settings.ACTION_SETTINGS);
+                                startActivity(ttsIntent);
+                            }
+                        })
+                .setPositiveButton(R.string.alert_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                                finishActivity();
+                                userInteraction = true;
+                            }
+                        })
+                .show();
+        final Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            public void run() {
+                if (userInteraction == false) {
+                    dialog.dismiss(); // when the task active then close the dialog
+                    finishActivity();
+                }
+                t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
+            }
+        }, 10000); // after 2 second (or 2000 miliseconds), the task will be active.
     }
 
 }

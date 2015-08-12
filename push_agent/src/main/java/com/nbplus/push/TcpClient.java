@@ -210,6 +210,7 @@ public class TcpClient {
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_PUSH_GW_CONNECTION, 60 * 1000);
                 } else if (mHandler != null && message[0] == PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST) {
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE, 60 * 1000);
+                    Log.d(TAG, ">>> send keep-alive.");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -479,6 +480,7 @@ public class TcpClient {
                             sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE, msgId, -1));
                             break;
                         case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE :
+                            Log.d(TAG, ">>> PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE.");
                             mDataIn.skipBytes(16);
                             mHandler.removeMessages(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE);
                             setKeepAliveHandler();
