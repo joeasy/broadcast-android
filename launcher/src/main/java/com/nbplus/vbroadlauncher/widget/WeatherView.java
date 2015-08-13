@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -91,6 +92,7 @@ public class WeatherView extends LinearLayout {
     private int mForecastGribRetry = 0;
 
     private long mLastUpdated = 0;
+    private boolean mIsPaused = true;
 
     private static final int BASE_SKY_STATUS_END_VALUE = 3;
 
@@ -134,6 +136,11 @@ public class WeatherView extends LinearLayout {
                     releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
                     releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
 
+                    if (mIsPaused || !NetworkUtils.isConnected(getContext())) {
+                        Log.d(TAG, "paused or not connected... ");
+                        return;
+                    }
+
                     // update weather and set next alarm
                     updateForecastGrib(1);
                     setNextForecastGribAlarm();
@@ -155,6 +162,11 @@ public class WeatherView extends LinearLayout {
                         Constants.WEATHER_SERVICE_DEFAULT_TIMER.equals(intent.getAction())) {
                     Log.d(TAG, "LOCATION_CHANGED_ACTION received !!!");
                     releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+
+                    if (mIsPaused || !NetworkUtils.isConnected(getContext())) {
+                        Log.d(TAG, "paused or not connected... ");
+                        return;
+                    }
 
                     // update weather and set next alarm
                     // 실황예보
@@ -251,10 +263,15 @@ public class WeatherView extends LinearLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        Log.d(TAG, "onAttachedToWindow");
 
+        releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+        releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
         if (!mAttached) {
             mAttached = true;
+            mIsPaused = false;
 
+            unregisterReceiver();
             registerReceiver();
             if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
                 Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
@@ -268,12 +285,14 @@ public class WeatherView extends LinearLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        Log.d(TAG, "onDetachedFromWindow");
 
         if (mAttached) {
             unregisterReceiver();
             mAttached = false;
         }
-        Log.d(TAG, "weatherview onDetachedFromWindow!!!");
+        releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+        releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
     }
 
     private void registerReceiver() {
@@ -288,7 +307,11 @@ public class WeatherView extends LinearLayout {
     }
 
     private void unregisterReceiver() {
-        getContext().unregisterReceiver(mIntentReceiver);
+        try {
+            getContext().unregisterReceiver(mIntentReceiver);
+        } catch (Exception e) {
+
+        }
     }
 
     // 알람 등록
@@ -342,7 +365,6 @@ public class WeatherView extends LinearLayout {
 
     // 알람 해제
     private void releaseAlarm(String action) {
-        Log.i(TAG, "releaseAlarm()");
         AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 
         Intent Intent = new Intent(action);
@@ -450,6 +472,10 @@ public class WeatherView extends LinearLayout {
      * @param pageNo
      */
     public void updateForecastGrib(int pageNo) {
+        if (!NetworkUtils.isConnected(getContext())) {
+            Log.d(TAG, "Network is not connted. skip updateForecastGrib()");
+            return;
+        }
         if (mWeatherRequestQueue == null) {
             mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
                 @Override
@@ -866,6 +892,11 @@ public class WeatherView extends LinearLayout {
     private void updateForecastGribWeatherView() {
         Log.d(TAG, ">> updateForecastGribWeatherViewWeatherView().......");
 
+        if (mIsPaused) {
+            Log.d(TAG, "paused status");
+            return;
+        }
+
         ForecastItem item = null;
         int skyStatusValue = 1;
 
@@ -1166,6 +1197,10 @@ public class WeatherView extends LinearLayout {
     private int mForecastRetry = 0;
 
     public void updateYahooGeocode() {
+        if (!NetworkUtils.isConnected(getContext())) {
+            Log.d(TAG, "Network is not connted. skip updateYahooGeocode()");
+            return;
+        }
         if (mWeatherRequestQueue == null) {
             mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
                 @Override
@@ -1227,6 +1262,36 @@ public class WeatherView extends LinearLayout {
      *  Yahoo! get weather data  검색
      */
     public void updateYahooForecast() {
+        if (!NetworkUtils.isConnected(getContext())) {
+            Log.d(TAG, "Network is not connted. skip updateYahooForecast()");
+            return;
+        }
+
+        /**
+         * 이전에 조회한 야후 날씨 데이터를 참고해서 이미 오늘을 포함한 3일 데이터가 있다면
+         * 다시 조회하지 않는다.
+         */
+        if (mForecastData != null && mForecastData.item != null && mForecastData.item.weekCondition != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+            Date date = new Date();
+            String today = sdf.format(date);
+
+            int todayPos = 0;
+            for (ForecastData.Forecast dayCondition : mForecastData.item.weekCondition) {
+                todayPos++;
+                if (today.equals(dayCondition.date)) {
+                    break;
+                }
+            }
+
+            // 3일 데이터가 필요하므로 이미있다면 다시 가져오지 않는다.
+            if (todayPos > 0 && mForecastData.item.weekCondition.size() - todayPos >= 2) {
+                Log.d(TAG, "updateYahooForecast() already data is loaded..");
+                updateYahooForecastView();
+                return;
+            }
+        }
+
         if (mWeatherRequestQueue == null) {
             mWeatherRequestQueue = Volley.newRequestQueue(getContext(), new HurlStack() {
                 @Override
@@ -1384,6 +1449,11 @@ public class WeatherView extends LinearLayout {
     private void updateYahooForecastView() {
         Log.d(TAG, ">> updateForecastView().......");
 
+        if (mIsPaused) {
+            Log.d(TAG, "paused status");
+            return;
+        }
+
         if (mForecastData == null || mForecastData.item == null) {
             return;
         }
@@ -1510,24 +1580,61 @@ public class WeatherView extends LinearLayout {
         }
     }
 
-    public void onNetworkConnected() {
-        Log.d(TAG, "onNetworkConnected() called......");
+    public void onNetworkConnected(boolean isConnected) {
+        Log.d(TAG, "onNetworkConnected() called = " + isConnected);
 
-        long currMs = System.currentTimeMillis();
-        // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
-        if ((currMs - mLastUpdated) > 1000 * 60 * 60) {
+        releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+        releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
+
+        if (mIsPaused) {
+            Log.d(TAG, "isPaused... ");
+            return;
+        }
+
+        if (isConnected) {
+            long currMs = System.currentTimeMillis();
+            // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
+            if ((currMs - mLastUpdated) > 1000 * 60 * 60) {
+                if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
+                    Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+                    getContext().sendBroadcast(intent);
+                } else {
+                    setAlarm(System.currentTimeMillis() + 5000, Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+                }
+            }
+        }
+    }
+
+    public void onResumed() {
+        if (mAttached) {
+            Log.d(TAG, "onResumed()");
+            mIsPaused = false;
             releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
             releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
-
-            // update weather and set next alarm
-            updateForecastGrib(1);
-            setNextForecastGribAlarm();
-
-            if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
-                updateYahooGeocode();
+            unregisterReceiver();
+            registerReceiver();
+            long currMs = System.currentTimeMillis();
+            // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
+            if ((currMs - mLastUpdated) > 1000 * 60 * 60) {
+                if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
+                    Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+                    getContext().sendBroadcast(intent);
+                } else {
+                    setAlarm(System.currentTimeMillis() + 5000, Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+                }
             } else {
-                updateYahooForecast();
+                setNextForecastGribAlarm();
             }
+        }
+    }
+
+    public void onPaused() {
+        if (mAttached) {
+            Log.d(TAG, "onPaused()");
+            releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
+            releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
+            mIsPaused = true;
+            unregisterReceiver();
         }
     }
 }

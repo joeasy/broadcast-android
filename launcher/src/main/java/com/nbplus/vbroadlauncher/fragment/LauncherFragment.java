@@ -140,8 +140,8 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
                 mLastNetworkStatus = networkStatus;
 
+                mWeatherView.onNetworkConnected(mLastNetworkStatus);
                 if (mLastNetworkStatus) {
-                    mWeatherView.onNetworkConnected();
                     // start push agent service
                     VBroadcastServer serverInfo = LauncherSettings.getInstance(getActivity()).getServerInformation();
                     if (serverInfo != null && StringUtils.isEmptyString(serverInfo.getPushInterfaceServer()) == false) {
@@ -802,5 +802,27 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     @Override
     public void onResume() {
         super.onResume();
+        if (mTextClock != null) {
+            mTextClock.onResumed();
+        }
+        if (mWeatherView != null) {
+            mWeatherView.onResumed();
+        }
+    }
+
+    /**
+     * Called when the Fragment is no longer resumed.  This is generally
+     * tied to {@link Activity#onPause() Activity.onPause} of the containing
+     * Activity's lifecycle.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mTextClock != null) {
+            mTextClock.onPaused();
+        }
+        if (mWeatherView != null) {
+            mWeatherView.onPaused();
+        }
     }
 }

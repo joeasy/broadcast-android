@@ -140,6 +140,7 @@ public class TextClock extends TextView {
     private boolean mHasSeconds;
 
     private boolean mAttached;
+    private boolean mRegistered;
 
     private Calendar mTime;
     private String mTimeZone;
@@ -563,13 +564,17 @@ public class TextClock extends TextView {
 
     @Override
     protected void onAttachedToWindow() {
+        Log.d("TextClock", "onAttachedToWindow()");
         super.onAttachedToWindow();
 
         if (!mAttached) {
             mAttached = true;
 
-            registerReceiver();
-            registerObserver();
+            if (!mRegistered) {
+                registerReceiver();
+                registerObserver();
+                mRegistered = true;
+            }
 
             createTime(mTimeZone);
 
@@ -583,11 +588,14 @@ public class TextClock extends TextView {
 
     @Override
     protected void onDetachedFromWindow() {
+        Log.d("TextClock", "onDetachedFromWindow()");
         super.onDetachedFromWindow();
 
         if (mAttached) {
-            unregisterReceiver();
-            unregisterObserver();
+            if (mRegistered) {
+                unregisterReceiver();
+                unregisterObserver();
+            }
 
             getHandler().removeCallbacks(mTicker);
 
@@ -611,15 +619,24 @@ public class TextClock extends TextView {
     }
 
     private void unregisterReceiver() {
-        getContext().unregisterReceiver(mIntentReceiver);
+        try {
+            getContext().unregisterReceiver(mIntentReceiver);
+        } catch (Exception e) {
+
+        }
     }
 
     private void unregisterObserver() {
-        final ContentResolver resolver = getContext().getContentResolver();
-        resolver.unregisterContentObserver(mFormatChangeObserver);
+        try {
+            final ContentResolver resolver = getContext().getContentResolver();
+            resolver.unregisterContentObserver(mFormatChangeObserver);
+        } catch (Exception e) {
+
+        }
     }
 
-    private void onTimeChanged() {
+    public void onTimeChanged() {
+        Log.d("TextClock", ">> onTimeChanged...");
         long currTimems = System.currentTimeMillis();
         mTime.setTimeInMillis(currTimems);
 
@@ -664,5 +681,35 @@ public class TextClock extends TextView {
                             0, span.length(),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         setText(span);
+    }
+
+    public void onResumed() {
+        Log.d("TextClock", "onResumed()");
+        if (mAttached) {
+            if (!mRegistered) {
+                registerReceiver();
+                registerObserver();
+
+                if (mHasSeconds) {
+                    mTicker.run();
+                } else {
+                    onTimeChanged();
+                }
+                mRegistered = true;
+            }
+        }
+    }
+    public void onPaused() {
+        Log.d("TextClock", "onPaused()");
+        if (mAttached) {
+            if (mRegistered) {
+                unregisterReceiver();
+                unregisterObserver();
+                mRegistered = false;
+            }
+            if (mHasSeconds) {
+                getHandler().removeCallbacks(mTicker);
+            }
+        }
     }
 }
