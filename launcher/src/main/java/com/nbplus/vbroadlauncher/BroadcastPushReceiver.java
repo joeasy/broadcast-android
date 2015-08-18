@@ -115,7 +115,11 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                             pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
                             Log.d(TAG, "1. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
-                            LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+                            // 서버에서 몇십ms  단위로거의 동일 시간에 전달되는 경우 먼저온 푸시의 액티비티가 생성되기도전에
+                            // broadcast 만전달될 수있다.
+                            // 액티비티가 생성된 이후에 던지자.
+                            //LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+
                             try {
                                 //Thread.sleep(30);
                                 context.startActivity(pi);
@@ -132,7 +136,10 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                                 pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
                                 Log.d(TAG, "2. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
-                                LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+                                // 서버에서 몇십ms  단위로거의 동일 시간에 전달되는 경우 먼저온 푸시의 액티비티가 생성되기도전에
+                                // broadcast 만전달될 수있다.
+                                // 액티비티가 생성된 이후에 던지자.
+                                //LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
                                 try {
                                     //Thread.sleep(30);
                                     context.startActivity(pi);

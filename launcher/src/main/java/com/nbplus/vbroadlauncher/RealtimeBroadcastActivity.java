@@ -158,15 +158,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         acquireCpuWakeLock();
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
-        filter.addAction(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
-
-        Intent i;
         Intent intent = getIntent();
-        if (intent == null) {
-            Log.d(TAG, "empty intent value ...");
+        if (intent == null || !PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(intent.getAction())) {
+            Log.d(TAG, "empty or none broadcast intent value ...");
             finishActivity();
             return;
         }
@@ -180,6 +174,20 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
         mBroadcastPayloadIdx = intent.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1);
         Log.d(TAG, ">> onCreate() mBroadcastPayloadIdx= " + mBroadcastPayloadIdx);
+
+        // 서버에서 몇십ms  단위로거의 동일 시간에 전달되는 경우 먼저온 푸시의 액티비티가 생성되기도전에
+        // broadcast 만전달될 수있다.
+        // 액티비티가 생성된 이후에 던지자.
+        Intent i = new Intent(this, RealtimeBroadcastActivity.class);
+        i.setAction(intent.getAction());
+        i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, mBroadcastData);
+        i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, mBroadcastPayloadIdx);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
+        filter.addAction(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
         hideSystemUI();
 
