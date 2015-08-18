@@ -128,7 +128,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
             final String action = getIntent().getAction();
             if (Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(getIntent().getAction())) {
                 fromNotiUrl = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
-                Log.d(TAG, ">> messageId = " + getIntent().getIntExtra("xxx", 0));
+                Log.d(TAG, ">> messageId = " + getIntent().getIntExtra("messageId", 0));
             } else if (Constants.ACTION_SHOW_NOTIFICATION_EMERGENCY_CALL.equals(getIntent().getAction())) {
                 final String lat = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LAT);
                 final String lon = getIntent().getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_EMERGENCY_LON);
@@ -294,7 +294,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
         String fromNotiUrl = null;
         if (intent != null && Constants.ACTION_SHOW_NOTIFICATION_CONTENTS.equals(intent.getAction())) {
             fromNotiUrl = intent.getStringExtra(Constants.EXTRA_SHOW_NOTIFICATION_CONTENTS);
-            Log.d(TAG, ">> messageId = " + getIntent().getIntExtra("xxx", 0));
+            Log.d(TAG, ">> messageId = " + getIntent().getIntExtra("messageId", 0));
         }
 
         String url = null;

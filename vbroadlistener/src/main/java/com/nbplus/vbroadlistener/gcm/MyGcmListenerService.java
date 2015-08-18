@@ -159,7 +159,7 @@ public class MyGcmListenerService extends GcmListenerService {
                     notificationId = Constants.BROADCAST_EVENT_NOTIFICATION_ID;
                 }
                 Log.d(TAG, ">>> notificationId = " + notificationId);
-                pi.putExtra("xxx", notificationId);
+                pi.putExtra("messageId", notificationId);
 
                 showNotification(this, notificationId, R.drawable.ic_notification_radio, PackageUtils.getApplicationName(this), payloadData.getAlertMessage(), null, pi);
                 break;
