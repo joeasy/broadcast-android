@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -213,6 +214,19 @@ public class NetworkUtils {
         return macAddressBytes;
     }
 
+    public static byte[] getHexDecimalAddress(Context context, String macAddressString) {
+        String[] macAddressParts = macAddressString.split(":");
+
+        // convert hex string to byte values
+        byte[] macAddressBytes = new byte[6];   // mac.length == 6 bytes
+        for(int i = 0; i < macAddressParts.length; i++) {
+            Integer hex = Integer.parseInt(macAddressParts[i], 16);
+            macAddressBytes[i] = hex.byteValue();
+        }
+
+        return macAddressBytes;
+    }
+
     public static String getMacAddress(Context context) {
         WifiManager wm = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
         return wm.getConnectionInfo().getMacAddress();
@@ -308,5 +322,19 @@ public class NetworkUtils {
                 ((i >> 16 ) & 0xFF) + "." +
                 ((i >> 8 ) & 0xFF) + "." +
                 ( i & 0xFF) ;
+    }
+
+    /**
+     * Wi-fi AP 정보
+     */
+    public static WifiInfo getCurrentWifiInfo(Context context) {
+        WifiInfo wifiInfo = null;
+
+        if (isConnectedWifi(context)) {
+            final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            wifiInfo = wifiManager.getConnectionInfo();
+        }
+
+        return wifiInfo;
     }
 }

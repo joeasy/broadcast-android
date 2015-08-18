@@ -206,7 +206,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 
     @Override
     public void messageReceived(PushBaseData data) {
-        Log.d(TAG, ">> TcpClient received from server = " + data.getMessageType());
+        Log.d(TAG, ">> TcpClient received from server(messageId) = " + data.getMessageId());
         Message msg = new Message();
         msg.what = PushConstants.HANDLER_MESSAGE_RECEIVE_PUSH_DATA;
         msg.obj = data;

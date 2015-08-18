@@ -108,6 +108,17 @@ public class DeviceUtils {
         return SHA1(macAddress);
     }
 
+    public static String getUuidFromMacAddress(Context context, String address) {
+        byte[] macAddress;
+
+        if (NetworkUtils.isWifiEnabled(context) == false) {
+            NetworkUtils.enableWifiNetwork(context);
+        }
+
+        macAddress = NetworkUtils.getHexDecimalAddress(context, address);
+        return SHA1(macAddress);
+    }
+
     private static String convertToHex(byte[] data) {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < data.length; i++) {

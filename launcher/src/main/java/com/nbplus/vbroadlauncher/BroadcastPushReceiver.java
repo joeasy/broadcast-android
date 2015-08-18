@@ -70,7 +70,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
             }
 
             String type = payloadData.getServiceType();
-            Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received = " + type);
+            Log.d(TAG, "HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED received type = " + type + ", messageId = " + payloadData.getMessageId());
             payloadData.setAlertMessage(data.getAlert());
             switch (type) {
                 // 방송알림

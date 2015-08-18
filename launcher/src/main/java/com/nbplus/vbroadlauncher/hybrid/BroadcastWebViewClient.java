@@ -1,13 +1,17 @@
 package com.nbplus.vbroadlauncher.hybrid;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -32,6 +36,7 @@ import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 
 import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
@@ -107,8 +112,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     public BroadcastWebViewClient(Activity activity, WebView view) {
         super(activity, view, activity.getString(R.string.app_name), activity.getString(R.string.app_name));
-        mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         mWebView.setWebViewClient(this);
+        mWebView.addJavascriptInterface(this, JAVASCRIPT_IF_NAME);
         mHandler = new BroadcastWebViewClientHandler(this);
     }
 
@@ -134,7 +139,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * @param data
      */
     @JavascriptInterface
-    public void setServerInfomation(String data) {
+    public void setServerInformation(String data) {
         Log.d(TAG, ">> setServerInfomation() received = " + data);
 
         if (StringUtils.isEmptyString(data)) {
@@ -315,6 +320,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
         mContext.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mIoTDiscoveringUrl = mWebView.getUrl();
                 // TODO : iot test
                 if (mWebView.getUrl().contains("/iot_test.html")) {
                     String devicesData = LauncherSettings.getInstance(mContext).getTestIoTDevices();
@@ -333,12 +339,16 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                         onUpdateIoTDevices(data);
                     }
                 } else {
-                    Intent intent = new Intent(mContext, IoTService.class);
-                    intent.setAction(com.nbplus.iotgateway.data.Constants.ACTION_GET_IOT_DEVICE_LIST);
-                    mContext.startService(intent);
-
-                    mIoTDiscoveringUrl = mWebView.getUrl();
                     showProgressDialog();
+                    final WifiInfo wifiInfo = NetworkUtils.getCurrentWifiInfo(mContext);
+                    if (wifiInfo != null) {
+                        Intent intent = new Intent(mContext, IoTService.class);
+                        intent.setAction(com.nbplus.iotgateway.data.Constants.ACTION_GET_IOT_DEVICE_LIST);
+                        mContext.startService(intent);
+                    } else {
+                        onUpdateIoTDevices("0997");
+                        showNetworkConnectionAlertDialog();
+                    }
                 }
             }
         });
@@ -371,11 +381,11 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
      * 검색된 IoT device 목록 전달
      * @param iotDevices device list
      */
-    public void onUpdateIoTDevices(String iotDevices) {
+    public void onUpdateIoTDevices(String result) {
         dismissProgressDialog();
-        Log.d(TAG, "call onUpdateIoTDevices() = " + iotDevices);
+        Log.d(TAG, "call onUpdateIoTDevices() result = " + result);
         mIoTDiscoveringUrl = null;
-        mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + iotDevices + "');");
+        mWebView.loadUrl("javascript:window.onUpdateIoTDevices('" + result + "');");
     }
 
     public void onCompleteTTSBroadcast() {
@@ -455,5 +465,23 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     }
     public void cancelUpdateIoTDevices() {
         mIoTDiscoveringUrl = null;
+    }
+    public void showNetworkConnectionAlertDialog() {
+        new AlertDialog.Builder(mContext).setMessage(R.string.alert_network_message)
+                .setTitle(R.string.alert_network_title)
+                .setCancelable(true)
+                .setNegativeButton(R.string.alert_network_btn_check_wifi,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                mContext.startActivity(new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK));
+                            }
+                        })
+                .setPositiveButton(R.string.alert_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                            }
+                        })
+                .show();
     }
 }
