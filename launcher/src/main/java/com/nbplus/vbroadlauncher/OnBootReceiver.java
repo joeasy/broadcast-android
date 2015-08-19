@@ -29,20 +29,20 @@ public class OnBootReceiver extends BroadcastReceiver {
                 Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())) {
             // do your thing here
             Log.i(TAG, "Intent.ACTION_BOOT_COMPLETED or android.intent.action.QUICKBOOT_POWERON received !!");
-            VBroadcastServer serverInfo = LauncherSettings.getInstance(context).getServerInformation();
-            if (serverInfo != null && StringUtils.isEmptyString(serverInfo.getPushInterfaceServer()) == false) {
-                ComponentName componentName = new ComponentName(context.getPackageName(), PushService.class.getName());
-                Intent i = new Intent();
-                i.setComponent(componentName);
-                i.setAction(PushConstants.ACTION_START_SERVICE);
-                i.putExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS, serverInfo.getPushInterfaceServer());
-                ComponentName serviceName = context.startService(i);
-                if (serviceName == null) {
-                    Log.e(TAG, "Could not start service " + componentName.toString());
-                } else {
-                    Log.d(TAG, "Start service " + componentName.toString());
-                }
-            }
+//            VBroadcastServer serverInfo = LauncherSettings.getInstance(context).getServerInformation();
+//            if (serverInfo != null && StringUtils.isEmptyString(serverInfo.getPushInterfaceServer()) == false) {
+//                ComponentName componentName = new ComponentName(context.getPackageName(), PushService.class.getName());
+//                Intent i = new Intent();
+//                i.setComponent(componentName);
+//                i.setAction(PushConstants.ACTION_START_SERVICE);
+//                i.putExtra(PushConstants.EXTRA_START_SERVICE_IFADDRESS, serverInfo.getPushInterfaceServer());
+//                ComponentName serviceName = context.startService(i);
+//                if (serviceName == null) {
+//                    Log.e(TAG, "Could not start service " + componentName.toString());
+//                } else {
+//                    Log.d(TAG, "Start service " + componentName.toString());
+//                }
+//            }
         }
     }
 }

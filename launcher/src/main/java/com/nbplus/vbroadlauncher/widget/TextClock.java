@@ -636,7 +636,6 @@ public class TextClock extends TextView {
     }
 
     public void onTimeChanged() {
-        Log.d("TextClock", ">> onTimeChanged...");
         long currTimems = System.currentTimeMillis();
         mTime.setTimeInMillis(currTimems);
 

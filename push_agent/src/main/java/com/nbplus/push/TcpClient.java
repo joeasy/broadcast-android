@@ -274,6 +274,16 @@ public class TcpClient {
             try {
                 mKeepAliveCheckSeconds = Integer.parseInt(mInterfaceData.keepAliveSeconds);
                 if (mKeepAliveCheckSeconds > 0) {
+                    /**
+                     * 8월 19일.
+                     * 단말상태가 ANR 일수도 있고.. 어떻게될지모르니..
+                     * 30분이상 1시간이내라면 3분줄이고 1시간이상이면 10분줄이자.
+                     */
+                    if (mKeepAliveCheckSeconds >= (60*30) && mKeepAliveCheckSeconds < (60*60)) {
+                        mKeepAliveCheckSeconds -= 60 * 3;
+                    } else if (mKeepAliveCheckSeconds >= (60*60)) {
+                        mKeepAliveCheckSeconds -= 60 * 10;
+                    }
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_CHECK_KEEP_ALIVE, mKeepAliveCheckSeconds * 1000);
                 }
             } catch (NumberFormatException e) {
@@ -356,6 +366,8 @@ public class TcpClient {
                                     receivedAuthKey = new String(messageBytes, 0, i, "utf-8");
                                 }
                                 if (mInterfaceData.deviceAuthKey != null && mInterfaceData.deviceAuthKey.equals(receivedAuthKey)) {
+                                    // 서버요청에 따라 연결후 바로 keep-alive
+                                    sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST));
                                     setKeepAliveHandler();
                                     if (mMessageListener != null) {
                                         //call the method messageReceived from MyActivity class
@@ -481,9 +493,34 @@ public class TcpClient {
                             break;
                         case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE :
                             Log.d(TAG, ">>> PUSH_MESSAGE_TYPE_KEEP_ALIVE_RESPONSE.");
-                            mDataIn.skipBytes(16);
                             mHandler.removeMessages(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE);
-                            setKeepAliveHandler();
+                            mDataIn.skipBytes(8);
+                            messageBytes = new byte[4];
+                            readBytes = mDataIn.read(messageBytes, 0, 4);
+                            if (readBytes > 0) {
+                                int i;
+                                for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
+                                if (i == 0) {
+                                    Log.d(TAG, "Error... keep-alive body read, but 0 len... reconnection!!");
+                                    isErrorOccurred = true;
+                                } else {
+                                    String str = new String(messageBytes, 0, i, "utf-8");
+                                    Log.d(TAG, "response code = " + str);
+                                    if (!StringUtils.isEmptyString(str) && PushConstants.RESULT_OK.equals(str)) {
+                                        setKeepAliveHandler();
+                                    } else {
+                                        isErrorOccurred = true;
+                                    }
+                                }
+
+                                /**
+                                 * correlator... skip..
+                                 */
+                                mDataIn.skipBytes(4);
+                            } else {
+                                Log.d(TAG, "Error... keep-alive body read failed.. reconnection!!");
+                                isErrorOccurred = true;
+                            }
                             break;
                         default:
                             Log.d(TAG, "UNKNOWN PUSH MESSAGE TYPE received !!");
