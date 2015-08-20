@@ -147,7 +147,11 @@ public class TcpClient {
                     byteBuffer.put(fillZero, 0, 20 - length);
                 }
                 mConnectionRequestId = mRequestMessageId;
-                mRequestMessageId++;
+                if (mRequestMessageId < Integer.MAX_VALUE) {
+                    mRequestMessageId++;
+                } else {
+                    mRequestMessageId = 0;
+                }
 
                 break;
             case PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST :
@@ -157,7 +161,11 @@ public class TcpClient {
                 byteBuffer.putInt(4);
                 byteBuffer.putInt(mRequestMessageId);
                 mKeepAliveRequestId = mRequestMessageId;
-                mRequestMessageId++;
+                if (mRequestMessageId < Integer.MAX_VALUE) {
+                    mRequestMessageId++;
+                } else {
+                    mRequestMessageId = 0;
+                }
                 break;
             case PushConstants.PUSH_MESSAGE_TYPE_PUSH_RESPONSE:
                 byteBuffer = ByteBuffer.allocate(17);        // 인터페이스설계서..
@@ -273,15 +281,16 @@ public class TcpClient {
         if (mInterfaceData != null && !StringUtils.isEmptyString(mInterfaceData.keepAliveSeconds)) {
             try {
                 mKeepAliveCheckSeconds = Integer.parseInt(mInterfaceData.keepAliveSeconds);
+                Log.d(TAG, ">> Keep-alive term seconds = " + mKeepAliveCheckSeconds);
                 if (mKeepAliveCheckSeconds > 0) {
                     /**
                      * 8월 19일.
                      * 단말상태가 ANR 일수도 있고.. 어떻게될지모르니..
                      * 30분이상 1시간이내라면 3분줄이고 1시간이상이면 10분줄이자.
                      */
-                    if (mKeepAliveCheckSeconds >= (60*30) && mKeepAliveCheckSeconds < (60*60)) {
+                    if (mKeepAliveCheckSeconds >= (60 * 30) && mKeepAliveCheckSeconds < (60 * 60)) {
                         mKeepAliveCheckSeconds -= 60 * 3;
-                    } else if (mKeepAliveCheckSeconds >= (60*60)) {
+                    } else if (mKeepAliveCheckSeconds >= (60 * 60)) {
                         mKeepAliveCheckSeconds -= 60 * 10;
                     }
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_CHECK_KEEP_ALIVE, mKeepAliveCheckSeconds * 1000);
@@ -368,7 +377,6 @@ public class TcpClient {
                                 if (mInterfaceData.deviceAuthKey != null && mInterfaceData.deviceAuthKey.equals(receivedAuthKey)) {
                                     // 서버요청에 따라 연결후 바로 keep-alive
                                     sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST));
-                                    setKeepAliveHandler();
                                     if (mMessageListener != null) {
                                         //call the method messageReceived from MyActivity class
                                         mMessageListener.onConnected();
@@ -397,6 +405,8 @@ public class TcpClient {
                                 } else {
                                     mInterfaceData.keepAliveSeconds = new String(messageBytes, 0, i, "utf-8");
                                 }
+                                mHandler.removeMessages(HANDLER_MESSAGE_WAIT_KEEP_ALIVE_RESPONSE);
+                                sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_REQUEST));
                                 setKeepAliveHandler();
                             }
                             sendMessage(getRequestMessage(PushConstants.PUSH_MESSAGE_TYPE_KEEP_ALIVE_CHANGE_RESPONSE, msgId, -1));
@@ -497,6 +507,10 @@ public class TcpClient {
                             mDataIn.skipBytes(8);
                             messageBytes = new byte[4];
                             readBytes = mDataIn.read(messageBytes, 0, 4);
+                            /**
+                             * correlator... skip..
+                             */
+                            int correlator = mDataIn.readInt();
                             if (readBytes > 0) {
                                 int i;
                                 for (i = 0; i < messageBytes.length && messageBytes[i] != 0; i++) { }
@@ -507,16 +521,15 @@ public class TcpClient {
                                     String str = new String(messageBytes, 0, i, "utf-8");
                                     Log.d(TAG, "response code = " + str);
                                     if (!StringUtils.isEmptyString(str) && PushConstants.RESULT_OK.equals(str)) {
-                                        setKeepAliveHandler();
+                                        if (correlator == mRequestMessageId - 1) {
+                                            Log.d(TAG, "Set next keep-alive handler !!!");
+                                            setKeepAliveHandler();
+                                        }
                                     } else {
                                         isErrorOccurred = true;
                                     }
                                 }
 
-                                /**
-                                 * correlator... skip..
-                                 */
-                                mDataIn.skipBytes(4);
                             } else {
                                 Log.d(TAG, "Error... keep-alive body read failed.. reconnection!!");
                                 isErrorOccurred = true;

@@ -459,6 +459,9 @@ public abstract class BasicWebViewClient extends WebViewClient {
      */
     @JavascriptInterface
     public void toast(String message, int duration) {
+        if (duration != Toast.LENGTH_LONG) {
+            duration = Toast.LENGTH_SHORT;
+        }
         Toast.makeText(mContext, message, duration).show();
     }
 
