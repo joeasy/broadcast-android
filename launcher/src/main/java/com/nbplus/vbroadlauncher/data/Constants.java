@@ -52,6 +52,9 @@ public class Constants {
     public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
 
     // weather open api key
+    // 개발계정.. 운영계정과동일하네..
+//    public static final String WEATHER_OPEN_API_KEY = "2GjUf7yXsE0w7ayKJ2jGnYctDTSyZYu1IoPphFuLaBq6Ij0as1Bks1KTLcVE7pqt9E76kdfLxtGc4ocQ9Lxpdg%3D%3D";
+    // 운영계정
     public static final String WEATHER_OPEN_API_KEY = "2GjUf7yXsE0w7ayKJ2jGnYctDTSyZYu1IoPphFuLaBq6Ij0as1Bks1KTLcVE7pqt9E76kdfLxtGc4ocQ9Lxpdg%3D%3D";
     // server
     public static final String WEATHER_SERVER_PREFIX = "http://newsky2.kma.go.kr/service/SecndSrtpdFrcstInfoService/";

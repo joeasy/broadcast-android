@@ -50,9 +50,15 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
         } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
             Log.d(TAG, "Receive.. broadcast ACTION_PUSH_MESSAGE_RECEIVED from push service. re-direct to activity!!!");
 
-            PushMessageData data = (PushMessageData)intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
-            if (data == null || StringUtils.isEmptyString(data.getPayload())) {
-                Log.d(TAG, "empty push message string !!");
+            PushMessageData data = null;
+            try {
+                data = (PushMessageData) intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);
+                if (data == null || StringUtils.isEmptyString(data.getPayload())) {
+                    Log.d(TAG, "empty push message string !!");
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
                 return;
             }
 
