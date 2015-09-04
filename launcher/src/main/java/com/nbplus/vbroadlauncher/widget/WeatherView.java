@@ -897,12 +897,15 @@ public class WeatherView extends LinearLayout {
             return;
         }
 
+        if (mForecastGribItems == null) {
+            return;
+        }
+
         ForecastItem item = null;
         int skyStatusValue = 1;
 
         item = getForecastItemCategory(mForecastGribItems, ForecastItem.SKY);
         if (item != null) {
-
             /**
              * 하늘상태 단위 - OpenAPI 활용 가이드(기상청_동네예보정보조회서비스)_v1.1.docx
              * ----------------------------------------------------------------
@@ -920,28 +923,31 @@ public class WeatherView extends LinearLayout {
             skyStatusValue = Integer.parseInt(item.obsrValue) - 1;
             // 강수형태를 가져온다.
             item = getForecastItemCategory(mForecastGribItems, ForecastItem.PTY);
-            int rainValue = 0;      // 하늘상태면 습도, 강수형태면 1시간 강수/적설량
-            int rainStatus = Integer.parseInt(item.obsrValue);
-            if (rainStatus > 0) {
-                skyStatusValue = BASE_SKY_STATUS_END_VALUE + rainStatus;
 
-                // 1시간 강수 또는 적설량
-                item = getForecastItemCategory(mForecastGribItems, ForecastItem.RN1);
-                if (item != null) {
-                    try {
-                        rainValue = Integer.parseInt(item.obsrValue);
-                    } catch (Exception e) {
-                        //
+            int rainValue = 0;      // 하늘상태면 습도, 강수형태면 1시간 강수/적설량
+            if (item != null) {
+                int rainStatus = Integer.parseInt(item.obsrValue);
+                if (rainStatus > 0) {
+                    skyStatusValue = BASE_SKY_STATUS_END_VALUE + rainStatus;
+
+                    // 1시간 강수 또는 적설량
+                    item = getForecastItemCategory(mForecastGribItems, ForecastItem.RN1);
+                    if (item != null) {
+                        try {
+                            rainValue = Integer.parseInt(item.obsrValue);
+                        } catch (Exception e) {
+                            //
+                        }
                     }
-                }
-            } else {
-                // 현재 습도
-                item = getForecastItemCategory(mForecastGribItems, ForecastItem.REH);
-                if (item != null) {
-                    try {
-                        rainValue = Integer.parseInt(item.obsrValue);
-                    } catch (Exception e) {
-                        //
+                } else {
+                    // 현재 습도
+                    item = getForecastItemCategory(mForecastGribItems, ForecastItem.REH);
+                    if (item != null) {
+                        try {
+                            rainValue = Integer.parseInt(item.obsrValue);
+                        } catch (Exception e) {
+                            //
+                        }
                     }
                 }
             }
@@ -1609,13 +1615,16 @@ public class WeatherView extends LinearLayout {
         if (mAttached) {
             Log.d(TAG, "onResumed()");
             mIsPaused = false;
+            updateForecastGribWeatherView();
+            updateYahooForecastView();
+
             releaseAlarm(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
             releaseAlarm(Constants.WEATHER_SERVICE_GRIB_UPDATE_ACTION);
             unregisterReceiver();
             registerReceiver();
             long currMs = System.currentTimeMillis();
             // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
-            if ((currMs - mLastUpdated) > 1000 * 60 * 60) {
+            if ((mForecastGribItems == null || mForecastGribItems.size() == 0) || (currMs - mLastUpdated) > 1000 * 60 * 60) {
                 if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
                     Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
                     getContext().sendBroadcast(intent);
