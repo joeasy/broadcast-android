@@ -1623,7 +1623,7 @@ public class WeatherView extends LinearLayout {
             unregisterReceiver();
             registerReceiver();
             long currMs = System.currentTimeMillis();
-            // 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
+            // 한번도 업데이트가 되지 않은 경우이거나 마지막 업데이트가 한시간 이상이라면 다시 가져온다.
             if ((mForecastGribItems == null || mForecastGribItems.size() == 0) || (currMs - mLastUpdated) > 1000 * 60 * 60) {
                 if (LauncherSettings.getInstance(getContext()).getPreferredUserLocation() != null) {
                     Intent intent = new Intent(Constants.WEATHER_SERVICE_DEFAULT_TIMER);
