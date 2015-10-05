@@ -1,0 +1,109 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+
+<title>autoplay test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+</head>
+<body>
+<script type="text/javascript">
+
+
+window.onload = function() {
+    getLocation();
+    var player = document.getElementById('myTune');
+    player.addEventListener("durationchange", onAudioDurationChange);
+    player.addEventListener("error", onAudioError);
+    player.addEventListener("ended", onAudioEnded);
+    player.play();
+}
+
+function onAudioDurationChange() {
+    var player = document.getElementById('myTune');
+    console.log(">> onAudioDurationChange = " + player.duration);
+    if (player.duration == 0) {
+        stopAudio();
+        window.nbplus.toast("파일을 재생할 수 없습니다.", 0);
+        window.setTimeout(function closeZeroDuration() {
+            closeWebApplication();
+        }, 3000);
+    }
+}
+
+function onAudioEnded() {
+    console.log(">> onAudioEnded");
+    stopAudio();
+}
+
+function onAudioError() {
+    console.log(">> onAudioEnded");
+    stopAudio();
+}
+
+function stopAudio() {
+    console.log(">> stopAudio");
+    var player = document.getElementById('myTune');
+    player.removeEventListener("error", onAudioError);
+    player.removeEventListener("ended", onAudioEnded);
+    player.pause();
+    player.currentTime = 0;
+    player.src = '';
+}
+
+var x = document.getElementById("demo");
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else { 
+        console.log("Geolocation is not supported by this browser.");
+    }
+}
+
+function showPosition(position) {
+    console.log("Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude);  
+}
+
+function showError(error) {
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            console.log("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            console.log("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            console.log("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            console.log("An unknown error occurred.");
+            break;
+    }
+}
+
+function onBackPressed () {
+    // body...
+    stopAudio();
+}
+
+function closeWebApplication() {
+    window.nbplus.closeWebApplication();
+}
+</script>
+<div id="content">
+
+  <audio id="myTune" controls> 
+    <source src="http://175.207.46.132:8080/upload/broadcast/20150817/brc33750.mp3">
+  </audio>
+
+</div>
+
+
+</body>
+</html>
+

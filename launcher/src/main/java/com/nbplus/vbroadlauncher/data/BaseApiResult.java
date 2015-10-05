@@ -13,6 +13,7 @@ public class BaseApiResult implements Parcelable {
     protected String resultCode;
     @SerializedName("RT_MSG")
     protected String resultMessage;
+
     @SerializedName("DROID_INTERNAL_DATA")
     protected Object object;
 
@@ -26,6 +27,14 @@ public class BaseApiResult implements Parcelable {
         return object;
     }
 
+
+    public void setResultCode(String resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public void setResultMessage(String resultMessage) {
+        this.resultMessage = resultMessage;
+    }
     public void setObject(Object object) {
         this.object = object;
     }

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test Register</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+</head>
+<body>
+  <div width='100%' height='100px'>
+      <label>WebView started at : </label><label id='start_time'></label>
+  </div>
+  <div width='100%' height='100px'>
+      <label>device id : </label><label id='device_id'></label>
+  </div>
+
+  <div id="buttonDiv"  width='100%' height='100%'>
+      <button type="button" onclick="controlMediaStream(1)" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">음성방송시작 테스트</button>
+      <button type="button" onclick="controlMediaStream(2)" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">음성방송일시정지 테스트</button>
+      <button type="button" onclick="controlMediaStream(3)" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">음성방송종료 테스트</button>
+      <button type="button" onclick="controlMediaStream(4)" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">문자방송시작 테스트</button>
+      <button type="button" onclick="controlMediaStream(3)" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">문자방송종료 테스트</button>
+      <button type="button" onclick="closeWebApplication()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">웹App 종료</button>
+  </div>
+</body>
+<script type="text/javascript">
+window.onload = function() {
+	var deviceId = undefined;
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		//console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+		deviceId = window.nbplus.getDeviceId();
+	} else {
+		console.log(">>window.nbplus.getDeviceId() not found !!!");
+	}
+	document.getElementById('start_time').innerText = new Date().getTime();
+	document.getElementById('device_id').innerText = deviceId;
+}
+
+function controlMediaStream(event) {
+    switch (event) {
+        case 1 :
+            if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+                window.nbplus.onStartBroadcastMediaStream(false, null);
+            } else {
+                console.log(">>window.nbplus.onStartBroadcastMediaStream() not found !!!");
+            }
+            break;
+        case 2 :
+            if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+                window.nbplus.onPauseBroadcastMediaStream();
+            } else {
+                console.log(">>window.nbplus.onPauseBroadcastMediaStream() not found !!!");
+            }
+            break;
+        case 3 :
+            if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+                window.nbplus.onStopBroadcastMediaStream();
+            } else {
+                console.log(">>window.nbplus.onStopBroadcastMediaStream() not found !!!");
+            }
+            break;
+        case 4 :
+            if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+                var text = "누구에게나 결함은 있단다.\n" + "그리고 고치려고 해도\n" +  "때로 자기 힘으로는 어쩔 수 없는 결함도 있지.\n" + 
+"집이 가난하다거나 다리가 부자유스러운 것은\n" + 
+"그 아이로서도 어쩔 수 없는 부분이다.\n" +  
+"네가 머리를 감는데도 \n" + 
+"머리 냄새가 나는 것과 똑같이.\n" + 
+"우리 모두는 저마다 모양이 다른 결함들을 \n" + 
+"지니고 산단다.\n" + 
+"하지만 결함이 때로는 고마운 것이 되기도 한단다. \n" + 
+"세상일이란, \n" + 
+"이해하려고 노력해서 이해할 수 있는 것도 있지만\n" + 
+"이해하려고 애쓰지 않아도 \n" + 
+"저절로 이해할 수 있는 것이 있더라.\n" + 
+"그건 자기 결함 때문에 괴로움을 겪어 봤거나\n" + 
+"자기 결함을 숨기지 않고 인정하는 사람이라면\n" + 
+"가질 수 있는 이해심이지.\n" + 
+"너의 머리 냄새가 \n" + 
+"다른 사람을 쉽게 이해할 수 있는\n" + 
+"아주 고마운 것이 되기를 엄마는 진정으로 바란다.\n";
+                window.nbplus.onStartBroadcastMediaStream(true, text);
+            } else {
+                console.log(">>window.nbplus.onStartBroadcastMediaStream() not found !!!");
+            }
+            break;
+    }
+}
+
+function onCompleteTTSBroadcast() {
+        console.log(">> onCompleteTTSBroadcast() received !!!");
+}
+
+function updateIoTDevices() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined' && typeof window.nbplus.updateIoTDevices != 'undefined') {
+        //console.log(">>window.nbplus.registerPushApplication() = " + TEST_APP_ID);
+        window.nbplus.updateIoTDevices();
+    } else {
+        console.log(">>window.nbplus.registerGcm() not found !!!");
+    }
+}
+function closeWebApplication() {
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		console.log(">>window.nbplus.closeWebApplication()");
+		window.nbplus.closeWebApplication();
+	} else {
+		console.log(">>window.nbplus.closeWebApplication() not found !!!");
+	}
+}
+
+function onBackPressed() {
+	console.log("onBackPressed() received from native");
+	closeWebApplication();
+}
+
+</script>
+</html>

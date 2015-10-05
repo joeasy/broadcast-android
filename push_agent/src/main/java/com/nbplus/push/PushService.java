@@ -123,8 +123,8 @@ public class PushService extends Service {
                     Log.d(TAG, ">> Already reconnected. ignore retry message !!!");
                     return;
                 }
+                mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                 if (NetworkUtils.isConnected(this)) {
-                    mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                     getPushGatewayInformationFromServer();
                 }
                 break;
@@ -382,19 +382,16 @@ public class PushService extends Service {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, ">>> get PushInterfaceData error");
-//                mApiRetryCount++;
-//                if (mApiRetryCount > 3) {     // retry 3 times
-//                    mApiRetryCount = 0;
-//                    Log.d(TAG, ">> 3 회재시도 실패.... 더이상조회할게없다. !!!");
-//                } else {                // retry
-//                    Log.d(TAG, ">> 재시도를한다.  retry count = " + mApiRetryCount);
-//
-//                    Message message = new Message();
-//                    message.what = PushConstants.HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA;
-//                    message.obj = null;
-//                    mHandler.sendMessage(message);
-//                }
+                /**
+                 * 2015.10.05
+                 * 실패시 1분후에 재시도 하도록 한다.
+                 */
+                Log.d(TAG, ">>> get PushInterfaceData error... retry connection after 1 minutes...");
+                if (mPushRunnable.getState() != PushRunnable.State.Stopped) {
+                    mPushRunnable.releasePushClientSocket(false);
+                }
+                mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
+                mHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
             }
         });
         gsonRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));

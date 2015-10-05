@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test Register</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+</head>
+<body>
+  <div width='100%' height='100px'>
+      <label>WebView started at : </label><label id='start_time'></label>
+  </div>
+  <div width='100%' height='100px'>
+      <label>device id : </label><label id='device_id'></label>
+  </div>
+  <div width='100%' height='100px'>
+      <label>GCM token : </label><label id='gcm_token'></label>
+  </div>
+
+  <div id="buttonDiv"  width='100%' height='100%'>
+      <button type="button" onclick="setApplicationData()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">setApplicationData()</button>
+      <button type="button" onclick="updateIoTDevices()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">updateIoTDevices()</button>
+      <button type="button" onclick="closeWebApplication()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">closeWebApplication()</button>
+  </div>
+</body>
+<script type="text/javascript">
+window.onload = function() {
+	var deviceId = undefined;
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		//console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+		deviceId = window.nbplus.getDeviceId();
+	} else {
+		console.log(">>window.nbplus.getDeviceId() not found !!!");
+	}
+	document.getElementById('start_time').innerText = new Date().getTime();
+	document.getElementById('device_id').innerText = deviceId;
+}
+
+function setApplicationData() {
+	var TEST_APP_DATA ="{ \"svc_domain\":{\"api_server\":\"http://175.207.46.132:8080\", \"doc_server\":\"http://175.207.46.132:8080\", \"push_if_server\":\"http://175.207.46.132:8080\"}}";
+
+	//console.log(">> TEST_APP_DATA = " + TEST_APP_DATA);
+
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		//console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+		window.nbplus.setServerInformation(TEST_APP_DATA);
+	} else {
+		console.log(">>window.nbplus.setServerInformation() not found !!!");
+	}
+}
+function updateIoTDevices() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined' && typeof window.nbplus.updateIoTDevices != 'undefined') {
+        //console.log(">>window.nbplus.registerPushApplication() = " + TEST_APP_ID);
+        window.nbplus.updateIoTDevices();
+    } else {
+        console.log(">>window.nbplus.registerGcm() not found !!!");
+    }
+}
+function closeWebApplication() {
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		console.log(">>window.nbplus.closeWebApplication()");
+		window.nbplus.closeWebApplication();
+	} else {
+		console.log(">>window.nbplus.closeWebApplication() not found !!!");
+	}
+}
+
+function onBackPressed() {
+	console.log("onBackPressed() received from native");
+	closeWebApplication();
+}
+
+function onRegistered(token) {
+    console.log("onRegistered() received token = " + token);
+    document.getElementById('gcm_token').innerText = token;
+}
+
+function onUnRegistered() {
+    console.log("onUnRegistered() received");
+}
+
+function onUpdateIoTDevices(deviceList) {
+    console.log("onUpdateIoTDevices() called" + deviceList);
+}
+
+</script>
+</html>

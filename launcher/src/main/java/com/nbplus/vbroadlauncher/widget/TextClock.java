@@ -99,6 +99,7 @@ import static android.widget.RemoteViews.RemoteView;
  */
 @RemoteView
 public class TextClock extends TextView {
+    private static final String TAG = TextClock.class.getSimpleName();
     /**
      * The default formatting pattern in 12-hour mode. This pattern is used
      * if {@link #setFormat12Hour(CharSequence)} is called with a null pattern
@@ -141,6 +142,7 @@ public class TextClock extends TextView {
 
     private boolean mAttached;
     private boolean mRegistered;
+    private boolean mResumed;
 
     private Calendar mTime;
     private String mTimeZone;
@@ -149,13 +151,17 @@ public class TextClock extends TextView {
         @Override
         public void onChange(boolean selfChange) {
             chooseFormat();
-            onTimeChanged();
+            if (mResumed) {
+                onTimeChanged();
+            }
         }
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             chooseFormat();
-            onTimeChanged();
+            if (mResumed) {
+                onTimeChanged();
+            }
         }
     };
 
@@ -165,8 +171,12 @@ public class TextClock extends TextView {
             if (mTimeZone == null && Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
                 final String timeZone = intent.getStringExtra("time-zone");
                 createTime(timeZone);
+            } else if (Intent.ACTION_TIME_CHANGED.equals(intent.getAction())) {
+                chooseFormat();
             }
-            onTimeChanged();
+            if (mResumed) {
+                onTimeChanged();
+            }
         }
     };
 
@@ -180,6 +190,7 @@ public class TextClock extends TextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
+    private boolean mTickerIsRunning = false;
 
     /**
      * Creates a new clock using the default patterns for the current locale.
@@ -478,8 +489,18 @@ public class TextClock extends TextView {
         mHasSeconds = hasSeconds(mFormat);
 
         if (handleTicker && mAttached && hadSeconds != mHasSeconds) {
-            if (hadSeconds) getHandler().removeCallbacks(mTicker);
-            else mTicker.run();
+            if (hadSeconds) {
+                if (mTickerIsRunning) {
+                    getHandler().removeCallbacks(mTicker);
+                    mTickerIsRunning = false;
+                }
+            }
+            else {
+                if (!mTickerIsRunning) {
+                    mTicker.run();
+                    mTickerIsRunning = true;
+                }
+            }
         }
     }
 
@@ -571,15 +592,20 @@ public class TextClock extends TextView {
             mAttached = true;
 
             if (!mRegistered) {
-                registerReceiver();
+                registerReceiver(true);
                 registerObserver();
                 mRegistered = true;
             }
 
+            mResumed = true;
+
             createTime(mTimeZone);
 
             if (mHasSeconds) {
-                mTicker.run();
+                if (!mTickerIsRunning) {
+                    mTicker.run();
+                    mTickerIsRunning = true;
+                }
             } else {
                 onTimeChanged();
             }
@@ -595,34 +621,47 @@ public class TextClock extends TextView {
             if (mRegistered) {
                 unregisterReceiver();
                 unregisterObserver();
+                mRegistered = false;
             }
 
-            getHandler().removeCallbacks(mTicker);
+            if (mTickerIsRunning) {
+                getHandler().removeCallbacks(mTicker);
+                mTickerIsRunning = false;
+            }
 
             mAttached = false;
         }
     }
 
-    private void registerReceiver() {
+    private void registerReceiver(boolean withTimeTick) {
+        unregisterReceiver();
         final IntentFilter filter = new IntentFilter();
 
-        filter.addAction(Intent.ACTION_TIME_TICK);
+        if (withTimeTick) {
+            filter.addAction(Intent.ACTION_TIME_TICK);
+        }
         filter.addAction(Intent.ACTION_TIME_CHANGED);
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
 
-        getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
+        try {
+            getContext().registerReceiver(mIntentReceiver, filter/*, null, getHandler()*/);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void registerObserver() {
-        final ContentResolver resolver = getContext().getContentResolver();
-        resolver.registerContentObserver(Settings.System.CONTENT_URI, true, mFormatChangeObserver);
+        if (!mRegistered) {
+            final ContentResolver resolver = getContext().getContentResolver();
+            resolver.registerContentObserver(Settings.System.CONTENT_URI, true, mFormatChangeObserver);
+        }
     }
 
     private void unregisterReceiver() {
         try {
             getContext().unregisterReceiver(mIntentReceiver);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -682,32 +721,50 @@ public class TextClock extends TextView {
         setText(span);
     }
 
+    /**
+     * TODO ::
+     * 액티비티가 pause/resume 되는것에 따라서 broadcast receiver 를 register/unregister 하는경우에
+     * "앱스" 액티비티나 타앱을 실행중인상태에서 홈키를누르면 런처앱이 재실행 되는 경우가 있다.
+     * 이때 register 이전에 항상 unregister를하도록 했지만... 무슨 이유에서인지
+     * IntentRecieverLeakedException 이 발생하면서 비정상 종료되는 케이스가발생한다.
+     *
+     * 왜일까?????????
+     * 원인을 알기전까지는 onAttach / onDetach 에서만 처리하고 resume 여부에따라서 onTimeChanged()를 호출하게 하자.
+     */
     public void onResumed() {
         Log.d("TextClock", "onResumed()");
         if (mAttached) {
-            if (!mRegistered) {
-                registerReceiver();
-                registerObserver();
-
-                if (mHasSeconds) {
+            mResumed = true;
+//            if (!mRegistered) {
+////                registerReceiver(true);
+//                registerObserver();
+//
+//                mRegistered = true;
+//            }
+            if (mHasSeconds) {
+                if (!mTickerIsRunning) {
                     mTicker.run();
-                } else {
-                    onTimeChanged();
+                    mTickerIsRunning = true;
                 }
-                mRegistered = true;
+            } else {
+                onTimeChanged();
             }
         }
     }
     public void onPaused() {
-        Log.d("TextClock", "onPaused()");
+        Log.d("TextClock", "onPaused() mAttched = " + mAttached + ", mRegistered = " + mRegistered);
         if (mAttached) {
-            if (mRegistered) {
-                unregisterReceiver();
-                unregisterObserver();
-                mRegistered = false;
-            }
+            mResumed = false;
+//            if (mRegistered) {
+//                //registerReceiver(false);
+//                unregisterObserver();
+//                mRegistered = false;
+//            }
             if (mHasSeconds) {
-                getHandler().removeCallbacks(mTicker);
+                if (mTickerIsRunning) {
+                    getHandler().removeCallbacks(mTicker);
+                    mTickerIsRunning = false;
+                }
             }
         }
     }

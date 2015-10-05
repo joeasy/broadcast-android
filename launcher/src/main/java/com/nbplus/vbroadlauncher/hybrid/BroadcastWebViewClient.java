@@ -34,6 +34,7 @@ import com.nbplus.vbroadlauncher.data.IoTDevicesData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
+import com.nbplus.vbroadlauncher.fragment.LoadIoTDevicesDialogFragment;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.NetworkUtils;
@@ -56,6 +57,9 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     BroadcastPlayState mBroadcastPlayState = BroadcastPlayState.STOPPED;
     TextToSpeechHandler mText2SpeechHandler = null;
     String mText2SpeechPlayText = null;
+
+    // update iot device dialog
+    LoadIoTDevicesDialogFragment mLoadIoTDevicesDialogFragment;
 
     String mIoTDiscoveringUrl = null;
 
@@ -290,6 +294,8 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
             mContext.startService(i);
             mIsClosingByWebApp = true;
         }
+        dismissProgressDialog();
+        dismissUpdateIoTDevicesDialog();
         ((BroadcastWebViewActivity)mContext).finishActivity();
     }
 
@@ -315,45 +321,19 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @JavascriptInterface
     public void updateIoTDevices() {
         Log.d(TAG, "call updateIoTDevices()");
-        // TODO : iot test
-
         mContext.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mIoTDiscoveringUrl = mWebView.getUrl();
-                // TODO : iot test
-                if (mWebView.getUrl().contains("/iot_test.html")) {
-                    String devicesData = LauncherSettings.getInstance(mContext).getTestIoTDevices();
-                    if (!StringUtils.isEmptyString(devicesData)) {
-                        onUpdateIoTDevices(devicesData);
-                    } else {
-                        long ts = System.currentTimeMillis();
-                        String data = "{ \"DEVICE_ID\":\"" + LauncherSettings.getInstance(mContext).getDeviceID() +
-                                "\", \"IOT_DEVICE_INFO\" : [" +
-                                "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + ts +
-                                "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST01\" }," +
-                                "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 1) +
-                                "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST02\" }," +
-                                "{ \"IOT_DEVICE_ID\":\"10000000000-100-" + (ts + 2) +
-                                "\", \"IOT_DEVICE_MAKER\":\"\", \"IOT_DEVICE_MODEL\":\"\", \"IOT_DEVICE_NAME\":\"TEST03\" }]}";
-                        onUpdateIoTDevices(data);
-                    }
+                if (com.nbplus.iotgateway.data.Constants.USE_IOT_GATEWAY) {
+                    showUpdateIoTDevicesDialog();
                 } else {
-                    showProgressDialog();
-                    final WifiInfo wifiInfo = NetworkUtils.getCurrentWifiInfo(mContext);
-                    if (wifiInfo != null) {
-                        Intent intent = new Intent(mContext, IoTService.class);
-                        intent.setAction(com.nbplus.iotgateway.data.Constants.ACTION_GET_IOT_DEVICE_LIST);
-                        mContext.startService(intent);
-                    } else {
-                        onUpdateIoTDevices("0997");
-                        showNetworkConnectionAlertDialog();
-                    }
+                    ((BroadcastWebViewActivity)mContext).checkBluetoothEnabled();
                 }
             }
         });
-
     }
+
     ////////////////////////////////
     /**
      * 아래의 함수들은 자바스크립트를 Native 에서 호출할 필요가 있을때 사용한다.
@@ -379,7 +359,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 
     /**
      * 검색된 IoT device 목록 전달
-     * @param iotDevices device list
+     * @param result device list
      */
     public void onUpdateIoTDevices(String result) {
         dismissProgressDialog();
@@ -483,5 +463,42 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                             }
                         })
                 .show();
+    }
+    // progress bar
+    public void showUpdateIoTDevicesDialog() {
+        if (com.nbplus.iotgateway.data.Constants.USE_IOT_GATEWAY) {
+            final boolean wifiEnabled = NetworkUtils.isWifiEnabled(mContext);
+            if (wifiEnabled) {
+                try {
+                    dismissProgressDialog();
+                    mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
+                    mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                onUpdateIoTDevices("0997");
+                showNetworkConnectionAlertDialog();
+            }
+        } else {
+            try {
+                dismissProgressDialog();
+                mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
+                mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    protected void dismissUpdateIoTDevicesDialog() {
+        try {
+            if (mLoadIoTDevicesDialogFragment != null) {
+                mLoadIoTDevicesDialogFragment.dismiss();
+            }
+            mLoadIoTDevicesDialogFragment = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

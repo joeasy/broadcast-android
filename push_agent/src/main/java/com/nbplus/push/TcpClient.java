@@ -286,13 +286,13 @@ public class TcpClient {
                     /**
                      * 8월 19일.
                      * 단말상태가 ANR 일수도 있고.. 어떻게될지모르니..
-                     * 30분이상 1시간이내라면 3분줄이고 1시간이상이면 10분줄이자.
+                     * 30분이상 이면 1분 줄이자. //1시간이내라면 1분줄이고 1시간이상이면 2분줄이자.
                      */
-                    if (mKeepAliveCheckSeconds >= (60 * 30) && mKeepAliveCheckSeconds < (60 * 60)) {
-                        mKeepAliveCheckSeconds -= 60 * 3;
-                    } else if (mKeepAliveCheckSeconds >= (60 * 60)) {
-                        mKeepAliveCheckSeconds -= 60 * 10;
-                    }
+                    if (mKeepAliveCheckSeconds >= (60 * 30)/* && mKeepAliveCheckSeconds < (60 * 60)*/) {
+                        mKeepAliveCheckSeconds -= 60 * 1;
+                    } /*else if (mKeepAliveCheckSeconds >= (60 * 60)) {
+                        mKeepAliveCheckSeconds -= 60 * 2;
+                    }*/
                     mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_CHECK_KEEP_ALIVE, mKeepAliveCheckSeconds * 1000);
                 }
             } catch (NumberFormatException e) {

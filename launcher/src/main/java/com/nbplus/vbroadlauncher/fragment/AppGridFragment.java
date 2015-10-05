@@ -157,8 +157,14 @@ public class AppGridFragment extends Fragment implements AdapterView.OnItemClick
         String packageName = viewHolder.appInfo.packageName;
         Intent startIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
 
-        if(startIntent != null){
-            startActivity(startIntent);
+        if(startIntent != null) {
+            // 런처앱을 다시 누를경우,, onDestroy 는호출되지만 다시 액티비티가 시작되지않는 경우가 발생한다.
+            // 홈키누른것과 같은 효과를 내도록 액티비티를 종료한다.
+            if (packageName != null && packageName.equals(getActivity().getApplication().getPackageName())) {
+                getActivity().finish();
+            } else {
+                startActivity(startIntent);
+            }
         }
     }
 

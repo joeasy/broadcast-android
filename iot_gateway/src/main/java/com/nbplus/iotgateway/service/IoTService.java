@@ -2,9 +2,11 @@ package com.nbplus.iotgateway.service;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -13,6 +15,7 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.nbplus.iotgateway.bluetooth.BluetoothLeService;
 import com.nbplus.iotgateway.data.Constants;
 import com.nbplus.iotgateway.data.IoTDevice;
 import com.nbplus.iotgateway.data.IoTGateway;
@@ -36,6 +39,7 @@ public class IoTService extends Service {
     // device from shutting off the Wifi radio
     WifiManager.WifiLock mWifiLock;
     boolean mLastConnectionStatus = false;          // network status
+    private BluetoothLeService mBluetoothLeService;
 
     private IoTServiceHandler mHandler = new IoTServiceHandler(this);
     // 핸들러 객체 만들기
@@ -88,6 +92,29 @@ public class IoTService extends Service {
 
     };
 
+    // Code to manage Service lifecycle.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            Log.d(TAG, "onServiceConnected()");
+            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            if (!mBluetoothLeService.initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth");
+                //finish();
+                return;
+            }
+            // Automatically connects to the device upon successful start-up initialization.
+            //mBluetoothLeService.connect(mDeviceData.getBluetoothDevice().getAddress());
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBluetoothLeService = null;
+        }
+    };
+
     @Override
     public void onCreate() {
         Log.i(TAG, "debug: Creating service");
@@ -109,6 +136,8 @@ public class IoTService extends Service {
      * this is the method that gets called. So here we react appropriately depending on the
      * Intent's action, which specifies what is being requested of us.
      */
+
+    private static int num = 0;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = null;
@@ -127,32 +156,141 @@ public class IoTService extends Service {
                 long ts = System.currentTimeMillis();
                 ArrayList<IoTDevice> testDevices = new ArrayList<>();
                 IoTDevice device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + ts);
-                device.setDeviceName("TEST01");
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
                 device.setDeviceVendor("11");
                 device.setDeviceModel("22");
+                device.setDeviceType("IR");
                 testDevices.add(device);
 
                 device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (ts + 1));
-                device.setDeviceName("TEST02");
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
                 device.setDeviceVendor("11");
                 device.setDeviceModel("22");
+                device.setDeviceType("IR");
                 testDevices.add(device);
 
                 device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (ts + 2));
-                device.setDeviceName("TEST03");
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
                 device.setDeviceVendor("11");
                 device.setDeviceModel("22");
+                device.setDeviceType("IR");
                 testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("ZW");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("ZW");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("ZW");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("ZW");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("ZW");
+                testDevices.add(device);
+
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
+                device = new IoTDevice();
+                device.setDeviceId("10000000000-100-" + (++ts));
+                device.setDeviceName(String.format("TEST%02d", (++num)));
+                device.setDeviceVendor("11");
+                device.setDeviceModel("22");
+                device.setDeviceType("BT");
+                testDevices.add(device);
+
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Constants.ACTION_IOT_DEVICE_LIST);
-                IoTGateway iotGateway = new IoTGateway();
-                sendIntent.putExtra(Constants.EXTRA_IOT_GATEWAY_DATA, iotGateway);
-                intent.putParcelableArrayListExtra(Constants.EXTRA_IOT_DEVICE_LIST, testDevices);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//                IoTGateway iotGateway = new IoTGateway();
+//                sendIntent.putExtra(Constants.EXTRA_IOT_GATEWAY_DATA, iotGateway);
+                sendIntent.putParcelableArrayListExtra(Constants.EXTRA_IOT_DEVICE_LIST, testDevices);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(sendIntent);
                 break;
             case Constants.ACTION_SEND_IOT_COMMAND :
                 Log.d(TAG, ">> ACTION_SEND_IOT_COMMAND device id = " + intent.getStringExtra(Constants.EXTRA_IOT_SEND_COMM_DEVICE_ID));

@@ -54,4 +54,10 @@
         <item>금</item>
         <item>토</item>
     </string-array>
+    <string-array name="iot_device_type">
+        <item>알 수 없는 장치</item>
+        <item>IR 리모콘</item>
+        <item>블루투스 장치</item>
+        <item>Z-Wave 장치</item>
+    </string-array>
 </resources>

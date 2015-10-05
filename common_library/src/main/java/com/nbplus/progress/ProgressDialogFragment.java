@@ -5,6 +5,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import org.basdroid.common.R;
 
@@ -19,13 +23,16 @@ public class ProgressDialogFragment extends DialogFragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         final ProgressDialog dialog = new ProgressDialog(getActivity());
-        dialog.setContentView(R.layout.dialogfragment_progress);
-        //dialog.setIndeterminate(true);
-        dialog.setCancelable(false);
 
+        dialog.setCancelable(false);
         this.setCancelable(false);
 
         // Disable the back button
