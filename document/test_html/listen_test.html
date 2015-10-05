@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test Register</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+</head>
+<body>
+  <div width='100%' height='100px'>
+      <label>WebView started at : </label><label id='start_time'></label>
+  </div>
+  <div width='100%' height='100px'>
+      <label>device id : </label><label id='device_id'></label>
+  </div>
+  <div width='100%' height='100px'>
+      <label>GCM token : </label><label id='gcm_token'></label>
+  </div>
+  <div width='100%' height='100px'>
+      <label>Line number : </label><label id='line_number'></label>
+  </div>
+
+  <div id="buttonDiv"  width='100%' height='100%'>
+      <button type="button" onclick="setVillageName()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">setVillageName()</button>
+      <button type="button" onclick="setServerInformation()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">setServerInformation()</button>
+      <button type="button" onclick="registerGcm()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">registerGcm()</button>
+      <button type="button" onclick="unRegisterGcm()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">unRegisterGcm()</button>
+      <button type="button" onclick="updateIoTDevices()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">updateIoTDevices()</button>
+      <button type="button" onclick="closeWebApplication()" style="display: block; width: 100%; height: 30px; margin-bottom: 20px">closeWebApplication()</button>
+  </div>
+</body>
+<script type="text/javascript">
+window.onload = function() {
+	var deviceId = undefined;
+  var line_number;
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		//console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+		deviceId = window.nbplus.getDeviceId();
+    line_number = window.nbplus.getLineNumber();
+	} else {
+		console.log(">>window.nbplus.getDeviceId() not found !!!");
+	}
+	document.getElementById('start_time').innerText = new Date().getTime();
+  document.getElementById('device_id').innerText = deviceId;
+	document.getElementById('line_number').innerText = line_number;
+}
+
+function setServerInformation() {
+	var TEST_APP_DATA ="{ \"api_server\":\"http://175.207.46.132:8010\", \"doc_server\":\"http://175.207.46.132:8010\", \"push_if_server\":\"http://175.207.46.132:8010\"}";
+
+	//console.log(">> TEST_APP_DATA = " + TEST_APP_DATA);
+
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		//console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+		window.nbplus.setServerInformation(TEST_APP_DATA);
+	} else {
+		console.log(">>window.nbplus.setServerInformation() not found !!!");
+	}
+}
+function setVillageName() {
+
+  if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+    //console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+    window.nbplus.setVillageName("test_name");
+  } else {
+    console.log(">>window.nbplus.setVillageName()) not found !!!");
+  }
+}
+function registerGcm() {
+	if (window.nbplus != null && typeof window.nbplus != 'undefined' && typeof window.nbplus.registerGcm != 'undefined') {
+		//console.log(">>window.nbplus.registerPushApplication() = " + TEST_APP_ID);
+		if (window.nbplus.registerGcm() == false) {
+            console.log("not supported........")
+        }
+	} else {
+		console.log(">>window.nbplus.registerGcm() not found !!!");
+	}
+}
+function unRegisterGcm() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined' && typeof window.nbplus.unRegisterGcm != 'undefined') {
+        //console.log(">>window.nbplus.registerPushApplication() = " + TEST_APP_ID);
+        if (window.nbplus.unRegisterGcm() == false) {
+            console.log("not supported........")
+        }
+    } else {
+        console.log(">>window.nbplus.registerGcm() not found !!!");
+    }
+}
+function updateIoTDevices() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined' && typeof window.nbplus.updateIoTDevices != 'undefined') {
+        //console.log(">>window.nbplus.registerPushApplication() = " + TEST_APP_ID);
+        window.nbplus.updateIoTDevices();
+    } else {
+        console.log(">>window.nbplus.registerGcm() not found !!!");
+    }
+}
+function closeWebApplication() {
+	if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+		console.log(">>window.nbplus.closeWebApplication()");
+		window.nbplus.closeWebApplication();
+	} else {
+		console.log(">>window.nbplus.closeWebApplication() not found !!!");
+	}
+}
+
+function onBackPressed() {
+	console.log("onBackPressed() received from native");
+	closeWebApplication();
+}
+
+function onRegistered(token) {
+    console.log("onRegistered() received token = " + token);
+    document.getElementById('gcm_token').innerText = token;
+}
+
+function onUnRegistered() {
+    console.log("onUnRegistered() received");
+}
+
+function onUpdateIoTDevices(deviceList) {
+    console.log("onUpdateIoTDevices() called" + deviceList);
+}
+
+</script>
+</html>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <integer name="iot_grid_numcolumns">5</integer>
     <integer name="app_grid_numcolumns">5</integer>
     <integer name="app_grid_numrows">7</integer>
     <integer name="radio_grid_numcolumns">3</integer>

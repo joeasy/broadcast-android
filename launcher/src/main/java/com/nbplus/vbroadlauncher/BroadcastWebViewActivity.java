@@ -1,13 +1,17 @@
 package com.nbplus.vbroadlauncher;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -125,13 +130,30 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 case Constants.ACTION_BROWSER_ACTIVITY_CLOSE :
                     mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
                     break;
-                case com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST :
+                case Constants.ACTION_IOT_DEVICE_LIST :
                     if (mWebViewClient == null || !mWebViewClient.isUpdateIoTDevices()) {
+                        return;
+                    }
+
+                    boolean isCanceled = intent.getBooleanExtra(Constants.EXTRA_IOT_DEVICE_CANCELED, false);
+                    if (isCanceled) {           // 사용자가 업데이트를 취소한 경우
+                        Log.d(TAG, "User cancel... use last updated..");
+//                        Message msg = new Message();
+//                        msg.what = Constants.HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK;
+//                        BaseApiResult result = new BaseApiResult();
+//                        result.setResultCode("1000");
+//                        msg.obj = result;
+//                        mHandler.sendMessage(msg);
                         return;
                     }
                     ArrayList<IoTDevice> iotDevicesList = intent.getParcelableArrayListExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_DEVICE_LIST);
                     if (iotDevicesList == null) {
                         iotDevicesList = new ArrayList<>();
+                    }
+
+                    if (iotDevicesList.size() == 0) {
+                        Log.d(TAG, "No device found.. Do not anything...");
+                        return;
                     }
 
                     IoTDevicesData data = new IoTDevicesData();
@@ -172,7 +194,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
-        filter.addAction(com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST);
+        filter.addAction(Constants.ACTION_IOT_DEVICE_LIST);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
         Intent i = getIntent();
@@ -326,7 +348,92 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     LauncherSettings.getInstance(this).setIsCheckedTTSEngine(true);
                 }
                 break;
+            case Constants.START_ACTIVITY_REQUEST_ENABLE_BT:
+                // User chose not to enable Bluetooth.
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    new AlertDialog.Builder(this).setMessage(R.string.alert_bluetooth_enable_message)
+                            //.setTitle(R.string.alert_network_title)
+                            .setCancelable(true)
+                            .setPositiveButton(R.string.alert_ok,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            mWebViewClient.onUpdateIoTDevices("0997");
+                                            dialog.dismiss();
+                                        }
+                                    })
+                            .show();
+                } else {
+                    /**
+                     * 버그라고 할 건아니지만...
+                     * Actually it's a known bug with the support package (edit: not actually a bug.
+                     * see @alex-lockwood's comment). A posted work around in the comments of the bug
+                     * report is to modify the source of the DialogFragment like so:
+                     *
+                     public int show(FragmentTransaction transaction, String tag) {
+                        return show(transaction, tag, false);
+                     }
+
+
+                     public int show(FragmentTransaction transaction, String tag, boolean allowStateLoss) {
+                        transaction.add(this, tag);
+                        mRemoved = false;
+                        mBackStackId = allowStateLoss ? transaction.commitAllowingStateLoss() : transaction.commit();
+                        return mBackStackId;
+                     }
+                     */
+                    mWebViewClient.showUpdateIoTDevicesDialog();
+                }
+                break;
         }
+    }
+
+    /**
+     * 자체적으로 블루투스를 연동하는 경우, 블루투스 enable 여부를 체크하여 사용자가 켜도록 한다.
+     */
+    public void checkBluetoothEnabled() {
+        // Use this check to determine whether BLE is supported on the device.  Then you can
+        // selectively disable BLE-related features.
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            showBluetoothAlertDialog(R.string.ble_not_supported);
+            return;
+        }
+
+        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
+        // BluetoothAdapter through BluetoothManager.
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        final BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+
+        // Checks if Bluetooth is supported on the device.
+        if (bluetoothAdapter == null) {
+            showBluetoothAlertDialog(R.string.error_bluetooth_not_supported);
+            return;
+        }
+
+        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
+        // fire an intent to display a dialog asking the user to grant permission to enable it.
+        if (!bluetoothAdapter.isEnabled()) {
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, Constants.START_ACTIVITY_REQUEST_ENABLE_BT);
+            }
+        } else {
+            mWebViewClient.showUpdateIoTDevicesDialog();
+        }
+    }
+
+    private void showBluetoothAlertDialog(int msgId) {
+        new AlertDialog.Builder(this).setMessage(R.string.alert_network_message)
+                //.setTitle(R.string.alert_network_title)
+                .setCancelable(true)
+                .setPositiveButton(R.string.alert_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                mWebViewClient.onUpdateIoTDevices("0997");
+                                dialog.dismiss();
+                            }
+                        })
+                .show();
     }
 
     public void finishActivity() {

@@ -49,8 +49,9 @@ public class Constants {
     public static final int HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED = 4002;
     public static final int HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK = 5001;
 
+    // activity for result
     public static final int START_ACTIVITY_REQUEST_CHECK_TTS_DATA = 1001;
-
+    public static final int START_ACTIVITY_REQUEST_ENABLE_BT = 1002;
     // weather open api key
     // 개발계정.. 운영계정과동일하네..
 //    public static final String WEATHER_OPEN_API_KEY = "2GjUf7yXsE0w7ayKJ2jGnYctDTSyZYu1IoPphFuLaBq6Ij0as1Bks1KTLcVE7pqt9E76kdfLxtGc4ocQ9Lxpdg%3D%3D";
@@ -121,4 +122,9 @@ public class Constants {
     public static final int RADIO_NOTIFICATION_ID = 2001;
     public static final int PW_FIND_NOTIFICATION_ID = 2002;
     public static final int SYSTEM_ADMIN_NOTIFICATION_ID = 2003;
+
+    // IoT Devices
+    public static final String ACTION_IOT_DEVICE_LIST = "com.nbplus.vbroadlauncher.intent.action.ACTION_IOT_DEVICE_LIST";
+    public static final String EXTRA_IOT_DEVICE_CANCELED = "extra_iot_device_canceled";
+
 }

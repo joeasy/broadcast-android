@@ -81,4 +81,14 @@
 
     <string name="server_connection_error">Can not connect to server. Check your service</string>
     <string name="empty_radio_channel_list">There is no available radio channels.</string>
+    <string name="iot_devices_title">Additional IoT Devices</string>
+    <string name="iot_devices_refresh">Refresh</string>
+    <string name="iot_devices_send">Send</string>
+    <string name="iot_devices_send_alert">Sync with Server?</string>
+    <string name="iot_devices_empty">No devices founded.</string>
+    <string name="iot_devices_desc">- If the desired device is not detected , press the [Refresh] button , or you hope to rediscover [Refresh] After proceed according to the instruction manual of the device.</string>
+
+    <!-- use internal bluetooth -->
+    <string name="alert_bluetooth_enable_message">Bluetooth is turned off. You must activate in order to use this feature.</string>
+
 </resources>

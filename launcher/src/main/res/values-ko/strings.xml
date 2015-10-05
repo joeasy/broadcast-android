@@ -81,4 +81,13 @@
 
     <string name="server_connection_error">서버 연결에 실패 하였습니다. 잠시 후 다시 시도해 주시기 바랍니다.</string>
     <string name="empty_radio_channel_list">사용가능한 라디오 채널이 없습니다.</string>
+    <string name="iot_devices_title">부가장치 찾기</string>
+    <string name="iot_devices_refresh">다시찾기</string>
+    <string name="iot_devices_send">저장하기</string>
+    <string name="iot_devices_send_alert">마을방송 서버와 동기화 하시겠습니까?</string>
+    <string name="iot_devices_empty">검색된 부가장치가 없습니다.</string>
+    <string name="iot_devices_desc">- 원하는 장치가 검색되지 않은 경우, [다시찾기] 버튼을 눌러 재검색을 하거나 해당 장치의 사용설명서에 따라 진행 후에 [다시찾기]를 하시기 바랍니다.</string>
+
+    <!-- use internal bluetooth -->
+    <string name="alert_bluetooth_enable_message">Bluetooth is turned off. You must activate in order to use this feature.</string>
 </resources>

@@ -3,6 +3,7 @@ package com.nbplus.vbroadlauncher.hybrid;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
@@ -38,7 +39,8 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
     public void setTextToSpeechObject(TextToSpeech tts) {
         if (tts != null) {
             mText2Speech = tts;
-            mText2Speech.setOnUtteranceProgressListener(this);
+            int result = mText2Speech.setOnUtteranceProgressListener(this);
+            Log.d(TAG, ">>> setOnUtteranceProgressListener result = " + result);
         }
     }
 
@@ -60,6 +62,7 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
 
         mText2Speech.setSpeechRate(0.8f);
         mText2Speech.setPitch(1.0f);
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
@@ -74,12 +77,29 @@ public class TextToSpeechHandler extends UtteranceProgressListener {
             });
             mText2Speech.speak(text,
                     TextToSpeech.QUEUE_FLUSH,  // Drop all pending entries in the playback queue.
-                    null);
+                    map);
         } else {
+
+            /**
+             * The new API prefers a Bundle so replace the HashMap with a Bundle
+
+             * > Bundle params = new Bundle();
+             * > params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "");
+             *
+             * then when you make the speak call
+             * > tts.speak(text, TextToSpeech.QUEUE_FLUSH, params, "UniqueID");
+             *
+             * The key is to use the ID in the speak call. You can put it in the Bundle,
+             * but it will do nothing more for you.
+             * It has to be in the speak call to trigger the listener.
+             */
+            Bundle params = new Bundle();
+            long sysTime = System.currentTimeMillis();
+            params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "VILLAGE_BROADCAST_TTS_UTTERANCE_ID" + sysTime);
             mText2Speech.speak(text,
                     TextToSpeech.QUEUE_FLUSH,  // Drop all pending entries in the playback queue.
-                    null,
-                    "TTS_UTTERANCE_ID");
+                    params,
+                    "VILLAGE_BROADCAST_TTS_UTTERANCE_ID" + sysTime);
         }
     }
 

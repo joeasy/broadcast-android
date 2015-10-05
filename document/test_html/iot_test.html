@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test Register</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+</head>
+<body>
+      <div class="gnb" id="gnb">
+          <ul class="gnbDepth2 depth2-3 ">
+                <li class="first " style="display: inline;"><a href="http://192.168.77.112:8080/addfunction/iotdata/getIotDataList.rcc">부가장치 데이터 조회</a></li>
+                <li class="" style="display: inline;"><a href="http://192.168.77.112:8080/addfunction/smarthome/getSmartHomeList.rcc">스마트 홈서비스</a></li>
+                <li class="first " style="display: inline;"><a href="http://192.168.77.112:8080/myinfo/myinfo/getMyinfoDetail.rcc">나의 정보관리</a></li>
+                <li class="" style="display: inline;"><a href="http://192.168.77.112:8080/myinfo/clientinfo/getClientinfoList.rcc">전용단말 관리</a></li>
+                <li class="" style="display: inline;"><a href="http://192.168.77.112:8080/myinfo/iotdevice/getIotdeviceList.rcc">부가장치 관리</a></li>
+            </ul>
+        </div><!-- gnb -->
+
+  <div width='100%' height='100px'>
+      <label>* device id : </label><label id='device_id'></label>
+  </div>
+
+  <div id="buttonDiv"  width='100%' height='100%'>
+      <button type="button" onclick="updateIoTDevices()" style="display: inline; width: 40%; height: 30px; margin-bottom: 20px">updateIoTDevices()</button>
+      <button type="button" onclick="excelDownload()" style="display: inline; width: 40%; height: 30px; margin-bottom: 20px">excelDownload()</button>
+      <button type="button" onclick="closeWebApplication()" style="display: inline; width: 40%; height: 30px; margin-bottom: 20px">closeWebApplication()</button>
+  </div>
+
+  <div id="buttonDiv"  width='100%' height='100%'>
+<select id='selectBox'>
+</select>
+      <input id='input1' type="text" style="display: inline; height: 30px; margin-bottom: 20px"></input>
+      <input id='input2' type="text" style="display: inline; height: 30px; margin-bottom: 20px"></input>
+      <input id='input3' type="text" style="display: inline; height: 30px; margin-bottom: 20px"></input>
+      <input id='input4' type="text" style="display: inline; height: 30px; margin-bottom: 20px"></input>
+      <input id='input5' type="text" style="display: inline; height: 30px; margin-bottom: 20px"></input>
+  </div>
+  <div width='100%' height='100px'>
+      <label>* Register Result : </label><label id='register_result'>NONE</label>
+      <label>* Send Data Result : </label><label id='send_result'>NONE</label>
+  </div>
+  <div id="iotJson"  width='100%' height='100%'><br>
+      <button type="button" onclick="sendIoTData()" style="display: inline; width: 20%; height: 30px; margin-bottom: 20px">Send</button>
+  </div>
+
+  <div id="iotJson"  width='100%' height='100%'><br>
+      <label width='100%'>* IoT JSON </label>
+  </div>
+<textarea id='iot_json' rows="8" cols="100%">
+</textarea>
+
+</body>
+<script type="text/javascript">
+  var deviceId = undefined;
+  var line_number;
+  var deviceListJson;
+  
+
+
+window.onload = function() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+        //console.log(">>window.nbplus.setApplicationData() = " + TEST_APP_DATA);
+        deviceId = window.nbplus.getDeviceId();
+    line_number = window.nbplus.getLineNumber();
+    } else {
+        console.log(">>window.nbplus.getDeviceId() not found !!!");
+        deviceId = '0c0ad1e1010fe101b1a1f1c10a0e01d1010f0d01';
+    }
+  document.getElementById('device_id').innerText = deviceId;
+}
+
+function updateIoTDevices() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined' && typeof window.nbplus.updateIoTDevices != 'undefined') {
+        //console.log(">>window.nbplus.registerPushApplication() = " + TEST_APP_ID);
+        window.nbplus.updateIoTDevices();
+    } else {
+        console.log(">>window.nbplus.updateIoTDevices() not found !!!");
+        var data = '{ "DEVICE_ID":"' + deviceId+ '", "IOT_DEVICE_INFO" : [' +
+'{ "IOT_DEVICE_ID":"10000000000-10000000000-10000000001" , "IOT_DEVICE_MAKER":"Apple", "IOT_DEVICE_MODEL":"XXX-120T", "IOT_DEVICE_NAME":"TEST01" },' +
+'{ "IOT_DEVICE_ID":"10000000000-10000000000-10000000002" , "IOT_DEVICE_MAKER":"Xiaomi", "IOT_DEVICE_MODEL":"EEE-120T", "IOT_DEVICE_NAME":"TEST02" },' +
+'{ "IOT_DEVICE_ID":"10000000000-10000000000-10000000003" , "IOT_DEVICE_MAKER":"Merong", "IOT_DEVICE_MODEL":"DDD-120T", "IOT_DEVICE_NAME":"TEST03" } ]}';
+
+        onUpdateIoTDevices(data);
+    }
+}
+function closeWebApplication() {
+    if (window.nbplus != null && typeof window.nbplus != 'undefined') {
+        console.log(">>window.nbplus.closeWebApplication()");
+        window.nbplus.closeWebApplication();
+    } else {
+        console.log(">>window.nbplus.closeWebApplication() not found !!!");
+    }
+}
+
+function sendIoTData() {
+  // collect the form data while iterating over the inputs
+  var jsonObj = {};
+
+  jsonObj['DEVICE_ID'] = deviceId;
+    var selectBox = document.getElementById('selectBox');
+
+  var data = {};
+  data['IOT_DEVICE_ID'] = selectBox.options[selectBox.selectedIndex].value;
+  data['DATE'] = new Date().format("yyyyMMddHHmm");
+
+  var i = 1;
+  var value = document.getElementById('input' + (i++)).value;
+  if (value == null || typeof(value) == 'undefined' || value.length <= 0) {
+    alert('input 1 is not valid');
+    return;
+  }
+
+  var valueStr = "" + value;
+  for (; i <= 5; i++) {
+    value = document.getElementById('input' + (i)).value;
+    if (value != null && typeof(value) != 'undefined' && value.length > 0) {
+      valueStr += "," + value;
+    }
+  }
+
+
+  jsonObj['IOT_DATA'] = [];
+  data['VALUE'] = valueStr;
+  jsonObj['IOT_DATA'][0] = data;
+
+  console.log("JSON data = " + JSON.stringify(jsonObj));
+  // construct an HTTP request
+  var xhr = new XMLHttpRequest();
+var url = "http://192.168.77.112:8080/is/api/iot/RegistIOTData";
+xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+  // send the collected data as JSON
+  xhr.send(JSON.stringify(jsonObj));
+
+xhr.onreadystatechange=function()
+  {
+    if (xhr.readyState < 4) {
+      return;
+    }
+    if (xhr.readyState==4 && xhr.status==200) {
+      console.log("xhr.readyState = " + xhr.readyState + ", xhr.status = " + xhr.status + ", " + xhr.responseText);
+      var rtJson = JSON.parse(xhr.responseText);
+      if (rtJson['RT'] != "0000") {
+        document.getElementById("send_result").innerText="FAIL";
+      } else {
+        document.getElementById("send_result").innerText="SUCCESS";
+      }
+    } else {
+    console.log("xhr.readyState = " + xhr.readyState + ", xhr.status = " + xhr.status + ", " + xhr.responseText);
+    document.getElementById("send_result").innerText="FAIL";
+    }
+  };
+}
+
+
+function onBackPressed() {
+    console.log("onBackPressed() received from native");
+    closeWebApplication();
+}
+
+function onUpdateIoTDevices(deviceList) {
+    console.log("onUpdateIoTDevices() called = " + deviceList);
+    document.getElementById('iot_json').innerText = deviceList;
+
+    deviceListJson = JSON.parse(deviceList);
+    var selectBox = document.getElementById('selectBox');
+    var selectLength = selectBox.options.length;
+    for (var i = 0; i < selectLength; i++) {
+      selectBox.options[i] = null;
+    }
+    selectBox.options.length = 0;
+
+    for (var i = 0; i < deviceListJson['IOT_DEVICE_INFO'].length; i++) {
+      var opt = document.createElement('option') //새로운 option 속성을 생성
+      opt.text = deviceListJson['IOT_DEVICE_INFO'][i]['IOT_DEVICE_NAME']; //새로운 option의 text 지정
+      opt.value = deviceListJson['IOT_DEVICE_INFO'][i]['IOT_DEVICE_ID']; //새로운 option의 value 지정
+      selectBox.add(opt); //select 태그에 sption을 추가
+    }
+
+    //registerIoTDevices(deviceList);
+}
+
+function registerIoTDevices(deviceList) {
+
+  // construct an HTTP request
+  var xhr = new XMLHttpRequest();
+var url = "http://192.168.77.112:8080/is/api/iot/RegistIOTDevice";
+xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+  // send the collected data as JSON
+  xhr.send(deviceList);
+
+xhr.onreadystatechange=function() {
+    if (xhr.readyState < 4) {
+      return;
+    }
+    if (xhr.readyState==4 && xhr.status==200) {
+      console.log("xhr.readyState = " + xhr.readyState + ", xhr.status = " + xhr.status + ", " + xhr.responseText);
+      var rtJson = JSON.parse(xhr.responseText);
+      if (rtJson['RT'] != "0000") {
+        document.getElementById("register_result").innerText="FAIL";
+      } else {
+        document.getElementById("register_result").innerText="SUCCESS";
+      }
+    } else {
+    console.log("xhr.readyState = " + xhr.readyState + ", xhr.status = " + xhr.status + ", " + xhr.responseText);
+    document.getElementById("register_result").innerText="FAIL";
+    }
+  };
+}
+
+function excelDownload() {
+  window.location.href = "http://192.168.77.112:8010/redmine_image/report.xls";
+}
+function onBackPressed() { 
+    console.log("onBackPressed() received from native");
+    closeWebApplication();
+}
+
+function onCloseWebApplicationByUser() {
+  closeWebApplication();
+}
+
+Date.prototype.format = function(f) {
+    if (!this.valueOf()) return " ";
+ 
+    var weekName = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+    var d = this;
+     
+    return f.replace(/(yyyy|yy|MM|dd|E|hh|mm|ss|a\/p)/gi, function($1) {
+        switch ($1) {
+            case "yyyy": return d.getFullYear();
+            case "yy": return (d.getFullYear() % 1000).zf(2);
+            case "MM": return (d.getMonth() + 1).zf(2);
+            case "dd": return d.getDate().zf(2);
+            case "E": return weekName[d.getDay()];
+            case "HH": return d.getHours().zf(2);
+            case "hh": return ((h = d.getHours() % 12) ? h : 12).zf(2);
+            case "mm": return d.getMinutes().zf(2);
+            case "ss": return d.getSeconds().zf(2);
+            case "a/p": return d.getHours() < 12 ? "오전" : "오후";
+            default: return $1;
+        }
+    });
+};
+ 
+String.prototype.string = function(len){var s = '', i = 0; while (i++ < len) { s += this; } return s;};
+String.prototype.zf = function(len){return "0".string(len - this.length) + this;};
+Number.prototype.zf = function(len){return this.toString().zf(len);};
+
+</script>
+</html>

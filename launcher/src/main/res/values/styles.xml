@@ -1,5 +1,9 @@
 <resources>
 
+    <style name="FullScreenDialog" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
     <style name="NBPlusTheme" parent="Theme.AppCompat.Light.DarkActionBar" >
     </style>
 
