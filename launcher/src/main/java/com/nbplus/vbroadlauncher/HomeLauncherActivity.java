@@ -4,6 +4,7 @@ package com.nbplus.vbroadlauncher;
  * Created by basagee on 2015. 5. 15..
  */
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -253,10 +254,6 @@ public class HomeLauncherActivity extends BaseActivity
         intent.putExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, mActivityRunningTime);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-//        if (!NetworkUtils.isConnected(this)) {
-//            showNetworkConnectionAlertDialog();
-//        }
-
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -293,24 +290,6 @@ public class HomeLauncherActivity extends BaseActivity
 
         // Update values using data stored in the Bundle.
         updateValuesFromBundle(savedInstanceState);
-
-        if (checkPlayServices()) {
-            Log.d(TAG, ">>> checkPlayServices() support");
-            // Building the GoogleApi client
-            buildGoogleApiClient();
-            createLocationRequest();
-            buildLocationSettingsRequest();
-
-            //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
-                checkLocationSettings();
-            //}
-            Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
-            if (mGoogleApiClient != null) {
-                mGoogleApiClient.connect();
-            }
-        } else {
-            Log.e(TAG, "Google Play Service is not available !!!!!");
-        }
 
         /**
          * 서버정보가 없거나 숏컷정보가 없다면 회원등록이나 설정에 문제가 있다.
@@ -379,7 +358,10 @@ public class HomeLauncherActivity extends BaseActivity
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST);
+                dialog.setCancelable(false);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
             } else {
                 Toast.makeText(getApplicationContext(),
                         "This device is not supported Play Service.", Toast.LENGTH_LONG)
@@ -439,6 +421,41 @@ public class HomeLauncherActivity extends BaseActivity
         super.onResume();
         Intent intent = new Intent(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        /**
+         * 구글 플레이 서비스가 최신버전이 실행되고 있어야 GPS 정보등을 정상적으로 받아올 수 있다.
+         * 항상 구글 플레이 서비스 상태를 체크한다.
+         */
+        if (checkPlayServices()) {
+            Log.d(TAG, ">>> checkPlayServices() support");
+            if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
+                // Building the GoogleApi client
+                buildGoogleApiClient();
+                createLocationRequest();
+                buildLocationSettingsRequest();
+
+                //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
+                checkLocationSettings();
+                //}
+                Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
+                if (mGoogleApiClient != null) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        } else {
+            Log.e(TAG, "Google Play Service is not available !!!!!");
+            return;
+        }
+
+        /**
+         * 네트워크 상태를 체크한다.
+         * 와이파이를 사용자가 설정에서 꺼놓은 상태인경우 와이파이를 켜도록 한다.
+         */
+        if (!NetworkUtils.isConnected(this)) {
+            if (!NetworkUtils.isWifiEnabled(this)) {
+                showWifiEnableAlertDialog();
+            }
+        }
     }
 
     @Override

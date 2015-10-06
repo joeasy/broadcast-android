@@ -18,6 +18,8 @@ import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
+import org.basdroid.common.NetworkUtils;
+
 import java.util.Locale;
 
 /**
@@ -46,6 +48,20 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
                 .setPositiveButton(R.string.alert_ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                            }
+                        })
+                .show();
+    }
+
+    public void showWifiEnableAlertDialog() {
+        new AlertDialog.Builder(this).setMessage(R.string.alert_network_message)
+                .setTitle(R.string.alert_wifi_enable_title)
+                .setCancelable(false)
+                .setPositiveButton(R.string.alert_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                NetworkUtils.enableWifiNetwork(getApplicationContext());
                                 dialog.dismiss();
                             }
                         })

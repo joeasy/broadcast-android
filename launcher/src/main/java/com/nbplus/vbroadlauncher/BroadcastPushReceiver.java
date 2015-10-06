@@ -95,6 +95,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                     } else {
                         if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type) || Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(type)) {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                                Log.d(TAG, ">> This device version code = " + Build.VERSION.SDK_INT + ", not supported version !!");
                                 Toast.makeText(context, R.string.notification_broadcast_not_support, Toast.LENGTH_SHORT);
                                 break;
                             }
