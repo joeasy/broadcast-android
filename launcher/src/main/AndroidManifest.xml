@@ -18,6 +18,12 @@
         android:stateNotNeeded="true"
         android:name=".HomeLauncherApplication"
         android:theme="@style/NBPlusTheme.NoActionBar" >
+
+        <!-- This is how we can request a library but still allow the app
+            to be installed if it doesn't exist.
+            앱실행시에 사용하도록 팝업을 띄우므로... 설치는 할 수 있게 한다. -->
+        <!--<uses-library android:name="com.google.android.gms" android:required="true" />-->
+
         <activity
             android:name=".HomeLauncherActivity"
             android:exported="true"
