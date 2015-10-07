@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2015. NB Plus (www.nbplus.co.kr)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.nbplus.vbroadlauncher;
 
 /**
@@ -426,26 +443,27 @@ public class HomeLauncherActivity extends BaseActivity
          * 구글 플레이 서비스가 최신버전이 실행되고 있어야 GPS 정보등을 정상적으로 받아올 수 있다.
          * 항상 구글 플레이 서비스 상태를 체크한다.
          */
-        if (checkPlayServices()) {
-            Log.d(TAG, ">>> checkPlayServices() support");
-            if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
-                // Building the GoogleApi client
-                buildGoogleApiClient();
-                createLocationRequest();
-                buildLocationSettingsRequest();
-
-                //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
-                checkLocationSettings();
-                //}
-                Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
-                if (mGoogleApiClient != null) {
-                    mGoogleApiClient.connect();
-                }
-            }
-        } else {
-            Log.e(TAG, "Google Play Service is not available !!!!!");
-            return;
-        }
+        // TODO : gms 설치된 버전을 받으면 다시 살려야 한다.  
+//        if (checkPlayServices()) {
+//            Log.d(TAG, ">>> checkPlayServices() support");
+//            if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
+//                // Building the GoogleApi client
+//                buildGoogleApiClient();
+//                createLocationRequest();
+//                buildLocationSettingsRequest();
+//
+//                //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
+//                checkLocationSettings();
+//                //}
+//                Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
+//                if (mGoogleApiClient != null) {
+//                    mGoogleApiClient.connect();
+//                }
+//            }
+//        } else {
+//            Log.e(TAG, "Google Play Service is not available !!!!!");
+//            return;
+//        }
 
         /**
          * 네트워크 상태를 체크한다.
