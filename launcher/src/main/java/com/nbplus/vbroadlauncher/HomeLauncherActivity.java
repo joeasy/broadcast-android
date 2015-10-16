@@ -63,6 +63,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.nbplus.iotlib.IoTInterface;
+import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -203,6 +205,21 @@ public class HomeLauncherActivity extends BaseActivity
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_home_launcher);
 
+        // vitamio library load
+        if (!LibsChecker.checkVitamioLibs(this)) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    finish();
+                }
+            });
+            alert.setMessage(R.string.alert_media_message);
+            alert.show();
+            return;
+        }
+
         mCurrentLocale = getResources().getConfiguration().locale;
         if (BuildConfig.DEBUG) {
             Point p = DisplayUtils.getScreenSize(this);
@@ -271,21 +288,6 @@ public class HomeLauncherActivity extends BaseActivity
         intent.putExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, mActivityRunningTime);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-        // vitamio library load
-        if (!LibsChecker.checkVitamioLibs(this)) {
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    finish();
-                }
-            });
-            alert.setMessage(R.string.alert_media_message);
-            alert.show();
-            return;
-        }
-
         // set background image
         setContentViewByOrientation();
         if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
@@ -337,6 +339,18 @@ public class HomeLauncherActivity extends BaseActivity
             fragmentTransaction.replace(R.id.launcherFragment, launcherFragment);
         }
         fragmentTransaction.commit();
+
+        // check installation or bind to service
+        IoTResultCodes resCode = IoTInterface.getInstance().initialize(this);
+        if (!resCode.equals(IoTResultCodes.SUCCESS)) {
+            if (resCode.equals(IoTResultCodes.BIND_SERVICE_FAILED)) {
+                Toast.makeText(getApplicationContext(),
+                        "Bind IoT Service failed!!!", Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                return;
+            }
+        }
 
     }
 

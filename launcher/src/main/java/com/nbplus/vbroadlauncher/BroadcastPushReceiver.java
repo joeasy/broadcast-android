@@ -34,8 +34,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.nbplus.iotgateway.data.IoTDevice;
-import com.nbplus.iotgateway.service.IoTService;
+import com.nbplus.iotlib.IoTInterface;
+import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.push.data.PushMessageData;
 import com.nbplus.vbroadlauncher.data.Constants;
@@ -199,17 +199,8 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                     break;
                 // IOT DEVICE 제어(스마트홈 서비스)
                 case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
-                    pi = new Intent(context, IoTService.class);
-                    pi.setAction(com.nbplus.iotgateway.data.Constants.ACTION_SEND_IOT_COMMAND);
-                    pi.putExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_SEND_COMM_DEVICE_ID, payloadData.getIotControlDeviceId());
-                    pi.putExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_SEND_COMM_COMMAND_ID, payloadData.getMessage());
-
                     Log.d(TAG, "startService >> ACTION_SEND_IOT_COMMAND");
-                    try {
-                        context.startService(pi);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    IoTInterface.getInstance().controlDevice(payloadData.getIotControlDeviceId(), payloadData.getMessage());
                     break;
                 // PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION
                 case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :

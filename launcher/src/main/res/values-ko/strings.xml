@@ -91,5 +91,5 @@
     <string name="iot_devices_desc">- 원하는 장치가 검색되지 않은 경우, [다시찾기] 버튼을 눌러 재검색을 하거나 해당 장치의 사용설명서에 따라 진행 후에 [다시찾기]를 하시기 바랍니다.</string>
 
     <!-- use internal bluetooth -->
-    <string name="alert_bluetooth_enable_message">Bluetooth is turned off. You must activate in order to use this feature.</string>
+    <string name="alert_bluetooth_enable_message">블루투스가 꺼져 있습니다. 사용하도록 설정 하시겠습니까?</string>
 </resources>

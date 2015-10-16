@@ -222,10 +222,14 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
         //mProgressDialogFragment.show(getSupportFragmentManager(), "progress_dialog");
     }
     public void dismissProgressDialog() {
-        if (mProgressDialogFragment != null) {
-            mProgressDialogFragment.dismiss();
-            mProgressDialogFragment = null;
+        try {
+            if (mProgressDialogFragment != null) {
+                mProgressDialogFragment.dismiss();
+            }
+        } catch (Exception e) {
+
         }
+        mProgressDialogFragment = null;
     }
 
     @Override

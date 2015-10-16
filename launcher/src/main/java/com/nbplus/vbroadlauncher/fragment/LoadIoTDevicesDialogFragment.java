@@ -20,6 +20,7 @@ package com.nbplus.vbroadlauncher.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,6 +30,7 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -43,13 +45,20 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 
-import com.nbplus.iotgateway.data.IoTDevice;
-import com.nbplus.iotgateway.service.IoTService;
+import com.nbplus.iotlib.IoTInterface;
+import com.nbplus.iotlib.callback.IoTServiceResponse;
+import com.nbplus.iotlib.data.DeviceTypes;
+import com.nbplus.iotlib.data.IoTDevice;
+import com.nbplus.iotlib.data.IoTResultCodes;
+import com.nbplus.iotlib.data.IoTServiceCommand;
+import com.nbplus.iotlib.data.IoTServiceStatus;
 import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.vbroadlauncher.BaseActivity;
+import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.adapter.StickyGridHeadersIoTDevicesAdapter;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleArrayAdapter;
 
 import org.basdroid.common.DisplayUtils;
@@ -61,7 +70,7 @@ import io.vov.vitamio.widget.CenterLayout;
 /**
  * Created by basagee on 2015. 6. 23..
  */
-public class LoadIoTDevicesDialogFragment extends DialogFragment implements DialogInterface.OnKeyListener {
+public class LoadIoTDevicesDialogFragment extends DialogFragment implements DialogInterface.OnKeyListener, IoTServiceResponse {
     private static final String TAG = LoadIoTDevicesDialogFragment.class.getSimpleName();
 
     private ArrayList<IoTDevice> mIoTDevicesList = new ArrayList<>();
@@ -74,55 +83,54 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
     StickyGridHeadersIoTDevicesAdapter mGridAdapter;
 
     Handler     mHandler = new Handler();
-    ProgressDialogFragment mProgressDialogFragment;
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = (intent == null) ? "" : intent.getAction();
-            Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
-            // send handler message
-            switch (action) {
-                case com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST :
-                    ArrayList<IoTDevice> iotDevicesList = intent.getParcelableArrayListExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_DEVICE_LIST);
-                    if (iotDevicesList != null) {
-                        mIoTDevicesList = iotDevicesList;
-                    } else {
-                        mIoTDevicesList = new ArrayList<>();
-                    }
-
-                    if (mGridAdapter == null) {
-                        mGridAdapter = new StickyGridHeadersIoTDevicesAdapter(getActivity(),
-                                mIoTDevicesList,
-                                R.layout.grid_iot_devices_header,
-                                R.layout.grid_iot_devices_item);
-
-                        mGridView.setAdapter(mGridAdapter);
-                    } else {
-                        mGridAdapter.setItems(mIoTDevicesList);
-                    }
-                    if (mGridAdapter.isEmpty()) {
-                        mSendButton.setEnabled(false);
-                        mSendButton.setClickable(false);
-                    } else {
-                        mSendButton.setEnabled(true);
-                        mSendButton.setClickable(true);
-                    }
-
-
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((BaseActivity)getActivity()).dismissProgressDialog();
-                        }
-                    }, 2000);
-                    break;
-                default :
-                    break;
-            }
-        }
-    };
+//    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            final String action = (intent == null) ? "" : intent.getAction();
+//            Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
+//            // send handler message
+//            switch (action) {
+//                case com.nbplus.iotlib.data.Constants.ACTION_IOT_DEVICE_LIST :
+//                    ArrayList<IoTDevice> iotDevicesList = intent.getParcelableArrayListExtra(com.nbplus.iotlib.data.Constants.EXTRA_IOT_DEVICE_LIST);
+//                    if (iotDevicesList != null) {
+//                        mIoTDevicesList = iotDevicesList;
+//                    } else {
+//                        mIoTDevicesList = new ArrayList<>();
+//                    }
+//
+//                    if (mGridAdapter == null) {
+//                        mGridAdapter = new StickyGridHeadersIoTDevicesAdapter(getActivity(),
+//                                mIoTDevicesList,
+//                                R.layout.grid_iot_devices_header,
+//                                R.layout.grid_iot_devices_item);
+//
+//                        mGridView.setAdapter(mGridAdapter);
+//                    } else {
+//                        mGridAdapter.setItems(mIoTDevicesList);
+//                    }
+//                    if (mGridAdapter.isEmpty()) {
+//                        mSendButton.setEnabled(false);
+//                        mSendButton.setClickable(false);
+//                    } else {
+//                        mSendButton.setEnabled(true);
+//                        mSendButton.setClickable(true);
+//                    }
+//
+//
+//                    mHandler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            ((BaseActivity)getActivity()).dismissProgressDialog();
+//                        }
+//                    }, 2000);
+//                    break;
+//                default :
+//                    break;
+//            }
+//        }
+//    };
 
     public static LoadIoTDevicesDialogFragment newInstance(Bundle b) {
         LoadIoTDevicesDialogFragment frag = new LoadIoTDevicesDialogFragment();
@@ -178,9 +186,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
                 Log.d(TAG, "onClick btnRefresh..");
                 ((BaseActivity)getActivity()).showProgressDialog();
 
-                Intent intent = new Intent(getActivity(), IoTService.class);
-                intent.setAction(com.nbplus.iotgateway.data.Constants.ACTION_GET_IOT_DEVICE_LIST);
-                getActivity().startService(intent);
+                IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragment.this);
             }
         });
 
@@ -217,8 +223,16 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
     @Override
     public void onResume() {
         super.onResume();
-        Point p = DisplayUtils.getScreenSize(getActivity());
-        getDialog().getWindow().setLayout(p.x - 60, p.y - 30);
+
+        try {
+            Point p = DisplayUtils.getScreenSize(getActivity());
+
+            if (getDialog() != null && getDialog().getWindow() != null) {
+                getDialog().getWindow().setLayout(p.x - 60, p.y - 30);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -239,26 +253,24 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(TAG, "dialog onAttach");
-        Intent intent = new Intent(getActivity(), IoTService.class);
-        intent.setAction(com.nbplus.iotgateway.data.Constants.ACTION_GET_IOT_DEVICE_LIST);
-        getActivity().startService(intent);
+        IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, this);
 
         ((BaseActivity)getActivity()).showProgressDialog();
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(com.nbplus.iotgateway.data.Constants.ACTION_IOT_DEVICE_LIST);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, filter);
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(com.nbplus.iotlib.data.Constants.ACTION_IOT_DEVICE_LIST);
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, filter);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         Log.d(TAG, "dialog onDetach");
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+//        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
     }
 
     public void showSyncAlertDialog() {
-        new android.support.v7.app.AlertDialog.Builder(getActivity()).setMessage(R.string.iot_devices_send_alert)
+        new AlertDialog.Builder(getActivity()).setMessage(R.string.iot_devices_send_alert)
                 //.setTitle(R.string.alert_network_title)
                 .setCancelable(false)
                 .setNegativeButton(android.R.string.cancel,
@@ -273,7 +285,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
                                 Intent sendIntent = new Intent();
                                 sendIntent.setAction(Constants.ACTION_IOT_DEVICE_LIST);
                                 sendIntent.putExtra(Constants.EXTRA_IOT_DEVICE_CANCELED, false);
-                                sendIntent.putParcelableArrayListExtra(com.nbplus.iotgateway.data.Constants.EXTRA_IOT_DEVICE_LIST, mIoTDevicesList);
+                                sendIntent.putParcelableArrayListExtra(Constants.EXTRA_DATA, mIoTDevicesList);
                                 LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(sendIntent);
 
                                 dialog.dismiss();
@@ -284,7 +296,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
     }
 
     private void dismissDialogFragment() {
-        dismiss();
+        ((BroadcastWebViewActivity)getActivity()).dismissUpdateIoTDevicesDialog();
     }
 
     /**
@@ -302,5 +314,140 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
         ft.commitAllowingStateLoss();
+    }
+
+    /**
+     * @param cmd
+     * @param serviceStatus
+     * @param serviceStatusCode
+     * @param b
+     */
+    @Override
+    public void onResult(int cmd, IoTServiceStatus serviceStatus, IoTResultCodes serviceStatusCode, Bundle b) {
+        Log.d(TAG, "IoTServiceResponse onResult...serviceStatus = " + serviceStatus + ", statusCode = " + serviceStatusCode);
+        switch (cmd) {
+            case IoTServiceCommand.GET_DEVICE_LIST:
+                if (serviceStatus == null || serviceStatusCode == null) {
+                    Log.e(TAG, "Unknown service status...");
+                    break;
+                }
+
+                if (!serviceStatus.equals(IoTServiceStatus.RUNNING)) {
+                    ((BaseActivity)getActivity()).dismissProgressDialog();
+
+                    if (serviceStatusCode.equals(IoTResultCodes.BLE_NOT_SUPPORTED) ||
+                            serviceStatusCode.equals(IoTResultCodes.BLUETOOTH_NOT_SUPPORTED) ||
+                            serviceStatusCode.equals(IoTResultCodes.BIND_SERVICE_FAILED)) {
+                        Log.d(TAG, ">> Can't use service :: " + serviceStatusCode);
+                        new AlertDialog.Builder(getActivity()).setMessage(R.string.error_bluetooth_not_supported)
+                                //.setTitle(R.string.alert_network_title)
+                                .setCancelable(true)
+                                .setPositiveButton(R.string.alert_ok,
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Intent sendIntent = new Intent();
+                                                sendIntent.setAction(Constants.ACTION_IOT_DEVICE_LIST);
+                                                sendIntent.putExtra(Constants.EXTRA_IOT_DEVICE_CANCELED, true);
+                                                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(sendIntent);
+
+                                                dialog.dismiss();
+                                                dismissDialogFragment();
+                                            }
+                                        })
+                                .show();
+                        break;
+                    } else if (serviceStatusCode.equals(IoTResultCodes.BLUETOOTH_NOT_ENABLED)) {
+                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        getActivity().startActivityForResult(enableBtIntent, Constants.START_ACTIVITY_REQUEST_ENABLE_BT);
+                    } else {
+                        new AlertDialog.Builder(getActivity()).setMessage(R.string.error_bluetooth_not_supported)
+                                //.setTitle(R.string.alert_network_title)
+                                .setCancelable(true)
+                                .setPositiveButton(R.string.alert_ok,
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                .show();
+                    }
+                } else {
+                    if (serviceStatusCode.equals(IoTResultCodes.SUCCESS)) {
+                        handleDeviceList(b);
+                    }
+                }
+                break;
+            default:
+                Log.d(TAG, "Unknown command ");
+        }
+    }
+
+    private void handleDeviceList(Bundle b) {
+        ArrayList<IoTDevice> iotDevicesList = b.getParcelableArrayList(IoTServiceCommand.KEY_DATA);
+        if (iotDevicesList != null) {
+            mIoTDevicesList = iotDevicesList;
+        } else {
+            mIoTDevicesList = new ArrayList<>();
+        }
+
+        if (mGridAdapter == null) {
+            mGridAdapter = new StickyGridHeadersIoTDevicesAdapter(getActivity(),
+                    mIoTDevicesList,
+                    R.layout.grid_iot_devices_header,
+                    R.layout.grid_iot_devices_item);
+
+            mGridView.setAdapter(mGridAdapter);
+        } else {
+            mGridAdapter.setItems(mIoTDevicesList);
+        }
+        if (mGridAdapter.isEmpty()) {
+            mSendButton.setEnabled(false);
+            mSendButton.setClickable(false);
+        } else {
+            mSendButton.setEnabled(true);
+            mSendButton.setClickable(true);
+        }
+
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ((BaseActivity)getActivity()).dismissProgressDialog();
+            }
+        }, 2000);
+    }
+
+    /**
+     * Receive the result from a previous call to
+     * {@link #startActivityForResult(Intent, int)}.  This follows the
+     * related Activity API as described there in
+     * {@link Activity#onActivityResult(int, int, Intent)}.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode  The integer result code returned by the child activity
+     *                    through its setResult().
+     * @param data        An Intent, which can return result data to the caller
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, ">>> onActivityResult...");
+        switch (requestCode) {
+            case Constants.START_ACTIVITY_REQUEST_ENABLE_BT:
+                // User chose not to enable Bluetooth.
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    dismissDialogFragment();
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Constants.ACTION_IOT_DEVICE_LIST);
+                    sendIntent.putExtra(Constants.EXTRA_IOT_DEVICE_CANCELED, true);
+                    LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(sendIntent);
+                } else {
+                    ((BaseActivity) getActivity()).showProgressDialog();
+                    //IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragment.this);
+                }
+                break;
+        }
     }
 }

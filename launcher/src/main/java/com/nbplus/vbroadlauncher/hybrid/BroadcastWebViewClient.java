@@ -38,7 +38,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
-import com.nbplus.iotgateway.service.IoTService;
 import com.nbplus.media.MusicService;
 import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.PushService;
@@ -342,11 +341,11 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
             @Override
             public void run() {
                 mIoTDiscoveringUrl = mWebView.getUrl();
-                if (com.nbplus.iotgateway.data.Constants.USE_IOT_GATEWAY) {
+//                if (com.nbplus.iotlib.data.Constants.USE_IOT_GATEWAY) {
                     showUpdateIoTDevicesDialog();
-                } else {
-                    ((BroadcastWebViewActivity)mContext).checkBluetoothEnabled();
-                }
+//                } else {
+//                    ((BroadcastWebViewActivity)mContext).checkBluetoothEnabled();
+//                }
             }
         });
     }
@@ -482,10 +481,14 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                 .show();
     }
     // progress bar
+    public LoadIoTDevicesDialogFragment getUpdateIoTDevicesDialogFragment() {
+        return mLoadIoTDevicesDialogFragment;
+    }
+
     public void showUpdateIoTDevicesDialog() {
-        if (com.nbplus.iotgateway.data.Constants.USE_IOT_GATEWAY) {
-            final boolean wifiEnabled = NetworkUtils.isWifiEnabled(mContext);
-            if (wifiEnabled) {
+//        if (com.nbplus.iotlib.data.Constants.USE_IOT_GATEWAY) {
+//            final boolean wifiEnabled = NetworkUtils.isWifiEnabled(mContext);
+//            if (wifiEnabled) {
                 try {
                     dismissProgressDialog();
                     mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
@@ -493,29 +496,29 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else {
-                onUpdateIoTDevices("0997");
-                showNetworkConnectionAlertDialog();
-            }
-        } else {
-            try {
-                dismissProgressDialog();
-                mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
-                mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//            } else {
+//                onUpdateIoTDevices("0997");
+//                showNetworkConnectionAlertDialog();
+//            }
+//        } else {
+//            try {
+//                dismissProgressDialog();
+//                mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
+//                mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
     }
-    protected void dismissUpdateIoTDevicesDialog() {
+    public void dismissUpdateIoTDevicesDialog() {
         try {
             if (mLoadIoTDevicesDialogFragment != null) {
                 mLoadIoTDevicesDialogFragment.dismiss();
             }
-            mLoadIoTDevicesDialogFragment = null;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
+        mLoadIoTDevicesDialogFragment = null;
     }
 }

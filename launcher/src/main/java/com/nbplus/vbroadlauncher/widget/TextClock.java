@@ -662,7 +662,7 @@ public class TextClock extends TextView {
         try {
             getContext().unregisterReceiver(mIntentReceiver);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -676,8 +676,8 @@ public class TextClock extends TextView {
     }
 
     public void onTimeChanged() {
-        long currTimems = System.currentTimeMillis();
-        mTime.setTimeInMillis(currTimems);
+        long currTimeMs = System.currentTimeMillis();
+        mTime.setTimeInMillis(currTimeMs);
 
         Locale locale = getContext().getResources().getConfiguration().locale;
         SimpleDateFormat sdf;
@@ -686,7 +686,7 @@ public class TextClock extends TextView {
         } else {
             sdf = new SimpleDateFormat("EEE, MMM dd");
         }
-        Date date = new Date(currTimems);
+        Date date = new Date(currTimeMs);
         String dateStr = sdf.format(date);
 
         CharSequence timeString = DateFormat.format(mFormat, mTime);

@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nbplus.iotgateway.data.IoTDevice;
+import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.vbroadlauncher.R;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleAdapter;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleArrayAdapter;

@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (c) 2015. NB Plus (www.nbplus.co.kr)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<resources>
+    <string name="app_name">iot_lib</string>
+    <string name="app_install_required">IoT application installation required.</string>
+    <string name="alert_ok">OK</string>
+
+
+  <!-- bluetooth -->
+  <string name="ble_not_supported">The BLE device is not supported.</string>
+  <string name="error_bluetooth_not_supported">It does not support Bluetooth.</string>
+  <string name="error_service_rety">Please try again.</string>
+
+  <string name="unknown_device">Unknown device</string>
+  <string name="unknown_characteristic">Unknown characteristic</string>
+  <string name="unknown_service">Unknown service</string>
+</resources>
