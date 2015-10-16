@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,6 +68,8 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     TextView mTextView;
     TextToSpeechHandler mText2SpeechHandler;
     private PushPayloadData mBroadcastData;
+
+    boolean mIsTTS = false;
 
     private long mBroadcastPayloadIdx = -1;
 
@@ -228,6 +231,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
             mText2SpeechHandler = new TextToSpeechHandler(this, this);
             checkText2SpeechAvailable();
+            mIsTTS = true;
         } else {
             // 실시간, 일반음성방송
             mWebView = (WebView)findViewById(R.id.webview);
@@ -243,6 +247,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                 url += ("&APPID=" + getApplicationContext().getPackageName());
             }
             mWebViewClient.loadUrl(url);
+            mIsTTS = false;
         }
     }
 
@@ -258,6 +263,21 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         }
     }
 
+    private void microphoneMute(boolean onoff) {
+        AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMicrophoneMute(onoff);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onPause()");
+        super.onResume();
+
+        if (!mIsTTS) {
+            microphoneMute(true);
+        }
+    }
+
     /**
      * Dispatch onPause() to fragments.
      */
@@ -265,6 +285,10 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     protected void onPause() {
         Log.d(TAG, "onPause()");
         super.onPause();
+
+        if (!mIsTTS) {
+            microphoneMute(false);
+        }
     }
 
     @Override

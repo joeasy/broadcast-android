@@ -1,0 +1,32 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.nbplus.iotlib">
+
+    <!-- Declare this required feature if you want to make the app available to BLE-capable
+    devices only.  If you want to make your app available to devices that don't support BLE,
+    you should omit this in the manifest.  Instead, determine BLE capability by using
+    PackageManager.hasSystemFeature(FEATURE_BLUETOOTH_LE) -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <!-- IOT Service access permission -->
+    <uses-permission android:name="com.nbplus.iot.permission.IOT_ACCESS" />
+
+    <permission android:name="com.nbplus.iot.permission.IOT_ACCESS" android:label="nbplus_iot_permission_access"
+                android:protectionLevel="dangerous" />
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name" >
+        <service android:exported="true"
+                 android:enabled="true"
+                 android:permission="com.nbplus.iot.permission.IOT_ACCESS"
+                 android:name="com.nbplus.iotapp.service.IoTService">
+            <intent-filter>
+                <action android:name="com.nbplus.iotapp.intent.action.IOT_SERVICE" />
+            </intent-filter>
+        </service>
+        <service android:name="com.nbplus.iotapp.bluetooth.BluetoothLeService" android:enabled="true"/>
+    </application>
+
+</manifest>

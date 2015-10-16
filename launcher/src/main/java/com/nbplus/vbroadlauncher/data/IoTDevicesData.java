@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.nbplus.iotgateway.data.IoTDevice;
+import com.nbplus.iotlib.data.IoTDevice;
 
 import java.util.ArrayList;
 

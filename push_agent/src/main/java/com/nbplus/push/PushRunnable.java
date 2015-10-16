@@ -210,6 +210,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 
         // we can also release the Wifi lock, if we're holding it
         if (mWifiLock != null && mWifiLock.isHeld()) mWifiLock.release();
+        mWifiLock = null;
 
         if (retry && NetworkUtils.isConnected(mContext)) {
             Log.d(TAG, "sendEmptyMessageDelayed PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE");
@@ -262,7 +263,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
     @Override
     public void run() {
         try {
-            mWifiLock = ((WifiManager) mContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "push_wifi_lock");
+            mWifiLock = ((WifiManager) mContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, PushRunnable.class.getSimpleName() + "_lock");
             //mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 20 * 1000);
 
             while (!Thread.currentThread().isInterrupted()) {
