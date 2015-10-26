@@ -26,15 +26,20 @@ import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.service.InstalledApplicationTask;
 
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
 import org.basdroid.common.StringUtils;
 
 /**
  * Created by basagee on 2015. 6. 1..
  */
+@ReportsCrashes(formUri = "https://collector.tracepot.com/801a759d")
 public class HomeLauncherApplication extends Application  {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ACRA.init(this);
 
         // pre-load installed application list
         new InstalledApplicationTask(this).execute();

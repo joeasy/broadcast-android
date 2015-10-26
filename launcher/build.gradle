@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'jacoco'
 
 android {
     compileSdkVersion 22
@@ -47,6 +46,8 @@ dependencies {
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.android.support:gridlayout-v7:22.1.1'
     compile 'com.google.android.gms:play-services-location:7.8.0'
+    compile 'ch.acra:acra:4.6.2'
+
     compile project(':iot_lib')
     compile project(':vitamio')
     compile project(':push_agent')
@@ -54,38 +55,3 @@ dependencies {
     compile project(':viewpager_indicator')
 }
 
-jacoco {
-    toolVersion = "0.7.1.201405082137"
-}
-
-def coverageSourceDirs = [
-        '../launcher/src/main/java'
-]
-
-task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
-    group = "Reporting"
-
-    description = "Generate Jacoco coverage reports"
-
-    // exclude auto-generated classes and tests
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*',
-                      'android/**/*.*']
-    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/classes/debug", excludes: fileFilter)
-    def mainSrc = "${project.projectDir}/src/main/java"
-
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = fileTree(dir: project.projectDir, includes: ['**/*.exec', '**/*.ec'])
-
-    reports {
-        xml {
-            enabled = true
-            destination = "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        }
-        csv.enabled false
-        html {
-            enabled = true
-            destination = "${project.buildDir}/reports/jacoco"
-        }
-    }
-}
