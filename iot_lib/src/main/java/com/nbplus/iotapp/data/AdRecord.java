@@ -80,6 +80,9 @@ public class AdRecord implements Parcelable {
     public static HashMap<Integer, AdRecord> parseScanRecord(byte[] scanRecord) {
         HashMap<Integer, AdRecord> records = new HashMap<Integer, AdRecord>();
 
+        if (scanRecord == null || scanRecord.length == 0) {
+            return records;
+        }
         int index = 0;
         while (index < scanRecord.length) {
             int length = scanRecord[index++];
@@ -108,7 +111,7 @@ public class AdRecord implements Parcelable {
 
     private int mLength;
     private int mType;
-    private byte[] mData;
+    transient private byte[] mData;
 
     public AdRecord(int length, int type, byte[] data) {
         mLength = length;

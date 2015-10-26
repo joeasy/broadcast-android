@@ -35,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -178,6 +179,20 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 } else {
                     mPushServiceStatus.setImageResource(R.drawable.ic_nav_wifi_off);
                 }
+
+//                int what = msg.arg2;
+//                if (what == PushConstants.PUSH_STATUS_WHAT_NETORSERVER) {
+//                    new AlertDialog.Builder(getActivity()).setMessage("네트워크 상태 또는 서버에 의하여 푸시 에이전트 연결이 해제되었습니다.")
+//                            //.setTitle(R.string.alert_network_title)
+//                            .setCancelable(true)
+//                            .setPositiveButton(R.string.alert_ok,
+//                                    new DialogInterface.OnClickListener() {
+//                                        public void onClick(DialogInterface dialog, int whichButton) {
+//                                            dialog.dismiss();
+//                                        }
+//                                    })
+//                            .show();
+//                }
                 break;
             case Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED :
                 PushPayloadData payloadData = (PushPayloadData)msg.obj;
@@ -293,6 +308,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Message msg = new Message();
                 msg.what = Constants.HANDLER_MESSAGE_PUSH_STATUS_CHANGED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
+                msg.arg2 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_WHAT, PushConstants.PUSH_STATUS_WHAT_NORMAL);
                 mHandler.sendMessage(msg);
             } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
                 Message msg = new Message();

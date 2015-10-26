@@ -21,16 +21,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -52,20 +47,15 @@ import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 import com.nbplus.iotlib.data.IoTServiceStatus;
-import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.adapter.StickyGridHeadersIoTDevicesAdapter;
 import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.data.LauncherSettings;
-import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleArrayAdapter;
 
 import org.basdroid.common.DisplayUtils;
 
 import java.util.ArrayList;
-
-import io.vov.vitamio.widget.CenterLayout;
 
 /**
  * Created by basagee on 2015. 6. 23..
@@ -77,60 +67,12 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
 
     // button control
     ImageButton mCloseButton;
-    Button      mRefreshButton;
-    Button      mSendButton;
-    GridView    mGridView;
+    Button mRefreshButton;
+    Button mSendButton;
+    GridView mGridView;
     StickyGridHeadersIoTDevicesAdapter mGridAdapter;
 
-    Handler     mHandler = new Handler();
-
-//    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            final String action = (intent == null) ? "" : intent.getAction();
-//            Log.d(TAG, ">> mBroadcastReceiver action received = " + action);
-//            // send handler message
-//            switch (action) {
-//                case com.nbplus.iotlib.data.Constants.ACTION_IOT_DEVICE_LIST :
-//                    ArrayList<IoTDevice> iotDevicesList = intent.getParcelableArrayListExtra(com.nbplus.iotlib.data.Constants.EXTRA_IOT_DEVICE_LIST);
-//                    if (iotDevicesList != null) {
-//                        mIoTDevicesList = iotDevicesList;
-//                    } else {
-//                        mIoTDevicesList = new ArrayList<>();
-//                    }
-//
-//                    if (mGridAdapter == null) {
-//                        mGridAdapter = new StickyGridHeadersIoTDevicesAdapter(getActivity(),
-//                                mIoTDevicesList,
-//                                R.layout.grid_iot_devices_header,
-//                                R.layout.grid_iot_devices_item);
-//
-//                        mGridView.setAdapter(mGridAdapter);
-//                    } else {
-//                        mGridAdapter.setItems(mIoTDevicesList);
-//                    }
-//                    if (mGridAdapter.isEmpty()) {
-//                        mSendButton.setEnabled(false);
-//                        mSendButton.setClickable(false);
-//                    } else {
-//                        mSendButton.setEnabled(true);
-//                        mSendButton.setClickable(true);
-//                    }
-//
-//
-//                    mHandler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            ((BaseActivity)getActivity()).dismissProgressDialog();
-//                        }
-//                    }, 2000);
-//                    break;
-//                default :
-//                    break;
-//            }
-//        }
-//    };
+    Handler mHandler = new Handler();
 
     public static LoadIoTDevicesDialogFragment newInstance(Bundle b) {
         LoadIoTDevicesDialogFragment frag = new LoadIoTDevicesDialogFragment();
@@ -160,7 +102,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
         dialog.setContentView(v);
 
         // grid view
-        mGridView = (GridView)v.findViewById(R.id.iot_devices_grid);
+        mGridView = (GridView) v.findViewById(R.id.iot_devices_grid);
         mGridView.setEmptyView(v.findViewById(android.R.id.empty));
 
         // set button control
@@ -169,7 +111,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick btnClose..");
-                ((BaseActivity)getActivity()).dismissProgressDialog();
+                ((BaseActivity) getActivity()).dismissProgressDialog();
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Constants.ACTION_IOT_DEVICE_LIST);
                 sendIntent.putExtra(Constants.EXTRA_IOT_DEVICE_CANCELED, true);
@@ -184,9 +126,9 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick btnRefresh..");
-                ((BaseActivity)getActivity()).showProgressDialog();
+                ((BaseActivity) getActivity()).showProgressDialog();
 
-                IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragment.this);
+                IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragment.this, true);
             }
         });
 
@@ -195,7 +137,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick btnSend..");
-                ((BaseActivity)getActivity()).dismissProgressDialog();
+                ((BaseActivity) getActivity()).dismissProgressDialog();
                 showSyncAlertDialog();
             }
         });
@@ -255,7 +197,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
         Log.d(TAG, "dialog onAttach");
         IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, this);
 
-        ((BaseActivity)getActivity()).showProgressDialog();
+        ((BaseActivity) getActivity()).showProgressDialog();
 
 //        IntentFilter filter = new IntentFilter();
 //        filter.addAction(com.nbplus.iotlib.data.Constants.ACTION_IOT_DEVICE_LIST);
@@ -296,16 +238,16 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
     }
 
     private void dismissDialogFragment() {
-        ((BroadcastWebViewActivity)getActivity()).dismissUpdateIoTDevicesDialog();
+        ((BroadcastWebViewActivity) getActivity()).dismissUpdateIoTDevicesDialog();
     }
 
     /**
      * 버그라고 할 건아니지만...
      * => Caused by: java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
-     *
+     * <p/>
      * There are two DialogFragment show() methods
-     *    - show(FragmentManager manager, String tag) and show(FragmentTransaction transaction, String tag).
-     *
+     * - show(FragmentManager manager, String tag) and show(FragmentTransaction transaction, String tag).
+     * <p/>
      * If you want to use the FragmentManager version of the method (as in the original question),
      * an easy solution is to override this method and use commitAllowingStateLoss:
      */
@@ -323,7 +265,16 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
      * @param b
      */
     @Override
-    public void onResult(int cmd, IoTServiceStatus serviceStatus, IoTResultCodes serviceStatusCode, Bundle b) {
+    public void onResult(final int cmd, final IoTServiceStatus serviceStatus, final IoTResultCodes serviceStatusCode, final Bundle b) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                handleIoTReuslt(cmd, serviceStatus, serviceStatusCode, b);
+            }
+        });
+    }
+
+    private void handleIoTReuslt(int cmd, final IoTServiceStatus serviceStatus, final IoTResultCodes serviceStatusCode, Bundle b) {
         Log.d(TAG, "IoTServiceResponse onResult...serviceStatus = " + serviceStatus + ", statusCode = " + serviceStatusCode);
         switch (cmd) {
             case IoTServiceCommand.GET_DEVICE_LIST:
@@ -333,7 +284,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
                 }
 
                 if (!serviceStatus.equals(IoTServiceStatus.RUNNING)) {
-                    ((BaseActivity)getActivity()).dismissProgressDialog();
+                    ((BaseActivity) getActivity()).dismissProgressDialog();
 
                     if (serviceStatusCode.equals(IoTResultCodes.BLE_NOT_SUPPORTED) ||
                             serviceStatusCode.equals(IoTResultCodes.BLUETOOTH_NOT_SUPPORTED) ||
@@ -381,7 +332,6 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
                 Log.d(TAG, "Unknown command ");
         }
     }
-
     private void handleDeviceList(Bundle b) {
         ArrayList<IoTDevice> iotDevicesList = b.getParcelableArrayList(IoTServiceCommand.KEY_DATA);
         if (iotDevicesList != null) {
@@ -408,13 +358,12 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
             mSendButton.setClickable(true);
         }
 
-
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ((BaseActivity)getActivity()).dismissProgressDialog();
+                ((BaseActivity) getActivity()).dismissProgressDialog();
             }
-        }, 2000);
+        }, 500);
     }
 
     /**

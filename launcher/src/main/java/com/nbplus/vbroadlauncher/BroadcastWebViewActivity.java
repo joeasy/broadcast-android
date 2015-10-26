@@ -182,8 +182,6 @@ public class BroadcastWebViewActivity extends BaseActivity {
                             mGson = new GsonBuilder().create();
                         }
                         String json = mGson.toJson(data);
-                        // TODO : iot test
-                        LauncherSettings.getInstance(context).setTestIoTDevices(json);
 
                         Message msg = new Message();
                         msg.what = HANDLER_MESSAGE_UPDATE_IOT_DEVICE_LIST;

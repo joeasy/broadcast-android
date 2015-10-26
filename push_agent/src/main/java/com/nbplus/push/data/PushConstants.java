@@ -17,8 +17,12 @@ public class PushConstants {
     // send to application
     public static final String ACTION_PUSH_STATUS_CHANGED = "com.nbplus.pushservice.intent.action.PUSH_STATUS_CHANGED";
     public static final String EXTRA_PUSH_STATUS_VALUE = "extra_push_status_value";
+    public static final String EXTRA_PUSH_STATUS_WHAT = "extra_push_status_what";
     public static final int PUSH_STATUS_VALUE_DISCONNECTED = 0;
     public static final int PUSH_STATUS_VALUE_CONNECTED = 1;
+    public static final int PUSH_STATUS_WHAT_NORMAL = 0;
+    public static final int PUSH_STATUS_WHAT_NETORSERVER = 1;
+    public static final int PUSH_STATUS_WHAT_SERVICE_ERROR = 2;
 
     // push data type from server..
     public static final char PUSH_MESSAGE_TYPE_CONNECTION_REQUEST = '0';

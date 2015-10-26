@@ -559,6 +559,7 @@ public class TcpClient {
 
                     if (messageType == -1) {
                         // maybe closed connection..
+                        Log.e(TAG, "TCP client read EOF !!!!");
                         if (mMessageListener != null) {
                             //call the method messageReceived from MyActivity class
                             mMessageListener.connectionClosed();
@@ -575,6 +576,7 @@ public class TcpClient {
                 }
                 Log.e(TAG, "TCP connection closed !!!");
             } catch (EOFException e) {
+                Log.e(TAG, "EOFException received", e);
                 // maybe closed connection..
                 if (mMessageListener != null) {
                     //call the method messageReceived from MyActivity class
@@ -584,7 +586,7 @@ public class TcpClient {
                 Log.e(TAG, "S: Error", e);
                 if (mMessageListener != null) {
                     //call the method messageReceived from MyActivity class
-                    mMessageListener.onConnectionError();
+                    mMessageListener.connectionClosed();
                 }
             } finally {
                 //the socket must be closed. It is not possible to reconnect to this socket

@@ -18,15 +18,11 @@
 package com.nbplus.iotlib;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -36,20 +32,27 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.nbplus.iotapp.data.AdRecord;
+import com.nbplus.iotapp.data.DataParser;
+import com.nbplus.iotapp.perferences.IoTServicePreference;
 import com.nbplus.iotapp.service.IoTService;
 import com.nbplus.iotlib.callback.IoTServiceResponse;
 import com.nbplus.iotlib.data.Constants;
 import com.nbplus.iotlib.data.DeviceTypes;
+import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 import com.nbplus.iotlib.data.IoTServiceStatus;
 import com.nbplus.iotlib.exception.InitializeRequiredException;
-import com.nbplus.iotlib.exception.NotRegisteredException;
 
 import org.basdroid.common.PackageUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by basagee on 2015. 3. 23..
@@ -89,9 +92,16 @@ public class IoTInterface {
 
     /** Context of the activity from which this connector was launched */
     private Context mCtx;
+    private boolean mInitialized = false;
 
+    WeakReference<IoTServiceResponse> mForceRescanCallback = null;
     HashMap<String, WeakReference<IoTServiceResponse>> mRequestedCallbaks = new HashMap<>();
     HashMap<String, WeakReference<IoTServiceResponse>> mWaitingRequestCallbaks = new HashMap<>();
+
+    /**
+     * 10초동안 검색된 device list 를 저장해 두는 공간
+     */
+    private HashMap<String, IoTDevice> mScanedList = new HashMap<>();
 
     /**
      * singleton instance 로 만들어준다.
@@ -117,6 +127,13 @@ public class IoTInterface {
 
     public IoTResultCodes initialize(Context context) {
         mCtx = context;
+
+        mInitialized = true;
+        String savedJson = IoTServicePreference.getIoTDevicesList(mCtx);
+        if (savedJson != null) {
+            Gson gson = new Gson();
+            mScanedList = gson.fromJson(savedJson, new TypeToken<HashMap<String, IoTDevice>>(){}.getType());
+        }
 
         // connect to remote service
         if (Constants.USE_ANOTHER_APP) {
@@ -152,20 +169,6 @@ public class IoTInterface {
     /**
      * Handler of incoming messages from service.
      */
-//    private static final int HANDLER_SERVICE_CREATED = IoTServiceCommand.COMMAND_BASE_VALUE - 1;
-//    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            final String action = intent.getAction();
-//            if (Constants.ACTION_SERVICE_CREATE_BROADCAST.equals(action)) {
-//                mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
-//            }
-//
-//        }
-//
-//    };
-
     class IoTInterfaceHandler extends Handler {
 
         public IoTInterfaceHandler(HandlerThread thr) {
@@ -186,6 +189,126 @@ public class IoTInterface {
                         mErrorCodes = (IoTResultCodes)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE);
 
                         Log.d(TAG, "IoTServiceCommand.SERVICE_STATUS_NOTIFICATION : status = " + mServiceStatus + ", errCode = " + mErrorCodes);
+                    }
+                    break;
+                }
+                case IoTServiceCommand.DEVICE_LIST_NOTIFICATION: {
+                    Bundle b = msg.getData();
+                    if (b != null) {
+                        HashMap<String, IoTDevice> devices = (HashMap<String, IoTDevice>)b.getSerializable(IoTServiceCommand.KEY_DATA);
+                        boolean changed = false;
+                        if (devices != null) {
+                            Iterator<String> iter = devices.keySet().iterator();
+                            while(iter.hasNext()) {
+                                String key = iter.next();
+                                IoTDevice device = mScanedList.get(key);
+                                if (device != null) {           // already exist
+                                    device.setAdRecordHashMap(devices.get(key).getAdRecordHashMap());
+                                    continue;
+                                }
+
+                                device = devices.get(key);
+                                ArrayList<String> uuids = getUuids(device.getAdRecordHashMap());
+                                if (uuids == null || uuids.size() == 0) {
+                                    Log.e(TAG, ">>> device name " + device.getDeviceName() + " has no uuid advertisement");
+                                    continue;
+                                }
+                                changed = true;
+                                device.setUuids(uuids);
+                                device.setUuidLen(getUuidLength(device.getAdRecordHashMap()));
+                                mScanedList.put(device.getDeviceId(), device);
+                            }
+
+                            Log.d(TAG, "IoTServiceCommand.GET_DEVICE_LIST added size = " + devices.size());
+                            // if devices and mScanedList have dulicate keys,
+                            // mScanedList overwrite values from devices
+//                            devices.putAll(mScanedList);
+//                            mScanedList = devices;
+                        }
+                        if (changed) {
+                            // save to preference.
+                            Gson gson = new Gson();
+                            String json = gson.toJson(mScanedList);
+                            if (json != null) {
+                                IoTServicePreference.setIoTDevicesList(mCtx, json);
+                            }
+                        }
+                        Log.d(TAG, "Current device size = " + mScanedList.size());
+
+                        if (mForceRescanCallback != null) {
+                            final IoTServiceResponse responseCallback = mForceRescanCallback.get();
+                            if (responseCallback != null) {
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Bundle b = new Bundle();
+                                        ArrayList<IoTDevice> devicesList = null;
+                                        if (mScanedList != null && mScanedList.size() > 0) {
+                                            devicesList = new ArrayList<>(mScanedList.values());
+                                        } else {
+                                            devicesList = new ArrayList<>();
+                                        }
+
+                                        b.putParcelableArrayList(IoTServiceCommand.KEY_DATA, devicesList);
+                                        responseCallback.onResult(IoTServiceCommand.GET_DEVICE_LIST, mServiceStatus, mErrorCodes, b);
+                                    }
+                                }, 100);
+                            }
+                            mForceRescanCallback = null;
+                        }
+
+                        // TODO : log
+                        Iterator<String> iter = mScanedList.keySet().iterator();
+                        while(iter.hasNext()) {
+                            String key = iter.next();
+                            IoTDevice device = mScanedList.get(key);
+
+                            if (device.getAdRecordHashMap() == null) {
+                                Log.d(TAG, "old scanned device...");
+                                ArrayList<String> uuids = getUuids(device.getAdRecordHashMap());
+                                if (uuids == null) {
+                                    continue;
+                                }
+                                String uuidStr = null;
+                                for (String uuid : uuids) {
+                                    if (uuidStr != null) {
+                                        uuidStr += ", " + uuid;
+                                    } else {
+                                        uuidStr = uuid;
+                                    }
+                                }
+                                Log.d(TAG, "--OO svcuuids = " + uuidStr + ", name = " + device.getDeviceName() + ", id = " + device.getDeviceId());
+                            } else {
+                                AdRecord typeRecord = device.getAdRecordHashMap().get(AdRecord.TYPE_FLAGS);
+
+                                String str = "";
+                                int flags;
+                                if (typeRecord.getValue() != null && typeRecord.getValue().length > 0) {
+                                    flags = typeRecord.getValue()[0] & 0x0FF;
+                                    str = "";
+                                    if ( (flags & 0x01) > 0 ) { str += "'LE Limited Discoverable Mode' "; }
+                                    if ( (flags & (0x01 << 1)) > 0 ) { str += "'LE General Discoverable Mode' "; }
+                                    if ( (flags & (0x01 << 2)) > 0 ) { str += "'BR/EDR Not Supported' "; }
+                                    if ( (flags & (0x01 << 3)) > 0 ) { str += "'Simultaneous LE and BR/EDR to Same Device Capacble (Controller)' "; }
+                                    if ( (flags & (0x01 << 4)) > 0 ) { str += "'Simultaneous LE and BR/EDR to Same Device Capacble (Host)' "; }
+                                }
+
+                                ArrayList<String> uuids = getUuids(device.getAdRecordHashMap());
+                                if (uuids == null) {
+                                    continue;
+                                }
+                                String uuidStr = null;
+                                for (String uuid : uuids) {
+                                    if (uuidStr != null) {
+                                        uuidStr += ", " + uuid;
+                                    } else {
+                                        uuidStr = uuid;
+                                    }
+                                }
+                                Log.d(TAG, "--NN svcuuids = " + uuidStr + ", name = " + device.getDeviceName() + ", id = " + device.getDeviceId() + ", type = " + str);
+                            }
+
+                        }
                     }
                     break;
                 }
@@ -307,7 +430,6 @@ public class IoTInterface {
 
         try {
             if (mCtx.getApplicationContext().bindService(i, mConnection, Context.BIND_AUTO_CREATE)) {
-                mServiceStatus = IoTServiceStatus.INITIALIZE;
                 return true;
             }
         } catch (SecurityException e) {
@@ -335,7 +457,10 @@ public class IoTInterface {
      * public methods
      */
     public void getDevicesList(DeviceTypes type, final IoTServiceResponse callback) {
-        if (mCtx == null) {
+        getDevicesList(type, callback, false);
+    }
+    public void getDevicesList(DeviceTypes type, final IoTServiceResponse callback, boolean forceRescan) {
+        if (!mInitialized) {
             InitializeRequiredException initException = new InitializeRequiredException("Init required Exception!!");
 
             try {
@@ -355,23 +480,47 @@ public class IoTInterface {
             }, 100);
         } else if (mServiceStatus.equals(IoTServiceStatus.RUNNING)) {
             // 서비스가 정상동작 중
-            Message msg = new Message();
+            if (forceRescan) {
+                // 전체 다시 검색을 요청할 경우..
+                Message msg = new Message();
 
-            msg.what = IoTServiceCommand.GET_DEVICE_LIST;
-            Bundle b = new Bundle();
-            String msgId = IoTServiceCommand.generateMessageId(mCtx);
-            b.putString(IoTServiceCommand.KEY_MSGID, msgId);
-            b.putSerializable(IoTServiceCommand.KEY_DEVICE_TYPE, type);
+                msg.what = IoTServiceCommand.GET_DEVICE_LIST;
+                Bundle b = new Bundle();
+                String msgId = IoTServiceCommand.generateMessageId(mCtx);
+                b.putString(IoTServiceCommand.KEY_MSGID, msgId);
+                b.putSerializable(IoTServiceCommand.KEY_DEVICE_TYPE, type);
 
-            mRequestedCallbaks.put(msgId, new WeakReference<>(callback));
+                mForceRescanCallback = new WeakReference<>(callback);
+                //mRequestedCallbaks.put(msgId, new WeakReference<>(callback));
 
-            msg.setData(b);
-            handler.sendMessage(msg);
+                msg.setData(b);
+                try {
+                    mServiceMessenger.send(msg);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Bundle b = new Bundle();
+                        ArrayList<IoTDevice> devicesList = null;
+                        if (mScanedList != null && mScanedList.size() > 0) {
+                            devicesList = new ArrayList<>(mScanedList.values());
+                        } else {
+                            devicesList = new ArrayList<>();
+                        }
 
+                        b.putParcelableArrayList(IoTServiceCommand.KEY_DATA, devicesList);
+                        callback.onResult(IoTServiceCommand.GET_DEVICE_LIST, mServiceStatus, mErrorCodes, b);
+                    }
+                }, 100);
+            }
         } else if (mServiceStatus.equals(IoTServiceStatus.INITIALIZE)) {
             // bound 진행중?
             String msgId = IoTServiceCommand.generateMessageId(mCtx);
-            mWaitingRequestCallbaks.put(msgId, new WeakReference<>(callback));
+            mForceRescanCallback = new WeakReference<>(callback);
+            //mWaitingRequestCallbaks.put(msgId, new WeakReference<>(callback));
             // REGISTER 가 잘못되었다.???
             // 개발시에 처리되어야 한다.
 //            try {
@@ -391,7 +540,64 @@ public class IoTInterface {
         }
     }
     public void controlDevice(String deviceId, String command) {
+        if (!mInitialized) {
+            InitializeRequiredException initException = new InitializeRequiredException("Init required Exception!!");
+
+            try {
+                throw initException;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
 
     }
 
+    private ArrayList<String> getUuids(HashMap<Integer, AdRecord> adRecords) {
+        byte[] uuidBytes = null;
+        ArrayList<String> uuids = null;
+
+        if (adRecords.get(AdRecord.TYPE_UUID16) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID16).getValue();
+            uuids = DataParser.getUint16StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID16_INC) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID16_INC).getValue();
+            uuids = DataParser.getUint16StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID32) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID32).getValue();
+            uuids = DataParser.getUint32StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID32_INC) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID32_INC).getValue();
+            uuids = DataParser.getUint32StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID128) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID128).getValue();
+            uuids = DataParser.getUint128StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID128_INC) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID128_INC).getValue();
+            uuids = DataParser.getUint128StringArray(uuidBytes);
+        }
+
+        return uuids;
+    }
+
+    private int getUuidLength(HashMap<Integer, AdRecord> adRecords) {
+        byte[] uuidBytes = null;
+        ArrayList<String> uuids = null;
+
+        if (adRecords.get(AdRecord.TYPE_UUID16) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_16;
+        } else if (adRecords.get(AdRecord.TYPE_UUID16_INC) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_16;
+        } else if (adRecords.get(AdRecord.TYPE_UUID32) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_32;
+        } else if (adRecords.get(AdRecord.TYPE_UUID32_INC) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_32;
+        } else if (adRecords.get(AdRecord.TYPE_UUID128) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_128;
+        } else if (adRecords.get(AdRecord.TYPE_UUID128_INC) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_128;
+        }
+
+        return IoTDevice.DEVICE_BT_UUID_LEN_16;
+    }
 }

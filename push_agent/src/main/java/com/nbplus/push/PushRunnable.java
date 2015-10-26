@@ -105,7 +105,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 
                 data.setPayload("{ \"FROM\":\"김김김\", \"ADDRESS\":\"그냥마을\", " +
                         "\"MESSAGE\":\"" +
-                        "111222" +
+                        "오는 19일(이하 현지시간) 열리는 캐나다 총선에서 보수당의 10년 집권이 마침표를 찍을 것이라는 관측이 나오고 있다." +
 
                         "\", \"SERVICE_TYPE\":\"02\"}");
                 testMsg.obj = data;
@@ -138,7 +138,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         this.mServiceHandler = handler;
     }
 
-    public void sendSatusChangedBroadcastMessage() {
+    public void sendSatusChangedBroadcastMessage(int what) {
         Log.d(TAG, "Send Broadcasting message action = " + PushConstants.ACTION_PUSH_STATUS_CHANGED);
         Intent intent = new Intent(PushConstants.ACTION_PUSH_STATUS_CHANGED);
         if (mState == State.Connected) {
@@ -146,6 +146,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         } else {
             intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
         }
+        intent.putExtra(PushConstants.EXTRA_PUSH_STATUS_WHAT, what);
         mContext.sendBroadcast(intent);
     }
 
@@ -184,28 +185,37 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
             }
             mTcpClient.run();
         } finally {
-            releasePushClientSocket();
+            if (mState == State.Connected) {
+                releasePushClientSocket();
+            }
         }
     }
 
     private void releasePushClientSocket() {
-        releasePushClientSocket(true);
+        if (mState == State.Connected) {
+            releasePushClientSocket(true, PushConstants.PUSH_STATUS_WHAT_NORMAL);
+        }
+    }
+    private void releasePushClientSocket(int what) {
+        if (mState == State.Connected) {
+            releasePushClientSocket(true, what);
+        }
     }
     public void releasePushClientSocket(boolean retry) {
+        if (mState == State.Connected) {
+            releasePushClientSocket(retry, PushConstants.PUSH_STATUS_WHAT_NORMAL);
+        }
+    }
+    public void releasePushClientSocket(boolean retry, int what) {
         if (mTcpClient != null) {
             mTcpClient.stopClient();
         }
-//        mTcpClient = null;
-//                    if (mTcpThread != null && mTcpThread.isAlive()) {
-//                        mTcpThread.interrupt();
-//                    }
-//                    mTcpThread = null;
 
         State prevState = mState;
         mState = State.Stopped;
 
         if (prevState != mState) {
-            sendSatusChangedBroadcastMessage();
+            sendSatusChangedBroadcastMessage(what);
         }
 
         // we can also release the Wifi lock, if we're holding it
@@ -213,9 +223,17 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         mWifiLock = null;
 
         if (retry && NetworkUtils.isConnected(mContext)) {
-            Log.d(TAG, "sendEmptyMessageDelayed PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE");
+            Log.d(TAG, "sendEmptyMessageDelayed PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE.. what = " + what);
             mServiceHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
-            mServiceHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
+            if (what != PushConstants.PUSH_STATUS_WHAT_SERVICE_ERROR) {
+                mServiceHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
+            } else {
+                /**
+                 * TCP close 시점에 RST를 받으면 재연결시에 keep-alive 에서 2001 이 돌아온다.
+                 * TCP 처리로직내에서 서버에서 에러코드를 받아 재연결하는 경우에는 바로 다시연결하자.
+                 */
+                mServiceHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS);
+            }
         }
     }
 
@@ -235,7 +253,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 //                                    mTcpThread.interrupt();
 //                                }
         //mIsPossibleTcpClientRun = false;
-        releasePushClientSocket();
+        releasePushClientSocket(PushConstants.PUSH_STATUS_WHAT_NETORSERVER);
     }
 
     @Override
@@ -245,14 +263,14 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 //                                    mTcpThread.interrupt();
 //                                }
         //mIsPossibleTcpClientRun = false;
-        releasePushClientSocket();
+        releasePushClientSocket(PushConstants.PUSH_STATUS_WHAT_SERVICE_ERROR);
     }
 
     @Override
     public void onConnected() {
         Log.i(TAG, ">> TcpClient onConnected received !!");
         mState = State.Connected;
-        sendSatusChangedBroadcastMessage();
+        sendSatusChangedBroadcastMessage(PushConstants.PUSH_STATUS_WHAT_NORMAL);
 
         if (mWifiLock != null) {
             mWifiLock.acquire();

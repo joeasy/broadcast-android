@@ -70,8 +70,10 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     private PushPayloadData mBroadcastData;
 
     boolean mIsTTS = false;
+    boolean mIsMuted = false;
 
     private long mBroadcastPayloadIdx = -1;
+    private int mStreamMusicVolume = 0;
 
     private static final int HANDLER_BROADCAST_STARTED = 1000;
     private static final int HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE = 1001;
@@ -249,6 +251,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
             mWebViewClient.loadUrl(url);
             mIsTTS = false;
         }
+        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mStreamMusicVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC),  AudioManager.FLAG_PLAY_SOUND);
     }
 
     /**
@@ -265,7 +270,13 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
     private void microphoneMute(boolean onoff) {
         AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMicrophoneMute(onoff);
+
+        if (!audioManager.isMicrophoneMute() && onoff) {
+            mIsMuted = true;
+            audioManager.setMicrophoneMute(onoff);
+        } else if (!onoff) {
+            audioManager.setMicrophoneMute(onoff);
+        }
     }
 
     @Override
@@ -439,6 +450,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                 showSystemUI();
             }
         });
+
+        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamMusicVolume, AudioManager.FLAG_PLAY_SOUND);
 
         finish();
     }
