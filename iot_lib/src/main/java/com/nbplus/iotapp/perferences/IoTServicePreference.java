@@ -24,10 +24,12 @@ import android.os.Build;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.basdroid.common.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,6 +44,7 @@ public class IoTServicePreference {
     private Gson mGson;
 
     public static final String KEY_USE_IOT_GATEWAY = "KEY_USE_IOT_GATEWAY";
+    public static final String KEY_IOT_DEVICES_LIST = "KEY_IOT_DEVICES_LIST";
 
     // 값 불러오기
     private static SharedPreferences getPreferences(Context context) {
@@ -335,5 +338,12 @@ public class IoTServicePreference {
      */
     public static boolean isUseIoTGateway(Context context) {
         return getBoolean(context, KEY_USE_IOT_GATEWAY, false);
+    }
+
+    public static void setIoTDevicesList (Context context, String json) {
+        putString(context, KEY_IOT_DEVICES_LIST, json);
+    }
+    public static String getIoTDevicesList (Context context) {
+        return getString(context, KEY_IOT_DEVICES_LIST, "{}");
     }
 }

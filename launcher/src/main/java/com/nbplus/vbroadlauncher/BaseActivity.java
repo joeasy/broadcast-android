@@ -108,7 +108,7 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
             Log.d(TAG, "여기서 제대로 설정안했다면 관두자.... 사용자 맘인데...");
             if (mcheckText2SpeechLister != null) {
                 mcheckText2SpeechLister.onCheckResult(null);
-                mText2Speech.shutdown();
+                if (mText2Speech != null) mText2Speech.shutdown();
                 mText2Speech = null;
             }
             showText2SpeechAlertDialog();
@@ -119,7 +119,7 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
                 Log.d(TAG, "여기서 제대로 설정안했다면 관두자.... 사용자 맘인데...");
                 if (mcheckText2SpeechLister != null) {
                     mcheckText2SpeechLister.onCheckResult(null);
-                    mText2Speech.shutdown();
+                    if (mText2Speech != null) mText2Speech.shutdown();
                     mText2Speech = null;
                 }
                 showText2SpeechAlertDialog();
@@ -129,7 +129,7 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
                 } else {
                     if (mcheckText2SpeechLister != null) {
                         mcheckText2SpeechLister.onCheckResult(null);
-                        mText2Speech.shutdown();
+                        if (mText2Speech != null) mText2Speech.shutdown();
                         mText2Speech = null;
                     }
                 }

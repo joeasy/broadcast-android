@@ -25,10 +25,4 @@ public class Constants {
     public static final String NBPLUS_IOT_APP_PACKAGE_NAME = "com.nbplus.iotapp";
 
     public static final String ACTION_SERVICE_CREATE_BROADCAST = "com.nbplus.iot.ACTION_SERVICE_CREATE_BROADCAST";
-    /**
-     * local broadcast action & extra
-     * 라이브러리에서 실제 어플리케이션으로 데이터를 전달하는 경우.
-     */
-    // 디바이스 리스트 전달
-    public static final String ACTION_IOT_DEVICE_LIST = "com.nbplus.iot.ACTION_IOT_DEVICE_LIST";
 }

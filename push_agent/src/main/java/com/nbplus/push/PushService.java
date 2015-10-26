@@ -22,6 +22,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -31,7 +32,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -64,7 +67,7 @@ public class PushService extends Service {
 
     // minutes
     public static final int MILLISECONDS = 1000;
-    public static final int mNextRetryPeriodTerm = 60;
+    public static final int mNextRetryPeriodTerm = 30;
 
     // Wifi lock that we hold when streaming files from the internet, in order to prevent the
     // device from shutting off the Wifi radio
@@ -282,7 +285,7 @@ public class PushService extends Service {
                 mPushRunnable.releasePushClientSocket(false);
             }
         } else if (action.equals(PushConstants.ACTION_GET_STATUS)) {
-            mPushRunnable.sendSatusChangedBroadcastMessage();
+            mPushRunnable.sendSatusChangedBroadcastMessage(PushConstants.PUSH_STATUS_WHAT_NORMAL);
         }
 
         /**

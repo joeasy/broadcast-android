@@ -20,7 +20,12 @@ package com.nbplus.iotlib.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.nbplus.iotapp.data.AdRecord;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by basagee on 2015. 8. 6..
@@ -37,6 +42,10 @@ public class IoTDevice implements Parcelable {
     public static final int DEVICE_TYPE_ID_ZW = 0x0003;
 
 
+    public static final int DEVICE_BT_UUID_LEN_16 = 0x0001;
+    public static final int DEVICE_BT_UUID_LEN_32 = 0x0002;
+    public static final int DEVICE_BT_UUID_LEN_128 = 0x0003;
+
     @SerializedName("IOT_DEVICE_ID")
     private String deviceId;
     @SerializedName("IOT_DEVICE_NAME")
@@ -47,6 +56,37 @@ public class IoTDevice implements Parcelable {
     private String deviceModel;
     @SerializedName("IOT_DEVICE_TYPE")
     private String deviceType;          // "IR", "BT", "ZW", etc.....
+    @SerializedName("IOT_DEVICE_BT_UUIDLEN")
+    private int uuidLen;                // 0: 16, 1: 32, 2: 128
+    @SerializedName("IOT_DEVICE_UUIDS")            // for bluetooth
+    private ArrayList<String> uuids;
+
+    @Expose
+    HashMap<Integer, AdRecord> adRecordHashMap;
+
+    public int getUuidLen() {
+        return uuidLen;
+    }
+
+    public void setUuidLen(int uuidLen) {
+        this.uuidLen = uuidLen;
+    }
+
+    public ArrayList<String> getUuids() {
+        return uuids;
+    }
+
+    public void setUuids(ArrayList<String> uuids) {
+        this.uuids = uuids;
+    }
+
+    public HashMap<Integer, AdRecord> getAdRecordHashMap() {
+        return adRecordHashMap;
+    }
+
+    public void setAdRecordHashMap(HashMap<Integer, AdRecord> adRecordHashMap) {
+        this.adRecordHashMap = adRecordHashMap;
+    }
 
     public String getDeviceModel() {
         return deviceModel;
@@ -115,6 +155,9 @@ public class IoTDevice implements Parcelable {
         dest.writeString(this.deviceVendor);
         dest.writeString(this.deviceModel);
         dest.writeString(this.deviceType);
+        dest.writeInt(this.uuidLen);
+        dest.writeStringList(this.uuids);
+        dest.writeSerializable(this.adRecordHashMap);
     }
 
     protected IoTDevice(Parcel in) {
@@ -123,6 +166,9 @@ public class IoTDevice implements Parcelable {
         this.deviceVendor = in.readString();
         this.deviceModel = in.readString();
         this.deviceType = in.readString();
+        this.uuidLen = in.readInt();
+        this.uuids = in.createStringArrayList();
+        this.adRecordHashMap = (HashMap<Integer, AdRecord>) in.readSerializable();
     }
 
     public static final Creator<IoTDevice> CREATOR = new Creator<IoTDevice>() {

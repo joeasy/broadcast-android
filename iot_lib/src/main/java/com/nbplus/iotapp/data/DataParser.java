@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2015. NB Plus (www.nbplus.co.kr)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.nbplus.iotapp.data;
 
 import android.util.Log;
@@ -53,17 +70,33 @@ public class DataParser {
         return ((0xff & value[1]) << 8 | (0xff & value[0]));
     }
 
-    public static String getUuid128String(byte[] value) {
+    public static String getUuid32String(byte[] value) {
         String result = "";
         int length = value.length;
-        if (length != 32) {
+        if (length != 8) {
             return "";
         }
 
-        for (int i = 0; i < length; i ++) {
-            result += String.format("%c", value[i]);
-            if (i == 7 || i == 11 || i == 15 || i == 19)
+        for (int i = 8; i > 0; i -= 2) {
+            byte[] temp = Arrays.copyOfRange(value, i - 2, i);
+            result += getUint16String(temp);
+        }
+        return result;
+    }
+
+    public static String getUuid128String(byte[] value) {
+        String result = "";
+        int length = value.length;
+        if (length != 16) {
+            return "";
+        }
+
+        for (int i = 16; i > 0; i -= 2) {
+            byte[] temp = Arrays.copyOfRange(value, i - 2, i);
+            if (i == 12 || i == 10 || i == 8 || i == 6) {
                 result += "-";
+            }
+            result += getUint16String(temp);
         }
         return result;
     }
@@ -88,12 +121,12 @@ public class DataParser {
      * @return
      */
     public static ArrayList<String> getUint16StringArray(byte[] value) {
-        int len = value.length;
         if (value == null || value.length < 2) {
             Log.e(TAG, "value is null or invalid length");
             return new ArrayList<String>();
         }
 
+        int len = value.length;
         ArrayList<String> strArrays = new ArrayList<String>();
         for (int i = 0; i < len; i += 2) {
             if (i + 2 > len) {
@@ -104,6 +137,40 @@ public class DataParser {
             strArrays.add(getUint16String(temp));
         }
 
+        return strArrays;
+    }
+
+    public static ArrayList<String> getUint32StringArray(byte[] value) {
+        final int bitlen32 = 8;
+        if (value == null || value.length < 8 || value.length % 8 != 0 ) {
+            Log.e(TAG, "value is null or invalid length");
+            return new ArrayList<String>();
+        }
+
+        int len = value.length;
+        ArrayList<String> strArrays = new ArrayList<String>();
+        for (int i = 0; i < len; i += bitlen32) {
+            String str128 = "";
+            byte[] temp = Arrays.copyOfRange(value, i, i + bitlen32);
+            strArrays.add(getUuid32String(temp));
+        }
+        return strArrays;
+    }
+
+    public static ArrayList<String> getUint128StringArray(byte[] value) {
+        final int bitlen128 = 16;
+        if (value == null || value.length < 16 || value.length % 16 != 0 ) {
+            Log.e(TAG, "value is null or invalid length");
+            return new ArrayList<String>();
+        }
+
+        int len = value.length;
+        ArrayList<String> strArrays = new ArrayList<String>();
+        for (int i = 0; i < len; i += bitlen128) {
+            String str128 = "";
+            byte[] temp = Arrays.copyOfRange(value, i, i + bitlen128);
+            strArrays.add(getUuid128String(temp));
+        }
         return strArrays;
     }
 

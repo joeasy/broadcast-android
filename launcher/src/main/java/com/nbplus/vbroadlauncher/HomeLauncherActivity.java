@@ -251,13 +251,13 @@ public class HomeLauncherActivity extends BaseActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        finish();
+                        //finish();
                     }
                 });
                 alert.setMessage(R.string.alert_phone_message);
                 alert.show();
 
-                return;
+                //return;
             }
         }
 
@@ -458,36 +458,36 @@ public class HomeLauncherActivity extends BaseActivity
          * 항상 구글 플레이 서비스 상태를 체크한다.
          */
         // TODO : gms 설치된 버전을 받으면 다시 살려야 한다.  
-//        if (checkPlayServices()) {
-//            Log.d(TAG, ">>> checkPlayServices() support");
-//            if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
-//                // Building the GoogleApi client
-//                buildGoogleApiClient();
-//                createLocationRequest();
-//                buildLocationSettingsRequest();
-//
-//                //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
-//                checkLocationSettings();
-//                //}
-//                Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
-//                if (mGoogleApiClient != null) {
-//                    mGoogleApiClient.connect();
-//                }
-//            }
-//        } else {
-//            Log.e(TAG, "Google Play Service is not available !!!!!");
-//            return;
-//        }
+        if (checkPlayServices()) {
+            Log.d(TAG, ">>> checkPlayServices() support");
+            if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
+                // Building the GoogleApi client
+                buildGoogleApiClient();
+                createLocationRequest();
+                buildLocationSettingsRequest();
+
+                //if (LauncherSettings.getInstance(this).getPreferredUserLocation() == null) {
+                checkLocationSettings();
+                //}
+                Log.d(TAG, "HomeLauncherActivity onCreate() call mGoogleApiClient.connect()");
+                if (mGoogleApiClient != null) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        } else {
+            Log.e(TAG, "Google Play Service is not available !!!!!");
+            return;
+        }
 
         /**
          * 네트워크 상태를 체크한다.
          * 와이파이를 사용자가 설정에서 꺼놓은 상태인경우 와이파이를 켜도록 한다.
          */
-        if (!NetworkUtils.isConnected(this)) {
-            if (!NetworkUtils.isWifiEnabled(this)) {
-                showWifiEnableAlertDialog();
-            }
-        }
+//        if (!NetworkUtils.isConnected(this)) {
+//            if (!NetworkUtils.isWifiEnabled(this)) {
+//                showWifiEnableAlertDialog();
+//            }
+//        }
     }
 
     @Override
@@ -663,6 +663,7 @@ public class HomeLauncherActivity extends BaseActivity
      * location settings are adequate. If they are not, begins the process of presenting a location
      * settings dialog to the user.
      */
+    private boolean mIsAlreadyShownDialog = false;
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
         mCheckLocationSettingStatus = locationSettingsResult.getStatus();
@@ -673,15 +674,19 @@ public class HomeLauncherActivity extends BaseActivity
                 updateLocaton();
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to" +
-                        "upgrade location settings ");
+                if (!mIsAlreadyShownDialog) {
+                    Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to" +
+                            "upgrade location settings ");
 
-                try {
-                    // Show the dialog by calling startResolutionForResult(), and check the result
-                    // in onActivityResult().
-                    mCheckLocationSettingStatus.startResolutionForResult(this, REQUEST_CHECK_SETTINGS);
-                } catch (IntentSender.SendIntentException e) {
-                    Log.i(TAG, "PendingIntent unable to execute request.");
+                    try {
+                        // Show the dialog by calling startResolutionForResult(), and check the result
+                        // in onActivityResult().
+                        mIsAlreadyShownDialog = true;
+                        mCheckLocationSettingStatus.startResolutionForResult(this, REQUEST_CHECK_SETTINGS);
+                    } catch (IntentSender.SendIntentException e) {
+                        Log.i(TAG, "PendingIntent unable to execute request.");
+                        mIsAlreadyShownDialog = false;
+                    }
                 }
                 break;
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
@@ -732,6 +737,7 @@ public class HomeLauncherActivity extends BaseActivity
         switch (requestCode) {
             // Check for the integer request code originally supplied to startResolutionForResult().
             case REQUEST_CHECK_SETTINGS:
+                mIsAlreadyShownDialog = false;
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.i(TAG, "User agreed to make required location settings changes.");

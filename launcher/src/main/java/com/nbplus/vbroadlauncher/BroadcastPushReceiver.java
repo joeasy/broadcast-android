@@ -66,7 +66,11 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         } else if (PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(action)) {
             Log.d(TAG, "Receive.. broadcast ACTION_PUSH_MESSAGE_RECEIVED from push service. re-direct to activity!!!");
-
+            //TODO: iot  개발로막음.
+//            int i = 0;
+//            if (i == 0) {
+//                return;
+//            }
             PushMessageData data = null;
             try {
                 data = (PushMessageData) intent.getParcelableExtra(PushConstants.EXTRA_PUSH_MESSAGE_DATA);

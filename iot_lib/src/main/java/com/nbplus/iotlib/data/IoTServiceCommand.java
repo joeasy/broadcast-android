@@ -50,21 +50,29 @@ public class IoTServiceCommand {
     public static final int GET_DEVICE_LIST = UNREGISTER_SERVICE + 1;
     public static final int DEVICE_BONDING = GET_DEVICE_LIST + 1;
     public static final int DEVICE_UN_BONDING = DEVICE_BONDING + 1;
-    public static final int SET_NOTIFICATION = DEVICE_UN_BONDING + 1;
-    public static final int WRITE = SET_NOTIFICATION + 1;
-    public static final int READ = WRITE + 1;
+    public static final int CONTROL_DEVICE = DEVICE_UN_BONDING + 1;     // IR 등에대한 제어
+    public static final int GET_DEVICE_DATA = CONTROL_DEVICE + 1;
 
     /**
      * from service to application.
      */
+    /**
+     * 디바이스리스트 갱신에 대한 notification
+     */
+    public static final int DEVICE_LIST_NOTIFICATION = GET_DEVICE_DATA + 1;
+    /**
+     * 어플리케이션에서 데이터조회 요청한 디바이스에 대해서
+     * 시나리오에 따라 데이터 조회(notify/indicate, read, write) 등등의 조합으로 처리결과
+     */
+    public static final int DEVICE_DATA_NOTIFICATION = DEVICE_LIST_NOTIFICATION + 1;
+    public static final int DEVICE_CONTROL_NOTIFICATION = DEVICE_DATA_NOTIFICATION + 1;
+
     // 위의 request 에 대한 결과를 전달하기 위함.
     // - message의 data 전달되는 데이터 형식
     // Bundle b = new Bundle(); b.putInt(REQUEST_CODE); b.putXXXXX~~~~
-    public static final int COMMAND_RESPONSE = READ + 1;
+    public static final int COMMAND_RESPONSE = DEVICE_CONTROL_NOTIFICATION + 1;
     // 서비스 상태 변경..
     public static final int SERVICE_STATUS_NOTIFICATION = COMMAND_RESPONSE + 1;
-    // set notification으로 설정된 내용이 변경되어 accessory 장치로부터 데이터를 받았을때
-    public static final int DATA_CHANGED_NOTIFICATION = SERVICE_STATUS_NOTIFICATION + 1;
 
     /**
      * bundle data key

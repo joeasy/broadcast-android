@@ -35,10 +35,13 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.nbplus.iotapp.bluetooth.BluetoothLeService;
 import com.nbplus.iotapp.perferences.IoTServicePreference;
+import com.nbplus.iotlib.data.Constants;
+import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 import com.nbplus.iotlib.data.IoTServiceStatus;
@@ -206,6 +209,15 @@ public class IoTService extends Service {
                 }
                 break;
             }
+
+            case IoTServiceCommand.GET_DEVICE_LIST: {
+                if (IoTServicePreference.isUseIoTGateway(this)) {
+                    // TODO
+                } else {
+                    mBluetoothLeService.scanLeDevicePeriodically(false);
+                    mBluetoothLeService.scanLeDevicePeriodically(true);
+                }
+            }
         }
     }
 
@@ -223,7 +235,39 @@ public class IoTService extends Service {
                     mHandler.sendMessage(msg);
                 }
             }
+            /**
+             * Bluetooth control.
+             */
+            else if (BluetoothLeService.ACTION_DEVICE_LIST.equals(action)) {
+                Message notiMessage = new Message();
+                notiMessage.what = IoTServiceCommand.DEVICE_LIST_NOTIFICATION;
 
+                Bundle recvBundle = intent.getExtras();
+                HashMap<String, IoTDevice> devices = (HashMap<String, IoTDevice>)recvBundle.getSerializable(IoTServiceCommand.KEY_DATA);
+                if (recvBundle != null && devices != null) {
+                    // 응답에 Bundle 은 request command (int)와 result code (serializable) 로만 이루어진다.
+                    Bundle b = new Bundle();
+                    b.putString(IoTServiceCommand.KEY_MSGID, getPackageName() + "_" + System.currentTimeMillis());
+                    b.putSerializable(IoTServiceCommand.KEY_DATA, devices);
+                    notiMessage.setData(b);
+
+                    sendNotificationToApplication(IoTServiceCommand.DEVICE_LIST_NOTIFICATION, notiMessage);
+                }
+            } else if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS.equals(action)) {
+
+            }
         }
 
     };
@@ -299,6 +343,10 @@ public class IoTService extends Service {
             intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
             registerReceiver(mBroadcastReceiver, intentFilter);
 
+            // bluetooth local broadcast
+            intentFilter = makeGattUpdateIntentFilter();
+            LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
+
             // connect to ble service
             mErrorCodes = checkBluetoothEnabled();
             if (mErrorCodes.equals(IoTResultCodes.SUCCESS)) {
@@ -318,6 +366,19 @@ public class IoTService extends Service {
         }
     }
 
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_DEVICE_LIST);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS);
+        return intentFilter;
+    }
+
     /**
      * Called by the system to notify a Service that it is no longer used and is being removed.  The
      * service should clean up any resources it holds (threads, registered
@@ -332,6 +393,7 @@ public class IoTService extends Service {
         mWifiLock = null;
         try {
             unregisterReceiver(mBroadcastReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -351,169 +413,6 @@ public class IoTService extends Service {
          * 항상 실행되도록 한다.
          */
         return Service.START_STICKY;//super.onStartCommand(intent, flags, startId);
-
-        /*
-        String action = null;
-        if (intent != null) {
-            action = intent.getAction();
-        }
-        if (intent == null || StringUtils.isEmptyString(action)) {
-            action = com.nbplus.iotlib.data.Constants.ACTION_START_IOT_SERVICE;
-        }
-
-        switch (action) {
-            case com.nbplus.iotlib.data.Constants.ACTION_START_IOT_SERVICE :
-                break;
-            case com.nbplus.iotlib.data.Constants.ACTION_GET_IOT_DEVICE_LIST :
-                // TODO : test code
-                long ts = System.currentTimeMillis();
-                ArrayList<IoTDevice> testDevices = new ArrayList<>();
-                IoTDevice device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("IR");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("IR");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("IR");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("ZW");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("ZW");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("ZW");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("ZW");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("ZW");
-                testDevices.add(device);
-
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-                device = new IoTDevice();
-                device.setDeviceId("10000000000-100-" + (++ts));
-                device.setDeviceName(String.format("TEST%02d", (++num)));
-                device.setDeviceVendor("11");
-                device.setDeviceModel("22");
-                device.setDeviceType("BT");
-                testDevices.add(device);
-
-
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(com.nbplus.iotlib.data.Constants.ACTION_IOT_DEVICE_LIST);
-//                IoTGateway iotGateway = new IoTGateway();
-//                sendIntent.putExtra(Constants.EXTRA_IOT_GATEWAY_DATA, iotGateway);
-                sendIntent.putParcelableArrayListExtra(com.nbplus.iotlib.data.Constants.EXTRA_IOT_DEVICE_LIST, testDevices);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(sendIntent);
-                break;
-            case com.nbplus.iotlib.data.Constants.ACTION_SEND_IOT_COMMAND :
-                Log.d(TAG, ">> ACTION_SEND_IOT_COMMAND device id = " + intent.getStringExtra(com.nbplus.iotlib.data.Constants.EXTRA_IOT_SEND_COMM_DEVICE_ID));
-                Log.d(TAG, ">> ACTION_SEND_IOT_COMMAND command = " + intent.getStringExtra(com.nbplus.iotlib.data.Constants.EXTRA_IOT_SEND_COMM_COMMAND_ID));
-                break;
-        }
-
-        return START_STICKY; // Means we started the service
-        // restart in case it's killed.
-        */
     }
 
     @Override
@@ -568,7 +467,7 @@ public class IoTService extends Service {
 
                 // 응답에 Bundle 은 request command (int)와 result code (serializable) 로만 이루어진다.
                 Bundle b = new Bundle();
-                b.putString(IoTServiceCommand.KEY_MSGID, this.getApplicationContext().getPackageName() + "_" + System.currentTimeMillis());
+                b.putString(IoTServiceCommand.KEY_MSGID, /*this.getApplicationContext().*/getPackageName() + "_" + System.currentTimeMillis());
                 b.putSerializable(IoTServiceCommand.KEY_SERVICE_STATUS, mServiceStatus);
                 b.putSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE, mErrorCodes);
                 response.setData(b);
@@ -593,7 +492,7 @@ public class IoTService extends Service {
 
             // 응답에 Bundle 은 request command (int)와 result code (serializable) 로만 이루어진다.
             Bundle b = new Bundle();
-            b.putString(IoTServiceCommand.KEY_MSGID, this.getApplicationContext().getPackageName() + "_" + System.currentTimeMillis());
+            b.putString(IoTServiceCommand.KEY_MSGID, /*this.getApplicationContext().*/getPackageName() + "_" + System.currentTimeMillis());
             b.putSerializable(IoTServiceCommand.KEY_SERVICE_STATUS, mServiceStatus);
             b.putSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE, mErrorCodes);
             response.setData(b);
@@ -631,6 +530,38 @@ public class IoTService extends Service {
                 clientMessenger.send(response);
             } catch (RemoteException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void sendNotificationToApplication(int cmd, Message message) {
+        sendNotificationToApplication(cmd, message, null);
+    }
+    private void sendNotificationToApplication(int cmd, Message message, String appPackageName) {
+        if (StringUtils.isEmptyString(appPackageName)) {            // send to all application
+            Iterator<String> iter = mRegisteredApps.keySet().iterator();
+            while(iter.hasNext()) {
+                String key = iter.next();
+                WeakReference<Messenger> clientMessengerRef = mRegisteredApps.get(key);
+                Messenger clientMessenger = clientMessengerRef.get();
+                if (clientMessenger != null) {
+
+                    try {
+                        clientMessenger.send(message);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            WeakReference<Messenger> clientMessengerRef = mRegisteredApps.get(appPackageName);
+            Messenger clientMessenger = clientMessengerRef.get();
+            if (clientMessenger != null) {
+                try {
+                    clientMessenger.send(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

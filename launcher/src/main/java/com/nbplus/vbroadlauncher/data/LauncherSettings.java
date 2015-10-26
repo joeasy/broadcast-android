@@ -32,10 +32,6 @@ public class LauncherSettings {
         return prefs.getString("KEY_TEST_IOT_DEVICES", "");
     }
 
-    public void setTestIoTDevices(String testIoTDevices) {
-        prefs.edit().putString("KEY_TEST_IOT_DEVICES", testIoTDevices).apply();
-    }
-
     // 맥어드레스 기반 40바이트 디바이스 UUID
     String deviceID;
     // 날씨정보에 사용할 로케이션정보
