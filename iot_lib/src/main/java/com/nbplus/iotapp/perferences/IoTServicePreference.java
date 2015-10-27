@@ -45,6 +45,7 @@ public class IoTServicePreference {
 
     public static final String KEY_USE_IOT_GATEWAY = "KEY_USE_IOT_GATEWAY";
     public static final String KEY_IOT_DEVICES_LIST = "KEY_IOT_DEVICES_LIST";
+    public static final String KEY_IOT_DEVICES_SCENARIOS = "KEY_IOT_DEVICES_SCENARIOS";
 
     // 값 불러오기
     private static SharedPreferences getPreferences(Context context) {
@@ -345,5 +346,8 @@ public class IoTServicePreference {
     }
     public static String getIoTDevicesList (Context context) {
         return getString(context, KEY_IOT_DEVICES_LIST, "{}");
+    }
+    public static String getIoTDeviceScenarioMap (Context context) {
+        return getString(context, KEY_IOT_DEVICES_SCENARIOS, "{}");
     }
 }

@@ -43,12 +43,16 @@ import com.nbplus.iotlib.data.Constants;
 import com.nbplus.iotlib.data.DeviceTypes;
 import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTResultCodes;
+import com.nbplus.iotlib.data.IoTScenarioDef;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 import com.nbplus.iotlib.data.IoTServiceStatus;
 import com.nbplus.iotlib.exception.InitializeRequiredException;
 
 import org.basdroid.common.PackageUtils;
+import org.basdroid.common.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,6 +103,11 @@ public class IoTInterface {
     HashMap<String, WeakReference<IoTServiceResponse>> mWaitingRequestCallbaks = new HashMap<>();
 
     /**
+     * known IoT device scenarios
+     */
+    HashMap<String, IoTScenarioDef> mIoTScenarioMap = null;
+
+    /**
      * 10초동안 검색된 device list 를 저장해 두는 공간
      */
     private HashMap<String, IoTDevice> mScanedList = new HashMap<>();
@@ -129,9 +138,20 @@ public class IoTInterface {
         mCtx = context;
 
         mInitialized = true;
+
+        Gson gson = new Gson();
+        // load scenarios
+        String jsonString = IoTServicePreference.getIoTDeviceScenarioMap(mCtx);
+        if (jsonString.equals("{}")) {
+            jsonString = loadJSONFromAsset("default_scenario.json");
+        }
+        if (!StringUtils.isEmptyString(jsonString)) {
+            mIoTScenarioMap = gson.fromJson(jsonString, new TypeToken<HashMap<String, IoTScenarioDef>>(){}.getType());
+        }
+
+        // load saved devices list
         String savedJson = IoTServicePreference.getIoTDevicesList(mCtx);
-        if (savedJson != null) {
-            Gson gson = new Gson();
+        if (!StringUtils.isEmptyString(savedJson)) {
             mScanedList = gson.fromJson(savedJson, new TypeToken<HashMap<String, IoTDevice>>(){}.getType());
         }
 
@@ -599,5 +619,22 @@ public class IoTInterface {
         }
 
         return IoTDevice.DEVICE_BT_UUID_LEN_16;
+    }
+
+    public String loadJSONFromAsset(String filename) {
+        String json = null;
+        try {
+            InputStream is = mCtx.getAssets().open(filename);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+
     }
 }
