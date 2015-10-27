@@ -134,6 +134,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                         }
                     }
                 }
+                break;
             case HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE :
                 if (Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST.equals(mBroadcastData.getServiceType())) {
                     finishActivity();
@@ -281,7 +282,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onPause()");
+        Log.d(TAG, "onResume()");
         super.onResume();
 
         if (!mIsTTS) {

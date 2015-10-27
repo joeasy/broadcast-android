@@ -451,6 +451,8 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        Log.d(TAG, "onResume()");
         Intent intent = new Intent(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
