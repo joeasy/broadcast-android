@@ -33,7 +33,7 @@ import org.basdroid.common.StringUtils;
 /**
  * Created by basagee on 2015. 6. 1..
  */
-@ReportsCrashes(formUri = "https://collector.tracepot.com/801a759d")
+@ReportsCrashes(formUri = "https://collector.tracepot.com/eee1cc67")
 public class HomeLauncherApplication extends Application  {
     @Override
     public void onCreate() {
