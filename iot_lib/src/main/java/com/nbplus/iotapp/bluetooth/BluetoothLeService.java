@@ -47,6 +47,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.ParcelUuid;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -645,9 +646,16 @@ public class BluetoothLeService extends Service {
                         device.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
                         device.setAdRecordHashMap(adRecords);
 
-                        mScanedList.put(device.getDeviceId(), device);
-
-                        //printScanDevices(result.getDevice(), adRecords);
+                        /**
+                         * UUID 가 없는것은 무시한다.
+                         */
+                        ArrayList<String> scanedUuids = DataParser.getUuids(device.getAdRecordHashMap());
+                        if (scanedUuids == null || scanedUuids.size() == 0) {
+                            Log.e(TAG, ">>> xx device name " + device.getDeviceName() + " has no uuid advertisement");
+                        } else {
+                            mScanedList.put(device.getDeviceId(), device);
+                            //printScanDevices(device, adRecords);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -680,9 +688,16 @@ public class BluetoothLeService extends Service {
                         iotDevice.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
                         iotDevice.setAdRecordHashMap(adRecords);
 
-                        mScanedList.put(iotDevice.getDeviceId(), iotDevice);
-
-                        //printScanDevices(device, adRecords);
+                        /**
+                         * UUID 가 없는것은 무시한다.
+                         */
+                        ArrayList<String> scanedUuids = DataParser.getUuids(iotDevice.getAdRecordHashMap());
+                        if (scanedUuids == null || scanedUuids.size() == 0) {
+                            Log.e(TAG, ">>> xx device name " + iotDevice.getDeviceName() + " has no uuid advertisement");
+                        } else {
+                            mScanedList.put(iotDevice.getDeviceId(), iotDevice);
+                            //printScanDevices(device, adRecords);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

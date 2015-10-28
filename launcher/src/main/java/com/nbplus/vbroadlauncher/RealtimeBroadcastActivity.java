@@ -23,6 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,16 +39,20 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.PushPayloadData;
+import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.hybrid.BroadcastWebViewClient;
 import com.nbplus.vbroadlauncher.hybrid.RealtimeBroadcastWebViewClient;
 import com.nbplus.vbroadlauncher.hybrid.TextToSpeechHandler;
 import com.nbplus.vbroadlauncher.service.BroadcastChatHeadService;
 
 import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.NetworkUtils;
+import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
@@ -78,7 +83,11 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     private static final int HANDLER_BROADCAST_STARTED = 1000;
     private static final int HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE = 1001;
     private static final int HANDLER_MESSAGE_SETUP_CURRENT_PLAYING = 1002;
+    private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 1003;
+
     private final RealtimeBroadcastActivityHandler mHandler = new RealtimeBroadcastActivityHandler(this);
+
+    private boolean mLastNetworkStatus = false;
 
     // 핸들러 객체 만들기
     private static class RealtimeBroadcastActivityHandler extends Handler {
@@ -144,6 +153,19 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                     }
                 }
                 break;
+            case HANDLER_MESSAGE_CONNECTIVITY_CHANGED:
+                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
+                final boolean networkStatus = NetworkUtils.isConnected(this);
+                if (mLastNetworkStatus == networkStatus) {
+                    Log.d(TAG, ">> current and previous are same status. ignore it...");
+                    return;
+                }
+                mLastNetworkStatus = networkStatus;
+                if (mWebViewClient != null) {
+                    mWebViewClient.onNetworkStatusChanged(mLastNetworkStatus);
+                }
+                break;
+
         }
     }
 
@@ -169,6 +191,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
                 case Constants.ACTION_BROWSER_ACTIVITY_CLOSE :
                     mHandler.sendEmptyMessage(HANDLER_MESSAGE_BROWSER_ACTIVITY_CLOSE);
                     break;
+                case ConnectivityManager.CONNECTIVITY_ACTION :
+                    mHandler.sendEmptyMessage(HANDLER_MESSAGE_CONNECTIVITY_CHANGED);
+                break;
                 default :
                     break;
             }
@@ -181,6 +206,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         acquireCpuWakeLock();
 
+        mLastNetworkStatus = NetworkUtils.isConnected(this);
         Intent intent = getIntent();
         if (intent == null || !PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(intent.getAction())) {
             Log.d(TAG, "empty or none broadcast intent value ...");
@@ -211,6 +237,10 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         filter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
         filter.addAction(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mBroadcastReceiver, intentFilter);
 
         hideSystemUI();
 
@@ -443,6 +473,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         mWebViewClient = null;
         mWebView = null;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
 
         releaseCpuLock();
         runOnUiThread(new Runnable() {

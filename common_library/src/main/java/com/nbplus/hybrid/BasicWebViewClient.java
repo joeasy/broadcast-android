@@ -55,6 +55,7 @@ import com.nbplus.progress.ProgressDialogFragment;
 
 import org.apache.http.util.EncodingUtils;
 import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.PhoneState;
 import org.basdroid.common.R;
 import org.basdroid.common.StorageUtils;
@@ -467,6 +468,25 @@ public abstract class BasicWebViewClient extends WebViewClient {
     @JavascriptInterface
     public boolean isPhoneCallAbility() {
         return PhoneState.hasPhoneCallAbility(mContext);
+    }
+
+    @JavascriptInterface
+    public boolean isNetworkAvailable() {
+        return NetworkUtils.isConnected(mContext);
+    }
+
+    @JavascriptInterface
+    public String getIpAddress() {
+        return NetworkUtils.getIPAddress(true);
+    }
+
+    @JavascriptInterface
+    public void onNetworkStatusChanged(boolean connected) {
+        String ipAddress = "";
+        if (connected) {
+            ipAddress = getIpAddress();
+        }
+        mWebView.loadUrl("javascript:window.onNetworkStatusChanged(" + connected + ", " + ipAddress + ");");
     }
 
     /**

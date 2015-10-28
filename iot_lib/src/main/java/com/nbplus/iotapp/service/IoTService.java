@@ -120,8 +120,6 @@ public class IoTService extends Service {
                 } else {
                     Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED network is disconnected !!!");
                 }
-//
-//                mServiceStatus = Status.STOPPED;
                 break;
             case HANDLER_MESSAGE_BT_STATE_CHANGED :
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
