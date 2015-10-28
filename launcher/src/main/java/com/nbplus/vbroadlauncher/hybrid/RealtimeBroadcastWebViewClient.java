@@ -45,6 +45,7 @@ import com.nbplus.media.MusicService;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
 import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.PhoneState;
 import org.basdroid.common.R;
 import org.basdroid.common.StringUtils;
@@ -451,6 +452,26 @@ public class RealtimeBroadcastWebViewClient extends WebViewClient {
                 mWebView.loadUrl("javascript:window.onCloseWebApplicationByUser();");
             }
         }
+    }
+
+    @JavascriptInterface
+    public boolean isNetworkAvailable() {
+        return NetworkUtils.isConnected(mContext);
+    }
+
+    @JavascriptInterface
+    public String getIpAddress() {
+        return NetworkUtils.getIPAddress(true);
+    }
+
+    @JavascriptInterface
+    public void onNetworkStatusChanged(boolean connected) {
+        Log.d(TAG, "onNetworkStatusChanged = " + connected);
+        String ipAddress = "";
+        if (connected) {
+            ipAddress = getIpAddress();
+        }
+        mWebView.loadUrl("javascript:window.onNetworkStatusChanged(" + connected + ", " + ipAddress + ");");
     }
 
 }

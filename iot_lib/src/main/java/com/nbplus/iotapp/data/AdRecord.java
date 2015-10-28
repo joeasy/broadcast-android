@@ -111,12 +111,17 @@ public class AdRecord implements Parcelable {
 
     private int mLength;
     private int mType;
-    transient private byte[] mData;
+    /**
+     * preference 에 저장할 예정이므로...
+     * String 으로.
+     */
+    transient private String mData;
 
     public AdRecord(int length, int type, byte[] data) {
         mLength = length;
         mType = type;
-        mData = data;
+        mData = DataParser.getHexString(data);
+        //mData = data;
     }
 
     public int getLength() {
@@ -128,7 +133,7 @@ public class AdRecord implements Parcelable {
     }
 
     public byte[] getValue() {
-        return mData;
+        return DataParser.getHextoBytes(mData);
     }
 
     @Override
@@ -162,13 +167,13 @@ public class AdRecord implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.mLength);
         dest.writeInt(this.mType);
-        dest.writeByteArray(this.mData);
+        dest.writeString(this.mData);
     }
 
     protected AdRecord(Parcel in) {
         this.mLength = in.readInt();
         this.mType = in.readInt();
-        this.mData = in.createByteArray();
+        this.mData = in.readString();
     }
 
     public static final Creator<AdRecord> CREATOR = new Creator<AdRecord>() {

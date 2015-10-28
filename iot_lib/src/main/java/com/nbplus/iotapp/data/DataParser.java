@@ -19,9 +19,14 @@ package com.nbplus.iotapp.data;
 
 import android.util.Log;
 
+import com.nbplus.iotlib.data.IoTDevice;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 
 /**
  * Created by basagee on 2015. 9. 14..
@@ -31,7 +36,17 @@ public class DataParser {
 
     // convert from byte array to String
     public static String getString(byte[] value) {
-        return new String(value);
+        if (value != null) {
+            return new String(value);
+        }
+        return null;
+    }
+
+    public static byte[] getBytes(String value) {
+        if (value != null) {
+            return value.getBytes(Charset.forName("UTF-8"));
+        }
+        return new byte[]{};
     }
 
     /**
@@ -180,6 +195,9 @@ public class DataParser {
      * @return
      */
     public static String getHexString(byte[] value) {
+        if (value == null) {
+            return null;
+        }
         String str = "";
         int length = value.length;
         for (int i = 0; i < length; i ++) {
@@ -187,6 +205,19 @@ public class DataParser {
             str += num;
         }
         return str.toUpperCase();
+    }
+
+    public static byte[] getHextoBytes(String value) {
+        if (value == null) {
+            return null;
+        }
+        int len = value.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(value.charAt(i), 16) << 4)
+                    + Character.digit(value.charAt(i + 1), 16));
+        }
+        return data;
     }
 
     /**
@@ -300,6 +331,54 @@ public class DataParser {
             value += (array[i] << (8 * i) ) & (0x0FF << (8 * i));
         }
         return value;
+    }
+
+    public static ArrayList<String> getUuids(HashMap<Integer, AdRecord> adRecords) {
+        byte[] uuidBytes = null;
+        ArrayList<String> uuids = null;
+
+        if (adRecords.get(AdRecord.TYPE_UUID16) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID16).getValue();
+            uuids = DataParser.getUint16StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID16_INC) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID16_INC).getValue();
+            uuids = DataParser.getUint16StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID32) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID32).getValue();
+            uuids = DataParser.getUint32StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID32_INC) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID32_INC).getValue();
+            uuids = DataParser.getUint32StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID128) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID128).getValue();
+            uuids = DataParser.getUint128StringArray(uuidBytes);
+        } else if (adRecords.get(AdRecord.TYPE_UUID128_INC) != null) {
+            uuidBytes = adRecords.get(AdRecord.TYPE_UUID128_INC).getValue();
+            uuids = DataParser.getUint128StringArray(uuidBytes);
+        }
+
+        return uuids;
+    }
+
+    public static int getUuidLength(HashMap<Integer, AdRecord> adRecords) {
+        byte[] uuidBytes = null;
+        ArrayList<String> uuids = null;
+
+        if (adRecords.get(AdRecord.TYPE_UUID16) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_16;
+        } else if (adRecords.get(AdRecord.TYPE_UUID16_INC) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_16;
+        } else if (adRecords.get(AdRecord.TYPE_UUID32) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_32;
+        } else if (adRecords.get(AdRecord.TYPE_UUID32_INC) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_32;
+        } else if (adRecords.get(AdRecord.TYPE_UUID128) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_128;
+        } else if (adRecords.get(AdRecord.TYPE_UUID128_INC) != null) {
+            return IoTDevice.DEVICE_BT_UUID_LEN_128;
+        }
+
+        return IoTDevice.DEVICE_BT_UUID_LEN_16;
     }
 
 }
