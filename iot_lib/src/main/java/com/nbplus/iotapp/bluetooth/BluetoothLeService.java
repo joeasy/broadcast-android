@@ -324,16 +324,12 @@ public class BluetoothLeService extends Service {
 
     /**
      * modified 2015.11.03
-     * @param address
      * @param action
-     * @param descriptor
-     * @param status
+     * @param data
      */
-    private void broadcastUpdate(String address, final String action, BluetoothGattDescriptor descriptor, int status) {
+    private void broadcastUpdate(final String action, IoTHandleData data) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA_SERVICE_UUID, descriptor.getCharacteristic().getService().getUuid().toString());
-        intent.putExtra(EXTRA_DATA_CHARACTERISTIC_UUID, descriptor.getCharacteristic().getUuid().toString());
-        intent.putExtra(EXTRA_DATA_STATUS, status);
+        intent.putExtra(IoTServiceCommand.KEY_DATA, data);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
