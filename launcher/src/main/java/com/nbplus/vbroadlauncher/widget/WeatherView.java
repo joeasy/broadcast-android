@@ -396,6 +396,9 @@ public class WeatherView extends LinearLayout {
     private Location convertLocation2Grid(Location location) {
         //  위경도 -> (X, Y)
         Location resLoc = lamcProjection(location, 0, mLamcParameter);
+        if (resLoc == null) {
+            return null;
+        }
         resLoc.setLongitude(resLoc.getLongitude() + 1.5);
         resLoc.setLatitude(resLoc.getLatitude() + 1.5);
         return resLoc;
@@ -409,7 +412,12 @@ public class WeatherView extends LinearLayout {
      * @return
      */
     private Location lamcProjection(Location location, int convertType, LamcParameter mapParam) {
-        Location resLocation = new Location(location);
+        Location resLocation;
+        try {
+            resLocation = new Location(location);
+        } catch (Exception e) {
+            return null;
+        }
 
         double pi = Math.asin(1.0) * 2.0;
         double degrad = pi / 180.0;
@@ -520,6 +528,9 @@ public class WeatherView extends LinearLayout {
         }
 
         Location gridLoc = convertLocation2Grid(currLoc);
+        if (gridLoc == null) {
+            return;
+        }
         Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
 
         url += "&" + "nx=" + (int)gridLoc.getLongitude();
@@ -619,6 +630,9 @@ public class WeatherView extends LinearLayout {
         }
 
         Location gridLoc = convertLocation2Grid(currLoc);
+        if (gridLoc == null) {
+            return;
+        }
         Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
 
         url += "&" + "nx=" + (int)gridLoc.getLongitude();
@@ -709,6 +723,9 @@ public class WeatherView extends LinearLayout {
         }
 
         Location gridLoc = convertLocation2Grid(currLoc);
+        if (gridLoc == null) {
+            return;
+        }
         Log.d(TAG, ">> gridLoc X = " + gridLoc.getLongitude() + ", Y = " + gridLoc.getLatitude());
 
         url += "&" + "nx=" + (int)gridLoc.getLongitude();

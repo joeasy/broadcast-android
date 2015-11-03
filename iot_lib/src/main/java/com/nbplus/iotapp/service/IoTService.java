@@ -40,16 +40,17 @@ import android.util.Log;
 
 import com.nbplus.iotapp.bluetooth.BluetoothLeService;
 import com.nbplus.iotapp.perferences.IoTServicePreference;
-import com.nbplus.iotlib.data.Constants;
 import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 import com.nbplus.iotlib.data.IoTServiceStatus;
+import com.nbplus.iotlib.data.IoTHandleData;
 
 import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -68,7 +69,7 @@ public class IoTService extends Service {
     WifiManager.WifiLock mWifiLock;
     boolean mLastConnectionStatus = false;          // network status
     private BluetoothLeService mBluetoothLeService;
-
+    boolean mUseIoTGateway = false;
 
     private IoTServiceHandler mHandler = new IoTServiceHandler(this);
     Messenger mServiceMessenger = null;
@@ -79,6 +80,9 @@ public class IoTService extends Service {
     // IoT 서비스를 사용하는 어플리케이션 및 Messenger 맵.
     // REGISTER_SERVICE 시에 등록되며, UNREGISTER_SERVICE 시에 제거된다.
     HashMap<String, WeakReference<Messenger>> mRegisteredApps = new HashMap<>();
+
+    ArrayList<IoTHandleData> mRequestQueue = new ArrayList<>();
+    ArrayList<String> mConnectedDeviceList = new ArrayList<>();
 
     // 핸들러 객체 만들기
     private static class IoTServiceHandler extends Handler {
@@ -209,13 +213,158 @@ public class IoTService extends Service {
             }
 
             case IoTServiceCommand.GET_DEVICE_LIST: {
-                if (IoTServicePreference.isUseIoTGateway(this)) {
+                if (mUseIoTGateway) {
                     // TODO
                 } else {
                     mBluetoothLeService.scanLeDevicePeriodically(false);
                     mBluetoothLeService.scanLeDevicePeriodically(true);
                 }
+                break;
             }
+
+            case IoTServiceCommand.DEVICE_CONNECT: {
+                Bundle b = msg.getData();
+                IoTHandleData ioTHandleData = b.getParcelable(IoTServiceCommand.KEY_DATA);
+                String msgId = b.getString(IoTServiceCommand.KEY_MSGID, "");
+                Messenger clientMessenger = getClientMessengerFromMessageId(msgId);
+
+                if (mUseIoTGateway) {
+                    if (ioTHandleData == null) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case IoTServiceCommand.DEVICE_CONNECT : ioTHandleData is null");
+                        return;
+                    }
+                } else {
+                    if (mBluetoothLeService == null || ioTHandleData == null) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case IoTServiceCommand.DEVICE_CONNECT : mBluetoothLeService or ioTHandleData is null");
+                        return;
+                    }
+                    if (ioTHandleData.getDeviceTypeId() != IoTDevice.DEVICE_TYPE_ID_BT) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case IoTServiceCommand.DEVICE_DISCONNECT : is not bt device... mUseIoTGateway == false");
+                        return;
+                    }
+
+                    if (mBluetoothLeService.connect(ioTHandleData.getDeviceId())) {
+                        ioTHandleData.setMsgId(msgId);
+                        ioTHandleData.setRequestCommand(msg.what);
+
+                        mRequestQueue.add(ioTHandleData);
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.SUCCESS);
+                    } else {
+                        Log.w(TAG, "mBluetoothLeService.connect() return false");
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                    }
+                }
+                break;
+            }
+
+            case IoTServiceCommand.DEVICE_DISCONNECT: {
+                Bundle b = msg.getData();
+                IoTHandleData ioTHandleData = b.getParcelable(IoTServiceCommand.KEY_DATA);
+                String msgId = b.getString(IoTServiceCommand.KEY_MSGID, "");
+                Messenger clientMessenger = getClientMessengerFromMessageId(msgId);
+
+                if (mUseIoTGateway) {
+                    if (ioTHandleData == null) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case IoTServiceCommand.DEVICE_DISCONNECT : ioTHandleData is null");
+                        return;
+                    }
+                } else {
+                    if (mBluetoothLeService == null || ioTHandleData == null) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case IoTServiceCommand.DEVICE_DISCONNECT : mBluetoothLeService or ioTHandleData is null");
+                        return;
+                    }
+                    if (ioTHandleData.getDeviceTypeId() != IoTDevice.DEVICE_TYPE_ID_BT) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case IoTServiceCommand.DEVICE_DISCONNECT : is not bt device... mUseIoTGateway == false");
+                        return;
+                    }
+
+                    if (mConnectedDeviceList.contains(ioTHandleData.getDeviceId())) {
+                        ioTHandleData.setMsgId(msgId);
+                        ioTHandleData.setRequestCommand(msg.what);
+
+                        mRequestQueue.add(ioTHandleData);
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.SUCCESS);
+                        mBluetoothLeService.disconnect(ioTHandleData.getDeviceId());
+                    } else {
+                        Log.w(TAG, "mConnectedDeviceList.contains(ioTHandleData.getDeviceId()) is false");
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                    }
+                }
+                break;
+            }
+
+            case IoTServiceCommand.DEVICE_READ_DATA:
+            case IoTServiceCommand.DEVICE_WRITE_DATA:
+            case IoTServiceCommand.DEVICE_SET_NOTIFICATION: {
+                Bundle b = msg.getData();
+                IoTHandleData ioTHandleData = b.getParcelable(IoTServiceCommand.KEY_DATA);
+                String msgId = b.getString(IoTServiceCommand.KEY_MSGID, "");
+                Messenger clientMessenger = getClientMessengerFromMessageId(msgId);
+
+                if (mUseIoTGateway) {
+                    if (ioTHandleData == null) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case READ_WRITE_SETNOTI : ioTHandleData is null");
+                        return;
+                    }
+                } else {
+                    if (mBluetoothLeService == null || ioTHandleData == null) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case READ_WRITE_SETNOTI : ioTHandleData is null");
+                        return;
+                    }
+
+                    if (ioTHandleData.getDeviceTypeId() != IoTDevice.DEVICE_TYPE_ID_BT) {
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        Log.w(TAG, "case READ_WRITE_SETNOTI : is not bt device... mUseIoTGateway == false");
+                        return;
+                    }
+
+                    if (mConnectedDeviceList.contains(ioTHandleData.getDeviceId())) {
+                        ioTHandleData.setMsgId(msgId);
+                        ioTHandleData.setRequestCommand(msg.what);
+
+                        boolean result = true;
+                        switch (msg.what) {
+                            case IoTServiceCommand.DEVICE_READ_DATA:
+                                result = mBluetoothLeService.readCharacteristic(ioTHandleData.getDeviceId(),
+                                        ioTHandleData.getServiceUuid(),
+                                        ioTHandleData.getCharacteristicUuid());
+                                break;
+                            case IoTServiceCommand.DEVICE_WRITE_DATA:
+                                result = mBluetoothLeService.writeRemoteCharacteristic(ioTHandleData.getDeviceId(),
+                                        ioTHandleData.getServiceUuid(),
+                                        ioTHandleData.getCharacteristicUuid(),
+                                        ioTHandleData.getValue());
+                                break;
+                            case IoTServiceCommand.DEVICE_SET_NOTIFICATION:
+                                result = mBluetoothLeService.setCharacteristicNotification(ioTHandleData.getDeviceId(),
+                                        ioTHandleData.getServiceUuid(),
+                                        ioTHandleData.getCharacteristicUuid(),
+                                        true);
+                                break;
+                        }
+
+                        if (result) {
+                            mRequestQueue.add(ioTHandleData);
+                            sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.SUCCESS);
+                        } else {
+                            sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                        }
+                    } else {
+                        Log.w(TAG, "mConnectedDeviceList.contains(ioTHandleData.getDeviceId()) is false");
+                        sendResultToApplication(clientMessenger, msgId, msg.what, IoTResultCodes.FAILED);
+                    }
+                }
+                break;
+            }
+
         }
     }
 
@@ -249,22 +398,122 @@ public class IoTService extends Service {
                     b.putSerializable(IoTServiceCommand.KEY_DATA, devices);
                     notiMessage.setData(b);
 
-                    sendNotificationToApplication(IoTServiceCommand.DEVICE_LIST_NOTIFICATION, notiMessage);
+                    sendNotificationToApplication(notiMessage);
                 }
-            } else if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+            }
+            /**
+             * when using bluetooth
+             */
+            else if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+                Log.d(TAG, "ACTION_GATT_CONNECTED received. Attempt to serviceDiscovery()");
+                if (mBluetoothLeService != null) {
+                    Bundle b = intent.getExtras();
+                    if (b == null) {
+                        Log.w(TAG, "Bundle is not found!!");
+                        return;
+                    }
 
+                    String address = b.getString(IoTServiceCommand.KEY_DEVICE_UUID, "");
+                    if (StringUtils.isEmptyString(address)) {
+                        Log.w(TAG, "Unknown address information... close it. ");
+                        mBluetoothLeService.disconnect(address);
+                        return;
+                    }
+
+                    for (int i = 0; i < mConnectedDeviceList.size(); i++) {
+                        Log.d(TAG, ">> mConnectedDeviceList[" + i + "] = " + mConnectedDeviceList.get(i));
+                    }
+                    if (!mConnectedDeviceList.contains(address)) {
+                        mConnectedDeviceList.add(address);
+                        Log.d(TAG, address + " address is added to mConnectedDeviceList");
+                    }
+                    mBluetoothLeService.discoveryServices(address);
+                }
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                Log.d(TAG, "ACTION_GATT_DISCONNECTED received.");
+                Bundle b = intent.getExtras();
+                if (b == null) {
+                    Log.w(TAG, "Bundle is not found!!");
+                    return;
+                }
 
+                String address = b.getString(IoTServiceCommand.KEY_DEVICE_UUID, "");
+                if (StringUtils.isEmptyString(address)) {
+                    Log.w(TAG, "Unknown address information.... ");
+                    return;
+                }
+
+                // send to IoT interface module
+                Message msg = new Message();
+                msg.what = IoTServiceCommand.DEVICE_DISCONNECTED;
+                Bundle extras = new Bundle();
+                extras.putString(IoTServiceCommand.KEY_DEVICE_UUID, address);
+                msg.setData(extras);
+
+                if (mRequestQueue.size() == 0) {
+                    // send to all
+                    sendNotificationToApplication(null, msg);
+                } else {
+                    for (int i = 0; i < mConnectedDeviceList.size(); i++) {
+                        Log.d(TAG, ">> mConnectedDeviceList[" + i + "] = " + mConnectedDeviceList.get(i));
+                    }
+                    Log.d(TAG, ">> mConnectedDeviceList.contains(" + address + ") = " + mConnectedDeviceList.contains(address));
+                    // 요청은 순차적으로 이루어져야 한다.
+                    IoTHandleData ioTHandleData = mRequestQueue.get(0);
+                    if (ioTHandleData.getRequestCommand() != IoTServiceCommand.DEVICE_DISCONNECT) {
+                        // 연결 시도시에 연결이되지 않고.. disconnect 가 오는 경우가 있음.
+                        // 연결중에 명령을 시도하더라도 중간에 비정상적으로 종료되는 케이스가 있을 수 있음.
+                        Log.w(TAG, address + " device connection is closed...");
+                    }
+                    mRequestQueue.remove(0);
+                    sendNotificationToApplication(ioTHandleData.getMsgId(), msg);
+                }
+                mConnectedDeviceList.remove(address);
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                Log.d(TAG, "ACTION_GATT_SERVICES_DISCOVERED received.");
+                Bundle b = intent.getExtras();
+                if (b == null) {
+                    Log.w(TAG, "Bundle is not found!!");
+                    return;
+                }
 
+                String address = b.getString(IoTServiceCommand.KEY_DEVICE_UUID, "");
+                if (StringUtils.isEmptyString(address) || !mConnectedDeviceList.contains(address)) {
+                    Log.w(TAG, "Unknown address information... close it. ");
+                    mBluetoothLeService.disconnect(address);
+                    return;
+                }
+
+                IoTHandleData ioTHandleData = mRequestQueue.get(0);
+                // 요청은 순차적으로 이루어져야 한다.
+                if (ioTHandleData.getRequestCommand() != IoTServiceCommand.DEVICE_CONNECT) {
+                    if (StringUtils.isEmptyString(address) || !mConnectedDeviceList.contains(address)) {
+                        Log.w(TAG, "Unknown address information... close it. ");
+                        mBluetoothLeService.disconnect(address);
+                        mRequestQueue.remove(0);
+                        return;
+                    }
+                }
+
+                HashMap<String, ArrayList<String>> discoveredServices = (HashMap<String, ArrayList<String>>)b.getSerializable(IoTServiceCommand.KEY_DATA);
+                //device.setDiscoveredServices(discoveredServices);
+
+                // send to IoT interface module
+                Message msg = new Message();
+                msg.what = IoTServiceCommand.DEVICE_CONNECTED;
+                Bundle extras = new Bundle();
+                extras.putString(IoTServiceCommand.KEY_DEVICE_UUID, ioTHandleData.getDeviceId());
+                extras.putSerializable(IoTServiceCommand.KEY_DATA, discoveredServices);
+                msg.setData(extras);
+
+                mRequestQueue.remove(0);
+                sendNotificationToApplication(ioTHandleData.getMsgId(), msg);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-
+                Log.d(TAG, "ACTION_DATA_AVAILABLE received.");
             } else if (BluetoothLeService.ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS.equals(action)) {
-
+                Log.d(TAG, "ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS received.");
             } else if (BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS.equals(action)) {
-
-            } else if (BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS.equals(action)) {
-
+                Log.d(TAG, "ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS received.");
             }
         }
 
@@ -320,7 +569,8 @@ public class IoTService extends Service {
          */
         mServiceMessenger = new Messenger(mHandler);
 
-        if (IoTServicePreference.isUseIoTGateway(this)) {
+        mUseIoTGateway = IoTServicePreference.isUseIoTGateway(this);
+        if (mUseIoTGateway) {
             Log.d(TAG, ">> Use IoT Gateway....");
             // Create the Wifi lock (this does not acquire the lock, this just creates it)
             mWifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
@@ -532,11 +782,11 @@ public class IoTService extends Service {
         }
     }
 
-    private void sendNotificationToApplication(int cmd, Message message) {
-        sendNotificationToApplication(cmd, message, null);
+    private void sendNotificationToApplication(Message message) {
+        sendNotificationToApplication(null, message);
     }
-    private void sendNotificationToApplication(int cmd, Message message, String appPackageName) {
-        if (StringUtils.isEmptyString(appPackageName)) {            // send to all application
+    private void sendNotificationToApplication(String msgId, Message message) {
+        if (StringUtils.isEmptyString(msgId)) {            // send to all application
             Iterator<String> iter = mRegisteredApps.keySet().iterator();
             while(iter.hasNext()) {
                 String key = iter.next();
@@ -552,8 +802,7 @@ public class IoTService extends Service {
                 }
             }
         } else {
-            WeakReference<Messenger> clientMessengerRef = mRegisteredApps.get(appPackageName);
-            Messenger clientMessenger = clientMessengerRef.get();
+            Messenger clientMessenger = getClientMessengerFromMessageId(msgId);
             if (clientMessenger != null) {
                 try {
                     clientMessenger.send(message);
@@ -562,5 +811,20 @@ public class IoTService extends Service {
                 }
             }
         }
+    }
+
+    private Messenger getClientMessengerFromMessageId(String msgId) {
+        if (!StringUtils.isEmptyString(msgId)) {
+            String[] strArrays = msgId.split("_");
+            if (strArrays.length == 2) {
+                WeakReference<Messenger> clientMessenger = mRegisteredApps.get(strArrays[0]);
+
+                return clientMessenger.get();
+            } else {
+                Log.e(TAG, "Invalid register args...");
+                return null;
+            }
+        }
+        return null;
     }
 }

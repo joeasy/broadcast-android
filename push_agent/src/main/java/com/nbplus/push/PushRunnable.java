@@ -263,7 +263,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 //                                    mTcpThread.interrupt();
 //                                }
         //mIsPossibleTcpClientRun = false;
-        releasePushClientSocket(PushConstants.PUSH_STATUS_WHAT_SERVICE_ERROR);
+        releasePushClientSocket(true, PushConstants.PUSH_STATUS_WHAT_SERVICE_ERROR);
     }
 
     @Override

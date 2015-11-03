@@ -85,7 +85,7 @@ public class SendEmergencyCallTask extends BaseServerApiAsyncTask {
                 "" + location.getLongitude());
 //        int retryCount = 0;
 //        while (retryCount < 3) {        // retry 3 times
-            RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
+            RequestFuture<BaseApiResult> future = RequestFuture.newFuture();
 
             GsonRequest request = new GsonRequest(Request.Method.POST, url, strRequestBody, BaseApiResult.class, future, future);
             request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));

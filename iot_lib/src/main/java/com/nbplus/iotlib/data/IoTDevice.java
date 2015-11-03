@@ -26,6 +26,7 @@ import com.nbplus.iotapp.data.AdRecord;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by basagee on 2015. 8. 6..
@@ -61,8 +62,61 @@ public class IoTDevice implements Parcelable {
     @SerializedName("IOT_DEVICE_UUIDS")            // for bluetooth
     private ArrayList<String> uuids;
 
-    @Expose
+    @SerializedName("BONDED")
+    private boolean isBondedWithServer;
+
     HashMap<Integer, AdRecord> adRecordHashMap;
+    transient HashMap<String, ArrayList<String>> discoveredServices;
+    transient ArrayList<IoTDeviceScenario> deviceScenario;
+    transient int scenarioPosition = 0;
+    transient boolean isKnownDevice;
+
+    public HashMap<String, ArrayList<String>> getDiscoveredServices() {
+        return discoveredServices;
+    }
+
+    public int getScenarioPosition() {
+        return scenarioPosition;
+    }
+
+    public void setScenarioPosition(int scenarioPosition) {
+        this.scenarioPosition = scenarioPosition;
+    }
+
+    public boolean isKnownDevice() {
+        return isKnownDevice;
+    }
+
+    public void setIsKnownDevice(boolean isKnownDevice) {
+        this.isKnownDevice = isKnownDevice;
+    }
+
+    public boolean isBondedWithServer() {
+        return isBondedWithServer;
+    }
+
+    public void setIsBondedWithServer(boolean isBonded) {
+        this.isBondedWithServer = isBonded;
+    }
+
+    public void setDiscoveredServices(HashMap<String, ArrayList<String>> discoveredServices) {
+        this.discoveredServices = discoveredServices;
+    }
+
+    public ArrayList<IoTDeviceScenario> getDeviceScenario() {
+        return deviceScenario;
+    }
+
+    public void setDeviceScenario(ArrayList<IoTDeviceScenario> deviceScenario) {
+        this.deviceScenario = deviceScenario;
+    }
+
+    public IoTDeviceScenario getNextScenario() {
+        if (this.deviceScenario == null || this.scenarioPosition + 1 == this.deviceScenario.size()) {
+            return null;
+        }
+        return this.deviceScenario.get(this.scenarioPosition++);
+    }
 
     public int getUuidLen() {
         return uuidLen;
@@ -157,7 +211,12 @@ public class IoTDevice implements Parcelable {
         dest.writeString(this.deviceType);
         dest.writeInt(this.uuidLen);
         dest.writeStringList(this.uuids);
+        dest.writeByte(isBondedWithServer ? (byte) 1 : (byte) 0);
         dest.writeSerializable(this.adRecordHashMap);
+        dest.writeSerializable(this.discoveredServices);
+        dest.writeTypedList(deviceScenario);
+        dest.writeInt(this.scenarioPosition);
+        dest.writeByte(isKnownDevice ? (byte) 1 : (byte) 0);
     }
 
     protected IoTDevice(Parcel in) {
@@ -168,7 +227,12 @@ public class IoTDevice implements Parcelable {
         this.deviceType = in.readString();
         this.uuidLen = in.readInt();
         this.uuids = in.createStringArrayList();
+        this.isBondedWithServer = in.readByte() != 0;
         this.adRecordHashMap = (HashMap<Integer, AdRecord>) in.readSerializable();
+        this.discoveredServices = (HashMap<String, ArrayList<String>>) in.readSerializable();
+        this.deviceScenario = in.createTypedArrayList(IoTDeviceScenario.CREATOR);
+        this.scenarioPosition = in.readInt();
+        this.isKnownDevice = in.readByte() != 0;
     }
 
     public static final Creator<IoTDevice> CREATOR = new Creator<IoTDevice>() {

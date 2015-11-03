@@ -47,6 +47,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nbplus.iotlib.IoTInterface;
 import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.media.MusicRetriever;
 import com.nbplus.media.MusicService;
@@ -117,8 +118,10 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 }
                 SendIoTDeviceListTask task = new SendIoTDeviceListTask();
                 if (task != null) {
-                    Log.d(TAG, "Device list = " + msg.obj);
-                    task.setBroadcastApiData(this, mHandler, serverInfo.getApiServer() + Constants.API_IOT_UPDATE_DEVICE_LIST, (String)msg.obj);
+                    Bundle extras = msg.getData();
+                    IoTDevicesData data = extras.getParcelable("data");
+
+                    task.setBroadcastApiData(this, mHandler, serverInfo.getApiServer() + Constants.API_IOT_UPDATE_DEVICE_LIST, data);
                     task.execute();
                 }
                 break;
@@ -127,6 +130,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 Log.d(TAG, "Device list reg result = " + result.getResultCode());
                 if (result != null) {
                     if (!StringUtils.isEmptyString(result.getResultCode())) {
+                        Bundle b = (Bundle)result.getObject();
+                        IoTDevicesData data = b.getParcelable("data");
+                        IoTInterface.getInstance().updateBondedWithServerDeviceList(data.getIotDevices());
                         mWebViewClient.onUpdateIoTDevices(result.getResultCode());
                     } else {
                         mWebViewClient.onUpdateIoTDevices("1000");      // Open API 코드참조.
@@ -178,14 +184,11 @@ public class BroadcastWebViewActivity extends BaseActivity {
                     data.setIotDevices(iotDevicesList);
 
                     try {
-                        if (mGson == null) {
-                            mGson = new GsonBuilder().create();
-                        }
-                        String json = mGson.toJson(data);
-
                         Message msg = new Message();
                         msg.what = HANDLER_MESSAGE_UPDATE_IOT_DEVICE_LIST;
-                        msg.obj = json;
+                        Bundle extras = new Bundle();
+                        extras.putParcelable("data", data);
+                        msg.setData(extras);
                         mHandler.sendMessage(msg);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -221,7 +224,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
             url = mShortcutData.getDomain() + mShortcutData.getPath();
         }
 
-        //url="http://175.207.46.132:8010/web_test/audio_autoplay.html";
+        //url="http://183.98.53.165:8010/web_test/audio_autoplay.html";
         if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {
             Log.e(TAG, "Wrong url ....");
             new AlertDialog.Builder(this).setMessage(R.string.alert_wrong_page_url)

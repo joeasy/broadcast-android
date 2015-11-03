@@ -24,6 +24,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by basagee on 2015. 10. 27..
@@ -32,9 +33,9 @@ public class IoTScenarioDef implements Parcelable {
     @SerializedName("type")
     private String type;
     @SerializedName("check")
-    private String scenarioFilter;
+    private ArrayList<String> scenarioFilter;
     @SerializedName("scenarios")
-    private HashMap<String, ArrayList<IoTDeviceScenario>> scenarios;
+    private LinkedHashMap<String, ArrayList<IoTDeviceScenario>> scenarios;
 
     public String getType() {
         return type;
@@ -44,19 +45,19 @@ public class IoTScenarioDef implements Parcelable {
         this.type = type;
     }
 
-    public String getScenarioFilter() {
+    public ArrayList<String> getScenarioFilter() {
         return scenarioFilter;
     }
 
-    public void setScenarioFilter(String scenarioFilter) {
+    public void setScenarioFilter(ArrayList<String> scenarioFilter) {
         this.scenarioFilter = scenarioFilter;
     }
 
-    public HashMap<String, ArrayList<IoTDeviceScenario>> getScenarios() {
-        return scenarios;
+    public ArrayList<IoTDeviceScenario> getScenarios(String id) {
+        return scenarios.get(id);
     }
 
-    public void setScenarios(HashMap<String, ArrayList<IoTDeviceScenario>> scenarios) {
+    public void setScenarios(LinkedHashMap<String, ArrayList<IoTDeviceScenario>> scenarios) {
         this.scenarios = scenarios;
     }
 
@@ -71,14 +72,14 @@ public class IoTScenarioDef implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.type);
-        dest.writeString(this.scenarioFilter);
+        dest.writeStringList(this.scenarioFilter);
         dest.writeSerializable(this.scenarios);
     }
 
     protected IoTScenarioDef(Parcel in) {
         this.type = in.readString();
-        this.scenarioFilter = in.readString();
-        this.scenarios = (HashMap<String, ArrayList<IoTDeviceScenario>>) in.readSerializable();
+        this.scenarioFilter = in.createStringArrayList();
+        this.scenarios = (LinkedHashMap<String, ArrayList<IoTDeviceScenario>>) in.readSerializable();
     }
 
     public static final Creator<IoTScenarioDef> CREATOR = new Creator<IoTScenarioDef>() {

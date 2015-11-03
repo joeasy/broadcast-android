@@ -5,8 +5,8 @@ package com.nbplus.vbroadlauncher.data;
  */
 public class Constants {
     //  서버정보
-    //public static final String VBROAD_INITIAL_PAGE = "http://175.207.46.132:8010/web_test/test.html";
-    public static final String VBROAD_INITIAL_PAGE = "http://175.207.46.132:8080/common/selectServer.rcc";
+    //public static final String VBROAD_INITIAL_PAGE = "http://183.98.53.165:8010/web_test/test.html";
+    public static final String VBROAD_INITIAL_PAGE = "http://183.98.53.165:8080/common/selectServer.rcc";
     public static final String API_IOT_UPDATE_DEVICE_LIST = "/is/api/iot/RegistIOTDevice";
 
     public static final int RADIO_CHANNEL_GRIDVIEW_SIZE = 6;

@@ -42,6 +42,16 @@ public class IoTDeviceScenario implements Parcelable {
     @SerializedName("data")
     String data;
 
+    int deviceTypeId;
+
+    public int getDeviceTypeId() {
+        return deviceTypeId;
+    }
+
+    public void setDeviceTypeId(int deviceTypeId) {
+        this.deviceTypeId = deviceTypeId;
+    }
+
     public String getCharacteristic() {
         return characteristic;
     }
@@ -82,6 +92,9 @@ public class IoTDeviceScenario implements Parcelable {
         this.data = data;
     }
 
+    public IoTDeviceScenario() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -94,9 +107,7 @@ public class IoTDeviceScenario implements Parcelable {
         dest.writeInt(this.cmd);
         dest.writeString(this.dataType);
         dest.writeString(this.data);
-    }
-
-    public IoTDeviceScenario() {
+        dest.writeInt(this.deviceTypeId);
     }
 
     protected IoTDeviceScenario(Parcel in) {
@@ -105,9 +116,10 @@ public class IoTDeviceScenario implements Parcelable {
         this.cmd = in.readInt();
         this.dataType = in.readString();
         this.data = in.readString();
+        this.deviceTypeId = in.readInt();
     }
 
-    public static final Parcelable.Creator<IoTDeviceScenario> CREATOR = new Parcelable.Creator<IoTDeviceScenario>() {
+    public static final Creator<IoTDeviceScenario> CREATOR = new Creator<IoTDeviceScenario>() {
         public IoTDeviceScenario createFromParcel(Parcel source) {
             return new IoTDeviceScenario(source);
         }

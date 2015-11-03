@@ -75,7 +75,6 @@ public class GetRadioChannelTask extends BaseServerApiAsyncTask {
 
             try {
                 response = future.get(); // this will block (forever)
-                Thread.sleep(1000);
 //                break;
             } catch (InterruptedException e) {
                 // exception handling
