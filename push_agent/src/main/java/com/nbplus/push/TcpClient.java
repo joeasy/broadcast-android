@@ -337,7 +337,7 @@ public class TcpClient {
             final InetAddress serverAddr = InetAddress.getByName(mInterfaceData.interfaceServerAddress);
             int port = Integer.parseInt(mInterfaceData.interfaceServerPort);
             final SocketAddress socketAddress = new InetSocketAddress(serverAddr, port);
-            Log.d(TAG, "C: Connecting...");
+            Log.d(TAG, "C: Connecting... serverAddr = " + serverAddr + ", port = " + port);
 
             if (mPushSocket == null) {
                 //create a socket to make the connection with the server

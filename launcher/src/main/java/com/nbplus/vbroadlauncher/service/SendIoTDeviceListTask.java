@@ -20,6 +20,7 @@ package com.nbplus.vbroadlauncher.service;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -30,8 +31,11 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.Constants;
+import com.nbplus.vbroadlauncher.data.IoTDevicesData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RadioChannelInfo;
 
@@ -48,12 +52,14 @@ import java.util.concurrent.ExecutionException;
 public class SendIoTDeviceListTask extends BaseServerApiAsyncTask {
     private static final String TAG = SendIoTDeviceListTask.class.getSimpleName();
 
-    private String mRequestBody = null;
-    public void setBroadcastApiData(Context context, Handler handler, String path, String body) {
+    private IoTDevicesData mRequestBody = null;
+    Gson mGson;
+
+    public void setBroadcastApiData(Context context, Handler handler, String path, IoTDevicesData data) {
         this.mContext = context;
         this.mHandler = handler;
         this.mServerPath = path;
-        this.mRequestBody = body;
+        this.mRequestBody = data;
 
     }
 
@@ -76,9 +82,14 @@ public class SendIoTDeviceListTask extends BaseServerApiAsyncTask {
         Uri.Builder builder = Uri.parse(mServerPath).buildUpon();
         String url = builder.toString();
 
-        RequestFuture<RadioChannelInfo> future = RequestFuture.newFuture();
+        RequestFuture<BaseApiResult> future = RequestFuture.newFuture();
+        if (mGson == null) {
+            mGson = new GsonBuilder().create();
+        }
+        String json = mGson.toJson(mRequestBody);
+        Log.d(TAG, "Send device list = " + json);
 
-        GsonRequest request = new GsonRequest(Request.Method.POST, url, mRequestBody, BaseApiResult.class, future, future);
+        GsonRequest request = new GsonRequest(Request.Method.POST, url, json, BaseApiResult.class, future, future);
         request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));
         requestQueue.add(request);
 
@@ -109,6 +120,9 @@ public class SendIoTDeviceListTask extends BaseServerApiAsyncTask {
 
             Message message = new Message();
             message.what = Constants.HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK;
+            Bundle b = new Bundle();
+            b.putParcelable("data", mRequestBody);
+            result.setObject(b);
             message.obj = result;
             mHandler.sendMessage(message);
         }

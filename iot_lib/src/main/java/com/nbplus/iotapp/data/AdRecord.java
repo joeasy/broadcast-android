@@ -115,7 +115,7 @@ public class AdRecord implements Parcelable {
      * preference 에 저장할 예정이므로...
      * String 으로.
      */
-    transient private String mData;
+    private String mData;
 
     public AdRecord(int length, int type, byte[] data) {
         mLength = length;

@@ -78,6 +78,10 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     ShortcutData mShortcutData;
     SettingsContentObserver mSettingsContentObserver;
 
+    // get radio channel list
+    boolean mIsExecuteGetRadioChannelTask = false;
+    GetRadioChannelTask getRadioChannelTask = null;
+
     RelativeLayout mActivityLayout;
     // title bar
     TextView    mRadioTitle;
@@ -149,8 +153,14 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
                         }
                     });
                     alert.setMessage(data.getResultMessage());
-                    alert.show();
+                    try {
+                        alert.show();
+                    } catch (Exception e) {
+
+                    }
                 }
+                mIsExecuteGetRadioChannelTask = false;
+                getRadioChannelTask = null;
 
                 setupRadioChannelPager();
                 break;
@@ -202,7 +212,9 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
                     mActivityInteractionListener.get(idx).onPlayItemChanged(b);
                 }
 
-                mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_HIDE_PROGRESS_DIALOG, 1500);
+                if (!mIsExecuteGetRadioChannelTask) {
+                    mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_HIDE_PROGRESS_DIALOG, 1500);
+                }
                 break;
 
             // 프로그레스바 제거
@@ -357,7 +369,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
         mShortcutData = i.getParcelableExtra(Constants.EXTRA_NAME_SHORTCUT_DATA);
         if (mShortcutData == null) {
             Log.e(TAG, "mShortcutData is not found..");
-            finish();
+            finishActivity();
             return;
         }
 
@@ -386,7 +398,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                finishActivity();
             }
         });
 
@@ -488,10 +500,11 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
             }
         });
 
-        GetRadioChannelTask task = new GetRadioChannelTask();
-        if (task != null) {
-            task.setBroadcastApiData(this, mHandler, mShortcutData.getDomain() + mShortcutData.getPath());
-            task.execute();
+        getRadioChannelTask = new GetRadioChannelTask();
+        if (getRadioChannelTask != null) {
+            getRadioChannelTask.setBroadcastApiData(this, mHandler, mShortcutData.getDomain() + mShortcutData.getPath());
+            mIsExecuteGetRadioChannelTask = true;
+            getRadioChannelTask.execute();
         }
     }
 
@@ -501,7 +514,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
      */
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        finishActivity();
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
@@ -544,9 +557,8 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     @Override
     protected void onPause() {
         super.onPause();
-        dismissProgressDialog();
 
-        finish();
+        finishActivity();
     }
 
     @Override
@@ -602,6 +614,17 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
         if (l != null) {
             l.onCheckResult(null);
         }
+    }
+
+    private void finishActivity() {
+        dismissProgressDialog();
+        if (getRadioChannelTask != null && mIsExecuteGetRadioChannelTask) {
+            getRadioChannelTask.cancel(true);
+            mIsExecuteGetRadioChannelTask = false;
+        }
+        getRadioChannelTask = null;
+
+        finish();
     }
 
 }

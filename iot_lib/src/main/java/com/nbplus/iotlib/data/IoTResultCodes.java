@@ -23,6 +23,7 @@ package com.nbplus.iotlib.data;
 // device list option
 public enum IoTResultCodes {
     SUCCESS (0),
+    FAILED (1),
     // app check
     BIND_SERVICE_FAILED(100),
     IOT_APP_NOT_INSTALLED(101),

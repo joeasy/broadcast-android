@@ -50,8 +50,12 @@ public class IoTServiceCommand {
     public static final int GET_DEVICE_LIST = UNREGISTER_SERVICE + 1;
     public static final int DEVICE_BONDING = GET_DEVICE_LIST + 1;
     public static final int DEVICE_UN_BONDING = DEVICE_BONDING + 1;
-    public static final int CONTROL_DEVICE = DEVICE_UN_BONDING + 1;     // IR 등에대한 제어
-    public static final int GET_DEVICE_DATA = CONTROL_DEVICE + 1;
+    public static final int DEVICE_CONNECT = DEVICE_UN_BONDING + 1;
+    public static final int DEVICE_DISCONNECT = DEVICE_CONNECT + 1;
+    public static final int CONTROL_DEVICE = DEVICE_DISCONNECT + 1;     // IR 등에대한 제어
+    public static final int DEVICE_READ_DATA = CONTROL_DEVICE + 1;
+    public static final int DEVICE_WRITE_DATA = DEVICE_READ_DATA + 1;
+    public static final int DEVICE_SET_NOTIFICATION = DEVICE_WRITE_DATA + 1;
 
     /**
      * from service to application.
@@ -59,18 +63,23 @@ public class IoTServiceCommand {
     /**
      * 디바이스리스트 갱신에 대한 notification
      */
-    public static final int DEVICE_LIST_NOTIFICATION = GET_DEVICE_DATA + 1;
+    public static final int DEVICE_LIST_NOTIFICATION = DEVICE_SET_NOTIFICATION + 1;
     /**
      * 어플리케이션에서 데이터조회 요청한 디바이스에 대해서
      * 시나리오에 따라 데이터 조회(notify/indicate, read, write) 등등의 조합으로 처리결과
      */
-    public static final int DEVICE_DATA_NOTIFICATION = DEVICE_LIST_NOTIFICATION + 1;
-    public static final int DEVICE_CONTROL_NOTIFICATION = DEVICE_DATA_NOTIFICATION + 1;
+    public static final int DEVICE_CONNECTED = DEVICE_LIST_NOTIFICATION + 1;
+    public static final int DEVICE_DISCONNECTED = DEVICE_CONNECTED + 1;
+    public static final int DEVICE_NOTIFICATION_DATA = DEVICE_DISCONNECTED + 1;
+    public static final int DEVICE_READ_SUCCESS = DEVICE_NOTIFICATION_DATA + 1;
+    public static final int DEVICE_READ_FAILED = DEVICE_READ_SUCCESS + 1;
+    public static final int DEVICE_WRITE_SUCCESS = DEVICE_READ_FAILED + 1;
+    public static final int DEVICE_WRITE_FAILED = DEVICE_WRITE_SUCCESS + 1;
 
     // 위의 request 에 대한 결과를 전달하기 위함.
     // - message의 data 전달되는 데이터 형식
     // Bundle b = new Bundle(); b.putInt(REQUEST_CODE); b.putXXXXX~~~~
-    public static final int COMMAND_RESPONSE = DEVICE_CONTROL_NOTIFICATION + 1;
+    public static final int COMMAND_RESPONSE = DEVICE_WRITE_FAILED + 1;
     // 서비스 상태 변경..
     public static final int SERVICE_STATUS_NOTIFICATION = COMMAND_RESPONSE + 1;
 
@@ -79,13 +88,14 @@ public class IoTServiceCommand {
      */
     public static final String KEY_MSGID = "KEY_MSGID";
     public static final String KEY_CMD = "KEY_CMD";
-    public static final String KEY_NEXT_CMD = "KEY_NEXT_CMD";
     public static final String KEY_RESULT = "KEY_RESULT";
     public static final String KEY_SERVICE_STATUS = "KEY_SERVICE_STATUS";
     public static final String KEY_SERVICE_STATUS_CODE = "KEY_SERVICE_STATUS_CODE";
 
     public static final String KEY_DEVICE_TYPE = "KEY_DEVICE_TYPE";
-    public static final String KEY_UUID = "KEY_UUID";
+    public static final String KEY_DEVICE_UUID = "KEY_UUID";           // device id
+    public static final String KEY_SERVICE_UUID = "KEY_SERVICE_UUID";       // service uuid
+    public static final String KEY_CHARACTERISTIC_UUID = "KEY_CHARACTERISTIC_UUID";       // characteristic uuid
     public static final String KEY_DATA = "KEY_DATA";
 
     public static String generateMessageId(Context context) {
