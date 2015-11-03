@@ -24,14 +24,25 @@ import android.os.Parcelable;
  * Created by basagee on 2015. 10. 29..
  */
 public class IoTHandleData implements Parcelable {
+    public static final int STATUS_SUCCESS = 0;
+
     int requestCommand;
     String msgId;
     String deviceId;
     String serviceUuid;
     String characteristicUuid;
     int deviceTypeId;
+    int status = 0;
 
     byte[] value;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public int getRequestCommand() {
         return requestCommand;
@@ -99,6 +110,7 @@ public class IoTHandleData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.status);
         dest.writeInt(this.requestCommand);
         dest.writeString(this.msgId);
         dest.writeString(this.deviceId);
@@ -114,6 +126,7 @@ public class IoTHandleData implements Parcelable {
     }
 
     protected IoTHandleData(Parcel in) {
+        this.status = in.readInt();
         this.requestCommand = in.readInt();
         this.msgId = in.readString();
         this.deviceId = in.readString();
