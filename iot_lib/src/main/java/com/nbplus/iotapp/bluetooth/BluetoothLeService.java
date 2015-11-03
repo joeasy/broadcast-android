@@ -62,6 +62,7 @@ import com.nbplus.iotapp.data.DataParser;
 import com.nbplus.iotapp.data.GattAttributes;
 import com.nbplus.iotlib.data.Constants;
 import com.nbplus.iotlib.data.IoTDevice;
+import com.nbplus.iotlib.data.IoTHandleData;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 
@@ -221,6 +222,12 @@ public class BluetoothLeService extends Service {
             }
         }
 
+        /**
+         * modified 2015.11.03
+         * @param gatt
+         * @param descriptor
+         * @param status
+         */
         @Override
         public void onDescriptorWrite (BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             byte[] descValue = descriptor.getValue();
@@ -231,7 +238,14 @@ public class BluetoothLeService extends Service {
             for (int i = 0; i < Byte.SIZE; i++) {
                 Log.d(TAG, "byteValue[" + i + "] = " + (byteValue >> i & 0x1));
             }
-            broadcastUpdate(gatt.getDevice().getAddress(), ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS, descriptor, status);
+
+            IoTHandleData data = new IoTHandleData();
+            data.setDeviceId(gatt.getDevice().getAddress());
+            data.setServiceUuid(characteristic.getService().getUuid().toString());
+            data.setCharacteristicUuid(characteristic.getUuid().toString());
+            data.setValue(descValue);
+            data.setStatus(status);
+            broadcastUpdate(ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS, data);
         }
 
     };
@@ -308,6 +322,13 @@ public class BluetoothLeService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    /**
+     * modified 2015.11.03
+     * @param address
+     * @param action
+     * @param descriptor
+     * @param status
+     */
     private void broadcastUpdate(String address, final String action, BluetoothGattDescriptor descriptor, int status) {
         final Intent intent = new Intent(action);
         intent.putExtra(EXTRA_DATA_SERVICE_UUID, descriptor.getCharacteristic().getService().getUuid().toString());
