@@ -71,15 +71,14 @@ public class IoTServiceCommand {
     public static final int DEVICE_CONNECTED = DEVICE_LIST_NOTIFICATION + 1;
     public static final int DEVICE_DISCONNECTED = DEVICE_CONNECTED + 1;
     public static final int DEVICE_NOTIFICATION_DATA = DEVICE_DISCONNECTED + 1;
-    public static final int DEVICE_READ_SUCCESS = DEVICE_NOTIFICATION_DATA + 1;
-    public static final int DEVICE_READ_FAILED = DEVICE_READ_SUCCESS + 1;
-    public static final int DEVICE_WRITE_SUCCESS = DEVICE_READ_FAILED + 1;
-    public static final int DEVICE_WRITE_FAILED = DEVICE_WRITE_SUCCESS + 1;
+    public static final int DEVICE_READ_DATA_RESULT = DEVICE_NOTIFICATION_DATA + 1;
+    public static final int DEVICE_WRITE_DATA_RESULT = DEVICE_READ_DATA_RESULT + 1;
+    public static final int DEVICE_SET_NOTIFICATION_RESULT = DEVICE_WRITE_DATA_RESULT + 1;
 
     // 위의 request 에 대한 결과를 전달하기 위함.
     // - message의 data 전달되는 데이터 형식
     // Bundle b = new Bundle(); b.putInt(REQUEST_CODE); b.putXXXXX~~~~
-    public static final int COMMAND_RESPONSE = DEVICE_WRITE_FAILED + 1;
+    public static final int COMMAND_RESPONSE = DEVICE_SET_NOTIFICATION_RESULT + 1;
     // 서비스 상태 변경..
     public static final int SERVICE_STATUS_NOTIFICATION = COMMAND_RESPONSE + 1;
 
