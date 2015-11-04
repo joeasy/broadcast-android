@@ -512,8 +512,49 @@ public class IoTService extends Service {
                 Log.d(TAG, "ACTION_DATA_AVAILABLE received.");
             } else if (BluetoothLeService.ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS.equals(action)) {
                 Log.d(TAG, "ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS received.");
+                IoTHandleData reqData = mRequestQueue.get(0);
+                mRequestQueue.remove(0);
+                IoTHandleData resultData = intent.getParcelableExtra(IoTServiceCommand.KEY_DATA);
+
+                Message msg = new Message();
+                msg.what = IoTServiceCommand.DEVICE_SET_NOTIFICATION_RESULT;
+                Bundle extras = new Bundle();
+                extras.putString(IoTServiceCommand.KEY_DEVICE_UUID, reqData.getDeviceId());
+                if (resultData == null) {
+                    Log.w(TAG, "result data not found");
+                    extras.putSerializable(IoTServiceCommand.KEY_RESULT, IoTResultCodes.FAILED);
+                } else {
+                    if (resultData.getStatus() == IoTHandleData.STATUS_SUCCESS) {
+                        extras.putSerializable(IoTServiceCommand.KEY_RESULT, IoTResultCodes.SUCCESS);
+                    } else {
+                        extras.putSerializable(IoTServiceCommand.KEY_RESULT, IoTResultCodes.FAILED);
+                    }
+                }
+                msg.setData(extras);
+                sendNotificationToApplication(reqData.getMsgId(), msg);
             } else if (BluetoothLeService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS.equals(action)) {
                 Log.d(TAG, "ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS received.");
+                IoTHandleData reqData = mRequestQueue.get(0);
+                mRequestQueue.remove(0);
+                IoTHandleData resultData = intent.getParcelableExtra(IoTServiceCommand.KEY_DATA);
+
+                Message msg = new Message();
+                msg.what = IoTServiceCommand.DEVICE_WRITE_DATA_RESULT;
+                Bundle extras = new Bundle();
+                extras.putString(IoTServiceCommand.KEY_DEVICE_UUID, reqData.getDeviceId());
+                if (resultData == null) {
+                    Log.w(TAG, "result data not found");
+                    extras.putSerializable(IoTServiceCommand.KEY_RESULT, IoTResultCodes.FAILED);
+                } else {
+                    if (resultData.getStatus() == IoTHandleData.STATUS_SUCCESS) {
+                        extras.putSerializable(IoTServiceCommand.KEY_RESULT, IoTResultCodes.SUCCESS);
+                        extras.putParcelable(IoTServiceCommand.KEY_DATA, resultData);
+                    } else {
+                        extras.putSerializable(IoTServiceCommand.KEY_RESULT, IoTResultCodes.FAILED);
+                    }
+                }
+                msg.setData(extras);
+                sendNotificationToApplication(reqData.getMsgId(), msg);
             }
         }
 

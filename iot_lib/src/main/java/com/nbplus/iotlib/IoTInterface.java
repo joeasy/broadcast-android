@@ -34,7 +34,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.nbplus.iotapp.btcharacteristics.WeightMeasurement;
 import com.nbplus.iotapp.data.AdRecord;
+import com.nbplus.iotapp.data.DataGenerator;
 import com.nbplus.iotapp.data.DataParser;
 import com.nbplus.iotapp.data.GattAttributes;
 import com.nbplus.iotapp.perferences.IoTServicePreference;
@@ -46,6 +48,7 @@ import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTDeviceScenario;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.iotlib.data.IoTScenarioDef;
+import com.nbplus.iotlib.data.IoTScenarioMap;
 import com.nbplus.iotlib.data.IoTServiceCommand;
 import com.nbplus.iotlib.data.IoTServiceStatus;
 import com.nbplus.iotlib.data.IoTHandleData;
@@ -58,6 +61,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -75,7 +80,7 @@ public class IoTInterface {
      * IoT 디바이스 데이터 변경내역 검사 주기.
      * 1시간이다.
      */
-    private static final int RETRIEVE_IOT_DEVICE_DATA_PERIOD = 1 * 60 * 1000;
+    private static final int RETRIEVE_IOT_DEVICE_DATA_PERIOD = 60 * 60 * 1000;
 
     // haneler
     private static final int HANDLER_RETRIEVE_IOT_DEVICES = IoTServiceCommand.COMMAND_BASE_VALUE - 1;
@@ -118,7 +123,7 @@ public class IoTInterface {
     /**
      * known IoT device scenarios
      */
-    HashMap<String, IoTScenarioDef> mIoTScenarioMap = null;
+    IoTScenarioMap mIoTScenarioMap = null;
 
     /**
      * 10초동안 검색된 device list 를 저장해 두는 공간
@@ -156,13 +161,54 @@ public class IoTInterface {
 
         Gson gson = new Gson();
         // load scenarios
-        String jsonString = IoTServicePreference.getIoTDeviceScenarioMap(mCtx);
-        if (jsonString.equals("{}")) {
-            jsonString = loadJSONFromAsset("default_scenario.json");
+
+        try {
+            String jsonString = IoTServicePreference.getIoTDeviceScenarioMap(mCtx);
+            if (!StringUtils.isEmptyString(jsonString)) {
+                Log.d(TAG, ">> scenario map json string = " + jsonString);
+                IoTScenarioMap jsonMap = gson.fromJson(jsonString, IoTScenarioMap.class);
+                // default json map.
+                IoTScenarioMap defaultJsonMap = null;
+                String assetJson = loadJSONFromAsset("default_scenario.json");
+                if (!StringUtils.isEmptyString(assetJson)) {
+                    defaultJsonMap = gson.fromJson(assetJson, IoTScenarioMap.class);
+                }
+
+                if (jsonMap != null && jsonMap.getVersion() <= 0) {
+                    Log.d(TAG, "saved json scenario map is older version. use default json map..");
+                    mIoTScenarioMap = defaultJsonMap;
+                    IoTServicePreference.setIoTDeviceScenarioMap(mCtx, assetJson);
+                } else {
+                    if (jsonMap == null) {
+                        Log.d(TAG, "saved json scenario map is null. use default json map..");
+                        mIoTScenarioMap = defaultJsonMap;
+                        IoTServicePreference.setIoTDeviceScenarioMap(mCtx, assetJson);
+                    } else if (defaultJsonMap != null && (defaultJsonMap.getVersion() > jsonMap.getVersion())) {
+                        Log.d(TAG, "saved json scenario map is older version. use default json map..");
+                        mIoTScenarioMap = defaultJsonMap;
+                        IoTServicePreference.setIoTDeviceScenarioMap(mCtx, assetJson);
+                    } else {
+                        Log.d(TAG, "saved json scenario map is latest version. use this map..");
+                        mIoTScenarioMap = jsonMap;
+                    }
+                }
+            } else {
+                Log.d(TAG, "saved json scenario map is not found. use default json map..");
+                // default json map.
+                IoTScenarioMap defaultJsonMap = null;
+                String assetJson = loadJSONFromAsset("default_scenario.json");
+                if (!StringUtils.isEmptyString(assetJson)) {
+                    defaultJsonMap = gson.fromJson(assetJson, IoTScenarioMap.class);
+                }
+
+                mIoTScenarioMap = defaultJsonMap;
+                IoTServicePreference.setIoTDeviceScenarioMap(mCtx, assetJson);
+            }
+        } catch (Exception e) {
+
         }
-        if (!StringUtils.isEmptyString(jsonString)) {
-            Log.d(TAG, ">> scenario map json string = " + jsonString);
-            mIoTScenarioMap = gson.fromJson(jsonString, new TypeToken<HashMap<String, IoTScenarioDef>>(){}.getType());
+        if (mIoTScenarioMap.getScenarioMap() == null) {
+            mIoTScenarioMap.setScenarioMap(new HashMap<String, IoTScenarioDef>());
         }
 
         // load saved devices list
@@ -251,7 +297,8 @@ public class IoTInterface {
                      * IoT 디바이스 상태를 조회한다.
                      */
                     mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
-                    mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 30 * 1000);
+                    // 서비스 시작 후 5분이 지난시점부터.
+                    mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 300 * 1000);
                 } else {
                     mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                 }
@@ -281,6 +328,40 @@ public class IoTInterface {
                 break;
             }
 
+            case IoTServiceCommand.DEVICE_WRITE_DATA_RESULT:
+            case IoTServiceCommand.DEVICE_SET_NOTIFICATION_RESULT: {
+                Log.d(TAG, "IoTServiceCommand.DEVICE_SET_NOTIFICATION_RESULT received");
+
+                Bundle b = msg.getData();
+                IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
+                if (IoTResultCodes.SUCCESS.equals(resultCode)) {
+                    // success set notifications.
+                    Log.d(TAG, "success set notification.. proceed next command");
+
+                    IoTHandleData resultData = (IoTHandleData)b.getParcelable(IoTServiceCommand.KEY_DATA);
+                    if (resultData != null) {
+                        // xiaomi
+                        if (resultData.getCharacteristicUuid().equals(GattAttributes.MISCALE_CHARACTERISTIC_2A2F)) {
+                            handleXiaomiScale(msg.what, resultData);
+                        }
+                    }
+
+                    proceedDeviceCommand();
+                } else {
+                    // fail set notifications.
+                    Log.d(TAG, "fail set notification.. disconnect device");
+                    mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                    mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                }
+                break;
+            }
+
+            case IoTServiceCommand.DEVICE_NOTIFICATION_DATA: {
+                // read 인지 notification 인지 구분해야 한다.
+                Log.d(TAG, "IoTServiceCommand.DEVICE_NOTIFICATION_DATA received");
+                break;
+            }
+
             case HANDLER_RETRIEVE_IOT_DEVICES : {
                 Log.d(TAG, "HANDLER_RETRIEVE_IOT_DEVICES received..");
                 mCurrentRetrieveIndex = 0;
@@ -288,8 +369,6 @@ public class IoTInterface {
                 mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                 if (mServiceStatus == IoTServiceStatus.RUNNING) {
                     sendConnectToDeviceMessage(mCurrentRetrieveIndex);
-                } else {
-                    mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                 }
                 break;
             }
@@ -354,6 +433,9 @@ public class IoTInterface {
                         mCurrentRetrieveIndex = -1;
                         mCurrentRetrieveDevice = null;
 
+                        // 하나도 조회하지 못했을 때는 10분후에 다시 한다.
+                        // 하나라도 성공을 했다면 1시간후에...
+                        mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                         mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD);
                     }
                 }
@@ -371,6 +453,21 @@ public class IoTInterface {
                         mCurrentRetrieveIndex++;
                         sendConnectToDeviceMessage(mCurrentRetrieveIndex);
                     }
+                }
+                break;
+            }
+
+            case IoTServiceCommand.DEVICE_READ_DATA:
+            case IoTServiceCommand.DEVICE_WRITE_DATA:
+            case IoTServiceCommand.DEVICE_SET_NOTIFICATION: {
+                IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
+                if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
+                    // success
+                    Log.d(TAG, ">> IoT READ_WRITE_SET_NOTIFICATION success...");
+                } else {
+                    Log.e(TAG, ">> IoT READ_WRITE_SET_NOTIFICATION failed code = " + resultCode);
+                    mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                    mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
                 }
                 break;
             }
@@ -708,6 +805,9 @@ public class IoTInterface {
         }
 
         if (!sendSuccess) {
+            // 하나도 조회하지 못했을 때는 10분후에 다시 한다.
+            // 하나라도 성공을 했다면 1시간후에...
+            mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
             mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD);
         }
     }
@@ -720,9 +820,12 @@ public class IoTInterface {
         HashMap<String, IoTDevice> devices = (HashMap<String, IoTDevice>)b.getSerializable(IoTServiceCommand.KEY_DATA);
         if (devices == null || devices.size() == 0) {
             Log.w(TAG, "empty device list");
-            return;
+            //return;
         }
 
+        if (devices == null) {
+            devices = new HashMap<>();
+        }
         boolean changed = false;
         Iterator<String> iter = devices.keySet().iterator();
         Log.d(TAG, "IoTServiceCommand.GET_DEVICE_LIST added size = " + devices.size());
@@ -901,7 +1004,7 @@ public class IoTInterface {
                         break;
                 }
             }
-            if (mIoTScenarioMap.get(uuid) != null) {
+            if (mIoTScenarioMap.getScenarioMap().get(uuid) != null) {
                 Log.d(TAG, "isKnownScenarioDevice() uuid = " + uuid);
                 isKnown = true;
                 break;
@@ -938,7 +1041,7 @@ public class IoTInterface {
                 uuid = uuids.get(i);
             }
 
-            ioTScenarioDef = mIoTScenarioMap.get(uuid);
+            ioTScenarioDef = mIoTScenarioMap.getScenarioMap().get(uuid);
             if (ioTScenarioDef != null) {
                 break;
             }
@@ -984,6 +1087,9 @@ public class IoTInterface {
             mCurrentRetrieveIndex = -1;
             mCurrentRetrieveDevice = null;
 
+            // 하나도 조회하지 못했을 때는 10분후에 다시 한다.
+            // 하나라도 성공을 했다면 1시간후에...
+            mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
             mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD);
         }
     }
@@ -1041,12 +1147,20 @@ public class IoTInterface {
             Log.d(TAG, "updateBondedWithServerDeviceList json = " + json);
             IoTServicePreference.setIoTDevicesList(mCtx, json);
         }
+
+        /**
+         * 전체 리스트가 갱신되는 시점에 전체데이터 조회를 한번 한다.
+         */
+        mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
+        mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 10 * 1000);
     }
 
     private boolean proceedDeviceCommand() {
+        Log.d(TAG, ">> proceedDeviceCommand()");
         // try first scenario command
         IoTDeviceScenario scenario = mCurrentRetrieveDevice.getNextScenario();
         if (scenario == null) {
+            mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
             mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 10 * 1000);
             return true;
         }
@@ -1065,12 +1179,36 @@ public class IoTInterface {
                 break;
             case IoTDeviceScenario.CMD_WRITE :
                 cmd = IoTServiceCommand.DEVICE_WRITE_DATA;
+                if (StringUtils.isEmptyString(scenario.getDataType())) {
+                    // data type 이 없으면 data 값이 있는지 확인한다.
+                    if (StringUtils.isEmptyString(scenario.getData())) {
+                        // data 값이없으면 진행을 중지한다.
+                        Log.w(TAG, "Can't find data type or data");
+                        mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        return false;
+                    }
+
+                    byte[] setData = DataParser.getHextoBytes(scenario.getData());
+                    data.setValue(setData);
+                } else {
+                    if (scenario.getDataType().equals("current_time")) {
+                        byte[] setData = DataGenerator.getCurrentTimeData();
+                        data.setValue(setData);
+                    } else {
+                        Log.w(TAG, "Unknown data type..");
+                        mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        return false;
+                    }
+                }
                 break;
             case IoTDeviceScenario.CMD_NOTIFY :
                 cmd = IoTServiceCommand.DEVICE_SET_NOTIFICATION;
                 break;
             default: {
                 Log.w(TAG, "Unknown device command... skip this device");
+                mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
                 mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
                 return false;
             }
@@ -1078,5 +1216,83 @@ public class IoTInterface {
         extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
         sendMessageToService(cmd, extras);
         return true;
+    }
+
+    private void handleXiaomiScale(int msgWhat, IoTHandleData data) {
+        if (data == null) {
+            return;
+        }
+        // 샤오미는 아래와 같은 시나리오로 진행된다.
+        // 1. write 2a2f - for notify saved record number
+        // 2. write result
+        // 3. notify 2a2f - saved recoreds number count (value의 1byte 값이 0x01)
+        // 4. (if (number > 0)) write 2a2f - for notify saved records
+        // 5.                   write result
+        // 6.                   notify saved record (value의 1byte 값이 0x62)
+        // 7.                   notify end of record (value의 1byte 값이 0x03)
+        // 8.                   write 2a2f - delete saved records
+        byte[] values = data.getValue();
+        if (values == null) {
+            Log.w(TAG, "handleXiaomiScale() value is not found..");
+        }
+        switch (msgWhat) {
+            case IoTServiceCommand.DEVICE_WRITE_DATA_RESULT: {
+                switch (values[0] & 0xff) {
+                    case 0x01:          // get number success.. data will be notify
+                        Log.d(TAG, "xiaomi sclae : get number success.. data will be notified..");
+                        break;
+                    case 0x02:
+                        Log.d(TAG, "xiaomi sclae : get data success.. data will be notified..");
+                        break;
+                    case 0x03:
+                        Log.d(TAG, "xiaomi sclae : stop saved notification data .. success");
+                        proceedDeviceCommand();     // delete saved record.
+                        break;
+                    case 0x04:
+                        Log.d(TAG, "xiaomi sclae : remove all saved data success... ");
+                        break;
+                }
+                break;
+            }
+            case IoTServiceCommand.DEVICE_NOTIFICATION_DATA: {
+                switch (values[0] & 0xFF) {
+                    case 0x01 :     // get saved number
+                        int savedNumber = DataParser.getUint16(Arrays.copyOfRange(values, 1, 3));
+                        Log.d(TAG, ">> Saved Data Num is " + savedNumber);
+                        if (savedNumber > 0) {
+                            proceedDeviceCommand();     // next command - notify record.
+                        }
+                        break;
+//                        case 0x02 :     // do not reached
+//                            break;
+                    case 0x03 :     // end of saved data ??
+                        Log.d(TAG, ">> End of saved data flag received...");
+                        proceedDeviceCommand();         // stop notifications.
+                        break;
+                    case 0x62 :     // saved data
+                        // send to server
+                        String address = data.getDeviceId();
+                        String characUuid = data.getCharacteristicUuid();
+                        ArrayList<WeightMeasurement> measurements = WeightMeasurement.parseWeightMeasurement(address, characUuid, values);
+
+                        for (WeightMeasurement measurement : measurements) {
+                            if (measurement != null) {
+                                Calendar calendar = measurement.getTimestamp();
+                                String extraData = "Weight = " + measurement.getWeight() + "" +
+                                        measurement.getMeasurementUnitString() + ", timestamp = " + calendar.get(Calendar.YEAR) + "." + calendar.get(Calendar.MONTH)
+                                        + "." + calendar.get(Calendar.DAY_OF_MONTH) + " " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE)
+                                        + ":" + calendar.get(Calendar.SECOND);
+
+                                Log.d(TAG, "weight measurement data = " + extraData);
+
+                                //displayData(extraData);
+                            }
+                        }
+                        break;
+                }
+                break;
+            }
+        }
+
     }
 }

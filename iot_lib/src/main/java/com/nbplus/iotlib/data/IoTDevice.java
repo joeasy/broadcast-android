@@ -70,9 +70,27 @@ public class IoTDevice implements Parcelable {
     transient ArrayList<IoTDeviceScenario> deviceScenario;
     transient int scenarioPosition = 0;
     transient boolean isKnownDevice;
+    transient int savedRecordCount = -1;
+    transient int recvedRecordCount = 0;
 
     public HashMap<String, ArrayList<String>> getDiscoveredServices() {
         return discoveredServices;
+    }
+
+    public int getSavedRecordCount() {
+        return savedRecordCount;
+    }
+
+    public void setSavedRecordCount(int savedRecordCount) {
+        this.savedRecordCount = savedRecordCount;
+    }
+
+    public int getRecvedRecordCount() {
+        return recvedRecordCount;
+    }
+
+    public void setRecvedRecordCount(int recvedRecordCount) {
+        this.recvedRecordCount = recvedRecordCount;
     }
 
     public int getScenarioPosition() {
@@ -112,10 +130,17 @@ public class IoTDevice implements Parcelable {
     }
 
     public IoTDeviceScenario getNextScenario() {
-        if (this.deviceScenario == null || this.scenarioPosition + 1 == this.deviceScenario.size()) {
+        if (this.deviceScenario == null || this.scenarioPosition == this.deviceScenario.size()) {
             return null;
         }
         return this.deviceScenario.get(this.scenarioPosition++);
+    }
+
+    public IoTDeviceScenario getCurrentScenario() {
+        if (this.deviceScenario == null || this.scenarioPosition == this.deviceScenario.size()) {
+            return null;
+        }
+        return this.deviceScenario.get(this.scenarioPosition);
     }
 
     public int getUuidLen() {
@@ -217,6 +242,8 @@ public class IoTDevice implements Parcelable {
         dest.writeTypedList(deviceScenario);
         dest.writeInt(this.scenarioPosition);
         dest.writeByte(isKnownDevice ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.savedRecordCount);
+        dest.writeInt(this.recvedRecordCount);
     }
 
     protected IoTDevice(Parcel in) {
@@ -233,6 +260,8 @@ public class IoTDevice implements Parcelable {
         this.deviceScenario = in.createTypedArrayList(IoTDeviceScenario.CREATOR);
         this.scenarioPosition = in.readInt();
         this.isKnownDevice = in.readByte() != 0;
+        this.savedRecordCount = in.readInt();
+        this.recvedRecordCount = in.readInt();
     }
 
     public static final Creator<IoTDevice> CREATOR = new Creator<IoTDevice>() {

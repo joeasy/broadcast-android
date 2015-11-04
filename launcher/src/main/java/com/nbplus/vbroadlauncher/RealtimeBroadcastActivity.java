@@ -486,7 +486,9 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamMusicVolume, AudioManager.FLAG_PLAY_SOUND);
 
-        finish();
+        //finish();
+        Log.e(TAG, "RealtimeBroadcastActivity.java call System.exit(0)");
+        System.exit(0);
     }
 
     static boolean userInteraction = false;

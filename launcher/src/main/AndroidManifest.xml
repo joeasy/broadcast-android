@@ -76,6 +76,7 @@
             >
         </activity>
         <activity
+            android:launchMode="singleTask"
             android:name=".RealtimeBroadcastActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|screenSize"

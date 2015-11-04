@@ -199,9 +199,14 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicWrite(BluetoothGatt gatt,
                                           BluetoothGattCharacteristic characteristic,
                                           int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(gatt.getDevice().getAddress(), ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS, characteristic);
-            }
+            IoTHandleData data = new IoTHandleData();
+            data.setDeviceId(gatt.getDevice().getAddress());
+            data.setServiceUuid(characteristic.getService().getUuid().toString());
+            data.setCharacteristicUuid(characteristic.getUuid().toString());
+            data.setValue(characteristic.getValue());
+            data.setStatus(status);
+
+            broadcastUpdate(ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS, data);
         }
 
         @Override
@@ -233,18 +238,13 @@ public class BluetoothLeService extends Service {
             byte[] descValue = descriptor.getValue();
             BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
 
-            Log.d(TAG, "onDescriptorWrite() uuid = " + characteristic.getUuid().toString());
-            byte byteValue = descValue[0];
-            for (int i = 0; i < Byte.SIZE; i++) {
-                Log.d(TAG, "byteValue[" + i + "] = " + (byteValue >> i & 0x1));
-            }
-
             IoTHandleData data = new IoTHandleData();
             data.setDeviceId(gatt.getDevice().getAddress());
             data.setServiceUuid(characteristic.getService().getUuid().toString());
             data.setCharacteristicUuid(characteristic.getUuid().toString());
             data.setValue(descValue);
             data.setStatus(status);
+
             broadcastUpdate(ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS, data);
         }
 
@@ -438,15 +438,15 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
-        if (mScanedList.get(address) == null) {
-            Iterator<String> iter = mScanedList.keySet().iterator();
-            while (iter.hasNext()) {
-                Log.d(TAG, "scanned address = " + iter.next());
-            }
-            Log.w(TAG, "Received address = " + address);
-            Log.w(TAG, "This device is not activated...... check device status");
-            return false;
-        }
+//        if (mScanedList.get(address) == null) {
+//            Iterator<String> iter = mScanedList.keySet().iterator();
+//            while (iter.hasNext()) {
+//                Log.d(TAG, "scanned address = " + iter.next());
+//            }
+//            Log.w(TAG, "Received address = " + address);
+//            Log.w(TAG, "This device is not activated...... check device status");
+//            return false;
+//        }
         BluetoothGatt bluetoothGatt = mConnectedBluetoothGattMap.get(address);
 
         // Previously connected device.  Try to reconnect.
@@ -707,7 +707,9 @@ public class BluetoothLeService extends Service {
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static long SCAN_PERIOD = 10000;
-    private static long SCAN_WAIT_PERIOD = 50000;
+    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 50000;
+    private static long SCAN_WAIT_PERIOD = 1800000;
+    private static long SCAN_WAIT_UNPLUGGED_PERIOD = 3600000;
 
     private static final int HANDLER_MSG_EXPIRED_SCAN_PERIOD = 1000;
     private static final int HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD = HANDLER_MSG_EXPIRED_SCAN_PERIOD + 1;
@@ -737,12 +739,12 @@ public class BluetoothLeService extends Service {
         Log.d(TAG, "handle message msg.what = " + msg.what);
         switch (msg.what) {
             case HANDLER_MSG_EXPIRED_SCAN_PERIOD:
+                mScanedList = new HashMap<>(mTempScanedList);
+                mTempScanedList.clear();
                 scanLeDevicePeriodically(false);
                 broadcastDeviceListUpdate();
                 break;
             case HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD:
-                mScanedList = new HashMap<>(mTempScanedList);
-                mTempScanedList.clear();
                 scanLeDevicePeriodically(true);
                 break;
         }
@@ -898,7 +900,7 @@ public class BluetoothLeService extends Service {
             if (!mIsBatteryPlugged) {
                 scanTime *= 2;         // default = 10 sec, unplugged = 20sec
             }
-            Log.d(TAG, "Set.. scan wait time ms = " + scanTime);
+            Log.d(TAG, "Set.. scan time ms = " + scanTime);
             mBleServiceHandler.sendEmptyMessageDelayed(HANDLER_MSG_EXPIRED_SCAN_PERIOD, scanTime);
             mIsLeScanning = true;
         } else {
@@ -917,7 +919,7 @@ public class BluetoothLeService extends Service {
 
             long waitTime = SCAN_WAIT_PERIOD;
             if (!mIsBatteryPlugged) {
-                waitTime *= 50;         // default = 50 sec, unplugged = 약 40분.
+                waitTime = SCAN_WAIT_UNPLUGGED_PERIOD;         // default = 290 sec, unplugged = 약 30분.
             }
             Log.d(TAG, "Set.. scan wait time ms = " + waitTime);
             mBleServiceHandler.sendEmptyMessageDelayed(HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD, waitTime);
@@ -1111,6 +1113,7 @@ public class BluetoothLeService extends Service {
                     // 최대 40분이상 waiting 타임이므로.. 충전상태일때의 시간텀을 가지도록.
                     // 배터리 충전중인 상태가 아니라면 그대로 둔다.
                     if (mIsBatteryPlugged && !mIsLeScanning) {
+                        scanLeDevicePeriodically(false);
                         scanLeDevicePeriodically(true);
                     }
                 }

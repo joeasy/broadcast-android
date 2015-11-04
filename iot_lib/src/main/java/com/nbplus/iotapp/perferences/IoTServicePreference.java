@@ -345,9 +345,12 @@ public class IoTServicePreference {
         putString(context, KEY_IOT_DEVICES_LIST, json);
     }
     public static String getIoTDevicesList (Context context) {
-        return getString(context, KEY_IOT_DEVICES_LIST, "{}");
+        return getString(context, KEY_IOT_DEVICES_LIST, "");
     }
     public static String getIoTDeviceScenarioMap (Context context) {
-        return getString(context, KEY_IOT_DEVICES_SCENARIOS, "{}");
+        return getString(context, KEY_IOT_DEVICES_SCENARIOS, "");
+    }
+    public static void setIoTDeviceScenarioMap (Context context, String json) {
+        putString(context, KEY_IOT_DEVICES_SCENARIOS, json);
     }
 }
