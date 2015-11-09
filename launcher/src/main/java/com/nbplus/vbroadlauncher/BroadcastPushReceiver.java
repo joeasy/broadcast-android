@@ -17,15 +17,20 @@
 
 package com.nbplus.vbroadlauncher;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Browser;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -44,6 +49,8 @@ import com.nbplus.vbroadlauncher.data.PushPayloadData;
 
 import org.basdroid.common.PackageUtils;
 import org.basdroid.common.StringUtils;
+
+import java.util.List;
 
 /**
  * 사용안함.
@@ -113,11 +120,50 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
                         pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                         LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+
+                        return;
                     } else {
+                        // 크롬브라우저가 실행중이며. 마을 방송 Domain url 이라면 실행하지 않는다.
+                        if (PackageUtils.isActivePackage(context, Constants.GOOGLE_CHROME_PACKAGE_NAME)) {
+                            Log.d(TAG, "chrome browser is active....");
+                            // get the last visited URL from the Browser.BOOKMARKS_URI database
+                            String url = "";
+                            Uri chromeUri = Uri.parse("content://com.android.chrome.browser/bookmarks");
+                            Cursor cur = context.getContentResolver().query(chromeUri/*Browser.BOOKMARKS_URI*/,
+                                    new String[] { Browser.BookmarkColumns.URL }, null, null,
+                                    Browser.BookmarkColumns.DATE + " DESC");
+                            if (cur != null && cur.getCount() > 0) {
+                                cur.moveToFirst();
+                                url = cur.getString(cur.getColumnIndex(Browser.BookmarkColumns.URL));
+                                cur.close();
+                            } else {
+                                if (cur != null) {
+                                    cur.close();
+                                }
+                            }
+
+                            Log.d(TAG, "Last activated url = " + url);
+                            if (!StringUtils.isEmptyString(url) && url.startsWith(Constants.VBROAD_HTTP_DOMAIN)) {
+                                Log.w(TAG, ">> Village broadcast is running... do not show!!!!");
+                                pi = new Intent();
+                                pi.setAction(action);
+                                pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+                                return;
+                            }
+                        }
+
+                        // android version check.
                         if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type) || Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(type)) {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                                 Log.d(TAG, ">> This device version code = " + Build.VERSION.SDK_INT + ", not supported version !!");
                                 Toast.makeText(context, R.string.notification_broadcast_not_support, Toast.LENGTH_SHORT);
+                                pi = new Intent();
+                                pi.setAction(action);
+                                pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
                                 break;
                             }
                         }
