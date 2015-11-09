@@ -76,7 +76,8 @@
             >
         </activity>
         <activity
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
+            android:process=":remote"
             android:name=".RealtimeBroadcastActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|screenSize"

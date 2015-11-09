@@ -46,6 +46,7 @@ public class IoTServicePreference {
     public static final String KEY_USE_IOT_GATEWAY = "KEY_USE_IOT_GATEWAY";
     public static final String KEY_IOT_DEVICES_LIST = "KEY_IOT_DEVICES_LIST";
     public static final String KEY_IOT_DEVICES_SCENARIOS = "KEY_IOT_DEVICES_SCENARIOS";
+    public static final String KEY_IOT_UNSENT_DEVICE_DATA = "KEY_IOT_UNSENT_DEVICE_DATA";
 
     // 값 불러오기
     private static SharedPreferences getPreferences(Context context) {
@@ -352,5 +353,11 @@ public class IoTServicePreference {
     }
     public static void setIoTDeviceScenarioMap (Context context, String json) {
         putString(context, KEY_IOT_DEVICES_SCENARIOS, json);
+    }
+    public static String getUnSentCollectedData (Context context) {
+        return getString(context, KEY_IOT_UNSENT_DEVICE_DATA, "");
+    }
+    public static void setUnSentCollectedData (Context context, String json) {
+        putString(context, KEY_IOT_UNSENT_DEVICE_DATA, json);
     }
 }

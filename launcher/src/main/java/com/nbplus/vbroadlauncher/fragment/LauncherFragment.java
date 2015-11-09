@@ -61,6 +61,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.nbplus.iotlib.IoTInterface;
+import com.nbplus.iotlib.data.IoTConstants;
 import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.push.PushService;
@@ -106,6 +108,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private LinearLayout mOutdoorMode;
     private TextView mOutdoorText;
 
+    //부가데이터 동기화
+    private LinearLayout mIoTDataSync;
+    private TextView mIoTDataSyncText;
+    private boolean mIsProcessingIoTDataSync;
+
     private LinearLayout mServiceTreeMap;
     private LinearLayout mApplicationsView;
     private TextView mVillageName;
@@ -124,6 +131,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final int HANDLER_MESSAGE_CONNECTIVITY_CHANGED = 0x01;
     private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
     private static final int HANDLER_MESSAGE_SET_VILLAGE_NAME = 0x03;
+    private static final int HANDLER_IOT_DATA_SYNC_COMPLETED = 0x04;
 
     private ArrayList<ShortcutData> mPushNotifiableShorcuts = new ArrayList<>();
 
@@ -259,7 +267,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
                 break;
 
-            case Constants.HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK:
+            case Constants.HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK: {
                 BaseApiResult result = (BaseApiResult) msg.obj;
                 Toast toast;
                 dismissProgressDialog();
@@ -280,6 +288,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     toast.show();
                 }
                 break;
+            }
             case HANDLER_MESSAGE_SET_VILLAGE_NAME :
                 if (mVillageName != null) {
                     mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
@@ -288,6 +297,27 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     mWeatherView.onChangedVillageName();
                 }
                 break;
+
+            // 부가데이터 동기화
+            case HANDLER_IOT_DATA_SYNC_COMPLETED: {
+                if (!mIsProcessingIoTDataSync) {
+                    return;
+                }
+                mIsProcessingIoTDataSync = false;
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissProgressDialog();
+                    }
+                }, 1000);
+                Toast toast;
+                toast = Toast.makeText(getActivity(), R.string.toast_iot_data_sync, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+                mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_white, 0, 0, 0);
+                mIoTDataSyncText.setTextColor(getResources().getColor(R.color.white));
+                break;
+            }
         }
     }
 
@@ -315,6 +345,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 msg.what = Constants.HANDLER_MESSAGE_PUSH_MESAGE_RECEIVED;
                 msg.arg1 = intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED);
                 msg.obj = intent.getParcelableExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA);
+                mHandler.sendMessage(msg);
+            } else if (IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED.equals(action)) {
+                Message msg = new Message();
+                msg.what = HANDLER_IOT_DATA_SYNC_COMPLETED;
                 mHandler.sendMessage(msg);
             }
         }
@@ -441,6 +475,20 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
                 }
+            }
+        });
+        // 부가데이터 동기화
+        mIoTDataSync= (LinearLayout)v.findViewById(R.id.ic_iot_data_sync);
+        mIoTDataSyncText = (TextView) v.findViewById(R.id.tv_iot_data_sync);
+        mIoTDataSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mIsProcessingIoTDataSync = true;
+                showProgressDialog();
+                mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
+                mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+
+                IoTInterface.getInstance().forceDataSync();
             }
         });
 
@@ -587,6 +635,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
 
             intentFilter = new IntentFilter();
             intentFilter.addAction(Constants.ACTION_SET_VILLAGE_NAME);
+            intentFilter.addAction(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
             intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
             intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, intentFilter);

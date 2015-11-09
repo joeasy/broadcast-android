@@ -36,7 +36,8 @@ public enum IoTResultCodes {
     BLUETOOTH_NOT_SUPPORTED (1001),
     BLUETOOTH_NOT_ENABLED (1002),
     // request argument ...
-    INVALID_REQUEST_ARGUMENTS (1003)
+    INVALID_REQUEST_ARGUMENTS (1003),
+    DEVICE_CONNECTION_NOT_RESPOND(1004)
     ;
 
     private final int value;

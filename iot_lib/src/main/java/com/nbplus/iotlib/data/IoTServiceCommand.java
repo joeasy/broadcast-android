@@ -45,7 +45,10 @@ public class IoTServiceCommand {
     public static final int COMMAND_BASE_VALUE = 1000;
 
     // request
-    public static final int REGISTER_SERVICE = COMMAND_BASE_VALUE + 1;
+    public static final int SCANNING_START = COMMAND_BASE_VALUE + 1;
+    public static final int SCANNING_STOP = SCANNING_START + 1;
+    public static final int DEVICE_DISCONNECT_ALL = SCANNING_STOP + 1;
+    public static final int REGISTER_SERVICE = DEVICE_DISCONNECT_ALL + 1;
     public static final int UNREGISTER_SERVICE = REGISTER_SERVICE + 1;
     public static final int GET_DEVICE_LIST = UNREGISTER_SERVICE + 1;
     public static final int DEVICE_BONDING = GET_DEVICE_LIST + 1;

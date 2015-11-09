@@ -26,6 +26,8 @@
     <string name="alert_tts_btn_settings">Settings</string>
 
     <!-- main top nav launcher -->
+    <string name="btn_iot_data_sync">IoT Data Sync</string>
+    <string name="toast_iot_data_sync">IoT Data Sync completed.</string>
     <string name="btn_outdoor">Out-Door</string>
     <string name="btn_show_map">Site Map</string>
     <string name="addr_show_map">/sitemap.rcc</string>

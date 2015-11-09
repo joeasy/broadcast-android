@@ -65,6 +65,9 @@ public class IoTDevice implements Parcelable {
     @SerializedName("BONDED")
     private boolean isBondedWithServer;
 
+    @SerializedName("LAST_SEQ")
+    private int lastSequenceNumber;
+
     HashMap<Integer, AdRecord> adRecordHashMap;
     transient HashMap<String, ArrayList<String>> discoveredServices;
     transient ArrayList<IoTDeviceScenario> deviceScenario;
@@ -72,6 +75,14 @@ public class IoTDevice implements Parcelable {
     transient boolean isKnownDevice;
     transient int savedRecordCount = -1;
     transient int recvedRecordCount = 0;
+
+    public int getLastSequenceNumber() {
+        return lastSequenceNumber;
+    }
+
+    public void setLastSequenceNumber(int lastSequenceNumber) {
+        this.lastSequenceNumber = lastSequenceNumber;
+    }
 
     public HashMap<String, ArrayList<String>> getDiscoveredServices() {
         return discoveredServices;
@@ -237,6 +248,7 @@ public class IoTDevice implements Parcelable {
         dest.writeInt(this.uuidLen);
         dest.writeStringList(this.uuids);
         dest.writeByte(isBondedWithServer ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.lastSequenceNumber);
         dest.writeSerializable(this.adRecordHashMap);
         dest.writeSerializable(this.discoveredServices);
         dest.writeTypedList(deviceScenario);
@@ -255,6 +267,7 @@ public class IoTDevice implements Parcelable {
         this.uuidLen = in.readInt();
         this.uuids = in.createStringArrayList();
         this.isBondedWithServer = in.readByte() != 0;
+        this.lastSequenceNumber = in.readInt();
         this.adRecordHashMap = (HashMap<Integer, AdRecord>) in.readSerializable();
         this.discoveredServices = (HashMap<String, ArrayList<String>>) in.readSerializable();
         this.deviceScenario = in.createTypedArrayList(IoTDeviceScenario.CREATOR);

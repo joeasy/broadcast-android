@@ -26,6 +26,8 @@
     <string name="alert_tts_btn_settings">설정</string>
 
     <!-- launcher top nav -->
+    <string name="btn_iot_data_sync">부가데이터동기화</string>
+    <string name="toast_iot_data_sync">부가 데이터 동기화가 완료 되었습니다.</string>
     <string name="btn_outdoor">외출중</string>
     <string name="btn_show_map">사이트맵</string>
     <string name="addr_show_map">/sitemap.rcc</string>

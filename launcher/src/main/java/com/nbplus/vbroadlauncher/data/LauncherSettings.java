@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.nbplus.iotlib.IoTInterface;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.RadioActivity;
 import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
@@ -327,6 +328,16 @@ public class LauncherSettings {
             addr = addr.substring(0, addr.length() - 2);
         }
         this.serverInformation = serverInformation;
+        String collectServerAddress = null;
+        if (this.serverInformation != null) {
+            String apiServer = this.serverInformation.getApiServer();
+            if (StringUtils.isEmptyString(apiServer)) {
+                collectServerAddress = null;
+            } else {
+                collectServerAddress = apiServer + Constants.API_COLLECTED_IOT_DATA_CONTEXT;
+            }
+        }
+        IoTInterface.getInstance().setCollectServerAddress(collectServerAddress);
         setPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, this.serverInformation);
     }
 

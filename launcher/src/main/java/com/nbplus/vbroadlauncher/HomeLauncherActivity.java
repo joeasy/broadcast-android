@@ -47,6 +47,7 @@ import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -65,15 +66,20 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.nbplus.iotlib.IoTInterface;
+import com.nbplus.iotlib.data.IoTConstants;
 import com.nbplus.iotlib.data.IoTResultCodes;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
+import com.nbplus.vbroadlauncher.data.BaseApiResult;
 import com.nbplus.vbroadlauncher.data.Constants;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 
+import com.nbplus.vbroadlauncher.data.VBroadcastServer;
 import com.nbplus.vbroadlauncher.fragment.LauncherFragment;
 import com.nbplus.vbroadlauncher.fragment.RegisterFragment;
 import com.nbplus.vbroadlauncher.location.FetchAddressIntentService;
+import com.nbplus.vbroadlauncher.service.BaseServerApiAsyncTask;
+import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
 
 import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.DisplayUtils;
@@ -146,8 +152,13 @@ public class HomeLauncherActivity extends BaseActivity
     // 실행중인 액티비티를 죽인다.
     private long mActivityRunningTime = -1;
     private static final int HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING = 1;
+    private static final int HANDLER_ERMERGENCY_CALL_DEVICE_ACTIVATED = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING + 1;
 
     private final HomeLauncherActivityHandler mHandler = new HomeLauncherActivityHandler(this);
+
+    // smart band .. emergency call
+    private long mLastDeviceEmergencyCallSent = 0L;
+    private boolean mIsSendingEmergencyCall = false;
 
     // 핸들러 객체 만들기
     private static class HomeLauncherActivityHandler extends Handler {
@@ -179,6 +190,63 @@ public class HomeLauncherActivity extends BaseActivity
                     finish();
                 }
                 break;
+            case HANDLER_ERMERGENCY_CALL_DEVICE_ACTIVATED: {
+                // BT device 는 약 2분 동안 broadcast 후에 sleep 으로 들어간다.
+                if (mLastDeviceEmergencyCallSent > 0) {
+                    long currTimeMs = System.currentTimeMillis();
+                    if (mLastDeviceEmergencyCallSent - currTimeMs < 120 * 1000) {
+                        Log.d(TAG, "Already emergency call sent = " + mLastDeviceEmergencyCallSent);
+                        return;
+                    }
+                }
+                if (mIsSendingEmergencyCall) {
+                    Log.d(TAG, "Emergency call send task already running... ");
+                    return;
+                }
+                BaseServerApiAsyncTask task;
+                VBroadcastServer serverData = LauncherSettings.getInstance(this).getServerInformation();
+
+                try {
+                    task = SendEmergencyCallTask.class.newInstance();
+                    if (task != null) {
+                        showProgressDialog();
+                        task.setBroadcastApiData(this, mHandler, serverData.getApiServer() + getString(R.string.shortcut_addr_call_emergency));
+                        task.execute();
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (java.lang.InstantiationException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+
+            case Constants.HANDLER_MESSAGE_SEND_EMERGENCY_CALL_COMPLETE_TASK: {
+                mIsSendingEmergencyCall = false;
+                mLastDeviceEmergencyCallSent = System.currentTimeMillis();
+
+                BaseApiResult result = (BaseApiResult) msg.obj;
+                Toast toast;
+                dismissProgressDialog();
+                if (result != null) {
+                    Log.d(TAG, ">> EMERGENCY CALL result code = " + result.getResultCode() + ", message = " + result.getResultMessage());
+                    if (Constants.RESULT_OK.equals(result.getResultCode())) {
+                        toast = Toast.makeText(this, R.string.emergency_call_success_message, Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+                    } else {
+                        toast = Toast.makeText(this, result.getResultMessage(), Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                } else {
+                    toast = Toast.makeText(this, R.string.emergency_call_fail_message, Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                break;
+            }
         }
     }
 
@@ -195,6 +263,10 @@ public class HomeLauncherActivity extends BaseActivity
                 Message msg = new Message();
                 msg.what = HANDLER_MESSAGE_LAUNCHER_ACTIVITY_RUNNING;
                 msg.obj = intent.getLongExtra(Constants.EXTRA_LAUNCHER_ACTIVITY_RUNNING, 0);
+                mHandler.sendMessage(msg);
+            } else if (IoTConstants.ACTION_RECEIVE_EMERGENCY_CALL_DEVICE_BROADCAST.equals(action)) {
+                Message msg = new Message();
+                msg.what = HANDLER_ERMERGENCY_CALL_DEVICE_ACTIVATED;
                 mHandler.sendMessage(msg);
             }
         }
@@ -252,7 +324,7 @@ public class HomeLauncherActivity extends BaseActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        //finish();
+                        finish();
                     }
                 });
                 alert.setMessage(R.string.alert_phone_message);
@@ -282,6 +354,7 @@ public class HomeLauncherActivity extends BaseActivity
         // 실행중인 액티비티를 죽인다.
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
+        filter.addAction(IoTConstants.ACTION_RECEIVE_EMERGENCY_CALL_DEVICE_BROADCAST);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
 
         Intent intent = new Intent(Constants.ACTION_LAUNCHER_ACTIVITY_RUNNING);
@@ -342,7 +415,19 @@ public class HomeLauncherActivity extends BaseActivity
         fragmentTransaction.commit();
 
         // check installation or bind to service
-        IoTResultCodes resCode = IoTInterface.getInstance().initialize(this);
+        VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
+        String collectServerAddress = null;
+        if (serverInfo != null) {
+            String apiServer = serverInfo.getApiServer();
+            if (StringUtils.isEmptyString(apiServer)) {
+                collectServerAddress = null;
+            } else {
+                collectServerAddress = apiServer + Constants.API_COLLECTED_IOT_DATA_CONTEXT;
+            }
+        }
+        IoTResultCodes resCode = IoTInterface.getInstance().initialize(this,
+                LauncherSettings.getInstance(this).getDeviceID(),
+                collectServerAddress);
         if (!resCode.equals(IoTResultCodes.SUCCESS)) {
             if (resCode.equals(IoTResultCodes.BIND_SERVICE_FAILED)) {
                 Toast.makeText(getApplicationContext(),
