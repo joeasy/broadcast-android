@@ -18,6 +18,7 @@
 package org.basdroid.common;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,9 +26,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by basagee on 2015. 5. 15..
@@ -85,5 +90,46 @@ public class PackageUtils {
     public static String getApplicationName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);
+    }
+
+    public static boolean isActivePackage(Context context, String packageName) {
+        if (context == null || StringUtils.isEmptyString(packageName)) {
+            return false;
+        }
+        String[] activePackages;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            activePackages = getActivePackages(context);
+        } else {
+            activePackages = getActivePackagesCompat(context);
+        }
+        if (activePackages != null) {
+            for (String activePackage : activePackages) {
+                if (activePackage.equals(packageName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static String[] getActivePackagesCompat(Context context) {
+        final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+        final ComponentName componentName = taskInfo.get(0).topActivity;
+        final String[] activePackages = new String[1];
+        activePackages[0] = componentName.getPackageName();
+        return activePackages;
+    }
+
+    public static String[] getActivePackages(Context context) {
+        final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        final Set<String> activePackages = new HashSet<String>();
+        final List<ActivityManager.RunningAppProcessInfo> processInfos = activityManager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
+            if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                activePackages.addAll(Arrays.asList(processInfo.pkgList));
+            }
+        }
+        return activePackages.toArray(new String[activePackages.size()]);
     }
 }

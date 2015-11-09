@@ -216,35 +216,9 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     // 방송알림
                     case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
                     case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
-                    case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
-                        boolean isOutdoor = LauncherSettings.getInstance(getActivity()).isOutdoorMode();
-                        if (isOutdoor) {        // 외출모드에서는 재생하지 않음.
-                            View btnShortcut = null;
-                            for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
-                                ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
-                                String[] pushType = shortcut.getPushType();
-                                if (pushType != null && pushType.length > 0 && Arrays.asList(pushType).indexOf(type) >= 0) {
-                                    btnShortcut = shortcut.getLauncherButton();
-                                    break;
-                                }
-                            }
-                            // push notification badge 를 보여준다.
-                            if (btnShortcut != null) {
-                                TextView badgeView = (TextView) btnShortcut.findViewById(R.id.launcher_menu_badge);
-                                if (badgeView != null) {
-                                    badgeView.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        }
-
-                        break;
-                    // 긴급호출메시지
-                    case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
-                        break;
-                    // 주민투표
-                    case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
-                    // 공동구매
-                    case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING :
+                    case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST : {
+                        // 외출모드, 브라우저에서 방송서버접속중, 실시간 미지원 단말등인 경우..
+                        // 여기로 들어온다.
                         View btnShortcut = null;
                         for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
                             ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
@@ -256,12 +230,39 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                         }
                         // push notification badge 를 보여준다.
                         if (btnShortcut != null) {
-                            TextView badgeView = (TextView)btnShortcut.findViewById(R.id.launcher_menu_badge);
+                            TextView badgeView = (TextView) btnShortcut.findViewById(R.id.launcher_menu_badge);
+                            if (badgeView != null) {
+                                badgeView.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        break;
+                    }
+                    // 긴급호출메시지
+                    case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :
+                        break;
+                    // 주민투표
+                    case Constants.PUSH_PAYLOAD_TYPE_INHABITANTS_POLL :
+                    // 공동구매
+                    case Constants.PUSH_PAYLOAD_TYPE_COOPERATIVE_BUYING : {
+                        View btnShortcut = null;
+                        for (int i = 0; i < mPushNotifiableShorcuts.size(); i++) {
+                            ShortcutData shortcut = mPushNotifiableShorcuts.get(i);
+                            String[] pushType = shortcut.getPushType();
+                            if (pushType != null && pushType.length > 0 && Arrays.asList(pushType).indexOf(type) >= 0) {
+                                btnShortcut = shortcut.getLauncherButton();
+                                break;
+                            }
+                        }
+                        // push notification badge 를 보여준다.
+                        if (btnShortcut != null) {
+                            TextView badgeView = (TextView) btnShortcut.findViewById(R.id.launcher_menu_badge);
                             if (badgeView != null) {
                                 badgeView.setVisibility(View.VISIBLE);
                             }
                         }
                         break;
+                    }
                     default:
                         Log.d(TAG, "Unknown push payload type !!!");
                         break;
