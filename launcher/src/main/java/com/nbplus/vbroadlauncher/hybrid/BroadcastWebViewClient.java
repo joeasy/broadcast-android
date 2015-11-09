@@ -175,6 +175,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                         Toast.makeText(mContext, R.string.empty_value, Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    serverInfo.setInitialServerPage(Constants.VBROAD_INITIAL_PAGE);
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
                     LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 

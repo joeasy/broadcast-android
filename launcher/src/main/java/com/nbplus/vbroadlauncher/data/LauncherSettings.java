@@ -315,17 +315,21 @@ public class LauncherSettings {
     }
 
     public void setServerInformation(VBroadcastServer serverInformation) {
-        String addr = serverInformation.getApiServer();
-        if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
-            addr = addr.substring(0, addr.length() - 2);
-        }
-        addr = serverInformation.getDocServer();
-        if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
-            addr = addr.substring(0, addr.length() - 2);
-        }
-        addr = serverInformation.getPushInterfaceServer();
-        if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
-            addr = addr.substring(0, addr.length() - 2);
+        if (serverInformation != null) {
+            String addr = serverInformation.getApiServer();
+            if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
+                addr = addr.substring(0, addr.length() - 2);
+            }
+            addr = serverInformation.getDocServer();
+            if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
+                addr = addr.substring(0, addr.length() - 2);
+            }
+            addr = serverInformation.getPushInterfaceServer();
+            if (!StringUtils.isEmptyString(addr) && addr.endsWith("/")) {
+                addr = addr.substring(0, addr.length() - 2);
+            }
+        } else {
+            serverInformation = new VBroadcastServer();
         }
         this.serverInformation = serverInformation;
         String collectServerAddress = null;

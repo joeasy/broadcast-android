@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
  * Created by basagee on 2015. 5. 18..
  */
 public class VBroadcastServer implements Parcelable {
+    @SerializedName("initial_server_page")
+    private String initialServerPage;
     @SerializedName("api_server")
     private String apiServer;
     @SerializedName("doc_server")
@@ -18,6 +20,14 @@ public class VBroadcastServer implements Parcelable {
 
     // 접속할 때마다 달라진다. push gateway server 에서 받아온다.
     private String pushConnServer;
+
+    public String getInitialServerPage() {
+        return initialServerPage;
+    }
+
+    public void setInitialServerPage(String initialServerPage) {
+        this.initialServerPage = initialServerPage;
+    }
 
     public String getApiServer() {
         return apiServer;
@@ -52,6 +62,9 @@ public class VBroadcastServer implements Parcelable {
         this.pushConnServer = pushConnServer;
     }
 
+    public VBroadcastServer() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -59,23 +72,22 @@ public class VBroadcastServer implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.initialServerPage);
         dest.writeString(this.apiServer);
         dest.writeString(this.docServer);
         dest.writeString(this.pushInterfaceServer);
         dest.writeString(this.pushConnServer);
     }
 
-    public VBroadcastServer() {
-    }
-
-    private VBroadcastServer(Parcel in) {
+    protected VBroadcastServer(Parcel in) {
+        this.initialServerPage = in.readString();
         this.apiServer = in.readString();
         this.docServer = in.readString();
         this.pushInterfaceServer = in.readString();
         this.pushConnServer = in.readString();
     }
 
-    public static final Parcelable.Creator<VBroadcastServer> CREATOR = new Parcelable.Creator<VBroadcastServer>() {
+    public static final Creator<VBroadcastServer> CREATOR = new Creator<VBroadcastServer>() {
         public VBroadcastServer createFromParcel(Parcel source) {
             return new VBroadcastServer(source);
         }

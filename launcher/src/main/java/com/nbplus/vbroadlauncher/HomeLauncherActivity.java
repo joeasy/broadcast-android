@@ -396,8 +396,13 @@ public class HomeLauncherActivity extends BaseActivity
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Bundle bundle;
 
-        if (LauncherSettings.getInstance(this).isCompletedSetup() == false) {
-
+        // check installation or bind to service
+        VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
+        if (serverInfo == null || !Constants.VBROAD_INITIAL_PAGE.equals(serverInfo.getInitialServerPage())) {
+            // 메인 서버 정보가 변경되었다.
+            // 정확한 정보갱신을 위해 Registration 을 다시 진행한다.
+            LauncherSettings.getInstance(this).setServerInformation(null);
+            LauncherSettings.getInstance(this).setIsCompletedSetup(false);
             // open user register fragment
             RegisterFragment registerFragment = new RegisterFragment();
             bundle = new Bundle();
@@ -405,17 +410,26 @@ public class HomeLauncherActivity extends BaseActivity
 
             fragmentTransaction.replace(R.id.launcherFragment, registerFragment);
         } else {
-            // open main launcher fragment
-            LauncherFragment launcherFragment = new LauncherFragment();
-            bundle = new Bundle();
-            launcherFragment.setArguments(bundle);
+            if (LauncherSettings.getInstance(this).isCompletedSetup() == false) {
 
-            fragmentTransaction.replace(R.id.launcherFragment, launcherFragment);
+                LauncherSettings.getInstance(this).setServerInformation(null);
+                // open user register fragment
+                RegisterFragment registerFragment = new RegisterFragment();
+                bundle = new Bundle();
+                registerFragment.setArguments(bundle);
+
+                fragmentTransaction.replace(R.id.launcherFragment, registerFragment);
+            } else {
+                // open main launcher fragment
+                LauncherFragment launcherFragment = new LauncherFragment();
+                bundle = new Bundle();
+                launcherFragment.setArguments(bundle);
+
+                fragmentTransaction.replace(R.id.launcherFragment, launcherFragment);
+            }
         }
         fragmentTransaction.commit();
 
-        // check installation or bind to service
-        VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
         String collectServerAddress = null;
         if (serverInfo != null) {
             String apiServer = serverInfo.getApiServer();
