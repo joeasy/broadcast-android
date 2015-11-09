@@ -47,7 +47,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.ParcelUuid;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -57,10 +56,8 @@ import com.nbplus.iotapp.btcharacteristics.GlucoseMeasurement;
 import com.nbplus.iotapp.btcharacteristics.RecordAccessControlPoint;
 import com.nbplus.iotapp.btcharacteristics.WeightMeasurement;
 import com.nbplus.iotapp.data.AdRecord;
-import com.nbplus.iotapp.data.BluetoothDeviceData;
 import com.nbplus.iotapp.data.DataParser;
 import com.nbplus.iotapp.data.GattAttributes;
-import com.nbplus.iotlib.data.Constants;
 import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTHandleData;
 import com.nbplus.iotlib.data.IoTResultCodes;
@@ -70,7 +67,6 @@ import org.basdroid.common.DeviceUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,6 +113,8 @@ public class BluetoothLeService extends Service {
             "com.nbplus.bluetooth.le.ACTION_GATT_DESCRIPTOR_WRITE_SUCCESS";
     public final static String ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS =
             "com.nbplus.bluetooth.le.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS";
+    public final static String ACTION_GATT_CHARACTERISTIC_READ_SUCCESS =
+            "com.nbplus.bluetooth.le.ACTION_GATT_CHARACTERISTIC_READ_SUCCESS";
 
     // intent extra data
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
@@ -157,6 +155,8 @@ public class BluetoothLeService extends Service {
                 broadcastUpdate(gatt.getDevice().getAddress(), intentAction);
 
                 close(gatt.getDevice().getAddress());
+            } else {
+                Log.d(TAG, "onConnectionStateChange : Unknown status = " + status + ", newState = " + newState);
             }
         }
 
@@ -190,9 +190,16 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(gatt.getDevice().getAddress(), ACTION_DATA_AVAILABLE, characteristic);
-            }
+            byte[] value = characteristic.getValue();
+
+            IoTHandleData data = new IoTHandleData();
+            data.setDeviceId(gatt.getDevice().getAddress());
+            data.setServiceUuid(characteristic.getService().getUuid().toString());
+            data.setCharacteristicUuid(characteristic.getUuid().toString());
+            data.setValue(value);
+            data.setStatus(status);
+
+            broadcastUpdate(ACTION_GATT_CHARACTERISTIC_READ_SUCCESS, data);
         }
 
         @Override
@@ -212,7 +219,16 @@ public class BluetoothLeService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(gatt.getDevice().getAddress(), ACTION_DATA_AVAILABLE, characteristic);
+            byte[] value = characteristic.getValue();
+
+            IoTHandleData data = new IoTHandleData();
+            data.setDeviceId(gatt.getDevice().getAddress());
+            data.setServiceUuid(characteristic.getService().getUuid().toString());
+            data.setCharacteristicUuid(characteristic.getUuid().toString());
+            data.setValue(value);
+            data.setStatus(BluetoothGatt.GATT_SUCCESS);
+
+            broadcastUpdate(ACTION_DATA_AVAILABLE, data);
         }
 
         @Override
@@ -706,10 +722,11 @@ public class BluetoothLeService extends Service {
 
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
+    // 스마트밴드 연동을 위해서.. 스마트밴드는 이벤트가 발생했을 경우에 2-3분간만 broadcast 를 보낸다.
     private static long SCAN_PERIOD = 10000;
-    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 50000;
-    private static long SCAN_WAIT_PERIOD = 1800000;
-    private static long SCAN_WAIT_UNPLUGGED_PERIOD = 3600000;
+    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 30000;
+    private static long SCAN_WAIT_PERIOD = 30000;
+    private static long SCAN_WAIT_UNPLUGGED_PERIOD = 60000;
 
     private static final int HANDLER_MSG_EXPIRED_SCAN_PERIOD = 1000;
     private static final int HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD = HANDLER_MSG_EXPIRED_SCAN_PERIOD + 1;
@@ -802,21 +819,21 @@ public class BluetoothLeService extends Service {
                         byte[] scanRecord = result.getScanRecord().getBytes();
                         final HashMap<Integer, AdRecord> adRecords = AdRecord.parseScanRecord(scanRecord);
 
-                        IoTDevice device = new IoTDevice();
-                        device.setDeviceId(btDevice.getAddress());
-                        device.setDeviceName(btDevice.getName());
-                        device.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
-                        device.setAdRecordHashMap(adRecords);
+                        IoTDevice iotDevice = new IoTDevice();
+                        iotDevice.setDeviceId(btDevice.getAddress());
+                        iotDevice.setDeviceName(btDevice.getName());
+                        iotDevice.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
+                        iotDevice.setAdRecordHashMap(adRecords);
 
                         /**
                          * UUID 가 없는것은 무시한다.
                          */
-                        ArrayList<String> scanedUuids = DataParser.getUuids(device.getAdRecordHashMap());
+                        ArrayList<String> scanedUuids = DataParser.getUuids(iotDevice.getAdRecordHashMap());
                         if (scanedUuids == null || scanedUuids.size() == 0) {
-                            Log.e(TAG, ">>> xx device name " + device.getDeviceName() + " has no uuid advertisement");
+                            Log.e(TAG, ">>> xx device name " + iotDevice.getDeviceName() + " has no uuid advertisement");
                         } else {
-                            mTempScanedList.put(device.getDeviceId(), device);
-                            //printScanDevices(device, adRecords);
+                            mTempScanedList.put(iotDevice.getDeviceId(), iotDevice);
+                            //printScanDevices(btDevice, adRecords);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -871,6 +888,9 @@ public class BluetoothLeService extends Service {
     }
 
     public void scanLeDevicePeriodically(final boolean enable) {
+        scanLeDevicePeriodically(enable, true);
+    }
+    public void scanLeDevicePeriodically(final boolean enable, final boolean setPeriod) {
         Log.d(TAG, "scanLeDevicePeriodically enabled = " + enable);
         /**
          * You have to start a scan for Classic Bluetooth devices with startDiscovery() and a scan for Bluetooth LE devices with startLeScan().
@@ -921,8 +941,11 @@ public class BluetoothLeService extends Service {
             if (!mIsBatteryPlugged) {
                 waitTime = SCAN_WAIT_UNPLUGGED_PERIOD;         // default = 290 sec, unplugged = 약 30분.
             }
-            Log.d(TAG, "Set.. scan wait time ms = " + waitTime);
-            mBleServiceHandler.sendEmptyMessageDelayed(HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD, waitTime);
+
+            if (setPeriod) {
+                Log.d(TAG, "Set.. scan wait time ms = " + waitTime);
+                mBleServiceHandler.sendEmptyMessageDelayed(HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD, waitTime);
+            }
             mIsLeScanning = false;
         }
     }

@@ -337,6 +337,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
     protected void onDestroy() {
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
+        finishActivity();
     }
 
     @Override
@@ -460,35 +461,44 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
 
     private void finishActivity() {
         Log.d(TAG, "finishActivity()");
-        LauncherSettings.getInstance(this).setCurrentPlayingBroadcastType(null);
-
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        if (mText2Speech != null) {
-            mText2Speech.shutdown();
-        }
-        mText2Speech = null;
-        mText2SpeechHandler = null;
-        mBroadcastPayloadIdx = -1;
-
-        mWebViewClient = null;
-        mWebView = null;
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-        unregisterReceiver(mBroadcastReceiver);
-
-        releaseCpuLock();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                showSystemUI();
+                LauncherSettings.getInstance(getApplicationContext()).setCurrentPlayingBroadcastType(null);
+
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                if (mText2Speech != null) {
+                    mText2Speech.shutdown();
+                }
+                mText2Speech = null;
+                mText2SpeechHandler = null;
+                mBroadcastPayloadIdx = -1;
+
+                if(mWebView != null) {
+                    mWebView.removeAllViews();
+                    mWebView.destroy();
+                }
+                mWebViewClient = null;
+                mWebView = null;
+                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
+                unregisterReceiver(mBroadcastReceiver);
+
+                releaseCpuLock();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showSystemUI();
+                    }
+                });
+
+                AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamMusicVolume, AudioManager.FLAG_PLAY_SOUND);
+
+                //finish();
+                Log.e(TAG, "RealtimeBroadcastActivity.java call System.exit(0)");
+                System.exit(0);
             }
         });
-
-        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamMusicVolume, AudioManager.FLAG_PLAY_SOUND);
-
-        //finish();
-        Log.e(TAG, "RealtimeBroadcastActivity.java call System.exit(0)");
-        System.exit(0);
     }
 
     static boolean userInteraction = false;

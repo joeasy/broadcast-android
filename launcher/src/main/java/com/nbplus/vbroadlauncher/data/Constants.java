@@ -8,6 +8,7 @@ public class Constants {
     //public static final String VBROAD_INITIAL_PAGE = "http://183.98.53.165:8010/web_test/test.html";
     public static final String VBROAD_INITIAL_PAGE = "http://183.98.53.165:8080/common/selectServer.rcc";
     public static final String API_IOT_UPDATE_DEVICE_LIST = "/is/api/iot/RegistIOTDevice";
+    public static final String API_COLLECTED_IOT_DATA_CONTEXT = "/is/api/iot/RegistIOTData";
 
     public static final int RADIO_CHANNEL_GRIDVIEW_SIZE = 6;
 

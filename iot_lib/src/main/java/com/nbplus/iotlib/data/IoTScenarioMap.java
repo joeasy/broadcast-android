@@ -22,6 +22,7 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -32,6 +33,16 @@ public class IoTScenarioMap implements Parcelable {
     private int version;
     @SerializedName("map")
     private HashMap<String, IoTScenarioDef> scenarioMap;
+    @SerializedName("emergency_device_list")
+    private ArrayList<String> emergencyCallDeviceList;
+
+    public ArrayList<String> getEmergencyCallDeviceList() {
+        return emergencyCallDeviceList;
+    }
+
+    public void setEmergencyCallDeviceList(ArrayList<String> emergencyCallDeviceList) {
+        this.emergencyCallDeviceList = emergencyCallDeviceList;
+    }
 
     public int getVersion() {
         return version;
@@ -49,6 +60,9 @@ public class IoTScenarioMap implements Parcelable {
         this.scenarioMap = scenarioMap;
     }
 
+    public IoTScenarioMap() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -58,14 +72,13 @@ public class IoTScenarioMap implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.version);
         dest.writeSerializable(this.scenarioMap);
-    }
-
-    public IoTScenarioMap() {
+        dest.writeStringList(this.emergencyCallDeviceList);
     }
 
     protected IoTScenarioMap(Parcel in) {
         this.version = in.readInt();
         this.scenarioMap = (HashMap<String, IoTScenarioDef>) in.readSerializable();
+        this.emergencyCallDeviceList = in.createStringArrayList();
     }
 
     public static final Creator<IoTScenarioMap> CREATOR = new Creator<IoTScenarioMap>() {

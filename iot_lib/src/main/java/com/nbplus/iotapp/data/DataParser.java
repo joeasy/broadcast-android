@@ -214,8 +214,12 @@ public class DataParser {
         int len = value.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(value.charAt(i), 16) << 4)
-                    + Character.digit(value.charAt(i + 1), 16));
+            if (i + 2 <= len) {
+                data[i / 2] = (byte) ((Character.digit(value.charAt(i), 16) << 4)
+                        + Character.digit(value.charAt(i + 1), 16));
+            } else {
+                data[i] = (byte) ((Character.digit(value.charAt(i), 16)));
+            }
         }
         return data;
     }
@@ -247,10 +251,10 @@ public class DataParser {
         int month = getUint8(value[pos++]);
         int day = getUint8(value[pos++]);
         int hour = getUint8(value[pos++]);
-        Log.d(TAG, "hour >>>> " + hour);
         int min = getUint8(value[pos++]);
         int sec = getUint8(value[pos++]);
-        cal.set(year, month, day, hour, min, sec);
+        // java Calendar : 월(0~11, 0:1월)
+        cal.set(year, month - 1, day, hour, min, sec);
 
         return cal;
     }

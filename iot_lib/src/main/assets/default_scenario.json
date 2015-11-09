@@ -1,6 +1,63 @@
 {
-    "version": 1,
+    "version": 23,
+    "emergency_device_list": [
+        "0000e102-0000-1000-8000-00805f9b34fb"
+    ],
     "map": {
+        "00001808-0000-1000-8000-00805f9b34fb": {
+            "type": "BT",
+            "check": [],
+            "scenarios": {
+                "00001808-0000-1000-8000-00805f9b34fb": [
+                    {
+                        "characteristic": "00002a18-0000-1000-8000-00805f9b34fb",
+                        "service": "00001808-0000-1000-8000-00805f9b34fb",
+                        "cmd": 2
+                    },
+                    {
+                        "characteristic": "00002a34-0000-1000-8000-00805f9b34fb",
+                        "service": "00001808-0000-1000-8000-00805f9b34fb",
+                        "cmd": 2
+                    },
+                    {
+                        "characteristic": "00002a52-0000-1000-8000-00805f9b34fb",
+                        "service": "00001808-0000-1000-8000-00805f9b34fb",
+                        "cmd": 2
+                    },
+                    {
+                        "characteristic": "00002a52-0000-1000-8000-00805f9b34fb",
+                        "service": "00001808-0000-1000-8000-00805f9b34fb",
+                        "cmd": 1,
+                        "data_type": "glucose_report_number"
+                    },
+                    {
+                        "characteristic": "00002a52-0000-1000-8000-00805f9b34fb",
+                        "service": "00001808-0000-1000-8000-00805f9b34fb",
+                        "cmd": 1,
+                        "data": "0101"
+                    },
+                    {
+                        "characteristic": "00002a52-0000-1000-8000-00805f9b34fb",
+                        "service": "00001808-0000-1000-8000-00805f9b34fb",
+                        "cmd": 1,
+                        "data": "0201"
+                    }
+                ]
+            }
+        },
+        "0000d102-0000-1000-8000-00805f9b34fb": {
+            "type": "BT",
+            "check": [],
+            "scenarios": {
+                "0000d102-0000-1000-8000-00805f9b34fb": [
+                    {
+                        "characteristic": "000011e1-0000-1000-8000-00805f9b34fb",
+                        "service": "0000d102-0000-1000-8000-00805f9b34fb",
+                        "cmd": 2
+                    }
+                ]
+            }
+        },
         "0000181d-0000-1000-8000-00805f9b34fb": {
             "type": "BT",
             "check": [
@@ -34,28 +91,28 @@
                         "characteristic": "00002a2f-0000-3512-2118-0009af100700",
                         "service": "0000181d-0000-1000-8000-00805f9b34fb",
                         "cmd": 1,
-                        "data_type": "get_count",
+                        "data_type": "miscale_get_count",
                         "data": "0195b1a25e"
                     },
                     {
                         "characteristic": "00002a2f-0000-3512-2118-0009af100700",
                         "service": "0000181d-0000-1000-8000-00805f9b34fb",
                         "cmd": 1,
-                        "data_type": "get_saved_record",
+                        "data_type": "miscale_get_saved_record",
                         "data": "02"
                     },
                     {
                         "characteristic": "00002a2f-0000-3512-2118-0009af100700",
                         "service": "0000181d-0000-1000-8000-00805f9b34fb",
                         "cmd": 1,
-                        "data_type": "saved_record_done",
+                        "data_type": "miscale_saved_record_done",
                         "data": "03"
                     },
                     {
                         "characteristic": "00002a2f-0000-3512-2118-0009af100700",
                         "service": "0000181d-0000-1000-8000-00805f9b34fb",
                         "cmd": 1,
-                        "data_type": "delete_record",
+                        "data_type": "miscale_delete_record",
                         "data": "0495b1a25e"
                     }
                 ]

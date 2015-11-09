@@ -20,9 +20,11 @@ package com.nbplus.iotlib.data;
 /**
  * Created by basagee on 2015. 10. 12..
  */
-public class Constants {
+public class IoTConstants {
     public static final boolean USE_ANOTHER_APP = false;
     public static final String NBPLUS_IOT_APP_PACKAGE_NAME = "com.nbplus.iotapp";
 
     public static final String ACTION_SERVICE_CREATE_BROADCAST = "com.nbplus.iot.ACTION_SERVICE_CREATE_BROADCAST";
+    public static final String ACTION_RECEIVE_EMERGENCY_CALL_DEVICE_BROADCAST = "com.nbplus.iot.ACTION_RECEIVE_EMERGENCY_CALL_DEVICE_BROADCAST";
+    public static final String ACTION_IOT_DATA_SYNC_COMPLETED = "com.nbplus.iot.ACTION_IOT_DATA_SYNC_COMPLETED";
 }

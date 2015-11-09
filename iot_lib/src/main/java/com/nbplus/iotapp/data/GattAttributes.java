@@ -116,6 +116,9 @@ public class GattAttributes {
     public static final String INDOOR_POSITIONING_SERVICE_UUID = "00001821-0000-1000-8000-00805f9b34fb";
     public static final String PULSE_OXIMETER_SERVICE_UUID = "00001822-0000-1000-8000-00805f9b34fb";
 
+    // smart sensor
+    public static final String SMART_SENSOR_SERVICE_UUID = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "d102");
+
     // for characteristics
     public static final String AEROBIC_HEART_RATE_LOWER_LIMIT = "00002a7e-0000-1000-8000-00805f9b34fb";
     public static final String AEROBIC_HEART_RATE_UPPER_LIMIT = "00002a84-0000-1000-8000-00805f9b34fb";
@@ -279,6 +282,8 @@ public class GattAttributes {
     public static final String WEIGHT_SCALE_FEATURE = "00002a9e-0000-1000-8000-00805f9b34fb";
     public static final String WIND_CHILL = "00002a79-0000-1000-8000-00805f9b34fb";
 
+    // smart sensor
+    public static final String SMART_SENSOR = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "11e1");
 
     static {
         // Services.
@@ -317,6 +322,8 @@ public class GattAttributes {
 
         sServices.put(MISCALE_WEIGHT_SERVICE_UUID, "XIAOMI Weight Service");
         sServices.put(MIBAND_MILI_SERVICE_UUID, "XIAOMI Band Mili Service");
+
+        sServices.put(SMART_SENSOR_SERVICE_UUID, "Smart Sensor Service");
 
         // for characteristics
         sCharacteristics.put(AEROBIC_HEART_RATE_LOWER_LIMIT, "AEROBIC_HEART_RATE_LOWER_LIMIT Characteristic");
@@ -499,6 +506,8 @@ public class GattAttributes {
         sCharacteristics.put(MIBAND_CHARACTERISTIC_TEST, "MI Band Test Characteristic");
         sCharacteristics.put(MIBAND_CHARACTERISTIC_SENSOR_DATA, "MI Band Sensor Data Characteristic");
         sCharacteristics.put(MIBAND_CHARACTERISTIC_PAIR, "MI Band Pair Characteristic");
+
+        sCharacteristics.put(SMART_SENSOR, "Smart Sensor Characteristic");
     }
 
     public static String lookupService(String uuid, String defaultName) {
