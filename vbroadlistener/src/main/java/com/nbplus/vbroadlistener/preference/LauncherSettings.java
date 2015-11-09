@@ -235,17 +235,21 @@ public class LauncherSettings implements Parcelable {
     }
 
     public void setServerInformation(VBroadcastServer serverInformation) {
-        String addr = serverInformation.getApiServer();
-        if (addr.endsWith("/")) {
-            addr = addr.substring(0, addr.length() - 2);
-        }
-        addr = serverInformation.getDocServer();
-        if (addr.endsWith("/")) {
-            addr = addr.substring(0, addr.length() - 2);
-        }
-        addr = serverInformation.getPushInterfaceServer();
-        if (addr.endsWith("/")) {
-            addr = addr.substring(0, addr.length() - 2);
+        if (serverInformation != null) {
+            String addr = serverInformation.getApiServer();
+            if (addr.endsWith("/")) {
+                addr = addr.substring(0, addr.length() - 2);
+            }
+            addr = serverInformation.getDocServer();
+            if (addr.endsWith("/")) {
+                addr = addr.substring(0, addr.length() - 2);
+            }
+            addr = serverInformation.getPushInterfaceServer();
+            if (addr.endsWith("/")) {
+                addr = addr.substring(0, addr.length() - 2);
+            }
+        } else {
+            serverInformation = new VBroadcastServer();
         }
         this.serverInformation = serverInformation;
         setPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, this.serverInformation);

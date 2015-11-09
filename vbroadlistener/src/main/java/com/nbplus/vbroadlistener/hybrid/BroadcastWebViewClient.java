@@ -172,8 +172,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                         }
                     }
 
-//                    LauncherSettings.getInstance(mContext).setVillageCode(settings.getVillageCode());
-//                    LauncherSettings.getInstance(mContext).setVillageName(settings.getVillageName());
+                    serverInfo.setInitialServerPage(LauncherSettings.getInstance(mContext).getRegisterAddress());
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
                     LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 

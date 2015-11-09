@@ -331,10 +331,16 @@ public class BroadcastWebViewActivity extends BaseActivity {
     private void loadWebView(String url) {
         if (StringUtils.isEmptyString(url)) {
             VBroadcastServer serverInfo = LauncherSettings.getInstance(this).getServerInformation();
-            if (serverInfo != null && serverInfo.getDocServer() != null) {
-                url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
-            } else {
+            if (serverInfo == null || !LauncherSettings.getInstance(this).getRegisterAddress().equals(serverInfo.getInitialServerPage())) {
                 url = LauncherSettings.getInstance(this).getRegisterAddress();
+                LauncherSettings.getInstance(this).setServerInformation(null);
+            } else {
+                if (!StringUtils.isEmptyString(serverInfo.getDocServer())) {
+                    url = serverInfo.getDocServer() + LauncherSettings.firstPageContext;
+                } else {
+                    url = LauncherSettings.getInstance(this).getRegisterAddress();
+                    LauncherSettings.getInstance(this).setServerInformation(null);
+                }
             }
         }
         if (StringUtils.isEmptyString(url) || !Patterns.WEB_URL.matcher(url).matches()) {

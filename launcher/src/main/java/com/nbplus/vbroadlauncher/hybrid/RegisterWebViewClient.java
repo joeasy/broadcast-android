@@ -117,6 +117,7 @@ public class RegisterWebViewClient extends BasicWebViewClient {
                         }
                     }
 
+                    serverInfo.setInitialServerPage(Constants.VBROAD_INITIAL_PAGE);
                     LauncherSettings.getInstance(mContext).setServerInformation(serverInfo);
                     LauncherSettings.getInstance(mContext).setIsCompletedSetup(true);
 

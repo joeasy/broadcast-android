@@ -32,6 +32,7 @@ import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -798,6 +799,10 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         switch (data.getType()) {
             case Constants.SHORTCUT_TYPE_WEB_INTERFACE_SERVER:
                 BaseServerApiAsyncTask task;
+                if (StringUtils.isEmptyString(serverData.getApiServer())) {
+                    showIncorrectServerInformation();
+                    break;
+                }
                 data.setDomain(serverData.getApiServer());
                 try {
                     task = (BaseServerApiAsyncTask)data.getNativeClass().newInstance();
@@ -813,12 +818,20 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
                 break;
             case Constants.SHORTCUT_TYPE_WEB_DOCUMENT_SERVER:
+                if (StringUtils.isEmptyString(serverData.getDocServer())) {
+                    showIncorrectServerInformation();
+                    break;
+                }
                 intent = new Intent(getActivity(), BroadcastWebViewActivity.class);
                 data.setDomain(serverData.getDocServer());
                 intent.putExtra(Constants.EXTRA_NAME_SHORTCUT_DATA, data);
                 startActivity(intent);
                 break;
             case Constants.SHORTCUT_TYPE_NATIVE_INTERFACE:
+                if (StringUtils.isEmptyString(serverData.getDocServer())) {
+                    showIncorrectServerInformation();
+                    break;
+                }
                 switch (data.getNativeType()) {
                     case 0 :            // activity
                         intent = new Intent(getActivity(), data.getNativeClass());
@@ -907,4 +920,18 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             mWeatherView.onPaused();
         }
     }
+
+    public void showIncorrectServerInformation() {
+        new AlertDialog.Builder(getActivity()).setMessage(R.string.alert_server_info_message)
+                //.setTitle(R.string.alert_network_title)
+                .setCancelable(true)
+                .setPositiveButton(R.string.alert_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                            }
+                        })
+                .show();
+    }
+
 }
