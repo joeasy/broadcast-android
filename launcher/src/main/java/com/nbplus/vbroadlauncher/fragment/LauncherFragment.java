@@ -133,6 +133,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     private static final int HANDLER_MESSAGE_LOCALE_CHANGED = 0x02;
     private static final int HANDLER_MESSAGE_SET_VILLAGE_NAME = 0x03;
     private static final int HANDLER_IOT_DATA_SYNC_COMPLETED = 0x04;
+    private static final int HANDLER_IOT_SERVICE_STATUS_CHANGED = 0x05;
 
     private ArrayList<ShortcutData> mPushNotifiableShorcuts = new ArrayList<>();
 
@@ -320,6 +321,30 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 mIoTDataSyncText.setTextColor(getResources().getColor(R.color.white));
                 break;
             }
+
+            case HANDLER_IOT_SERVICE_STATUS_CHANGED: {
+                Bundle extras = msg.getData();
+                if (extras == null) {
+                    return;
+                }
+
+                boolean serviceStatus = extras.getBoolean(IoTConstants.EXTRA_SERVICE_STATUS);
+                if (serviceStatus) {
+                    mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_white, 0, 0, 0);
+                    mIoTDataSyncText.setTextColor(getResources().getColor(R.color.white));
+
+                    mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
+                    mIoTDataSync.setClickable(true);
+                    mIoTDataSync.setEnabled(true);
+                } else {
+                    mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
+                    mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+
+                    mIoTDataSync.setOnClickListener(null);
+                    mIoTDataSync.setClickable(false);
+                    mIoTDataSync.setEnabled(false);
+                }
+            }
         }
     }
 
@@ -352,6 +377,14 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 Message msg = new Message();
                 msg.what = HANDLER_IOT_DATA_SYNC_COMPLETED;
                 mHandler.sendMessage(msg);
+            } else if (IoTConstants.ACTION_IOT_SERVICE_STATUS_CHANGED.equals(action)) {
+                Message msg = new Message();
+                msg.what = HANDLER_IOT_SERVICE_STATUS_CHANGED;
+                Bundle data = new Bundle();
+                data.putBoolean(IoTConstants.EXTRA_SERVICE_STATUS, intent.getBooleanExtra(IoTConstants.EXTRA_SERVICE_STATUS, false));
+                msg.setData(data);
+
+                mHandler.sendMessage(msg);
             }
         }
     };
@@ -372,6 +405,18 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
     public LauncherFragment() {
         // Required empty public constructor
     }
+
+    private View.OnClickListener mIoTSyncClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mIsProcessingIoTDataSync = true;
+            showProgressDialog();
+            mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
+            mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+
+            IoTInterface.getInstance().forceDataSync();
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -412,7 +457,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         mVillageName = (TextView)v.findViewById(R.id.launcher_village_name);
         mVillageName.setText(LauncherSettings.getInstance(getActivity()).getVillageName());
 
-        mApplicationsView = (LinearLayout)v.findViewById(R.id.ic_nav_apps);
+        mApplicationsView = (LinearLayout) v.findViewById(R.id.ic_nav_apps);
         mApplicationsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -482,17 +527,9 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         // 부가데이터 동기화
         mIoTDataSync= (LinearLayout)v.findViewById(R.id.ic_iot_data_sync);
         mIoTDataSyncText = (TextView) v.findViewById(R.id.tv_iot_data_sync);
-        mIoTDataSync.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mIsProcessingIoTDataSync = true;
-                showProgressDialog();
-                mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
-                mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
-
-                IoTInterface.getInstance().forceDataSync();
-            }
-        });
+        mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
+        mIoTDataSync.setClickable(true);
+        mIoTDataSync.setEnabled(true);
 
         mTextClock = (TextClock)v.findViewById(R.id.text_clock);
         if (mTextClock != null) {
@@ -638,6 +675,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             intentFilter = new IntentFilter();
             intentFilter.addAction(Constants.ACTION_SET_VILLAGE_NAME);
             intentFilter.addAction(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+            intentFilter.addAction(IoTConstants.ACTION_IOT_SERVICE_STATUS_CHANGED);
             intentFilter.addAction(PushConstants.ACTION_PUSH_STATUS_CHANGED);
             intentFilter.addAction(PushConstants.ACTION_PUSH_MESSAGE_RECEIVED);
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, intentFilter);
@@ -903,6 +941,21 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         }
         if (mWeatherView != null) {
             mWeatherView.onResumed();
+        }
+        if (IoTInterface.getInstance().isIoTServiceAvailable()) {
+            mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_white, 0, 0, 0);
+            mIoTDataSyncText.setTextColor(getResources().getColor(R.color.white));
+
+            mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
+            mIoTDataSync.setClickable(true);
+            mIoTDataSync.setEnabled(true);
+        } else {
+            mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
+            mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+
+            mIoTDataSync.setOnClickListener(null);
+            mIoTDataSync.setClickable(false);
+            mIoTDataSync.setEnabled(false);
         }
     }
 
