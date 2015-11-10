@@ -723,9 +723,9 @@ public class BluetoothLeService extends Service {
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     // 스마트밴드 연동을 위해서.. 스마트밴드는 이벤트가 발생했을 경우에 2-3분간만 broadcast 를 보낸다.
-    private static long SCAN_PERIOD = 10000;
-    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 30000;
-    private static long SCAN_WAIT_PERIOD = 30000;
+    private static long SCAN_PERIOD = 5000;
+    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 10000;
+    private static long SCAN_WAIT_PERIOD = 10000;
     private static long SCAN_WAIT_UNPLUGGED_PERIOD = 60000;
 
     private static final int HANDLER_MSG_EXPIRED_SCAN_PERIOD = 1000;

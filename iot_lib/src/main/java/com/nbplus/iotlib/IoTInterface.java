@@ -854,9 +854,9 @@ public class IoTInterface {
     }
 
     private void printScanDeviceInformation(IoTDevice device) {
-        if (!BuildConfig.DEBUG) {           // skip release mode..
-            return;
-        }
+//        if (!BuildConfig.DEBUG) {           // skip release mode..
+//            return;
+//        }
         if (device.getAdRecordHashMap() == null) {
             Log.d(TAG, "old scanned device...");
             ArrayList<String> uuids = device.getUuids();
@@ -1081,7 +1081,7 @@ public class IoTInterface {
         }
         Log.d(TAG, "Current device size = " + mScanedList.size());
         // TODO : log
-        if (BuildConfig.DEBUG) {
+//        if (BuildConfig.DEBUG) {
             iter = mScanedList.keySet().iterator();
             while (iter.hasNext()) {
                 String key = iter.next();
@@ -1089,7 +1089,7 @@ public class IoTInterface {
 
                 printScanDeviceInformation(device);
             }
-        }
+//        }
 
         if (mForceRescanCallback == null) {
             return;
