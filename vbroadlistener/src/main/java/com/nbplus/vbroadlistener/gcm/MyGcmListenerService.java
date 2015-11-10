@@ -107,7 +107,7 @@ public class MyGcmListenerService extends GcmListenerService {
         String moveUrl = null;
         int notificationId = 0;
 
-                PushPayloadData payloadData = null;
+        PushPayloadData payloadData = null;
         try {
             Gson gson = new GsonBuilder().create();
             payloadData = gson.fromJson(payload, new TypeToken<PushPayloadData>(){}.getType());
