@@ -831,6 +831,9 @@ public class IoTInterface {
     }
 
     private void printScanDeviceInformation(IoTDevice device) {
+        if (!BuildConfig.DEBUG) {           // skip release mode..
+            return;
+        }
         if (device.getAdRecordHashMap() == null) {
             Log.d(TAG, "old scanned device...");
             ArrayList<String> uuids = device.getUuids();
