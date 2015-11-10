@@ -141,6 +141,7 @@ public class IoTInterface {
      * 10초동안 검색된 device list 를 저장해 두는 공간
      */
     private HashMap<String, IoTDevice> mScanedList = new HashMap<>();
+    private int mBondedWithServerCount = 0;
     private int mCurrentRetrieveIndex = -1;
     private IoTDevice mCurrentRetrieveDevice;
     private String mDeviceId;
@@ -249,6 +250,9 @@ public class IoTInterface {
 
                 while (iter.hasNext()) {
                     String key = iter.next();
+                    if (mScanedList.get(key).isBondedWithServer()) {
+                        mBondedWithServerCount++;
+                    }
                     mScanedList.get(key).setIsKnownDevice(isKnownScenarioDevice(mScanedList.get(key).getDeviceTypeId(),
                             mScanedList.get(key).getUuids(), mScanedList.get(key).getUuidLen()));
                 }
@@ -1378,11 +1382,17 @@ public class IoTInterface {
             bondedDeviceIds.add(bondedList.get(i).getDeviceId());
         }
 
+        mBondedWithServerCount = 0;
         Iterator<String> iter = mScanedList.keySet().iterator();
         while(iter.hasNext()) {
             String key = iter.next();
 
-            mScanedList.get(key).setIsBondedWithServer(bondedDeviceIds.contains(key));
+            if (bondedDeviceIds.contains(key)) {
+                mBondedWithServerCount++;
+                mScanedList.get(key).setIsBondedWithServer(true);
+            } else {
+                mScanedList.get(key).setIsBondedWithServer(false);
+            }
         }
         Gson gson = new Gson();
         String json = gson.toJson(mScanedList);
@@ -1936,7 +1946,7 @@ public class IoTInterface {
     }
 
     public boolean isIoTServiceAvailable() {
-        if (mServiceStatus == IoTServiceStatus.RUNNING) {
+        if (mBondedWithServerCount > 0 && mServiceStatus == IoTServiceStatus.RUNNING) {
             return true;
         }
         return false;
