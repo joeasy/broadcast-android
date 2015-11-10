@@ -362,7 +362,14 @@ public class IoTInterface {
                     mHandler.removeMessages(HANDLER_COMMAND_NOT_RESPOND);
                     mCurrentRetrieveIndex = -1;
                     mCurrentRetrieveDevice = null;
+
+                    Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                    LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
                 }
+
+                Intent intent = new Intent(IoTConstants.ACTION_IOT_SERVICE_STATUS_CHANGED);
+                intent.putExtra(IoTConstants.EXTRA_SERVICE_STATUS, (mServiceStatus == IoTServiceStatus.RUNNING));
+                LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
 
                 mErrorCodes = (IoTResultCodes)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE);
                 Log.d(TAG, "IoTServiceCommand.SERVICE_STATUS_NOTIFICATION : status = " + mServiceStatus + ", errCode = " + mErrorCodes);
@@ -446,9 +453,14 @@ public class IoTInterface {
 
             case HANDLER_RETRIEVE_IOT_DEVICES : {
                 Log.d(TAG, "HANDLER_RETRIEVE_IOT_DEVICES received.. Clear all previous connection first..");
-                sendMessageToService(IoTServiceCommand.SCANNING_STOP, null);
-                mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
-                sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT_ALL, null);
+                if (mServiceStatus != IoTServiceStatus.RUNNING) {
+                    Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                    LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+                } else {
+                    sendMessageToService(IoTServiceCommand.SCANNING_STOP, null);
+                    mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
+                    sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT_ALL, null);
+                }
                 break;
             }
 
@@ -508,6 +520,9 @@ public class IoTInterface {
 
                 if (mServiceStatus == IoTServiceStatus.RUNNING) {
                     sendConnectToDeviceMessage(mCurrentRetrieveIndex);
+                } else {
+                    Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                    LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
                 }
                 break;
             }
@@ -546,6 +561,8 @@ public class IoTInterface {
                             mCurrentRetrieveIndex = -1;
                             mCurrentRetrieveDevice = null;
 
+                            Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                            LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
                             break;
                         }
                         Log.d(TAG, "mConnectionRetryCount = " + mConnectionRetryCount);
@@ -665,6 +682,8 @@ public class IoTInterface {
             mCurrentRetrieveIndex = -1;
             mCurrentRetrieveDevice = null;
 
+            Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+            LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -1058,12 +1077,14 @@ public class IoTInterface {
         }
         Log.d(TAG, "Current device size = " + mScanedList.size());
         // TODO : log
-        iter = mScanedList.keySet().iterator();
-        while(iter.hasNext()) {
-            String key = iter.next();
-            IoTDevice device = mScanedList.get(key);
+        if (BuildConfig.DEBUG) {
+            iter = mScanedList.keySet().iterator();
+            while (iter.hasNext()) {
+                String key = iter.next();
+                IoTDevice device = mScanedList.get(key);
 
-            printScanDeviceInformation(device);
+                printScanDeviceInformation(device);
+            }
         }
 
         if (mForceRescanCallback == null) {
@@ -1903,9 +1924,21 @@ public class IoTInterface {
     }
 
     public void forceDataSync() {
+        if (mServiceStatus != IoTServiceStatus.RUNNING) {
+            Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+            LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+            return;
+        }
         if (mCurrentRetrieveIndex < 0 && mCurrentRetrieveDevice == null) {
             mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
             mHandler.sendEmptyMessage(HANDLER_RETRIEVE_IOT_DEVICES);
         }
+    }
+
+    public boolean isIoTServiceAvailable() {
+        if (mServiceStatus == IoTServiceStatus.RUNNING) {
+            return true;
+        }
+        return false;
     }
 }

@@ -27,4 +27,7 @@ public class IoTConstants {
     public static final String ACTION_SERVICE_CREATE_BROADCAST = "com.nbplus.iot.ACTION_SERVICE_CREATE_BROADCAST";
     public static final String ACTION_RECEIVE_EMERGENCY_CALL_DEVICE_BROADCAST = "com.nbplus.iot.ACTION_RECEIVE_EMERGENCY_CALL_DEVICE_BROADCAST";
     public static final String ACTION_IOT_DATA_SYNC_COMPLETED = "com.nbplus.iot.ACTION_IOT_DATA_SYNC_COMPLETED";
+    public static final String ACTION_IOT_SERVICE_STATUS_CHANGED = "com.nbplus.iot.ACTION_IOT_SERVICE_STATUS_CHANGED";
+
+    public static final String EXTRA_SERVICE_STATUS = "EXTRA_SERVICE_STATUS";
 }
