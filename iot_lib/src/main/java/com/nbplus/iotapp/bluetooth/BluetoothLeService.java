@@ -724,9 +724,9 @@ public class BluetoothLeService extends Service {
     // Stops scanning after 10 seconds.
     // 스마트밴드 연동을 위해서.. 스마트밴드는 이벤트가 발생했을 경우에 2-3분간만 broadcast 를 보낸다.
     private static long SCAN_PERIOD = 5000;
-    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 10000;
-    private static long SCAN_WAIT_PERIOD = 10000;
-    private static long SCAN_WAIT_UNPLUGGED_PERIOD = 60000;
+    private static long SCAN_WAIT_EMPTY_RETRY_PERIOD = 5000;
+    private static long SCAN_WAIT_PERIOD = 5000;
+    private static long SCAN_WAIT_UNPLUGGED_PERIOD = 5000;
 
     private static final int HANDLER_MSG_EXPIRED_SCAN_PERIOD = 1000;
     private static final int HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD = HANDLER_MSG_EXPIRED_SCAN_PERIOD + 1;
@@ -815,26 +815,29 @@ public class BluetoothLeService extends Service {
                     //super.onScanResult(callbackType, result);
 
                     try {
-                        BluetoothDevice btDevice = result.getDevice();
+                        BluetoothDevice device = result.getDevice();
                         byte[] scanRecord = result.getScanRecord().getBytes();
                         final HashMap<Integer, AdRecord> adRecords = AdRecord.parseScanRecord(scanRecord);
-
-                        IoTDevice iotDevice = new IoTDevice();
-                        iotDevice.setDeviceId(btDevice.getAddress());
-                        iotDevice.setDeviceName(btDevice.getName());
-                        iotDevice.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
-                        iotDevice.setAdRecordHashMap(adRecords);
 
                         /**
                          * UUID 가 없는것은 무시한다.
                          */
-                        ArrayList<String> scanedUuids = DataParser.getUuids(iotDevice.getAdRecordHashMap());
-                        if (scanedUuids == null || scanedUuids.size() == 0) {
-                            Log.e(TAG, ">>> xx device name " + iotDevice.getDeviceName() + " has no uuid advertisement");
-                        } else {
-                            mTempScanedList.put(iotDevice.getDeviceId(), iotDevice);
-                            //printScanDevices(btDevice, adRecords);
+                        ArrayList<String> scannedUuids = DataParser.getUuids(adRecords);
+                        if (scannedUuids == null || scannedUuids.size() == 0) {
+                            Log.e(TAG, ">>> xx device name " + device.getAddress() + " has no uuid advertisement");
+                            return;
                         }
+
+                        IoTDevice iotDevice = new IoTDevice();
+                        iotDevice.setDeviceId(device.getAddress());
+                        iotDevice.setDeviceName(device.getName());
+                        iotDevice.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
+
+                        iotDevice.setUuids(scannedUuids);
+                        iotDevice.setUuidLen(DataParser.getUuidLength(adRecords));
+
+                        iotDevice.setAdRecordHashMap(adRecords);
+                        mTempScanedList.put(iotDevice.getDeviceId(), iotDevice);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -861,22 +864,25 @@ public class BluetoothLeService extends Service {
 
                     try {
                         final HashMap<Integer, AdRecord> adRecords = AdRecord.parseScanRecord(scanRecord);
+                        /**
+                         * UUID 가 없는것은 무시한다.
+                         */
+                        ArrayList<String> scannedUuids = DataParser.getUuids(adRecords);
+                        if (scannedUuids == null || scannedUuids.size() == 0) {
+                            Log.e(TAG, ">>> xx device name " + device.getAddress() + " has no uuid advertisement");
+                            return;
+                        }
+
                         IoTDevice iotDevice = new IoTDevice();
                         iotDevice.setDeviceId(device.getAddress());
                         iotDevice.setDeviceName(device.getName());
                         iotDevice.setDeviceType(IoTDevice.DEVICE_TYPE_STRING_BT);
-                        iotDevice.setAdRecordHashMap(adRecords);
 
-                        /**
-                         * UUID 가 없는것은 무시한다.
-                         */
-                        ArrayList<String> scanedUuids = DataParser.getUuids(iotDevice.getAdRecordHashMap());
-                        if (scanedUuids == null || scanedUuids.size() == 0) {
-                            Log.e(TAG, ">>> xx device name " + iotDevice.getDeviceName() + " has no uuid advertisement");
-                        } else {
-                            mTempScanedList.put(iotDevice.getDeviceId(), iotDevice);
-                            //printScanDevices(device, adRecords);
-                        }
+                        iotDevice.setUuids(scannedUuids);
+                        iotDevice.setUuidLen(DataParser.getUuidLength(adRecords));
+
+                        iotDevice.setAdRecordHashMap(adRecords);
+                        mTempScanedList.put(iotDevice.getDeviceId(), iotDevice);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
