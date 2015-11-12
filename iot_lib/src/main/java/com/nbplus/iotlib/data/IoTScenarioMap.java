@@ -35,6 +35,8 @@ public class IoTScenarioMap implements Parcelable {
     private HashMap<String, IoTScenarioDef> scenarioMap;
     @SerializedName("emergency_device_list")
     private ArrayList<String> emergencyCallDeviceList;
+    @SerializedName("emergency_devices_scenario")
+    private HashMap<String, ArrayList<IoTDeviceScenario>> emergencyCallDevicesScenarioMap;
 
     public ArrayList<String> getEmergencyCallDeviceList() {
         return emergencyCallDeviceList;
@@ -60,6 +62,14 @@ public class IoTScenarioMap implements Parcelable {
         this.scenarioMap = scenarioMap;
     }
 
+    public HashMap<String, ArrayList<IoTDeviceScenario>> getEmergencyCallDevicesScenarioMap() {
+        return emergencyCallDevicesScenarioMap;
+    }
+
+    public void setEmergencyCallDevicesScenarioMap(HashMap<String, ArrayList<IoTDeviceScenario>> emergencyCallDevicesScenarioMap) {
+        this.emergencyCallDevicesScenarioMap = emergencyCallDevicesScenarioMap;
+    }
+
     public IoTScenarioMap() {
     }
 
@@ -73,12 +83,14 @@ public class IoTScenarioMap implements Parcelable {
         dest.writeInt(this.version);
         dest.writeSerializable(this.scenarioMap);
         dest.writeStringList(this.emergencyCallDeviceList);
+        dest.writeSerializable(this.emergencyCallDevicesScenarioMap);
     }
 
     protected IoTScenarioMap(Parcel in) {
         this.version = in.readInt();
         this.scenarioMap = (HashMap<String, IoTScenarioDef>) in.readSerializable();
         this.emergencyCallDeviceList = in.createStringArrayList();
+        this.emergencyCallDevicesScenarioMap = (HashMap<String, ArrayList<IoTDeviceScenario>>) in.readSerializable();
     }
 
     public static final Creator<IoTScenarioMap> CREATOR = new Creator<IoTScenarioMap>() {

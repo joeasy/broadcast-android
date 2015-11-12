@@ -323,6 +323,7 @@ public class IoTService extends Service {
             }
 
             case HANDLER_MESSAGE_CONNECTION_NOT_RESPOND : {
+                Log.d(TAG, "HANDLER_MESSAGE_CONNECTION_NOT_RESPOND ...");
                 if (mBluetoothLeService != null) {
                     mBluetoothLeService.disconnect(mRequestHandleData.getDeviceId());
                 }
@@ -492,6 +493,13 @@ public class IoTService extends Service {
                         return;
                     }
 
+                    // 현재 요청메시지와 비교해서 아닌 경우라면 연결 종료.
+                    if (mRequestHandleData == null || !address.equals(mRequestHandleData.getDeviceId())) {
+                        Log.d(TAG, "Is not equal to mRequestHandleData..");
+                        mBluetoothLeService.disconnect(address);
+                        return;
+                    }
+
                     for (int i = 0; i < mConnectedDeviceList.size(); i++) {
                         Log.d(TAG, ">> mConnectedDeviceList[" + i + "] = " + mConnectedDeviceList.get(i));
                     }
@@ -538,7 +546,7 @@ public class IoTService extends Service {
                     return;
                 }
 
-                if (mRequestHandleData == null) {
+                if (mRequestHandleData == null || !address.equals(mRequestHandleData.getDeviceId())) {
                     // send to all
                     sendNotificationToApplication(null, msg);
                 } else {
@@ -572,6 +580,15 @@ public class IoTService extends Service {
                 }
 
                 // 요청은 순차적으로 이루어져야 한다.
+                // 현재 요청메시지와 비교해서 아닌 경우라면 연결 종료.
+                if (mRequestHandleData == null || !address.equals(mRequestHandleData.getDeviceId())) {
+                    Log.d(TAG, "Is not equal to mRequestHandleData..");
+                    mBluetoothLeService.disconnect(address);
+                    return;
+                }
+
+                // 이 경우는 connect 요청을 했는데.
+                // 실패하고 disconnect를 바로 받은 경우이다.
                 if (mRequestHandleData.getRequestCommand() != IoTServiceCommand.DEVICE_CONNECT) {
                     if (StringUtils.isEmptyString(address) || !mConnectedDeviceList.contains(address)) {
                         Log.w(TAG, "Unknown address information... close it. ");

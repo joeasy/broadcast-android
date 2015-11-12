@@ -118,6 +118,7 @@ public class GattAttributes {
 
     // smart sensor
     public static final String SMART_SENSOR_SERVICE_UUID = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "d102");
+    public static final String SMART_BAND_SERVICE_UUID = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "e102");
 
     // for characteristics
     public static final String AEROBIC_HEART_RATE_LOWER_LIMIT = "00002a7e-0000-1000-8000-00805f9b34fb";
@@ -284,6 +285,8 @@ public class GattAttributes {
 
     // smart sensor
     public static final String SMART_SENSOR = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "11e1");
+    public static final String SMART_BAND_NOTIFICATION = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "21e1");
+    public static final String SMART_BAND_WRITE = String.format(GATT_BASE_UUID128_FROM_UUID16_FORMATTING, "6b00");
 
     static {
         // Services.
@@ -324,6 +327,7 @@ public class GattAttributes {
         sServices.put(MIBAND_MILI_SERVICE_UUID, "XIAOMI Band Mili Service");
 
         sServices.put(SMART_SENSOR_SERVICE_UUID, "Smart Sensor Service");
+        sServices.put(SMART_BAND_SERVICE_UUID, "Smart Band Service");
 
         // for characteristics
         sCharacteristics.put(AEROBIC_HEART_RATE_LOWER_LIMIT, "AEROBIC_HEART_RATE_LOWER_LIMIT Characteristic");
@@ -508,6 +512,8 @@ public class GattAttributes {
         sCharacteristics.put(MIBAND_CHARACTERISTIC_PAIR, "MI Band Pair Characteristic");
 
         sCharacteristics.put(SMART_SENSOR, "Smart Sensor Characteristic");
+        sCharacteristics.put(SMART_BAND_NOTIFICATION, "Smart Band Notification Characteristic");
+        sCharacteristics.put(SMART_BAND_WRITE, "Smart Band Write Characteristic");
     }
 
     public static String lookupService(String uuid, String defaultName) {
