@@ -1099,7 +1099,11 @@ public class IoTInterface {
                     mIsWaitingForceDataSync = false;
                     mHandler.sendEmptyMessage(HANDLER_RETRIEVE_IOT_DEVICES);
                 } else {
-                    mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD - (currTimeMs - mLastSendCollectedDataToServer));
+                    if (mLastEmergencyDeviceFoundTimeMs == 0L) {
+                        mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD);
+                    } else {
+                        mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD - (currTimeMs - mLastSendCollectedDataToServer));
+                    }
                 }
             }
         }
