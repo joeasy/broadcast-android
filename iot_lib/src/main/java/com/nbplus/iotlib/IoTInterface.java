@@ -145,7 +145,8 @@ public class IoTInterface {
 
     // 긴급호출 디바이스 수집 목록
     private ArrayList<IoTDevice> mEmergencyDeviceList = new ArrayList<>();
-    private boolean mIsEmergencyDataCollecting;
+    private boolean mIsEmergencyDataCollecting = false;
+    private boolean mIsWaitingForceDataSync = false;
 
     private int mBondedWithServerCount = 0;
 
@@ -382,6 +383,12 @@ public class IoTInterface {
                     if (mIsEmergencyDataCollecting) {
                         mEmergencyDeviceList.clear();
                         mIsEmergencyDataCollecting = false;
+
+                        if (mIsWaitingForceDataSync) {
+                            mIsWaitingForceDataSync = false;
+                            Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                            LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+                        }
                     } else {
                         Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
                         LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
@@ -597,6 +604,12 @@ public class IoTInterface {
                             if (mIsEmergencyDataCollecting) {
                                 mEmergencyDeviceList.clear();
                                 mIsEmergencyDataCollecting = false;
+
+                                if (mIsWaitingForceDataSync) {
+                                    mIsWaitingForceDataSync = false;
+                                    Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                                    LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+                                }
                             } else {
                                 Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
                                 LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
@@ -731,6 +744,12 @@ public class IoTInterface {
             if (mIsEmergencyDataCollecting) {
                 mEmergencyDeviceList.clear();
                 mIsEmergencyDataCollecting = false;
+
+                if (mIsWaitingForceDataSync) {
+                    mIsWaitingForceDataSync = false;
+                    Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                    LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+                }
             } else {
                 Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
                 LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
@@ -1076,7 +1095,12 @@ public class IoTInterface {
             if (currTimeMs - mLastSendCollectedDataToServer > RETRIEVE_IOT_DEVICE_DATA_PERIOD) {
                 mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 100);
             } else {
-                mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD - (currTimeMs - mLastSendCollectedDataToServer));
+                if (mIsWaitingForceDataSync) {
+                    mIsWaitingForceDataSync = false;
+                    mHandler.sendEmptyMessage(HANDLER_RETRIEVE_IOT_DEVICES);
+                } else {
+                    mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD - (currTimeMs - mLastSendCollectedDataToServer));
+                }
             }
         }
     }
@@ -2119,9 +2143,14 @@ public class IoTInterface {
             LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
             return;
         }
-        if (mCurrentRetrieveIndex < 0 && mCurrentRetrieveDevice == null) {
-            mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
-            mHandler.sendEmptyMessage(HANDLER_RETRIEVE_IOT_DEVICES);
+
+        if (mIsEmergencyDataCollecting) {
+            mIsWaitingForceDataSync = true;
+        } else {
+            if (mCurrentRetrieveIndex < 0 && mCurrentRetrieveDevice == null) {
+                mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
+                mHandler.sendEmptyMessage(HANDLER_RETRIEVE_IOT_DEVICES);
+            }
         }
     }
 
