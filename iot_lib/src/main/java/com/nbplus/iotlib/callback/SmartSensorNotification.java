@@ -17,22 +17,16 @@
 
 package com.nbplus.iotlib.callback;
 
-import android.os.Bundle;
-
-import com.nbplus.iotlib.data.IoTResultCodes;
-import com.nbplus.iotlib.data.IoTServiceCommand;
-import com.nbplus.iotlib.data.IoTServiceStatus;
+import com.nbplus.iotlib.data.IoTDevice;
 
 /**
  * Created by basagee on 2015. 10. 14..
  */
-public interface IoTServiceResponse {
+public interface SmartSensorNotification {
     /**
-     *
-     * @param cmd
-     * @param serviceStatus
-     * @param serviceStatusCode
-     * @param b
+     * 스마트센서 움직임에 관련된 콜백.
+     * @param device
+     * @param isActive
      */
-    public void onResult(int cmd, IoTServiceStatus serviceStatus, IoTResultCodes serviceStatusCode, Bundle b);
+    public void notifyMotionSensor(IoTDevice device, boolean isActive);
 }

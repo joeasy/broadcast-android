@@ -41,7 +41,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 
 import com.nbplus.iotlib.IoTInterface;
-import com.nbplus.iotlib.callback.IoTServiceResponse;
+import com.nbplus.iotlib.callback.IoTServiceStatusNotification;
 import com.nbplus.iotlib.data.DeviceTypes;
 import com.nbplus.iotlib.data.IoTDevice;
 import com.nbplus.iotlib.data.IoTResultCodes;
@@ -60,8 +60,8 @@ import java.util.ArrayList;
 /**
  * Created by basagee on 2015. 6. 23..
  */
-public class LoadIoTDevicesDialogFragment extends DialogFragment implements DialogInterface.OnKeyListener, IoTServiceResponse {
-    private static final String TAG = LoadIoTDevicesDialogFragment.class.getSimpleName();
+public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implements DialogInterface.OnKeyListener, IoTServiceStatusNotification {
+    private static final String TAG = LoadIoTDevicesDialogFragmentStatus.class.getSimpleName();
 
     private ArrayList<IoTDevice> mIoTDevicesList = new ArrayList<>();
 
@@ -74,8 +74,8 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
 
     Handler mHandler = new Handler();
 
-    public static LoadIoTDevicesDialogFragment newInstance(Bundle b) {
-        LoadIoTDevicesDialogFragment frag = new LoadIoTDevicesDialogFragment();
+    public static LoadIoTDevicesDialogFragmentStatus newInstance(Bundle b) {
+        LoadIoTDevicesDialogFragmentStatus frag = new LoadIoTDevicesDialogFragmentStatus();
         if (b != null) {
             frag.setArguments(b);
         }
@@ -128,7 +128,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
                 Log.d(TAG, "onClick btnRefresh..");
                 ((BaseActivity) getActivity()).showProgressDialog();
 
-                IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragment.this, true);
+                IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragmentStatus.this, true);
             }
         });
 
@@ -195,13 +195,9 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(TAG, "dialog onAttach");
-        IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, this);
+        IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, this, true);
 
         ((BaseActivity) getActivity()).showProgressDialog();
-
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(com.nbplus.iotlib.data.Constants.ACTION_IOT_DEVICE_LIST);
-//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, filter);
     }
 
     @Override
@@ -333,6 +329,9 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
         }
     }
     private void handleDeviceList(Bundle b) {
+        if (b == null) {
+            return;
+        }
         ArrayList<IoTDevice> iotDevicesList = b.getParcelableArrayList(IoTServiceCommand.KEY_DATA);
         if (iotDevicesList != null) {
             mIoTDevicesList = iotDevicesList;
@@ -394,7 +393,7 @@ public class LoadIoTDevicesDialogFragment extends DialogFragment implements Dial
                     LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(sendIntent);
                 } else {
                     ((BaseActivity) getActivity()).showProgressDialog();
-                    //IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragment.this);
+                    IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragmentStatus.this);
                 }
                 break;
         }

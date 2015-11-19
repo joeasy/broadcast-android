@@ -74,13 +74,4 @@ public class BaseCharacteristicValue implements Parcelable {
         this.mUuid = in.readString();
     }
 
-    public static final Creator<BaseCharacteristicValue> CREATOR = new Creator<BaseCharacteristicValue>() {
-        public BaseCharacteristicValue createFromParcel(Parcel source) {
-            return new BaseCharacteristicValue(source);
-        }
-
-        public BaseCharacteristicValue[] newArray(int size) {
-            return new BaseCharacteristicValue[size];
-        }
-    };
 }

@@ -24,6 +24,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.nbplus.iotapp.data.AdRecord;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,7 +32,9 @@ import java.util.LinkedHashMap;
 /**
  * Created by basagee on 2015. 8. 6..
  */
-public class IoTDevice implements Parcelable {
+public class IoTDevice implements Parcelable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final String DEVICE_TYPE_STRING_IR = "IR";
     public static final String DEVICE_TYPE_STRING_BT = "BT";
     public static final String DEVICE_TYPE_STRING_ZW = "ZW";
@@ -68,13 +71,11 @@ public class IoTDevice implements Parcelable {
     @SerializedName("LAST_SEQ")
     private int lastSequenceNumber;
 
-    HashMap<Integer, AdRecord> adRecordHashMap;
+    transient HashMap<Integer, AdRecord> adRecordHashMap;
     transient HashMap<String, ArrayList<String>> discoveredServices;
     transient ArrayList<IoTDeviceScenario> deviceScenario;
     transient int scenarioPosition = 0;
     transient boolean isKnownDevice;
-    transient int savedRecordCount = -1;
-    transient int recvedRecordCount = 0;
 
     public int getLastSequenceNumber() {
         return lastSequenceNumber;
@@ -86,22 +87,6 @@ public class IoTDevice implements Parcelable {
 
     public HashMap<String, ArrayList<String>> getDiscoveredServices() {
         return discoveredServices;
-    }
-
-    public int getSavedRecordCount() {
-        return savedRecordCount;
-    }
-
-    public void setSavedRecordCount(int savedRecordCount) {
-        this.savedRecordCount = savedRecordCount;
-    }
-
-    public int getRecvedRecordCount() {
-        return recvedRecordCount;
-    }
-
-    public void setRecvedRecordCount(int recvedRecordCount) {
-        this.recvedRecordCount = recvedRecordCount;
     }
 
     public int getScenarioPosition() {
@@ -254,8 +239,6 @@ public class IoTDevice implements Parcelable {
         dest.writeTypedList(deviceScenario);
         dest.writeInt(this.scenarioPosition);
         dest.writeByte(isKnownDevice ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.savedRecordCount);
-        dest.writeInt(this.recvedRecordCount);
     }
 
     protected IoTDevice(Parcel in) {
@@ -273,8 +256,6 @@ public class IoTDevice implements Parcelable {
         this.deviceScenario = in.createTypedArrayList(IoTDeviceScenario.CREATOR);
         this.scenarioPosition = in.readInt();
         this.isKnownDevice = in.readByte() != 0;
-        this.savedRecordCount = in.readInt();
-        this.recvedRecordCount = in.readInt();
     }
 
     public static final Creator<IoTDevice> CREATOR = new Creator<IoTDevice>() {

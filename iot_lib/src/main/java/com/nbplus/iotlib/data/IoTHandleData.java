@@ -33,6 +33,7 @@ public class IoTHandleData implements Parcelable {
     String characteristicUuid;
     int deviceTypeId;
     int status = 0;
+    boolean isKeepAliveDevice;
 
     byte[] value;
 
@@ -100,6 +101,14 @@ public class IoTHandleData implements Parcelable {
         this.deviceId = deviceId;
     }
 
+    public boolean isKeepAliveDevice() {
+        return isKeepAliveDevice;
+    }
+
+    public void setIsKeepAliveDevice(boolean isKeepAliveDevice) {
+        this.isKeepAliveDevice = isKeepAliveDevice;
+    }
+
     public IoTHandleData() {
     }
 
@@ -117,6 +126,7 @@ public class IoTHandleData implements Parcelable {
         dest.writeString(this.serviceUuid);
         dest.writeString(this.characteristicUuid);
         dest.writeInt(this.deviceTypeId);
+        dest.writeByte(this.isKeepAliveDevice ? (byte) 1 : (byte) 0);
         if (this.value != null) {
             dest.writeInt(this.value.length);
             dest.writeByteArray(this.value);
@@ -133,6 +143,7 @@ public class IoTHandleData implements Parcelable {
         this.serviceUuid = in.readString();
         this.characteristicUuid = in.readString();
         this.deviceTypeId = in.readInt();
+        this.isKeepAliveDevice = in.readByte() != 0;
 
         int len = in.readInt();
         if (len > 0) {

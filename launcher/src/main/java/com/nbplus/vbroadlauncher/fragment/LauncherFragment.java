@@ -70,6 +70,7 @@ import com.nbplus.push.PushService;
 import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
+import com.nbplus.vbroadlauncher.HomeLauncherApplication;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.ShowApplicationActivity;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
@@ -432,6 +433,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             getActivity().startActivityForResult(checkIntent, Constants.START_ACTIVITY_REQUEST_CHECK_TTS_DATA);
         }
 
+        Log.d(TAG, "PushConstants.ACTION_GET_STATUS send");
         // check push agent status
         Intent intent = new Intent(getActivity(), PushService.class);
         intent.setAction(PushConstants.ACTION_GET_STATUS);
@@ -505,6 +507,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             public void onClick(View view) {
                 Toast toast;
 
+                boolean mode = false;
                 if (LauncherSettings.getInstance(getActivity()).isOutdoorMode()) {
                     LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(false);
                     mOutdoorText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_off, 0, 0, 0);
@@ -514,6 +517,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
                 } else {
+                    mode = true;
                     LauncherSettings.getInstance(getActivity()).setIsOutdoorMode(true);
                     mOutdoorText.setTextColor(getResources().getColor(R.color.btn_color_absentia_on));
                     mOutdoorText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_nav_absentia_on, 0, 0, 0);
@@ -521,6 +525,11 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                     toast = Toast.makeText(getActivity(), R.string.outdoor_mode_on, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
+                }
+
+                HomeLauncherApplication application = (HomeLauncherApplication)getActivity().getApplicationContext();
+                if (application != null) {
+                    application.outdoorModeChanged(mode);
                 }
             }
         });

@@ -12,6 +12,7 @@ public class PushConstants {
     public static final String ACTION_SETUP_PUSH_IF_SERVER = "com.nbplus.pushservice.intent.action.SETUP_PUSH_GW";
     public static final String ACTION_GET_STATUS = "com.nbplus.pushservice.intent.action.GET_TATUS";
     public static final String ACTION_START_SERVICE = "com.nbplus.pushservice.intent.action.START_SERVICE";
+    public static final String ACTION_STOP_SERVICE = "com.nbplus.pushservice.intent.action.STOP_SERVICE";
     public static final String EXTRA_START_SERVICE_IFADDRESS = "extra_push_start_service_ifaddress";
 
     // send to application

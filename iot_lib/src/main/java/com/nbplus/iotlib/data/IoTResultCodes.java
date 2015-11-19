@@ -17,11 +17,16 @@
 
 package com.nbplus.iotlib.data;
 
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
 /**
  * Created by basagee on 2015. 10. 13..
  */
 // device list option
-public enum IoTResultCodes {
+public enum IoTResultCodes implements Serializable {
+
     SUCCESS (0),
     FAILED (1),
     // app check
@@ -41,6 +46,7 @@ public enum IoTResultCodes {
     ;
 
     private final int value;
+    private static final long serialVersionUID = 1L;
 
     private IoTResultCodes(int value) {
         this.value = value;

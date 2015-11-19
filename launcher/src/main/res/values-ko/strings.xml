@@ -36,6 +36,8 @@
     <string name="alert_calendar_not_found">캘린더 어플리케이션 실행에 실패했습니다. 어플리케이션 설정이 정상적인지 확인하시기 바랍니다.</string>
     <string name="outdoor_mode_on">외출모드가 활성화 되었습니다.</string>
     <string name="outdoor_mode_off">외출모드가 비활성화 되었습니다.</string>
+    <string name="outdoor_mode_motion">외출모드에서 동작이 감지되었습니다.</string>
+    <string name="indoor_mode_no_motion">사용자의 동작이 하루이상 감지되지 않습니다.</string>
 
     <!--main shortcut -->
     <string name="shortcut_btn_show_broadcast">방송듣기</string>

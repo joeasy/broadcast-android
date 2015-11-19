@@ -47,50 +47,50 @@ public class SmartSensor extends BaseCharacteristicValue implements Parcelable {
     private double mAIO1;
     private double mAIO2;
 
-    private boolean digitalInButton4Checked;
-    private boolean digitalInButton5Checked;
-    private boolean digitalInButton6Checked;
-    private boolean digitalInButton7Checked;
-    private boolean digitalInButton9Checked;
+    private boolean mDI4;
+    private boolean mDI5;
+    private boolean mDI6;
+    private boolean mDI7;
+    private boolean mDI9;
 
-    public boolean isDigitalInButton4Checked() {
-        return digitalInButton4Checked;
+    public boolean isDI4() {
+        return mDI4;
     }
 
-    public void setDigitalInButton4Checked(boolean digitalInButton4Checked) {
-        this.digitalInButton4Checked = digitalInButton4Checked;
+    public void setDI4(boolean DI4) {
+        this.mDI4 = DI4;
     }
 
-    public boolean isDigitalInButton5Checked() {
-        return digitalInButton5Checked;
+    public boolean isDI7() {
+        return mDI7;
     }
 
-    public void setDigitalInButton5Checked(boolean digitalInButton5Checked) {
-        this.digitalInButton5Checked = digitalInButton5Checked;
+    public void setDI7(boolean DI7) {
+        this.mDI7 = DI7;
     }
 
-    public boolean isDigitalInButton6Checked() {
-        return digitalInButton6Checked;
+    public boolean isDI6() {
+        return mDI6;
     }
 
-    public void setDigitalInButton6Checked(boolean digitalInButton6Checked) {
-        this.digitalInButton6Checked = digitalInButton6Checked;
+    public void setDI6(boolean DI6) {
+        this.mDI6 = DI6;
     }
 
-    public boolean isDigitalInButton7Checked() {
-        return digitalInButton7Checked;
+    public boolean isDI5() {
+        return mDI5;
     }
 
-    public void setDigitalInButton7Checked(boolean digitalInButton7Checked) {
-        this.digitalInButton7Checked = digitalInButton7Checked;
+    public void setDI5(boolean DI5) {
+        this.mDI5 = DI5;
     }
 
-    public boolean isDigitalInButton9Checked() {
-        return digitalInButton9Checked;
+    public boolean isDI9() {
+        return mDI9;
     }
 
-    public void setDigitalInButton9Checked(boolean digitalInButton9Checked) {
-        this.digitalInButton9Checked = digitalInButton9Checked;
+    public void setDI9(boolean DI9) {
+        this.mDI9 = DI9;
     }
 
     public double getTemperature() {
@@ -185,41 +185,41 @@ public class SmartSensor extends BaseCharacteristicValue implements Parcelable {
             // Digital Input..
             // PIN7
             if((value[10] & 0x80) == 0x80) {
-                measurement.setDigitalInButton7Checked(true);
+                measurement.setDI7(true);
             }
             else {
-                measurement.setDigitalInButton7Checked(false);
+                measurement.setDI7(false);
             }
             //PIN 6
             if((value[10] & 0x40) == 0x40) {
-                measurement.setDigitalInButton6Checked(true);
+                measurement.setDI6(true);
             }
             else {
-                measurement.setDigitalInButton6Checked(false);
+                measurement.setDI6(false);
             }
 
             //PIN 5
             if((value[10] & 0x20) == 0x20) {
-                measurement.setDigitalInButton5Checked(true);
+                measurement.setDI5(true);
             }
             else {
-                measurement.setDigitalInButton5Checked(false);
+                measurement.setDI5(false);
             }
 
             //PIN 9
             if((value[11] & 0x02) == 0x02) {
-                measurement.setDigitalInButton9Checked(true);
+                measurement.setDI9(true);
             }
             else {
-                measurement.setDigitalInButton9Checked(false);
+                measurement.setDI9(false);
             }
 
             //PIN 4
             if((value[10] & 0x10) == 0x10) {
-                measurement.setDigitalInButton4Checked(true);
+                measurement.setDI4(true);
             }
             else {
-                measurement.setDigitalInButton4Checked(false);
+                measurement.setDI4(false);
             }
             pos += Constants.UINT16_LEN;
 
@@ -252,11 +252,11 @@ public class SmartSensor extends BaseCharacteristicValue implements Parcelable {
         dest.writeDouble(this.mAIO0);
         dest.writeDouble(this.mAIO1);
         dest.writeDouble(this.mAIO2);
-        dest.writeByte(digitalInButton4Checked ? (byte) 1 : (byte) 0);
-        dest.writeByte(digitalInButton5Checked ? (byte) 1 : (byte) 0);
-        dest.writeByte(digitalInButton6Checked ? (byte) 1 : (byte) 0);
-        dest.writeByte(digitalInButton7Checked ? (byte) 1 : (byte) 0);
-        dest.writeByte(digitalInButton9Checked ? (byte) 1 : (byte) 0);
+        dest.writeByte(mDI4 ? (byte) 1 : (byte) 0);
+        dest.writeByte(mDI5 ? (byte) 1 : (byte) 0);
+        dest.writeByte(mDI6 ? (byte) 1 : (byte) 0);
+        dest.writeByte(mDI7 ? (byte) 1 : (byte) 0);
+        dest.writeByte(mDI9 ? (byte) 1 : (byte) 0);
     }
 
     protected SmartSensor(Parcel in) {
@@ -267,11 +267,11 @@ public class SmartSensor extends BaseCharacteristicValue implements Parcelable {
         this.mAIO0 = in.readDouble();
         this.mAIO1 = in.readDouble();
         this.mAIO2 = in.readDouble();
-        this.digitalInButton4Checked = in.readByte() != 0;
-        this.digitalInButton5Checked = in.readByte() != 0;
-        this.digitalInButton6Checked = in.readByte() != 0;
-        this.digitalInButton7Checked = in.readByte() != 0;
-        this.digitalInButton9Checked = in.readByte() != 0;
+        this.mDI4 = in.readByte() != 0;
+        this.mDI5 = in.readByte() != 0;
+        this.mDI6 = in.readByte() != 0;
+        this.mDI7 = in.readByte() != 0;
+        this.mDI9 = in.readByte() != 0;
     }
 
     public static final Creator<SmartSensor> CREATOR = new Creator<SmartSensor>() {

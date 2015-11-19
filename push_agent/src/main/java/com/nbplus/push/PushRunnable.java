@@ -225,7 +225,10 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         if (retry && NetworkUtils.isConnected(mContext)) {
             Log.d(TAG, "sendEmptyMessageDelayed PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE.. what = " + what);
             mServiceHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
-            if (what != PushConstants.PUSH_STATUS_WHAT_SERVICE_ERROR) {
+            // 테스트중 일부 AP에 연결된상태에서 망문제인지? 알수는없지만.
+            // EOFException 이 자주발생하는 경우가 있다.
+            // 원인을찾기 전까지는 일단 PUSH_STATUS_WHAT_NETORSERVER 인경우에도 바로 재연결 시도
+            if (what != PushConstants.PUSH_STATUS_WHAT_SERVICE_ERROR && what != PushConstants.PUSH_STATUS_WHAT_NETORSERVER) {
                 mServiceHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
             } else {
                 /**
@@ -253,7 +256,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
 //                                    mTcpThread.interrupt();
 //                                }
         //mIsPossibleTcpClientRun = false;
-        releasePushClientSocket(PushConstants.PUSH_STATUS_WHAT_NETORSERVER);
+        releasePushClientSocket(true, PushConstants.PUSH_STATUS_WHAT_NETORSERVER);
     }
 
     @Override

@@ -34,6 +34,8 @@ public class IoTScenarioDef implements Parcelable {
     private String type;
     @SerializedName("check")
     private ArrayList<String> scenarioFilter;
+    @SerializedName("keep_alive")
+    private boolean keepAlive;
     @SerializedName("scenarios")
     private LinkedHashMap<String, ArrayList<IoTDeviceScenario>> scenarios;
 
@@ -61,6 +63,14 @@ public class IoTScenarioDef implements Parcelable {
         this.scenarios = scenarios;
     }
 
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
+    }
+
     public IoTScenarioDef() {
     }
 
@@ -73,12 +83,14 @@ public class IoTScenarioDef implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.type);
         dest.writeStringList(this.scenarioFilter);
+        dest.writeByte(keepAlive ? (byte) 1 : (byte) 0);
         dest.writeSerializable(this.scenarios);
     }
 
     protected IoTScenarioDef(Parcel in) {
         this.type = in.readString();
         this.scenarioFilter = in.createStringArrayList();
+        this.keepAlive = in.readByte() != 0;
         this.scenarios = (LinkedHashMap<String, ArrayList<IoTDeviceScenario>>) in.readSerializable();
     }
 
