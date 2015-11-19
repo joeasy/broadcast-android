@@ -15,18 +15,25 @@
  *
  */
 
-package com.nbplus.iotlib.data;
+package com.nbplus.iotlib.callback;
 
-import java.io.Serializable;
+import android.os.Bundle;
+
+import com.nbplus.iotlib.data.IoTDevice;
+import com.nbplus.iotlib.data.IoTResultCodes;
+import com.nbplus.iotlib.data.IoTServiceCommand;
+import com.nbplus.iotlib.data.IoTServiceStatus;
 
 /**
  * Created by basagee on 2015. 10. 14..
  */
-public enum IoTServiceStatus implements Serializable {
-    NONE,               // use app...
-    INITIALIZE,         // default use service.
-    STOPPED,
-    RUNNING;
-
-    private static final long serialVersionUID = 1L;
+public interface IoTServiceStatusNotification {
+    /**
+     *
+     * @param cmd
+     * @param serviceStatus
+     * @param serviceStatusCode
+     * @param b
+     */
+    public void onResult(int cmd, IoTServiceStatus serviceStatus, IoTResultCodes serviceStatusCode, Bundle b);
 }

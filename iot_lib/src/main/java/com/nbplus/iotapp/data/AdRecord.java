@@ -23,6 +23,7 @@ package com.nbplus.iotapp.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -31,7 +32,8 @@ import java.util.HashMap;
  * Double Encore, Inc.
  * AdRecord
  */
-public class AdRecord implements Parcelable {
+public class AdRecord implements Parcelable, Serializable {
+    private static final long serialVersionUID = 1L;
 
     /* An incomplete list of the Bluetooth GAP AD Type identifiers */
     public static final int TYPE_FLAGS = 0x1;

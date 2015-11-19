@@ -345,6 +345,7 @@ public class BluetoothLeService extends Service {
      */
     private void broadcastUpdate(final String action, IoTHandleData data) {
         final Intent intent = new Intent(action);
+        intent.setExtrasClassLoader(IoTHandleData.class.getClassLoader());
         intent.putExtra(IoTServiceCommand.KEY_DATA, data);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -758,11 +759,11 @@ public class BluetoothLeService extends Service {
             case HANDLER_MSG_EXPIRED_SCAN_PERIOD:
                 mScanedList = new HashMap<>(mTempScanedList);
                 mTempScanedList.clear();
-                scanLeDevicePeriodically(false);
+                scanLeDevicePeriodically(false, mIsBleScanPeriodic);
                 broadcastDeviceListUpdate();
                 break;
             case HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD:
-                scanLeDevicePeriodically(true);
+                scanLeDevicePeriodically(true, mIsBleScanPeriodic);
                 break;
         }
     }
@@ -893,10 +894,32 @@ public class BluetoothLeService extends Service {
         return IoTResultCodes.SUCCESS;
     }
 
+    /**
+     * 기존에 설정된 periodic 여부에 따라 설정된다.
+     * @param enable
+     */
+    public void scanLeDevice(final boolean enable) {
+        scanLeDevicePeriodically(enable, false);
+    }
+
+    /**
+     * 일정시간마다 주기적으로 scan 을 실행
+     * @param enable
+     */
     public void scanLeDevicePeriodically(final boolean enable) {
         scanLeDevicePeriodically(enable, true);
     }
+
+    /**
+     * setPeriod의 설정값에 따라 1회 또는 반복적으로 scan 실행
+     * @param enable
+     * @param setPeriod
+     */
     public void scanLeDevicePeriodically(final boolean enable, final boolean setPeriod) {
+        mIsBleScanPeriodic = setPeriod;
+
+        Log.d(TAG, "mIsBleScanPeriodic = " + mIsBleScanPeriodic);
+
         Log.d(TAG, "scanLeDevicePeriodically enabled = " + enable);
         /**
          * You have to start a scan for Classic Bluetooth devices with startDiscovery() and a scan for Bluetooth LE devices with startLeScan().
@@ -906,6 +929,10 @@ public class BluetoothLeService extends Service {
          *       On Samsung Galaxy S3 with Android 4.3 startDiscovery() doesn't find Bluetooth LE devices.
          */
         if (enable) {
+            if (mIsLeScanning) {
+                Log.d(TAG, "Already scanning enabled...");
+                return;
+            }
             mBleServiceHandler.removeMessages(HANDLER_MSG_EXPIRED_SCAN_PERIOD);
             mBleServiceHandler.removeMessages(HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD);
 
@@ -930,15 +957,19 @@ public class BluetoothLeService extends Service {
             mBleServiceHandler.sendEmptyMessageDelayed(HANDLER_MSG_EXPIRED_SCAN_PERIOD, scanTime);
             mIsLeScanning = true;
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                BluetoothLeScanner leScanner = mBluetoothAdapter.getBluetoothLeScanner();
-                if (leScanner != null) {
-                    leScanner.stopScan(mLeScanLollipopCallback);
-
-                }
+            if (!mIsLeScanning) {
+                Log.d(TAG, "Already scanning stopped...");
             } else {
-                // deprecated api 21.
-                mBluetoothAdapter.stopLeScan(mLeScanKitkatCallback);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    BluetoothLeScanner leScanner = mBluetoothAdapter.getBluetoothLeScanner();
+                    if (leScanner != null) {
+                        leScanner.stopScan(mLeScanLollipopCallback);
+
+                    }
+                } else {
+                    // deprecated api 21.
+                    mBluetoothAdapter.stopLeScan(mLeScanKitkatCallback);
+                }
             }
             mBleServiceHandler.removeMessages(HANDLER_MSG_EXPIRED_SCAN_PERIOD);
             mBleServiceHandler.removeMessages(HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD);
@@ -948,7 +979,7 @@ public class BluetoothLeService extends Service {
                 waitTime = SCAN_WAIT_UNPLUGGED_PERIOD;         // default = 290 sec, unplugged = 약 30분.
             }
 
-            if (setPeriod) {
+            if (mIsBleScanPeriodic) {
                 Log.d(TAG, "Set.. scan wait time ms = " + waitTime);
                 mBleServiceHandler.sendEmptyMessageDelayed(HANDLER_MSG_EXPIRED_SCAN_WAIT_PERIOD, waitTime);
             }
@@ -1096,6 +1127,7 @@ public class BluetoothLeService extends Service {
      */
     private static boolean mIsBatteryPlugged = false;
     private static boolean mIsLeScanning = false;
+    private static boolean mIsBleScanPeriodic = false;
 
     /**
      * Called by the system when the service is first created.  Do not call this method directly.
@@ -1142,8 +1174,10 @@ public class BluetoothLeService extends Service {
                     // 최대 40분이상 waiting 타임이므로.. 충전상태일때의 시간텀을 가지도록.
                     // 배터리 충전중인 상태가 아니라면 그대로 둔다.
                     if (mIsBatteryPlugged && !mIsLeScanning) {
-                        scanLeDevicePeriodically(false);
-                        scanLeDevicePeriodically(true);
+                        if (mIsBleScanPeriodic) {
+                            scanLeDevicePeriodically(false);
+                            scanLeDevicePeriodically(true);
+                        }
                     }
                 }
             }

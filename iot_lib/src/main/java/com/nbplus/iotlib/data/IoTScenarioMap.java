@@ -24,6 +24,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by basagee on 2015. 10. 27..
@@ -31,8 +32,10 @@ import java.util.HashMap;
 public class IoTScenarioMap implements Parcelable {
     @SerializedName("version")
     private int version;
-    @SerializedName("map")
+    @SerializedName("regular_scenario_map")
     private HashMap<String, IoTScenarioDef> scenarioMap;
+    @SerializedName("smart_sensor_map")
+    private LinkedHashMap<String, ArrayList<IoTDeviceScenario>> smartSensorMap;
     @SerializedName("emergency_device_list")
     private ArrayList<String> emergencyCallDeviceList;
     @SerializedName("emergency_devices_scenario")
@@ -70,6 +73,14 @@ public class IoTScenarioMap implements Parcelable {
         this.emergencyCallDevicesScenarioMap = emergencyCallDevicesScenarioMap;
     }
 
+    public LinkedHashMap<String, ArrayList<IoTDeviceScenario>> getSmartSensorMap() {
+        return smartSensorMap;
+    }
+
+    public void setSmartSensorMap(LinkedHashMap<String, ArrayList<IoTDeviceScenario>> smartSensorMap) {
+        this.smartSensorMap = smartSensorMap;
+    }
+
     public IoTScenarioMap() {
     }
 
@@ -82,6 +93,7 @@ public class IoTScenarioMap implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.version);
         dest.writeSerializable(this.scenarioMap);
+        dest.writeSerializable(this.smartSensorMap);
         dest.writeStringList(this.emergencyCallDeviceList);
         dest.writeSerializable(this.emergencyCallDevicesScenarioMap);
     }
@@ -89,6 +101,7 @@ public class IoTScenarioMap implements Parcelable {
     protected IoTScenarioMap(Parcel in) {
         this.version = in.readInt();
         this.scenarioMap = (HashMap<String, IoTScenarioDef>) in.readSerializable();
+        this.smartSensorMap = (LinkedHashMap<String, ArrayList<IoTDeviceScenario>>) in.readSerializable();
         this.emergencyCallDeviceList = in.createStringArrayList();
         this.emergencyCallDevicesScenarioMap = (HashMap<String, ArrayList<IoTDeviceScenario>>) in.readSerializable();
     }

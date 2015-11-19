@@ -150,6 +150,28 @@ public class IoTCollectedData implements Parcelable {
         this.ioTData.clear();
     }
 
+    public void removeIoTData(String deviceId) {
+        if (this.ioTData == null) {
+            this.ioTData = new ArrayList<>();
+        }
+        if (this.ioTData.size() == 0) {
+            return;
+        }
+
+        int arridx = 0;
+        int[] removePos = new int[this.ioTData.size()];
+        for (int i = 0; i < this.ioTData.size(); i++) {
+            IoTData data = this.ioTData.get(i);
+            if (data.getIotDeviceId().equals(deviceId)) {
+                removePos[arridx++] = i;
+            }
+        }
+
+        for (int i = 0; i < arridx; i++) {
+            this.ioTData.remove(removePos[i]);
+        }
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -24,6 +24,8 @@ package com.nbplus.iotlib.data;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.Serializable;
+
 /**
  * 커맨드는 request, response 및 notification 으로 구성
  * 프로세스간 IPC는 Messenger를 이용한다.
@@ -41,7 +43,9 @@ import android.util.Log;
  * |KEY_SERVICE_STATUS|O|서비스 상태, IoTServiceStatus 참조|
  * |KEY_SERVICE_STATUS_CODE|O|서비스 상태 code , IoTResultCodes 참조|
  */
-public class IoTServiceCommand {
+public class IoTServiceCommand implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final int COMMAND_BASE_VALUE = 1000;
 
     // request
@@ -55,7 +59,10 @@ public class IoTServiceCommand {
     public static final int DEVICE_UN_BONDING = DEVICE_BONDING + 1;
     public static final int DEVICE_CONNECT = DEVICE_UN_BONDING + 1;
     public static final int DEVICE_DISCONNECT = DEVICE_CONNECT + 1;
-    public static final int CONTROL_DEVICE = DEVICE_DISCONNECT + 1;     // IR 등에대한 제어
+    // smart sensor
+    public static final int KEEPALIVE_DEVICE_CONNECT = DEVICE_DISCONNECT + 1;
+    public static final int KEEPALIVE_DEVICE_DISCONNECT = KEEPALIVE_DEVICE_CONNECT + 1;
+    public static final int CONTROL_DEVICE = KEEPALIVE_DEVICE_DISCONNECT + 1;     // IR 등에대한 제어
     public static final int DEVICE_READ_DATA = CONTROL_DEVICE + 1;
     public static final int DEVICE_WRITE_DATA = DEVICE_READ_DATA + 1;
     public static final int DEVICE_SET_NOTIFICATION = DEVICE_WRITE_DATA + 1;

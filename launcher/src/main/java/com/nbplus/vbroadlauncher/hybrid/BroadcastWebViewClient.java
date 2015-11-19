@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
@@ -39,21 +38,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nbplus.hybrid.BasicWebViewClient;
 import com.nbplus.media.MusicService;
-import com.nbplus.progress.ProgressDialogFragment;
 import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.BroadcastWebViewActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.data.Constants;
-import com.nbplus.vbroadlauncher.data.IoTDevicesData;
 import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.data.RegSettingData;
 import com.nbplus.vbroadlauncher.data.VBroadcastServer;
-import com.nbplus.vbroadlauncher.fragment.LoadIoTDevicesDialogFragment;
+import com.nbplus.vbroadlauncher.fragment.LoadIoTDevicesDialogFragmentStatus;
 
-import org.basdroid.common.DeviceUtils;
-import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
 import java.lang.ref.WeakReference;
@@ -75,7 +70,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     String mText2SpeechPlayText = null;
 
     // update iot device dialog
-    LoadIoTDevicesDialogFragment mLoadIoTDevicesDialogFragment;
+    LoadIoTDevicesDialogFragmentStatus mLoadIoTDevicesDialogFragment;
 
     String mIoTDiscoveringUrl = null;
 
@@ -482,7 +477,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
                 .show();
     }
     // progress bar
-    public LoadIoTDevicesDialogFragment getUpdateIoTDevicesDialogFragment() {
+    public LoadIoTDevicesDialogFragmentStatus getUpdateIoTDevicesDialogFragment() {
         return mLoadIoTDevicesDialogFragment;
     }
 
@@ -492,7 +487,7 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
 //            if (wifiEnabled) {
                 try {
                     dismissProgressDialog();
-                    mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
+                    mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragmentStatus.newInstance(null);
                     mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
                 } catch (Exception e) {
                     e.printStackTrace();

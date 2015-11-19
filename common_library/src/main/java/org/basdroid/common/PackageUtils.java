@@ -121,9 +121,15 @@ public class PackageUtils {
         return activePackages;
     }
 
+
     public static String[] getActivePackages(Context context) {
         final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         final Set<String> activePackages = new HashSet<String>();
+
+//        final List<ActivityManager.AppTask> tasks = activityManager.getAppTasks();
+//        for (ActivityManager.AppTask task : tasks) {
+//            activePackages.add(task.getTaskInfo().baseIntent.getComponent().getPackageName());
+//        }
         final List<ActivityManager.RunningAppProcessInfo> processInfos = activityManager.getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
             if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {

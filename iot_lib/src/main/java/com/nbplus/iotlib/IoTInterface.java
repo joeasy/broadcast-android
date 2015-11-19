@@ -49,7 +49,8 @@ import com.nbplus.iotapp.service.IoTService;
 import com.nbplus.iotlib.api.BaseApiResult;
 import com.nbplus.iotlib.api.IoTCollectedData;
 import com.nbplus.iotlib.api.SendIoTDeviceDataTask;
-import com.nbplus.iotlib.callback.IoTServiceResponse;
+import com.nbplus.iotlib.callback.IoTServiceStatusNotification;
+import com.nbplus.iotlib.callback.SmartSensorNotification;
 import com.nbplus.iotlib.data.IoTConstants;
 import com.nbplus.iotlib.data.DeviceTypes;
 import com.nbplus.iotlib.data.IoTDevice;
@@ -91,6 +92,7 @@ public class IoTInterface {
      * 1시간이다.
      */
     private static final int RETRIEVE_IOT_DEVICE_DATA_PERIOD = 30 * 60 * 1000;
+    private static final int MAX_KEEP_ALIVE_CONNECTED_DEVICE_SIZE = 3;
 
     // haneler
     private static final int HANDLER_RETRIEVE_IOT_DEVICES = IoTServiceCommand.COMMAND_BASE_VALUE - 1;
@@ -130,7 +132,8 @@ public class IoTInterface {
     private Context mCtx;
     private boolean mInitialized = false;
 
-    WeakReference<IoTServiceResponse> mForceRescanCallback = null;
+    WeakReference<IoTServiceStatusNotification> mForceRescanCallback = null;
+    HashMap<String, SmartSensorNotification> mSensorNotificationCallbacks = new HashMap<>();
 
     /**
      * known IoT device scenarios
@@ -140,15 +143,14 @@ public class IoTInterface {
     /**
      * 10초동안 검색된 device list 를 저장해 두는 공간
      */
-    private HashMap<String, IoTDevice> mScanedList = new HashMap<>();
+    private HashMap<String, IoTDevice> mBondedWithServerList = new HashMap<>();
+    private HashMap<String, IoTDevice> mKeepAliveDeviceList = new HashMap<>();
     private long mLastSendCollectedDataToServer = 0L;
 
     // 긴급호출 디바이스 수집 목록
     private ArrayList<IoTDevice> mEmergencyDeviceList = new ArrayList<>();
     private boolean mIsEmergencyDataCollecting = false;
     private boolean mIsWaitingForceDataSync = false;
-
-    private int mBondedWithServerCount = 0;
 
     // 데이터 수집중인 디바이스 정보
     private int mCurrentRetrieveIndex = -1;
@@ -257,17 +259,16 @@ public class IoTInterface {
             String savedJson = IoTServicePreference.getIoTDevicesList(mCtx);
             if (!StringUtils.isEmptyString(savedJson)) {
                 Log.d(TAG, ">> scanned list json string = " + savedJson);
-                mScanedList = mGson.fromJson(savedJson, new TypeToken<HashMap<String, IoTDevice>>() {
-                }.getType());
-                Iterator<String> iter = mScanedList.keySet().iterator();
+                mBondedWithServerList = mGson.fromJson(savedJson, new TypeToken<HashMap<String, IoTDevice>>() {}.getType());
+
+                // 알려진 디바이스 타입은 변경이 될수 있으므로
+                // 저장된 데이터를 로드하는 시점에 다시 설정해준다.
+                Iterator<String> iter = mBondedWithServerList.keySet().iterator();
 
                 while (iter.hasNext()) {
                     String key = iter.next();
-                    if (mScanedList.get(key).isBondedWithServer()) {
-                        mBondedWithServerCount++;
-                    }
-                    mScanedList.get(key).setIsKnownDevice(isKnownScenarioDevice(mScanedList.get(key).getDeviceTypeId(),
-                            mScanedList.get(key).getUuids(), mScanedList.get(key).getUuidLen()));
+                    mBondedWithServerList.get(key).setIsKnownDevice(isKnownScenarioDevice(mBondedWithServerList.get(key).getDeviceTypeId(),
+                            mBondedWithServerList.get(key).getUuids(), mBondedWithServerList.get(key).getUuidLen()));
                 }
             }
         } catch (Exception e) {
@@ -330,7 +331,11 @@ public class IoTInterface {
 
         @Override
         public void handleMessage(Message msg) {
-            handleServiceMessage(msg);
+            try {
+                handleServiceMessage(msg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -365,15 +370,22 @@ public class IoTInterface {
                     Log.w(TAG, "bundle data is null");
                     return;
                 }
-                mServiceStatus = (IoTServiceStatus)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS);
+                b.setClassLoader(IoTServiceStatus.class.getClassLoader());
+                IoTServiceStatus serviceStatus = (IoTServiceStatus)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS);
+                if (mServiceStatus.equals(serviceStatus)) {
+                    Log.w(TAG, "same service status received.");
+                    return;
+                }
+                mServiceStatus = serviceStatus;
                 if (mServiceStatus == IoTServiceStatus.RUNNING) {
-                    /**
-                     * IoT 디바이스 상태를 조회한다.
-                     */
+                    if (mBondedWithServerList.size() > 0) {
+                        Bundle extras = new Bundle();
+                        extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
+                        sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
+                    }
+                    // IoT 디바이스 상태를 조회한다.
                     mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
-                    // 서비스 시작 후 1분이 지난시점부터.
-                    mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 60 * 1000);
-                    sendCollectedDataToServer();
+                    mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 10 * 1000);
                 } else {
                     mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                     mHandler.removeMessages(HANDLER_COMMAND_NOT_RESPOND);
@@ -399,6 +411,7 @@ public class IoTInterface {
                 intent.putExtra(IoTConstants.EXTRA_SERVICE_STATUS, (mServiceStatus == IoTServiceStatus.RUNNING));
                 LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
 
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 mErrorCodes = (IoTResultCodes)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE);
                 Log.d(TAG, "IoTServiceCommand.SERVICE_STATUS_NOTIFICATION : status = " + mServiceStatus + ", errCode = " + mErrorCodes);
                 break;
@@ -429,12 +442,14 @@ public class IoTInterface {
                 Log.d(TAG, "IoTServiceCommand.DEVICE_SET_NOTIFICATION_RESULT received");
 
                 Bundle b = msg.getData();
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
                 if (IoTResultCodes.SUCCESS.equals(resultCode)) {
                     // success set notifications.
                     Log.d(TAG, "success set notification.. proceed next command");
 
-                    IoTHandleData resultData = (IoTHandleData)b.getParcelable(IoTServiceCommand.KEY_DATA);
+                    b.setClassLoader(IoTHandleData.class.getClassLoader());
+                    IoTHandleData resultData = b.getParcelable(IoTServiceCommand.KEY_DATA);
                     if (resultData != null) {
                         // xiaomi
                         if (resultData.getCharacteristicUuid().equals(GattAttributes.MISCALE_CHARACTERISTIC_2A2F)) {
@@ -454,7 +469,10 @@ public class IoTInterface {
                     // fail set notifications.
                     Log.d(TAG, "fail set notification.. disconnect device");
                     mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                    mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                    Message disconnMsg = new Message();
+                    disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                    disconnMsg.arg1 = 1;
+                    mHandler.sendMessage(disconnMsg);
                 }
                 break;
             }
@@ -463,25 +481,31 @@ public class IoTInterface {
             case IoTServiceCommand.DEVICE_NOTIFICATION_DATA: {
                 // read 인지 notification 인지 구분해야 한다.
                 Log.d(TAG, "IoTServiceCommand.DEVICE_NOTIFICATION_DATA received");
-                Bundle b = msg.getData();
-                IoTHandleData resultData = (IoTHandleData)b.getParcelable(IoTServiceCommand.KEY_DATA);
-                if (resultData != null) {
-                    // xiaomi
-                    if (resultData.getCharacteristicUuid().equals(GattAttributes.MISCALE_CHARACTERISTIC_2A2F)) {
-                        handleXiaomiScale(msg.what, resultData);
-                    } else if (resultData.getCharacteristicUuid().equals(GattAttributes.SMART_SENSOR)) {
-                        handleSmartSensor(msg.what, resultData);
-                    } else if (resultData.getServiceUuid().equals(GattAttributes.GLUCOSE_SERVICE_UUID)) {
-                        handleGlucoseMeasurement(msg.what, resultData);
-                    }
-                    else {
-                        if (mIsEmergencyDataCollecting) {
-                            handleSmartBand(msg.what, resultData);
-                        } else {
-                            // TODO : what???
-                            proceedDeviceCommand();
+
+                try {
+                    Bundle b = msg.getData();
+                    b.setClassLoader(IoTHandleData.class.getClassLoader());
+                    IoTHandleData resultData = b.getParcelable(IoTServiceCommand.KEY_DATA);
+                    if (resultData != null) {
+                        // xiaomi
+                        if (resultData.getCharacteristicUuid().equals(GattAttributes.MISCALE_CHARACTERISTIC_2A2F)) {
+                            handleXiaomiScale(msg.what, resultData);
+                        } else if (resultData.getCharacteristicUuid().equals(GattAttributes.SMART_SENSOR)) {
+                            handleSmartSensor(msg.what, resultData);
+                        } else if (resultData.getServiceUuid().equals(GattAttributes.GLUCOSE_SERVICE_UUID)) {
+                            handleGlucoseMeasurement(msg.what, resultData);
+                        }
+                        else {
+                            if (mIsEmergencyDataCollecting) {
+                                handleSmartBand(msg.what, resultData);
+                            } else {
+                                // TODO : what???
+                                proceedDeviceCommand();
+                            }
                         }
                     }
+                } catch (Exception e) {
+
                 }
                 break;
             }
@@ -492,7 +516,11 @@ public class IoTInterface {
                     Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
                     LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
                 } else {
-                    sendMessageToService(IoTServiceCommand.SCANNING_STOP, null);
+                    // 모든 조회가 완료되기 전까지 스캐닝 자체를 중지시킨다.
+                    Bundle extras = new Bundle();
+                    extras.putBoolean(IoTServiceCommand.KEY_DATA, false);
+                    sendMessageToService(IoTServiceCommand.SCANNING_STOP, extras);
+
                     mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                     sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT_ALL, null);
                 }
@@ -501,7 +529,9 @@ public class IoTInterface {
 
             case HANDLER_WAIT_FOR_NOTIFY_DATA : {
                 mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                if (mCurrentRetrieveDevice == null) {
+                if (mCurrentRetrieveDevice == null || msg.arg1 == 0) {
+                    // 스마트센서와 같이 항상연결되는 단말인 경우... 에는
+                    // 실제 커넥션을 종료하지 않는다.
                     return;
                 }
                 Log.w(TAG, "I have no more scenario for this device = " + mCurrentRetrieveDevice.getDeviceName());
@@ -567,10 +597,16 @@ public class IoTInterface {
                 break;
             }
             case IoTServiceCommand.REGISTER_SERVICE : {
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
                 if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
                     // success
                     Log.d(TAG, ">> IoT Register service success...");
+                    if (mBondedWithServerList.size() > 0) {
+                        Bundle extras = new Bundle();
+                        extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
+                        sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
+                    }
                 } else {
                     Log.w(TAG, ">> IoT Register service failed code = " + resultCode);
                     mErrorCodes = resultCode;
@@ -578,6 +614,7 @@ public class IoTInterface {
                 break;
             }
             case IoTServiceCommand.UNREGISTER_SERVICE: {
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
                 if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
                     // success
@@ -589,12 +626,20 @@ public class IoTInterface {
             }
 
             case IoTServiceCommand.DEVICE_CONNECT: {
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
                 if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
                     // success
                     Log.d(TAG, ">> IoT DEVICE_CONNECT success...");
                 } else {
                     Log.w(TAG, ">> IoT DEVICE_CONNECT failed code = " + resultCode);
+                    String deviceId = b.getString(IoTServiceCommand.KEY_DEVICE_UUID);
+                    if (deviceId != null && mKeepAliveDeviceList.containsKey(deviceId)) {
+                        Log.d(TAG, "Keep alive device connection failed.");
+                        mKeepAliveDeviceList.remove(deviceId);
+                        return;
+                    }
+
                     if (IoTResultCodes.DEVICE_CONNECTION_NOT_RESPOND.equals(resultCode) &&
                             mConnectionRetryCount < MAX_CONNECTION_RETRY) {
                         if (mServiceStatus != IoTServiceStatus.RUNNING) {
@@ -630,7 +675,7 @@ public class IoTInterface {
                     if (mIsEmergencyDataCollecting) {
                         sendConnectToEmergencyDevice();
                     } else {
-                        if (mCurrentRetrieveIndex + 1 < mScanedList.size()) {
+                        if (mCurrentRetrieveIndex + 1 < mBondedWithServerList.size()) {
                             mCurrentRetrieveIndex++;
                             sendConnectToDeviceMessage(mCurrentRetrieveIndex);
                         } else {
@@ -648,6 +693,7 @@ public class IoTInterface {
             }
 
             case IoTServiceCommand.DEVICE_DISCONNECT: {
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
                 if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
                     // success
@@ -657,7 +703,7 @@ public class IoTInterface {
                     if (mIsEmergencyDataCollecting) {
                         sendConnectToEmergencyDevice();
                     } else {
-                        if (mCurrentRetrieveIndex + 1 < mScanedList.size()) {
+                        if (mCurrentRetrieveIndex + 1 < mBondedWithServerList.size()) {
                             mCurrentRetrieveIndex++;
                             sendConnectToDeviceMessage(mCurrentRetrieveIndex);
                         } else {
@@ -676,6 +722,7 @@ public class IoTInterface {
             case IoTServiceCommand.DEVICE_READ_DATA:
             case IoTServiceCommand.DEVICE_WRITE_DATA:
             case IoTServiceCommand.DEVICE_SET_NOTIFICATION: {
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
                 IoTResultCodes resultCode = (IoTResultCodes) b.getSerializable(IoTServiceCommand.KEY_RESULT);
                 if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
                     // success
@@ -683,7 +730,10 @@ public class IoTInterface {
                 } else {
                     Log.e(TAG, ">> IoT READ_WRITE_SET_NOTIFICATION failed code = " + resultCode);
                     mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                    mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                    Message disconnMsg = new Message();
+                    disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                    disconnMsg.arg1 = 1;
+                    mHandler.sendMessage(disconnMsg);
                 }
                 break;
             }
@@ -805,10 +855,10 @@ public class IoTInterface {
     /**
      * public methods
      */
-    public void getDevicesList(DeviceTypes type, final IoTServiceResponse callback) {
+    public void getDevicesList(DeviceTypes type, final IoTServiceStatusNotification callback) {
         getDevicesList(type, callback, false);
     }
-    public void getDevicesList(DeviceTypes type, final IoTServiceResponse callback, boolean forceRescan) {
+    public void getDevicesList(DeviceTypes type, final IoTServiceStatusNotification callback, boolean forceRescan) {
         if (!mInitialized) {
             InitializeRequiredException initException = new InitializeRequiredException("Init required Exception!!");
 
@@ -854,8 +904,8 @@ public class IoTInterface {
                     public void run() {
                         Bundle b = new Bundle();
                         ArrayList<IoTDevice> devicesList = null;
-                        if (mScanedList != null && mScanedList.size() > 0) {
-                            devicesList = new ArrayList<>(mScanedList.values());
+                        if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
+                            devicesList = new ArrayList<>(mBondedWithServerList.values());
                         } else {
                             devicesList = new ArrayList<>();
                         }
@@ -869,15 +919,6 @@ public class IoTInterface {
             // bound 진행중?
             String msgId = IoTServiceCommand.generateMessageId(mCtx);
             mForceRescanCallback = new WeakReference<>(callback);
-            //mWaitingRequestCallbaks.put(msgId, new WeakReference<>(callback));
-            // REGISTER 가 잘못되었다.???
-            // 개발시에 처리되어야 한다.
-//            try {
-//                throw new NotRegisteredException("Not registered !!!");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return;
         } else {
             // stop 상태.. 어플리케이션에 서비스상태와 에러코드를 돌려준다.
             mHandler.postDelayed(new Runnable() {
@@ -1005,10 +1046,10 @@ public class IoTInterface {
 
     private void sendConnectToDeviceMessage(int idx) {
         Log.d(TAG, "Retrieving next devices.. idx = " + idx);
-        Iterator<String> iter = mScanedList.keySet().iterator();
+        Iterator<String> iter = mBondedWithServerList.keySet().iterator();
         int i = 0;
 
-        if (idx >= mScanedList.size()) {
+        if (idx >= mBondedWithServerList.size()) {
             // 마지막 아이템이다.
             mCurrentRetrieveIndex = -1;
             mCurrentRetrieveDevice = null;
@@ -1016,6 +1057,7 @@ public class IoTInterface {
             mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
             mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD);
             sendCollectedDataToServer();
+            return;
         }
 
         boolean sendSuccess = false;
@@ -1028,7 +1070,7 @@ public class IoTInterface {
 
             i++;
             String key = iter.next();
-            IoTDevice device = mScanedList.get(key);
+            IoTDevice device = mBondedWithServerList.get(key);
             if (!device.isBondedWithServer()) {
                 Log.d(TAG, key + " device is not bonded with server. skip this device.");
                 mCurrentRetrieveIndex++;
@@ -1088,7 +1130,11 @@ public class IoTInterface {
             mCurrentRetrieveIndex = -1;
             mCurrentRetrieveDevice = null;
 
-            sendMessageToService(IoTServiceCommand.SCANNING_START, null);
+            if (mBondedWithServerList.size() > 0) {
+                Bundle b = new Bundle();
+                b.putBoolean(IoTServiceCommand.KEY_DATA, true);
+                sendMessageToService(IoTServiceCommand.SCANNING_START, b);
+            }
             mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
 
             long currTimeMs = System.currentTimeMillis();
@@ -1116,89 +1162,124 @@ public class IoTInterface {
         }
 
         mEmergencyDeviceList.clear();
-        HashMap<String, IoTDevice> scannedDevices = (HashMap<String, IoTDevice>)b.getSerializable(IoTServiceCommand.KEY_DATA);
+        b.setClassLoader(IoTDevice.class.getClassLoader());
+        final HashMap<String, IoTDevice> scannedDevices = (HashMap<String, IoTDevice>)b.getSerializable(IoTServiceCommand.KEY_DATA);
         if (scannedDevices == null || scannedDevices.size() == 0) {
             Log.w(TAG, "empty device list");
-            //return;
+            return;
         }
 
-        if (scannedDevices == null) {
-            scannedDevices = new HashMap<>();
-        }
         boolean changed = false;
         Iterator<String> iter = scannedDevices.keySet().iterator();
         Log.d(TAG, "IoTServiceCommand.GET_DEVICE_LIST added size = " + scannedDevices.size());
         while(iter.hasNext()) {
             String key = iter.next();
-            IoTDevice device = mScanedList.get(key);
+            IoTDevice bondedDevice = mBondedWithServerList.get(key);
 
             IoTDevice scannedDevice = scannedDevices.get(key);
             Log.d(TAG, "check " + key + " is exist or new...");
-            if (device != null) {           // already exist
-                if (scannedDevice.getUuids() == null || scannedDevice.getUuids().size() == 0) {
-                    Log.e(TAG, ">>> xx device name " + device.getDeviceName() + " has no uuid advertisement");
-                    continue;
+            // 서버에 등록되지 않은 단말은 사용자가 등록하기 전까지는 무시해도 된다.
+            if (bondedDevice == null) {
+                continue;
+            }
+
+//            if (bondedDevice != null) {           // already exist
+            if (scannedDevice.getUuids() == null || scannedDevice.getUuids().size() == 0) {
+                Log.e(TAG, ">>> xx device name " + bondedDevice.getDeviceName() + " has no uuid advertisement");
+                continue;
+            }
+            ArrayList<String> deviceUuids = bondedDevice.getUuids();
+            if (deviceUuids == null || deviceUuids.size() == 0) {
+                if (bondedDevice.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
+                    bondedDevice.setAdRecordHashMap(scannedDevice.getAdRecordHashMap());
+                    bondedDevice.setUuids(scannedDevice.getUuids());
+                    bondedDevice.setUuidLen(scannedDevice.getUuidLen());
                 }
-                ArrayList<String> deviceUuids = device.getUuids();
-                if (deviceUuids == null || deviceUuids.size() == 0) {
-                    if (device.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
-                        device.setAdRecordHashMap(scannedDevice.getAdRecordHashMap());
-                        device.setUuids(scannedDevice.getUuids());
-                        device.setUuidLen(scannedDevice.getUuidLen());
+                bondedDevice.setIsKnownDevice(isKnownScenarioDevice(bondedDevice.getDeviceTypeId(), bondedDevice.getUuids(), bondedDevice.getUuidLen()));
+                mBondedWithServerList.put(key, bondedDevice);
+                changed = true;
+            } else {
+                if (!scannedDevice.getUuids().equals(deviceUuids)) {
+                    if (bondedDevice.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
+                        bondedDevice.setAdRecordHashMap(scannedDevice.getAdRecordHashMap());
+                        bondedDevice.setUuids(scannedDevice.getUuids());
+                        bondedDevice.setUuidLen(scannedDevice.getUuidLen());
                     }
-                    device.setIsKnownDevice(isKnownScenarioDevice(device.getDeviceTypeId(), device.getUuids(), device.getUuidLen()));
-                    mScanedList.put(key, device);
+                    bondedDevice.setIsKnownDevice(isKnownScenarioDevice(bondedDevice.getDeviceTypeId(), bondedDevice.getUuids(), bondedDevice.getUuidLen()));
+                    mBondedWithServerList.put(key, bondedDevice);
                     changed = true;
-                } else {
-                    if (!scannedDevice.getUuids().equals(deviceUuids)) {
-                        if (device.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
-                            device.setAdRecordHashMap(scannedDevice.getAdRecordHashMap());
-                            device.setUuids(scannedDevice.getUuids());
-                            device.setUuidLen(scannedDevice.getUuidLen());
-                        }
-                        device.setIsKnownDevice(isKnownScenarioDevice(device.getDeviceTypeId(), device.getUuids(), device.getUuidLen()));
-                        mScanedList.put(key, device);
-                        changed = true;
+                }
+            }
+            // do nothing...
+            // 서버에 등록되지 않은 단말은 사용자가 등록하기 전까지는 무시해도 된다.
+//            } else {
+//                ArrayList<String> uuids = DataParser.getUuids(scannedDevice.getAdRecordHashMap());
+//                if (uuids == null || uuids.size() == 0) {
+//                    Log.e(TAG, ">>> device name " + scannedDevice.getDeviceName() + " has no uuid advertisement");
+//                    continue;
+//                }
+//                scannedDevice.setUuids(uuids);
+//                scannedDevice.setUuidLen(DataParser.getUuidLength(scannedDevice.getAdRecordHashMap()));
+//                scannedDevice.setIsKnownDevice(isKnownScenarioDevice(scannedDevice.getDeviceTypeId(), scannedDevice.getUuids(), scannedDevice.getUuidLen()));
+//
+//                bondedDevice = scannedDevice;
+//                mBondedWithServerList.put(bondedDevice.getDeviceId(), bondedDevice);
+//                changed = true;
+//            }
+
+            // 등록된 긴급호출 디바이스인 경우.
+            if (bondedDevice.isBondedWithServer() && isEmergencyCallDevice(bondedDevice.getDeviceTypeId(), bondedDevice.getUuids(),
+                    bondedDevice.getUuidLen())) {
+                Log.d(TAG, "Emergency call device broadcast received : " + bondedDevice.getDeviceId());
+
+                mEmergencyDeviceList.add(bondedDevice);
+            }
+
+            // 스마트 센서와 같이 항상 연결하여 데이터를 Notification 하는 디바이스.
+            if (bondedDevice.isBondedWithServer() && isKeepAliveDevice(bondedDevice)) {
+                Log.d(TAG, "Smart sensor device found device ID = " + bondedDevice.getDeviceId());
+
+                if (!mKeepAliveDeviceList.containsKey(bondedDevice.getDeviceId())) {
+                    // 항상 연결되는 디바이스는 최대 3개로 제한한다.
+                    if (mKeepAliveDeviceList.size() >= MAX_KEEP_ALIVE_CONNECTED_DEVICE_SIZE) {
+                        Log.d(TAG, "MAX_KEEP_ALIVE_CONNECTED_DEVICE_SIZE reached....");
+                        // do nothing.
+                    } else {
+                        mKeepAliveDeviceList.put(bondedDevice.getDeviceId(), bondedDevice);
+                        Bundle extras = new Bundle();
+                        IoTHandleData data = new IoTHandleData();
+                        data.setDeviceId(bondedDevice.getDeviceId());
+                        data.setDeviceTypeId(bondedDevice.getDeviceTypeId());
+                        data.setIsKeepAliveDevice(true);
+
+                        extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
+                        sendMessageToService(IoTServiceCommand.DEVICE_CONNECT, extras);
                     }
+                } else {
+                    Log.d(TAG, "This device already connected. and collecting data... ");
                 }
-
-                // 등록된 긴급호출 디바이스인 경우.
-                if (device.isBondedWithServer() && isEmergencyCallDevice(scannedDevice.getDeviceTypeId(), scannedDevice.getUuids(),
-                        scannedDevice.getUuidLen())) {
-                    Log.d(TAG, "Emergency call device broadcast received : " + device.getDeviceId());
-
-                    mEmergencyDeviceList.add(device);
-                }
-
-                continue;
             }
-
-            ArrayList<String> uuids = DataParser.getUuids(scannedDevice.getAdRecordHashMap());
-            if (uuids == null || uuids.size() == 0) {
-                Log.e(TAG, ">>> device name " + scannedDevice.getDeviceName() + " has no uuid advertisement");
-                continue;
-            }
-            changed = true;
-            scannedDevice.setUuids(uuids);
-            scannedDevice.setUuidLen(DataParser.getUuidLength(scannedDevice.getAdRecordHashMap()));
-            scannedDevice.setIsKnownDevice(isKnownScenarioDevice(scannedDevice.getDeviceTypeId(), scannedDevice.getUuids(), scannedDevice.getUuidLen()));
-            mScanedList.put(scannedDevice.getDeviceId(), scannedDevice);
         }
 
         if (changed) {
             // save to preference.
-            String json = mGson.toJson(mScanedList);
+            String json = mGson.toJson(mBondedWithServerList);
             if (json != null) {
                 IoTServicePreference.setIoTDevicesList(mCtx, json);
             }
         }
-        Log.d(TAG, "Current device size = " + mScanedList.size());
+        Log.d(TAG, "Current device size = " + mBondedWithServerList.size());
         if (mEmergencyDeviceList.size() > 0) {
             // 긴급호출데이터 수집 및 초기화 시작
             long currTimeMs = System.currentTimeMillis();
             if (currTimeMs - mLastEmergencyDeviceFoundTimeMs > 1 * 60 * 1000) {
                 mIsEmergencyDataCollecting = true;
-                sendMessageToService(IoTServiceCommand.SCANNING_STOP, null);
+
+                // 모든 조회가 완료되기 전까지 스캐닝 자체를 중지시킨다.
+                Bundle extras = new Bundle();
+                extras.putBoolean(IoTServiceCommand.KEY_DATA, false);
+                sendMessageToService(IoTServiceCommand.SCANNING_STOP, extras);
+
                 mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                 sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT_ALL, null);
             } else {
@@ -1212,19 +1293,33 @@ public class IoTInterface {
             return;
         }
 
-        final IoTServiceResponse responseCallback = mForceRescanCallback.get();
+        final IoTServiceStatusNotification responseCallback = mForceRescanCallback.get();
         if (responseCallback != null) {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     Bundle b = new Bundle();
                     ArrayList<IoTDevice> devicesList = null;
-                    if (mScanedList != null && mScanedList.size() > 0) {
-                        devicesList = new ArrayList<>(mScanedList.values());
+                    if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
+                        devicesList = new ArrayList<>(mBondedWithServerList.values());
                     } else {
                         devicesList = new ArrayList<>();
                     }
 
+                    // 중복제거
+                    ArrayList<String> deviceIdList = new ArrayList<>();
+                    for (int i = 0; i < devicesList.size(); i++) {
+                        deviceIdList.add(devicesList.get(i).getDeviceId());
+                    }
+
+                    ArrayList<IoTDevice> scannedDevicesList = new ArrayList<>(scannedDevices.values());
+                    for (int i = 0; i < scannedDevicesList.size(); i++) {
+                        if (deviceIdList.contains(scannedDevicesList.get(i).getDeviceId())) {
+                            Log.d(TAG, "mForceRescanCallback device id " + scannedDevicesList.get(i).getDeviceId() + " is already added.");
+                            continue;
+                        }
+                        devicesList.add(scannedDevicesList.get(i));
+                    }
                     b.putParcelableArrayList(IoTServiceCommand.KEY_DATA, devicesList);
                     responseCallback.onResult(IoTServiceCommand.GET_DEVICE_LIST, mServiceStatus, mErrorCodes, b);
                 }
@@ -1233,14 +1328,24 @@ public class IoTInterface {
         mForceRescanCallback = null;
         // TODO : log
         if (BuildConfig.DEBUG) {
-            iter = mScanedList.keySet().iterator();
+            iter = mBondedWithServerList.keySet().iterator();
             while (iter.hasNext()) {
                 String key = iter.next();
-                IoTDevice device = mScanedList.get(key);
+                IoTDevice device = mBondedWithServerList.get(key);
 
                 printScanDeviceInformation(device);
             }
         }
+
+    }
+
+    /**
+     * 검색된 디바이스가 항상 연결되어야 하는 경우라면 keep alive device 리스트에 넣는다.
+     * 최대 3개까지만 가능하다.
+     *
+     * @param device
+     */
+    private void addKeepAliveDevice(IoTDevice device) {
 
     }
 
@@ -1256,15 +1361,25 @@ public class IoTInterface {
             return;
         }
 
+        if (mKeepAliveDeviceList.containsKey(deviceUuid)) {
+            Log.d(TAG, "Keep alive device connection success.");
+            mKeepAliveDeviceList.get(deviceUuid).setScenarioPosition(0);
+            mKeepAliveDeviceList.get(deviceUuid).setDeviceScenario(getKeepAliveDeviceScenario(mKeepAliveDeviceList.get(deviceUuid)));
+            proceedKeepAliveDeviceCommand(deviceUuid);
+            return;
+        }
+
         if (mCurrentRetrieveDevice == null || !deviceUuid.equals(mCurrentRetrieveDevice.getDeviceId())) {
             Log.w(TAG, "current retrieve device is empty or not matched..");
-            Log.w(TAG, "mCurrentRetrieveDevice.getDeviceId() = " + mCurrentRetrieveDevice.getDeviceId());
+            if (mCurrentRetrieveDevice != null) {
+                Log.w(TAG, "mCurrentRetrieveDevice.getDeviceId() = " + mCurrentRetrieveDevice.getDeviceId());
+            }
             Log.w(TAG, "connected device getDeviceId() = " + deviceUuid);
 
             Bundle extras = new Bundle();
             IoTHandleData data = new IoTHandleData();
             data.setDeviceId(deviceUuid);
-            data.setDeviceTypeId(mCurrentRetrieveDevice.getDeviceTypeId());
+            //data.setDeviceTypeId(mCurrentRetrieveDevice.getDeviceTypeId());
 
             extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
             sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT, extras);
@@ -1272,6 +1387,7 @@ public class IoTInterface {
         }
 
         mConnectionRetryCount = 0;
+        b.setClassLoader(ArrayList.class.getClassLoader());
         HashMap<String, ArrayList<String>> disCoveredServices =
                 (HashMap<String, ArrayList<String>>)b.getSerializable(IoTServiceCommand.KEY_DATA);
         if (disCoveredServices == null || disCoveredServices.size() == 0) {
@@ -1300,6 +1416,7 @@ public class IoTInterface {
             Bundle extras = new Bundle();
             IoTHandleData data = new IoTHandleData();
             data.setDeviceId(deviceUuid);
+            data.setDeviceTypeId(mCurrentRetrieveDevice.getDeviceTypeId());
 
             extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
             sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT, extras);
@@ -1394,19 +1511,13 @@ public class IoTInterface {
         for (int i = 0; i < uuids.size(); i++) {
             if (device.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
                 int uuidLen = device.getUuidLen();
-                switch (uuidLen) {
-                    case IoTDevice.DEVICE_BT_UUID_LEN_16 :
-                        uuid = String.format(GattAttributes.GATT_BASE_UUID128_FROM_UUID16_FORMATTING, uuids.get(i));
-                        break;
-                    case IoTDevice.DEVICE_BT_UUID_LEN_32 :
-                        uuid = String.format(GattAttributes.GATT_BASE_UUID128_FROM_UUID32_FORMATTING, uuids.get(i));
-                        break;
-                    case IoTDevice.DEVICE_BT_UUID_LEN_128 :
-                        uuid = uuids.get(i);
-                        break;
-                }
+                uuid = getBluetoothUuid128(uuidLen, uuids.get(i));
             } else {
                 uuid = uuids.get(i);
+            }
+
+            if (uuid == null) {
+                continue;
             }
 
             ioTScenarioDef = mIoTScenarioMap.getScenarioMap().get(uuid);
@@ -1455,19 +1566,13 @@ public class IoTInterface {
         for (int i = 0; i < uuids.size(); i++) {
             if (device.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
                 int uuidLen = device.getUuidLen();
-                switch (uuidLen) {
-                    case IoTDevice.DEVICE_BT_UUID_LEN_16 :
-                        uuid = String.format(GattAttributes.GATT_BASE_UUID128_FROM_UUID16_FORMATTING, uuids.get(i));
-                        break;
-                    case IoTDevice.DEVICE_BT_UUID_LEN_32 :
-                        uuid = String.format(GattAttributes.GATT_BASE_UUID128_FROM_UUID32_FORMATTING, uuids.get(i));
-                        break;
-                    case IoTDevice.DEVICE_BT_UUID_LEN_128 :
-                        uuid = uuids.get(i);
-                        break;
-                }
+                uuid = getBluetoothUuid128(uuidLen, uuids.get(i));
             } else {
                 uuid = uuids.get(i);
+            }
+
+            if (uuid == null) {
+                continue;
             }
 
             ioTScenarios = mIoTScenarioMap.getEmergencyCallDevicesScenarioMap().get(uuid);
@@ -1484,14 +1589,100 @@ public class IoTInterface {
         return ioTScenarios;
     }
 
-    private void handleDeviceDisconnectedNotification(Bundle b) {
-        if (mCurrentRetrieveIndex == -1 && mCurrentRetrieveDevice == null) {
-            return;
+    private boolean isKeepAliveDevice(IoTDevice device) {
+        if (device == null) {
+            return false;
         }
 
+        ArrayList<String> uuids = device.getUuids();
+        String uuid = null;
+
+        for (int i = 0; i < uuids.size(); i++) {
+            if (device.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
+                int uuidLen = device.getUuidLen();
+                uuid = getBluetoothUuid128(uuidLen, uuids.get(i));
+            } else {
+                uuid = uuids.get(i);
+            }
+
+            if (uuid == null) {
+                continue;
+            }
+
+            if (mIoTScenarioMap.getSmartSensorMap().containsKey(uuid)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private ArrayList<IoTDeviceScenario> getKeepAliveDeviceScenario(IoTDevice device) {
+        if (device == null) {
+            return null;
+        }
+
+        ArrayList<String> uuids = device.getUuids();
+        ArrayList<IoTDeviceScenario> ioTScenarios = null;
+        String uuid = null;
+
+        for (int i = 0; i < uuids.size(); i++) {
+            if (device.getDeviceTypeId() == IoTDevice.DEVICE_TYPE_ID_BT) {
+                int uuidLen = device.getUuidLen();
+                uuid = getBluetoothUuid128(uuidLen, uuids.get(i));
+            } else {
+                uuid = uuids.get(i);
+            }
+
+            if (uuid == null) {
+                continue;
+            }
+
+            ioTScenarios = mIoTScenarioMap.getSmartSensorMap().get(uuid);
+            if (ioTScenarios != null) {
+                break;
+            }
+        }
+
+        if (ioTScenarios == null) {
+            Log.w(TAG, "getEmergencyDeviceScenario() ioTScenarios is null");
+            return null;
+        }
+
+        return ioTScenarios;
+    }
+
+    private String getBluetoothUuid128(int uuidLen, String uuid) {
+        String uuid128 = "";
+        switch (uuidLen) {
+            case IoTDevice.DEVICE_BT_UUID_LEN_16 :
+                uuid128 = String.format(GattAttributes.GATT_BASE_UUID128_FROM_UUID16_FORMATTING, uuid);
+                break;
+            case IoTDevice.DEVICE_BT_UUID_LEN_32 :
+                uuid128 = String.format(GattAttributes.GATT_BASE_UUID128_FROM_UUID32_FORMATTING, uuid);
+                break;
+            case IoTDevice.DEVICE_BT_UUID_LEN_128 :
+                uuid128 = uuid;
+                break;
+        }
+
+        return uuid128;
+    }
+
+    private void handleDeviceDisconnectedNotification(Bundle b) {
         String deviceUuid = b.getString(IoTServiceCommand.KEY_DEVICE_UUID);
         if (StringUtils.isEmptyString(deviceUuid)) {
             Log.w(TAG, "deviceUuid is null");
+            return;
+        }
+
+        if (mKeepAliveDeviceList.containsKey(deviceUuid)) {
+            Log.d(TAG, "KeepAlive device conntion is closed = " + deviceUuid);
+            mKeepAliveDeviceList.remove(deviceUuid);
+            return;
+        }
+
+        if (mCurrentRetrieveIndex == -1 && mCurrentRetrieveDevice == null) {
             return;
         }
 
@@ -1503,7 +1694,7 @@ public class IoTInterface {
         if (mIsEmergencyDataCollecting) {
             sendConnectToEmergencyDevice();
         } else {
-            if (mCurrentRetrieveIndex + 1 < mScanedList.size()) {
+            if (mCurrentRetrieveIndex + 1 < mBondedWithServerList.size()) {
                 mCurrentRetrieveIndex++;
                 sendConnectToDeviceMessage(mCurrentRetrieveIndex);
             } else {
@@ -1519,25 +1710,25 @@ public class IoTInterface {
     }
 
     public void updateBondedWithServerDeviceList(ArrayList<IoTDevice> bondedList) {
-        ArrayList<String> bondedDeviceIds = new ArrayList<>();
         for (int i = 0; i < bondedList.size(); i++) {
-            bondedDeviceIds.add(bondedList.get(i).getDeviceId());
+            IoTDevice newBondedDevice = bondedList.get(i);
+            if (StringUtils.isEmptyString(newBondedDevice.getDeviceId())) {
+                Log.d(TAG, "updateBondedWithServerDeviceList() : Device id not found...");
+                continue;
+            }
+            newBondedDevice.setIsBondedWithServer(true);
+            newBondedDevice.setIsKnownDevice(isKnownScenarioDevice(newBondedDevice.getDeviceTypeId(),
+                    newBondedDevice.getUuids(), newBondedDevice.getUuidLen()));
+            mBondedWithServerList.put(newBondedDevice.getDeviceId(), newBondedDevice);
         }
 
-        mBondedWithServerCount = 0;
-        Iterator<String> iter = mScanedList.keySet().iterator();
-        while(iter.hasNext()) {
-            String key = iter.next();
-
-            if (bondedDeviceIds.contains(key)) {
-                mBondedWithServerCount++;
-                mScanedList.get(key).setIsBondedWithServer(true);
-            } else {
-                mScanedList.get(key).setIsBondedWithServer(false);
-            }
+        if (mBondedWithServerList.size() > 0) {
+            Bundle extras = new Bundle();
+            extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
+            sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
         }
         Gson gson = new Gson();
-        String json = gson.toJson(mScanedList);
+        String json = gson.toJson(mBondedWithServerList);
         if (json != null) {
             Log.d(TAG, "updateBondedWithServerDeviceList json = " + json);
             IoTServicePreference.setIoTDevicesList(mCtx, json);
@@ -1548,7 +1739,6 @@ public class IoTInterface {
          */
         mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
         mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 10 * 1000);
-        sendCollectedDataToServer();
     }
 
     private boolean proceedDeviceCommand() {
@@ -1557,7 +1747,10 @@ public class IoTInterface {
         IoTDeviceScenario scenario = mCurrentRetrieveDevice.getNextScenario();
         if (scenario == null) {
             mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-            mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+            Message disconnMsg = new Message();
+            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+            disconnMsg.arg1 = 1;
+            mHandler.sendMessage(disconnMsg);
             return true;
         }
 
@@ -1581,7 +1774,10 @@ public class IoTInterface {
                         // data 값이없으면 진행을 중지한다.
                         Log.w(TAG, "Can't find data type or data");
                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 1;
+                        mHandler.sendMessage(disconnMsg);
                         return false;
                     }
 
@@ -1609,7 +1805,10 @@ public class IoTInterface {
                     else {
                         Log.w(TAG, "Unknown data type..");
                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 1;
+                        mHandler.sendMessage(disconnMsg);
                         return false;
                     }
                 }
@@ -1620,7 +1819,10 @@ public class IoTInterface {
             default: {
                 Log.w(TAG, "Unknown device command... skip this device");
                 mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                Message disconnMsg = new Message();
+                disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                disconnMsg.arg1 = 1;
+                mHandler.sendMessage(disconnMsg);
                 return false;
             }
         }
@@ -1628,8 +1830,104 @@ public class IoTInterface {
         if (cmd == -1) {
             Log.w(TAG, "Unknown device command... skip this device");
             mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-            mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+            Message disconnMsg = new Message();
+            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+            disconnMsg.arg1 = 1;
+            mHandler.sendMessage(disconnMsg);
             return false;
+        }
+        extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
+        sendMessageToService(cmd, extras);
+        return true;
+    }
+
+    private boolean proceedKeepAliveDeviceCommand(String uuid) {
+        Log.d(TAG, ">> proceedKeepAliveDeviceCommand() uuid = " + uuid);
+
+        if (mKeepAliveDeviceList.get(uuid) == null) {
+            Log.w(TAG, "Unknown uuid...");
+            mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+            Message disconnMsg = new Message();
+            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+            disconnMsg.arg1 = 0;
+            mHandler.sendMessage(disconnMsg);
+            return false;
+        }
+
+        // try first scenario command
+        IoTDeviceScenario scenario = mKeepAliveDeviceList.get(uuid).getNextScenario();
+        if (scenario == null) {
+            Log.w(TAG, "Device scenario is not found.. ");
+            mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+            Message disconnMsg = new Message();
+            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+            disconnMsg.arg1 = 0;
+            mHandler.sendMessage(disconnMsg);
+            return false;
+        }
+
+        Bundle extras = new Bundle();
+        IoTHandleData data = new IoTHandleData();
+        data.setDeviceId(mKeepAliveDeviceList.get(uuid).getDeviceId());
+        data.setDeviceTypeId(mKeepAliveDeviceList.get(uuid).getDeviceTypeId());
+        data.setCharacteristicUuid(scenario.getCharacteristic());
+        data.setServiceUuid(scenario.getService());
+
+        int cmd = -1;
+        switch (scenario.getCmd()) {
+            case IoTDeviceScenario.CMD_READ :
+                cmd = IoTServiceCommand.DEVICE_READ_DATA;
+                break;
+            case IoTDeviceScenario.CMD_WRITE :
+                cmd = IoTServiceCommand.DEVICE_WRITE_DATA;
+                if (StringUtils.isEmptyString(scenario.getDataType())) {
+                    // data type 이 없으면 data 값이 있는지 확인한다.
+                    if (StringUtils.isEmptyString(scenario.getData())) {
+                        // data 값이없으면 진행을 중지한다.
+                        Log.w(TAG, "Can't find data type or data");
+                        mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 0;
+                        mHandler.sendMessage(disconnMsg);
+                        return false;
+                    }
+
+                    byte[] setData = DataParser.getHextoBytes(scenario.getData());
+                    data.setValue(setData);
+                } else {
+                    if (scenario.getDataType().equals("current_time")) {
+                        byte[] dataByte = DataGenerator.getCurrentTimeData();
+                        data.setValue(dataByte);
+                    }
+                    else {
+                        Log.w(TAG, "Unknown data type..");
+                        mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 0;
+                        mHandler.sendMessage(disconnMsg);
+                        return false;
+                    }
+                }
+                break;
+            case IoTDeviceScenario.CMD_NOTIFY :
+                cmd = IoTServiceCommand.DEVICE_SET_NOTIFICATION;
+                break;
+            default: {
+                Log.w(TAG, "Unknown device command... skip this device");
+                mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                Message disconnMsg = new Message();
+                disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                disconnMsg.arg1 = 0;
+                mHandler.sendMessage(disconnMsg);
+                return false;
+            }
+        }
+
+        if (cmd == -1) {
+            Log.w(TAG, "may be end of command...");
+            return true;
         }
         extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
         sendMessageToService(cmd, extras);
@@ -1642,7 +1940,10 @@ public class IoTInterface {
         IoTDeviceScenario scenario = mCurrentRetrieveDevice.getCurrentScenario();
         if (scenario == null) {
             mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-            mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+            Message disconnMsg = new Message();
+            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+            disconnMsg.arg1 = 1;
+            mHandler.sendMessage(disconnMsg);
             return true;
         }
 
@@ -1666,7 +1967,10 @@ public class IoTInterface {
                         // data 값이없으면 진행을 중지한다.
                         Log.w(TAG, "Can't find data type or data");
                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 1;
+                        mHandler.sendMessage(disconnMsg);
                         return false;
                     }
 
@@ -1694,7 +1998,10 @@ public class IoTInterface {
                     else {
                         Log.w(TAG, "Unknown data type..");
                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 1;
+                        mHandler.sendMessage(disconnMsg);
                         return false;
                     }
                 }
@@ -1705,7 +2012,10 @@ public class IoTInterface {
             default: {
                 Log.w(TAG, "Unknown device command... skip this device");
                 mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                Message disconnMsg = new Message();
+                disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                disconnMsg.arg1 = 1;
+                mHandler.sendMessage(disconnMsg);
                 return false;
             }
         }
@@ -1713,7 +2023,10 @@ public class IoTInterface {
         if (cmd == -1) {
             Log.w(TAG, "Unknown device command... skip this device");
             mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-            mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+            Message disconnMsg = new Message();
+            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+            disconnMsg.arg1 = 1;
+            mHandler.sendMessage(disconnMsg);
             return false;
         }
         extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
@@ -1759,7 +2072,10 @@ public class IoTInterface {
                         Log.d(TAG, "xiaomi sclae : remove all saved data success... ");
                         Log.d(TAG, "xiaomi scale : disconnect.... ");
                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 1;
+                        mHandler.sendMessage(disconnMsg);
                         break;
                 }
                 break;
@@ -1775,7 +2091,10 @@ public class IoTInterface {
                             // disconnect ...
                             Log.d(TAG, "xiaomi scale : disconnect.... ");
                             mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                            mHandler.sendEmptyMessageDelayed(HANDLER_WAIT_FOR_NOTIFY_DATA, 100);
+                            Message disconnMsg = new Message();
+                            disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                            disconnMsg.arg1 = 1;
+                            mHandler.sendMessage(disconnMsg);
                         }
                         break;
 //                        case 0x02 :     // do not reached
@@ -1833,6 +2152,7 @@ public class IoTInterface {
                 String characUuid = data.getCharacteristicUuid();
                 ArrayList<SmartSensor> measurements = SmartSensor.parseSmartSensorMeasurement(address, characUuid, values);
 
+                Log.d(TAG, "handleSmartSensor() : values = " + DataParser.getHexString(values));
                 for (SmartSensor measurement : measurements) {
                     if (measurement != null) {
                         IoTCollectedData.IoTData iotData = new IoTCollectedData.IoTData();
@@ -1844,11 +2164,29 @@ public class IoTInterface {
                         String value = String.format("%.2f,%.2f", measurement.getTemperature(), measurement.getHumidity());
                         iotData.setValue(value);
 
-                        Log.d(TAG, "SmartSensor : Temp and Humidity = " + iotData.getValue() + ", timestamp = " + iotData.getDate());
+//                        Log.d(TAG, "device id = " + address + " ===================================");
+//                        Log.d(TAG, "SmartSensor : Temp and Humidity = " + value);
+//                        Log.d(TAG, "SmartSensor : AIO0 = " + measurement.getAIO0());
+//                        Log.d(TAG, "SmartSensor : AIO1 = " + measurement.getAIO1());
+//                        Log.d(TAG, "SmartSensor : AIO2 = " + measurement.getAIO2());
+//                        Log.d(TAG, "SmartSensor : DI4 = " + measurement.isDI4());
+//                        Log.d(TAG, "SmartSensor : DI5 = " + measurement.isDI5());
+//                        Log.d(TAG, "SmartSensor : DI6 = " + measurement.isDI6());
+//                        Log.d(TAG, "SmartSensor : DI7 = " + measurement.isDI7());
+//                        Log.d(TAG, "SmartSensor : DI9 = " + measurement.isDI9());
+//                        Log.d(TAG, "=========================================================");
+
+                        mCollectedData.removeIoTData(iotData.getIotDeviceId());
                         mCollectedData.addIoTData(iotData);
 
-                        mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessage(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                        // 2015.11.19
+                        // 샘플로 받은 스마트 센서는 DI7 에 모션센셔 연결이 되어 있음.
+                        Iterator<String> iter = mSensorNotificationCallbacks.keySet().iterator();
+
+                        while (iter.hasNext()) {
+                            String key = iter.next();
+                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7());
+                        }
                     }
                 }
                 break;
@@ -1918,7 +2256,10 @@ public class IoTInterface {
                     RecordAccessControlPoint recordAccessControlPoint = RecordAccessControlPoint.parseRecordAccessControlPoint(values);
                     if (recordAccessControlPoint == null) {
                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                        mHandler.sendEmptyMessage(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                        Message disconnMsg = new Message();
+                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                        disconnMsg.arg1 = 1;
+                        mHandler.sendMessage(disconnMsg);
                         break;
                     }
 
@@ -1930,7 +2271,10 @@ public class IoTInterface {
                                 proceedDeviceCommand();
                             } else {
                                 mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                                mHandler.sendEmptyMessage(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                                Message disconnMsg = new Message();
+                                disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                                disconnMsg.arg1 = 1;
+                                mHandler.sendMessage(disconnMsg);
                                 break;
                             }
                             break;
@@ -1946,7 +2290,10 @@ public class IoTInterface {
                                         Log.w(TAG, "RACP req operation failed... ");
 
                                         mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                                        mHandler.sendEmptyMessage(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                                        Message disconnMsg = new Message();
+                                        disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                                        disconnMsg.arg1 = 1;
+                                        mHandler.sendMessage(disconnMsg);
                                         break;
                                     } else {
                                         // end of RACP_REQ_OP_CODE_REPORT_STORED_RECORDS
@@ -1957,12 +2304,18 @@ public class IoTInterface {
                                     }
                                 } else if (cmd == Constants.RACP_REQ_OP_CODE_DELETE_STORED_RECORDS) {
                                     mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                                    mHandler.sendEmptyMessage(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                                    Message disconnMsg = new Message();
+                                    disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                                    disconnMsg.arg1 = 1;
+                                    mHandler.sendMessage(disconnMsg);
                                     break;
                                 }
                             } else {
                                 mHandler.removeMessages(HANDLER_WAIT_FOR_NOTIFY_DATA);
-                                mHandler.sendEmptyMessage(HANDLER_WAIT_FOR_NOTIFY_DATA);
+                                Message disconnMsg = new Message();
+                                disconnMsg.what = HANDLER_WAIT_FOR_NOTIFY_DATA;
+                                disconnMsg.arg1 = 1;
+                                mHandler.sendMessage(disconnMsg);
                                 break;
                             }
                             break;
@@ -1995,9 +2348,9 @@ public class IoTInterface {
                         iotData.setValue(Long.toString(mgdl));
 
                         try {
-                            mScanedList.get(mCurrentRetrieveDevice.getDeviceId()).setLastSequenceNumber(measurement.getSequenceNumber());
+                            mBondedWithServerList.get(mCurrentRetrieveDevice.getDeviceId()).setLastSequenceNumber(measurement.getSequenceNumber());
                             // save to preference.
-                            String json = mGson.toJson(mScanedList);
+                            String json = mGson.toJson(mBondedWithServerList);
                             if (json != null) {
                                 IoTServicePreference.setIoTDevicesList(mCtx, json);
                             }
@@ -2098,6 +2451,11 @@ public class IoTInterface {
     }
 
     private void sendCollectedDataToServer() {
+        if (mBondedWithServerList.size() > 0) {
+            Bundle b = new Bundle();
+            b.putBoolean(IoTServiceCommand.KEY_DATA, true);
+            sendMessageToService(IoTServiceCommand.SCANNING_START, b);
+        }
         if (!NetworkUtils.isConnected(mCtx)) {
             Log.w(TAG, "sendCollectedDataToServer() : Network is unavailable..");
             IoTServicePreference.setUnSentCollectedData(mCtx, mGson.toJson(mCollectedData));
@@ -2107,7 +2465,6 @@ public class IoTInterface {
             return;
         }
 
-        sendMessageToService(IoTServiceCommand.SCANNING_START, null);
         if (StringUtils.isEmptyString(mCollectServerAddress)) {
             Log.w(TAG, "sendCollectedDataToServer() : mCollectServerAddress is empty..");
             IoTServicePreference.setUnSentCollectedData(mCtx, mGson.toJson(mCollectedData));
@@ -2159,9 +2516,13 @@ public class IoTInterface {
     }
 
     public boolean isIoTServiceAvailable() {
-        if (mBondedWithServerCount > 0 && mServiceStatus == IoTServiceStatus.RUNNING) {
+        if (mBondedWithServerList.size() > 0 && mServiceStatus == IoTServiceStatus.RUNNING) {
             return true;
         }
         return false;
+    }
+
+    public void setSmartSensorNotificationCallback(String className, SmartSensorNotification notificationCallback) {
+        mSensorNotificationCallbacks.put(className, notificationCallback);
     }
 }

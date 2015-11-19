@@ -68,6 +68,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.nbplus.iotlib.IoTInterface;
 import com.nbplus.iotlib.data.IoTConstants;
 import com.nbplus.iotlib.data.IoTResultCodes;
+import com.nbplus.push.PushService;
 import com.nbplus.push.data.PushConstants;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
 import com.nbplus.vbroadlauncher.data.BaseApiResult;
@@ -330,7 +331,7 @@ public class HomeLauncherActivity extends BaseActivity
                 alert.setMessage(R.string.alert_phone_message);
                 alert.show();
 
-                //return;
+                return;
             }
         }
 
@@ -430,6 +431,7 @@ public class HomeLauncherActivity extends BaseActivity
         }
         fragmentTransaction.commit();
 
+        // initialize iot interface.
         String collectServerAddress = null;
         if (serverInfo != null) {
             String apiServer = serverInfo.getApiServer();
@@ -447,11 +449,8 @@ public class HomeLauncherActivity extends BaseActivity
                 Toast.makeText(getApplicationContext(),
                         "Bind IoT Service failed!!!", Toast.LENGTH_SHORT)
                         .show();
-            } else {
-                return;
             }
         }
-
     }
 
     // when screen orientation changed.
@@ -606,7 +605,12 @@ public class HomeLauncherActivity extends BaseActivity
         mText2Speech = null;
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-        //unregisterReceiver(mBroadcastReceiver);
+
+        // stop push service
+//        Intent intent = new Intent(this, PushService.class);
+//        intent.setAction(PushConstants.ACTION_STOP_SERVICE);
+//        startService(intent);
+
     }
 
     @Override
