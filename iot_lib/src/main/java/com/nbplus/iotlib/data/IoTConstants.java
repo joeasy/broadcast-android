@@ -21,6 +21,9 @@ package com.nbplus.iotlib.data;
  * Created by basagee on 2015. 10. 12..
  */
 public class IoTConstants {
+    public static final int IOT_GATEWAY_SERVER_PORT = 10089;
+    public static final int IOT_GATEWAY_SERVER_THREAD_POOL_SIZE = 1;
+
     public static final boolean USE_ANOTHER_APP = false;
     public static final String NBPLUS_IOT_APP_PACKAGE_NAME = "com.nbplus.iotapp";
 

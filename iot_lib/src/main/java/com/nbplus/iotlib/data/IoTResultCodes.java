@@ -29,6 +29,8 @@ public enum IoTResultCodes implements Serializable {
 
     SUCCESS (0),
     FAILED (1),
+
+    INITIALIZING(10),
     // app check
     BIND_SERVICE_FAILED(100),
     IOT_APP_NOT_INSTALLED(101),

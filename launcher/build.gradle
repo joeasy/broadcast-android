@@ -9,7 +9,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 21
         versionCode 93               // set push interface..
-        versionName "0.9.3"
+        versionName "0.9.4"
     }
     signingConfigs {
         debug {

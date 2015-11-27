@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.nbplus.push.data.PushBaseData;
@@ -61,6 +62,7 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
     PushInterfaceData mIfaceData;
     Context mContext;
     WifiManager.WifiLock mWifiLock;
+    PowerManager.WakeLock mWakeLock;
 
     private static final int HANDLER_MESSAGE_PUSH_MESSAGE_TEST = 1111;
 
@@ -221,6 +223,8 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         // we can also release the Wifi lock, if we're holding it
         if (mWifiLock != null && mWifiLock.isHeld()) mWifiLock.release();
         mWifiLock = null;
+        if (mWakeLock != null && mWakeLock.isHeld()) mWakeLock.release();
+        mWakeLock = null;
 
         if (retry && NetworkUtils.isConnected(mContext)) {
             Log.d(TAG, "sendEmptyMessageDelayed PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE.. what = " + what);
@@ -275,18 +279,24 @@ public class PushRunnable implements Runnable, TcpClient.OnMessageReceived {
         mState = State.Connected;
         sendSatusChangedBroadcastMessage(PushConstants.PUSH_STATUS_WHAT_NORMAL);
 
-        if (mWifiLock != null) {
+        mWifiLock = ((WifiManager) mContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, PushService.class.getSimpleName() + "_lock");
+        if (mWifiLock != null && !mWifiLock.isHeld()) {
             mWifiLock.acquire();
             Log.i(TAG, ">> mWifiLock.acquire() called !!");
+        }
+
+        PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        // acquire a WakeLock to keep the CPU running
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, PushService.class.getSimpleName());
+        if(mWakeLock != null && !mWakeLock.isHeld()) {
+            mWakeLock.acquire();
+            Log.i(TAG, ">> mWakeLock.acquire() called !!");
         }
     }
 
     @Override
     public void run() {
         try {
-            mWifiLock = ((WifiManager) mContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, PushRunnable.class.getSimpleName() + "_lock");
-            //mHandler.sendEmptyMessageDelayed(HANDLER_MESSAGE_PUSH_MESSAGE_TEST, 20 * 1000);
-
             while (!Thread.currentThread().isInterrupted()) {
                 switch (mPushThreadCommand) {
                     case StartPushClient:

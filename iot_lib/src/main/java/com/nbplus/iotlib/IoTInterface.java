@@ -1156,17 +1156,22 @@ public class IoTInterface {
     }
 
     private void handleDeviceListNotification(Bundle b) {
+        mEmergencyDeviceList.clear();
+        HashMap<String, IoTDevice> scannedDevices = new HashMap<>();
         if (b == null) {
             Log.w(TAG, "bundle data is null");
-            return;
+            //return; // 앱에서리스트 요청한 경우도 있으므로 아래쪽 타고 가게 한다.
+        } else {
+            b.setClassLoader(IoTDevice.class.getClassLoader());
+            scannedDevices = (HashMap<String, IoTDevice>)b.getSerializable(IoTServiceCommand.KEY_DATA);
+            if (scannedDevices == null) {
+                scannedDevices = new HashMap<>();
+            }
         }
 
-        mEmergencyDeviceList.clear();
-        b.setClassLoader(IoTDevice.class.getClassLoader());
-        final HashMap<String, IoTDevice> scannedDevices = (HashMap<String, IoTDevice>)b.getSerializable(IoTServiceCommand.KEY_DATA);
         if (scannedDevices == null || scannedDevices.size() == 0) {
             Log.w(TAG, "empty device list");
-            return;
+            //return; // 앱에서리스트 요청한 경우도 있으므로 아래쪽 타고 가게 한다.
         }
 
         boolean changed = false;
@@ -1295,35 +1300,30 @@ public class IoTInterface {
 
         final IoTServiceStatusNotification responseCallback = mForceRescanCallback.get();
         if (responseCallback != null) {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Bundle b = new Bundle();
-                    ArrayList<IoTDevice> devicesList = null;
-                    if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
-                        devicesList = new ArrayList<>(mBondedWithServerList.values());
-                    } else {
-                        devicesList = new ArrayList<>();
-                    }
+            Bundle extras = new Bundle();
+            ArrayList<IoTDevice> devicesList = null;
+            if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
+                devicesList = new ArrayList<>(mBondedWithServerList.values());
+            } else {
+                devicesList = new ArrayList<>();
+            }
 
-                    // 중복제거
-                    ArrayList<String> deviceIdList = new ArrayList<>();
-                    for (int i = 0; i < devicesList.size(); i++) {
-                        deviceIdList.add(devicesList.get(i).getDeviceId());
-                    }
+            // 중복제거
+            ArrayList<String> deviceIdList = new ArrayList<>();
+            for (int i = 0; i < devicesList.size(); i++) {
+                deviceIdList.add(devicesList.get(i).getDeviceId());
+            }
 
-                    ArrayList<IoTDevice> scannedDevicesList = new ArrayList<>(scannedDevices.values());
-                    for (int i = 0; i < scannedDevicesList.size(); i++) {
-                        if (deviceIdList.contains(scannedDevicesList.get(i).getDeviceId())) {
-                            Log.d(TAG, "mForceRescanCallback device id " + scannedDevicesList.get(i).getDeviceId() + " is already added.");
-                            continue;
-                        }
-                        devicesList.add(scannedDevicesList.get(i));
-                    }
-                    b.putParcelableArrayList(IoTServiceCommand.KEY_DATA, devicesList);
-                    responseCallback.onResult(IoTServiceCommand.GET_DEVICE_LIST, mServiceStatus, mErrorCodes, b);
+            ArrayList<IoTDevice> scannedDevicesList = new ArrayList<>(scannedDevices.values());
+            for (int i = 0; i < scannedDevicesList.size(); i++) {
+                if (deviceIdList.contains(scannedDevicesList.get(i).getDeviceId())) {
+                    Log.d(TAG, "mForceRescanCallback device id " + scannedDevicesList.get(i).getDeviceId() + " is already added.");
+                    continue;
                 }
-            }, 100);
+                devicesList.add(scannedDevicesList.get(i));
+            }
+            extras.putParcelableArrayList(IoTServiceCommand.KEY_DATA, devicesList);
+            responseCallback.onResult(IoTServiceCommand.GET_DEVICE_LIST, mServiceStatus, mErrorCodes, extras);
         }
         mForceRescanCallback = null;
         // TODO : log

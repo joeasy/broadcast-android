@@ -279,6 +279,8 @@ public class HomeLauncherActivity extends BaseActivity
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_home_launcher);
 
+        DeviceUtils.showDeviceInformation();
+
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
