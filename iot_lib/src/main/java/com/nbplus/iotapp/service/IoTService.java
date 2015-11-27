@@ -39,6 +39,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.nbplus.iotapp.bluetooth.BluetoothLeService;
+import com.nbplus.iotapp.iotgateway.ThreadPooledServer;
 import com.nbplus.iotapp.perferences.IoTServicePreference;
 import com.nbplus.iotlib.data.IoTConstants;
 import com.nbplus.iotlib.data.IoTDevice;
@@ -79,10 +80,11 @@ public class IoTService extends Service {
     private IoTServiceHandler mHandler = new IoTServiceHandler(this);
     Messenger mServiceMessenger = null;
 
-    private IoTServiceStatus mServiceStatus = IoTServiceStatus.INITIALIZE;
-    private IoTResultCodes mErrorCodes = IoTResultCodes.SUCCESS;
+    private IoTServiceStatus mServiceStatus = IoTServiceStatus.STOPPED;
+    private IoTResultCodes mErrorCodes = IoTResultCodes.INITIALIZING;
 
     // IoT 서비스를 사용하는 어플리케이션 및 Messenger 맵.
+    // 2015.11.10 하나만 사용한다.
     // REGISTER_SERVICE 시에 등록되며, UNREGISTER_SERVICE 시에 제거된다.
     WeakReference<Messenger> mRegisteredAppMessenger = null;
 
@@ -90,6 +92,10 @@ public class IoTService extends Service {
     ArrayList<String> mKeepAliveConnectionDeviceList = new ArrayList<>();
     ArrayList<String> mConnectedDeviceList = new ArrayList<>();
     boolean mIsDisconnectAllState = false;
+
+    // IoT Gateway variables...
+    ThreadPooledServer mThreadPooledServer;
+    WeakReference<Messenger> mIoTGatewayWorkerMessengerRef = null;
 
     // 핸들러 객체 만들기
     private static class IoTServiceHandler extends Handler {
@@ -114,6 +120,27 @@ public class IoTService extends Service {
         }
         Log.d(TAG, "handle message msg.what = " + msg.what);
         switch (msg.what) {
+            // when using iot gateway
+            case IoTServiceCommand.IOT_GATEWAY_CONNECTED: {
+                Log.d(TAG, "IoTServiceCommand.IOT_GATEWAY_CONNECTED received...");
+                mIoTGatewayWorkerMessengerRef = new WeakReference<>(msg.replyTo);
+                // TODO : test handler
+                if (mIoTGatewayWorkerMessengerRef != null) {
+                    try {
+                        Messenger workerMessenger = mIoTGatewayWorkerMessengerRef.get();
+                        if (workerMessenger != null) {
+                            Message testMsg = new Message();
+                            msg.what = IoTServiceCommand.IOT_GATEWAY_DISCONNECTED;
+                            Log.d(TAG, "test IoTServiceCommand.IOT_GATEWAY_DISCONNECTED");
+                            workerMessenger.send(testMsg);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                break;
+            }
             case IoTServiceCommand.SCANNING_START: {
                 Bundle extras = msg.getData();
                 if (extras == null) {
@@ -149,9 +176,10 @@ public class IoTService extends Service {
                 break;
             }
             case HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
-                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
                 final boolean isConnected = NetworkUtils.isConnected(this);
+                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received isConnected = " + isConnected);
                 if (mLastConnectionStatus == isConnected) {
+                    Log.d(TAG, "mLastConnectionStatus == isConnected do not anything.");
                     return;
                 }
 
@@ -868,6 +896,12 @@ public class IoTService extends Service {
             mLastConnectionStatus = NetworkUtils.isConnected(this);
 
             // TODO : connect to iot gateway
+            if (mThreadPooledServer != null) {
+                mThreadPooledServer.stop(false);
+            }
+            mThreadPooledServer = new ThreadPooledServer(mServiceMessenger,
+                    IoTConstants.IOT_GATEWAY_SERVER_PORT, IoTConstants.IOT_GATEWAY_SERVER_THREAD_POOL_SIZE);
+            new Thread(mThreadPooledServer).start();
         } else {
             Log.d(TAG, ">> Use internal blutooth....");
             // check bluetooth status

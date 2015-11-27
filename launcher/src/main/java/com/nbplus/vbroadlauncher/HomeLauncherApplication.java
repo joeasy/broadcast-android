@@ -89,6 +89,10 @@ public class HomeLauncherApplication extends Application  {
             Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isActive);
             boolean isOutdoor = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
             long currTime = System.currentTimeMillis();
+            if (mLastInOutdoorMotionReportTime == 0L) {
+                mLastInOutdoorMotionReportTime = currTime;
+            }
+            
             if (isOutdoor && isActive) {
                 // 외출모드 설정 중인데 모션이 감지되었다.
                 // 외출모드는 마지막 보고시점을 별도로 기록하지 않고 움직임이 발생할때마다 전달한다.
@@ -137,7 +141,14 @@ public class HomeLauncherApplication extends Application  {
         Log.d(TAG, "outdoorModechanged() called....");
         if (mCurrentOutdoorMode != isOutdoor) {
             mCurrentOutdoorMode = isOutdoor;
-            mLastInOutdoorMotionReportTime = System.currentTimeMillis();
+
+            // 인터페이스가 정상동작 중인지 확인하여 정상이면 현재시간.
+            // 정상이 아니면 0으로 셋팅한다.
+            if (IoTInterface.getInstance().isIoTServiceAvailable()) {
+                mLastInOutdoorMotionReportTime = System.currentTimeMillis();
+            } else {
+                mLastInOutdoorMotionReportTime = 0L;
+            }
         }
     }
 

@@ -18,6 +18,7 @@
         android:clearTaskOnLaunch="true"
         android:launchMode="singleTask"
         android:stateNotNeeded="true"
+        android:largeHeap="true"
         android:name=".HomeLauncherApplication"
         android:theme="@style/NBPlusTheme.NoActionBar" >
 

@@ -412,6 +412,10 @@ public class WeatherView extends LinearLayout {
      * @return
      */
     private Location lamcProjection(Location location, int convertType, LamcParameter mapParam) {
+        if (location == null) {
+            Log.w(TAG, "lamcProjection() : location info not found..");
+            return null;
+        }
         Location resLocation;
         try {
             resLocation = new Location(location);

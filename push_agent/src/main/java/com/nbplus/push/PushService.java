@@ -171,9 +171,10 @@ public class PushService extends Service {
                 }
                 break;
             case PushConstants.HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
-                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received !!!");
                 final boolean isConnected = NetworkUtils.isConnected(this);
+                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received isConnected = " + isConnected);
                 if (mLastConnectionStatus == isConnected) {
+                    Log.d(TAG, "mLastConnectionStatus == isConnected do not anything.");
                     return;
                 }
 

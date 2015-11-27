@@ -92,6 +92,11 @@ public class IoTServiceCommand implements Serializable {
     // 서비스 상태 변경..
     public static final int SERVICE_STATUS_NOTIFICATION = COMMAND_RESPONSE + 1;
 
+    // when using iot gateway
+    public static final int IOT_GATEWAY_CONNECTED = SERVICE_STATUS_NOTIFICATION + 1;
+    public static final int IOT_GATEWAY_DISCONNECTED = IOT_GATEWAY_CONNECTED + 1;
+
+
     /**
      * bundle data key
      */

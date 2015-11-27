@@ -210,5 +210,31 @@ public class DeviceUtils {
         }
         return isPlugged;
     }
+
+    public static void showDeviceInformation() {
+        Log.i(TAG, "=========== Device Information ==================");
+        Log.i(TAG, "BOARD = " + Build.BOARD);
+        Log.i(TAG, "BRAND = " + Build.BRAND);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            Log.i(TAG, "CPU_ABI = " + Build.CPU_ABI);
+        } else {
+            Log.i(TAG, "SUPPORTED_ABIS = " + Build.SUPPORTED_ABIS);
+        }
+        Log.i(TAG, "DEVICE = " + Build.DEVICE);
+        Log.i(TAG, "DISPLAY = " + Build.DISPLAY);
+        Log.i(TAG, "HARDWARE = " + Build.HARDWARE);
+        Log.i(TAG, "FINGERPRINT = " + Build.FINGERPRINT);
+        Log.i(TAG, "HOST = " + Build.HOST);
+        Log.i(TAG, "ID = " + Build.ID);
+        Log.i(TAG, "MANUFACTURER = " + Build.MANUFACTURER);
+        Log.i(TAG, "MODEL = " + Build.MODEL);
+        Log.i(TAG, "PRODUCT = " + Build.PRODUCT);
+        Log.i(TAG, "SERIAL = " + Build.SERIAL);
+        Log.i(TAG, "TAGS = " + Build.TAGS);
+        Log.i(TAG, "TYPE = " + Build.TYPE);
+        Log.i(TAG, "USER = " + Build.USER);
+        Log.i(TAG, "VERSION.RELEASE = " + Build.VERSION.RELEASE);
+        Log.i(TAG, "==================================================");
+    }
 }
 
