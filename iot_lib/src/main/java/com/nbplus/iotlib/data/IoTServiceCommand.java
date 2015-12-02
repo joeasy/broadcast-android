@@ -60,10 +60,7 @@ public class IoTServiceCommand implements Serializable {
     public static final int DEVICE_CONNECT = DEVICE_UN_BONDING + 1;
     public static final int DEVICE_DISCONNECT = DEVICE_CONNECT + 1;
     // smart sensor
-    public static final int KEEPALIVE_DEVICE_CONNECT = DEVICE_DISCONNECT + 1;
-    public static final int KEEPALIVE_DEVICE_DISCONNECT = KEEPALIVE_DEVICE_CONNECT + 1;
-    public static final int CONTROL_DEVICE = KEEPALIVE_DEVICE_DISCONNECT + 1;     // IR 등에대한 제어
-    public static final int DEVICE_READ_DATA = CONTROL_DEVICE + 1;
+    public static final int DEVICE_READ_DATA = DEVICE_DISCONNECT + 1;
     public static final int DEVICE_WRITE_DATA = DEVICE_READ_DATA + 1;
     public static final int DEVICE_SET_NOTIFICATION = DEVICE_WRITE_DATA + 1;
 
