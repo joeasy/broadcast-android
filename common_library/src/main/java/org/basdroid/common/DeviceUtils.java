@@ -108,6 +108,9 @@ public class DeviceUtils {
         }
 
         macAddress = NetworkUtils.getHexDecimalMacAddress(context);
+        if (macAddress == null) {
+            return getDeviceIdByAndroidID(context);
+        }
         return SHA1(macAddress);
     }
 
@@ -118,7 +121,7 @@ public class DeviceUtils {
             NetworkUtils.enableWifiNetwork(context);
         }
 
-        macAddress = NetworkUtils.getHexDecimalAddress(context, address);
+        macAddress = NetworkUtils.getHexDecimalMacAddress(context, address);
         return SHA1(macAddress);
     }
 
@@ -138,7 +141,7 @@ public class DeviceUtils {
         return buf.toString();
     }
 
-    private static String SHA1(String text) {
+    public static String SHA1(String text) {
         try {
             MessageDigest md;
             md = MessageDigest.getInstance(StringUtils.SHA1_ALGORITHM);
@@ -152,7 +155,7 @@ public class DeviceUtils {
             return null;
         }
     }
-    private static String SHA1(byte[] bytes) {
+    public static String SHA1(byte[] bytes) {
         try {
             MessageDigest md;
             md = MessageDigest.getInstance(StringUtils.SHA1_ALGORITHM);

@@ -3,8 +3,10 @@ package com.nbplus.vbroadlauncher.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,6 +18,7 @@ import com.nbplus.vbroadlauncher.RadioActivity;
 import com.nbplus.vbroadlauncher.service.SendEmergencyCallTask;
 
 import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -114,10 +117,34 @@ public class LauncherSettings {
 
         // load from preferences..
         this.deviceID = prefs.getString(KEY_VBROADCAST_DEVICE_ID, "");
+
         if (StringUtils.isEmptyString(this.deviceID)) {
-            String deviceID = DeviceUtils.getDeviceIdByMacAddress(context);
-            prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
-            this.deviceID = deviceID;
+            // TODO : 마시멜로에서 맥어드레스 이상하게 가져온다. 일단 "02:00:00:00:00:00"을 받으면 "wlan0" 로...
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1 + 1 /* MashMallow */) {
+                String macAddrString = NetworkUtils.getMacAddress(this.context);
+                if (!StringUtils.isEmptyString(macAddrString) && "02:00:00:00:00:00".equals(macAddrString)) {
+                    // 잘못된값...
+                    Log.d("LauncherSettings", "마시멜로에서 맥어드레스 이상하게 가져온다. 일단 \"02:00:00:00:00:00\"을 받으면 \"wlan0\" 로...");
+                    macAddrString = NetworkUtils.getMACAddress("wlan0");
+                    String deviceID = null;
+                    byte[] macAddressBytes = NetworkUtils.getHexDecimalMacAddress(context, macAddrString);
+                    if (macAddressBytes == null) {
+                        deviceID = DeviceUtils.getDeviceIdByAndroidID(context);
+                    } else {
+                        deviceID = DeviceUtils.SHA1(macAddressBytes);
+                    }
+                    prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+                    this.deviceID = deviceID;
+                } else {
+                    String deviceID = DeviceUtils.getDeviceIdByMacAddress(context);
+                    prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+                    this.deviceID = deviceID;
+                }
+            } else {
+                String deviceID = DeviceUtils.getDeviceIdByMacAddress(context);
+                prefs.edit().putString(KEY_VBROADCAST_DEVICE_ID, deviceID).apply();
+                this.deviceID = deviceID;
+            }
         }
 
         this.isCompletedSetup = prefs.getBoolean(KEY_VBROADCAST_IS_COMPLETED_SETUP, false);
