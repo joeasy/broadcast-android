@@ -219,6 +219,9 @@ public class NetworkUtils {
 
     public static byte[] getHexDecimalMacAddress(Context context) {
         String macAddress = getMacAddress(context);
+        if (StringUtils.isEmptyString(macAddress)) {
+            return null;
+        }
         String[] macAddressParts = macAddress.split(":");
 
         // convert hex string to byte values
@@ -231,7 +234,10 @@ public class NetworkUtils {
         return macAddressBytes;
     }
 
-    public static byte[] getHexDecimalAddress(Context context, String macAddressString) {
+    public static byte[] getHexDecimalMacAddress(Context context, String macAddressString) {
+        if (StringUtils.isEmptyString(macAddressString)) {
+            return null;
+        }
         String[] macAddressParts = macAddressString.split(":");
 
         // convert hex string to byte values
@@ -259,6 +265,7 @@ public class NetworkUtils {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface intf : interfaces) {
                 if (interfaceName != null) {
+                    Log.d(TAG, "intf.getName() = " + intf.getName());
                     if (!intf.getName().equalsIgnoreCase(interfaceName)) continue;
                 }
                 byte[] mac = intf.getHardwareAddress();
