@@ -146,6 +146,8 @@ public class PushService extends Service {
                 mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
                 if (NetworkUtils.isConnected(this)) {
                     getPushGatewayInformationFromServer();
+                } else {
+                    Log.d(TAG, "NetworkUtils.isConnected(this) == false.. Retry when re-connected wifi...");
                 }
                 break;
             case PushConstants.HANDLER_MESSAGE_GET_PUSH_GATEWAY_DATA :
@@ -174,7 +176,13 @@ public class PushService extends Service {
                 final boolean isConnected = NetworkUtils.isConnected(this);
                 Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received isConnected = " + isConnected);
                 if (mLastConnectionStatus == isConnected) {
-                    Log.d(TAG, "mLastConnectionStatus == isConnected do not anything.");
+                    if (isConnected && mPushRunnable.getState() == PushRunnable.State.Stopped &&
+                            !StringUtils.isEmptyString(mPushInterfaceServerAddress)) {
+                        Log.d(TAG, "mLastConnectionStatus == isConnected.. and network is connected. But push service is not connected. re=connect");
+                        getPushGatewayInformationFromServer();
+                    } else {
+                        Log.d(TAG, "mLastConnectionStatus == isConnected do not anything.");
+                    }
                     return;
                 }
 
