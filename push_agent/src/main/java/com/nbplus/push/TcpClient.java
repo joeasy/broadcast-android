@@ -344,7 +344,6 @@ public class TcpClient {
                 mPushSocket = new Socket();
                 mPushSocket.setReuseAddress(true);
                 mPushSocket.setKeepAlive(true);
-                mPushSocket.setSoTimeout(60000);
             }
             mPushSocket.connect(socketAddress);
 
