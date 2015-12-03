@@ -376,7 +376,8 @@ public class HomeLauncherActivity extends BaseActivity
             LauncherSettings.getInstance(this).setPreferredUserLocation(defaultLocation);
         }
 
-        Log.d(TAG, "Mac Addr = " + NetworkUtils.getMacAddress(this));
+        Log.d(TAG, "getMacAddress = " + NetworkUtils.getMacAddress(this));
+        Log.d(TAG, "getMacAddressFromNetworkInterface = " + NetworkUtils.getMacAddressFromNetworkInterface(this));
         Log.d(TAG, "SET Device ID = " + LauncherSettings.getInstance(this).getDeviceID());
 
         // First we need to check availability of play services
