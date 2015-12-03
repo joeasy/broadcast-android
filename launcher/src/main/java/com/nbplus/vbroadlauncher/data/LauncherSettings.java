@@ -125,7 +125,7 @@ public class LauncherSettings {
                 if (!StringUtils.isEmptyString(macAddrString) && "02:00:00:00:00:00".equals(macAddrString)) {
                     // 잘못된값...
                     Log.d("LauncherSettings", "마시멜로에서 맥어드레스 이상하게 가져온다. 일단 \"02:00:00:00:00:00\"을 받으면 \"wlan0\" 로...");
-                    macAddrString = NetworkUtils.getMACAddress("wlan0");
+                    macAddrString = NetworkUtils.getMacAddressFromNetworkInterface(context);
                     String deviceID = null;
                     byte[] macAddressBytes = NetworkUtils.getHexDecimalMacAddress(context, macAddrString);
                     if (macAddressBytes == null) {

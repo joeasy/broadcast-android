@@ -28,8 +28,12 @@ import android.util.Log;
 
 import org.apache.http.conn.util.InetAddressUtils;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.List;
 
@@ -279,6 +283,47 @@ public class NetworkUtils {
             }
         } catch (Exception ex) { } // for now eat exceptions
         return "";
+    }
+
+    public static String getMacAddressFromNetworkInterface(final Context context) {
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo.getIpAddress();
+
+        // Convert little-endian to big-endianif needed
+        if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
+            ipAddress = Integer.reverseBytes(ipAddress);
+        }
+
+        byte[] bytes = BigInteger.valueOf(ipAddress).toByteArray();
+
+        String result;
+        try {
+            InetAddress addr = InetAddress.getByAddress(bytes);
+            NetworkInterface netInterface = NetworkInterface.getByInetAddress(addr);
+            Log.d(TAG, "Wifi netInterface.getName() = " + netInterface.getName());
+
+            byte[] mac = netInterface.getHardwareAddress();
+            if (mac == null || mac.length == 0) return "";
+            StringBuilder buf = new StringBuilder();
+            for (int idx = 0; idx < mac.length; idx++) {
+                buf.append(String.format("%02X:", mac[idx]));
+            }
+            if (buf.length() > 0) buf.deleteCharAt(buf.length()-1);
+            return buf.toString();
+        } catch (UnknownHostException ex) {
+            Log.e(TAG, "getMacAddressFromNetworkInterface() Unknown host.", ex);
+            result = null;
+        } catch (SocketException ex) {
+            Log.e(TAG, "getMacAddressFromNetworkInterface() Socket exception.", ex);
+            result = null;
+        } catch (Exception ex) {
+            Log.e(TAG, "getMacAddressFromNetworkInterface() Exception.", ex);
+            result = null;
+        }
+
+        return result;
     }
 
     /**
