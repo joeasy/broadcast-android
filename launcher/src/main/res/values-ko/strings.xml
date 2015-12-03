@@ -37,6 +37,7 @@
     <string name="outdoor_mode_on">외출모드가 활성화 되었습니다.</string>
     <string name="outdoor_mode_off">외출모드가 비활성화 되었습니다.</string>
     <string name="outdoor_mode_motion">외출모드에서 동작이 감지되었습니다.</string>
+    <string name="outdoor_mode_door_open">외출모드에서 문열림이 감지되었습니다.</string>
     <string name="indoor_mode_no_motion">사용자의 동작이 하루이상 감지되지 않습니다.</string>
 
     <!--main shortcut -->
