@@ -78,24 +78,25 @@ public class HomeLauncherApplication extends Application  {
     private boolean mCurrentOutdoorMode = false;
     private long mLastInOutdoorMotionReportTime = System.currentTimeMillis();
     // OutDoor 설정 후 1분이 지난 다음부터 체크한다.
-    private static final int OUTDOOR_MOTION_CHECK_START_TERM = 60 * 1000;
+    private static final int OUTDOOR_MOTION_CHECK_START_TERM = 10 * 1000;
 
     // Indoor 모드에서 하루이상 모션이 발생하지 않는 경우 리포트
     private static final int INDOOR_NO_MOTION_REPORT_TERM = 24 * 60 * 60 * 1000;
 
     SmartSensorNotification mSmartSensorNotificationCallback = new SmartSensorNotification() {
         @Override
-        public void notifyMotionSensor(IoTDevice device, boolean isActive) {
-            Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isActive);
+        public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened) {
+            Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened);
             boolean isOutdoor = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
             long currTime = System.currentTimeMillis();
             if (mLastInOutdoorMotionReportTime == 0L) {
                 mLastInOutdoorMotionReportTime = currTime;
             }
             
-            if (isOutdoor && isActive) {
+            if (isOutdoor && (isMotionActive || isDoorOpened)) {
                 // 외출모드 설정 중인데 모션이 감지되었다.
                 // 외출모드는 마지막 보고시점을 별도로 기록하지 않고 움직임이 발생할때마다 전달한다.
+                Log.d(TAG, "currTime - mLastInOutdoorMotionReportTime = " + (currTime - mLastInOutdoorMotionReportTime));
                 if (currTime - mLastInOutdoorMotionReportTime > OUTDOOR_MOTION_CHECK_START_TERM) {
                     Log.d(TAG, "외출중 모션 감지");
                     mLastInOutdoorMotionReportTime = currTime;
@@ -104,16 +105,22 @@ public class HomeLauncherApplication extends Application  {
                     Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
                     r.play();
 
-                    Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_motion, Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                    toast.show();
+                    if (isMotionActive) {
+                        Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_motion, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        toast.show();
+                    } else if (isDoorOpened) {
+                        Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_door_open, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        toast.show();
+                    }
                 }
-            } else if (isOutdoor && !isActive) {
+            } else if (isOutdoor && (!isMotionActive && !isDoorOpened)) {
                 // 일정시간이 지나면 false 가한번씩 올라와서... 여기선 아무것도하지말자.
                 //if (currTime - mLastInOutdoorMotionReportTime < OUTDOOR_MOTION_CHECK_START_TERM) {
                     //mLastInOutdoorMotionReportTime = currTime;
                 //}
-            } else if (!isOutdoor && !isActive) {
+            } else if (!isOutdoor && !isMotionActive) {
                 // 외출모드가 아닌데 모션이 감지되지 않는다.
                 // 모션이 감지되지 않는 보고시간은 마지막 보고시점이후에 INDOOR_NO_MOTION_REPORT_TERM에 정해진 시간 이상일 경우이다.
                 if (currTime - mLastInOutdoorMotionReportTime > INDOOR_NO_MOTION_REPORT_TERM) {
@@ -128,7 +135,7 @@ public class HomeLauncherApplication extends Application  {
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
                 }
-            } else if (!isOutdoor && isActive) {
+            } else if (!isOutdoor && isMotionActive) {
                 if (currTime - mLastInOutdoorMotionReportTime < INDOOR_NO_MOTION_REPORT_TERM) {
                     // 서버에 보고?????
                 }

@@ -1099,6 +1099,9 @@ public class IoTInterface {
         }
 
         if (!sendSuccess) {
+            mCurrentRetrieveIndex = -1;
+            mCurrentRetrieveDevice = null;
+
             mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
             mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, RETRIEVE_IOT_DEVICE_DATA_PERIOD);
             sendCollectedDataToServer();
@@ -2185,7 +2188,7 @@ public class IoTInterface {
 
                         while (iter.hasNext()) {
                             String key = iter.next();
-                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7());
+                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7(), measurement.isDI6());
                         }
                     }
                 }

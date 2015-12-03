@@ -28,5 +28,5 @@ public interface SmartSensorNotification {
      * @param device
      * @param isActive
      */
-    public void notifyMotionSensor(IoTDevice device, boolean isActive);
+    public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened);
 }
