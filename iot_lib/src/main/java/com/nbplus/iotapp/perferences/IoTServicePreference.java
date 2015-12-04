@@ -339,7 +339,7 @@ public class IoTServicePreference {
      *
      */
     public static boolean isUseIoTGateway(Context context) {
-        return getBoolean(context, KEY_USE_IOT_GATEWAY, true);
+        return getBoolean(context, KEY_USE_IOT_GATEWAY, false);
     }
 
     public static void setIoTDevicesList (Context context, String json) {
