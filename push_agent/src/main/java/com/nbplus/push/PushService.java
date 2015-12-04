@@ -174,9 +174,9 @@ public class PushService extends Service {
                 break;
             case PushConstants.HANDLER_MESSAGE_CONNECTIVITY_CHANGED :
                 final boolean isConnected = NetworkUtils.isConnected(this);
-                Log.d(TAG, "HANDLER_MESSAGE_CONNECTIVITY_CHANGED received isConnected = " + isConnected);
+                Log.d(TAG, "CONNECTIVITY_CHANGED received isConnected = " + isConnected + ", mPushRunnable.getState() = " + mPushRunnable.getState());
                 if (mLastConnectionStatus == isConnected) {
-                    if (isConnected && mPushRunnable.getState() == PushRunnable.State.Stopped &&
+                    if (isConnected && mPushRunnable.getState() != PushRunnable.State.Connected &&
                             !StringUtils.isEmptyString(mPushInterfaceServerAddress)) {
                         Log.d(TAG, "mLastConnectionStatus == isConnected.. and network is connected. But push service is not connected. re=connect");
                         mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);

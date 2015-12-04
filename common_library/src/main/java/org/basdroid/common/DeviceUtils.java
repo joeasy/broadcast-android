@@ -108,7 +108,7 @@ public class DeviceUtils {
         }
 
         macAddress = NetworkUtils.getHexDecimalMacAddress(context);
-        if (macAddress == null) {
+        if (macAddress == null || macAddress.length == 0) {
             return getDeviceIdByAndroidID(context);
         }
         return SHA1(macAddress);
