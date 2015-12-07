@@ -193,13 +193,13 @@ public class HomeLauncherActivity extends BaseActivity
                 break;
             case HANDLER_ERMERGENCY_CALL_DEVICE_ACTIVATED: {
                 // BT device 는 약 2분 동안 broadcast 후에 sleep 으로 들어간다.
-                if (mLastDeviceEmergencyCallSent > 0) {
-                    long currTimeMs = System.currentTimeMillis();
-                    if (currTimeMs - mLastDeviceEmergencyCallSent  < 120 * 1000) {
-                        Log.d(TAG, "Already emergency call sent = " + mLastDeviceEmergencyCallSent);
-                        return;
-                    }
-                }
+//                if (mLastDeviceEmergencyCallSent > 0) {
+//                    long currTimeMs = System.currentTimeMillis();
+//                    if (currTimeMs - mLastDeviceEmergencyCallSent  < 120 * 1000) {
+//                        Log.d(TAG, "Already emergency call sent = " + mLastDeviceEmergencyCallSent);
+//                        return;
+//                    }
+//                }
                 if (mIsSendingEmergencyCall) {
                     Log.d(TAG, "Emergency call send task already running... ");
                     return;
