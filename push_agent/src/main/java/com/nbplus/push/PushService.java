@@ -67,7 +67,7 @@ public class PushService extends Service {
 
     // minutes
     public static final int MILLISECONDS = 1000;
-    public static final int mNextRetryPeriodTerm = 30;
+    public static final int mNextRetryPeriodTerm = 5;
 
     // Wifi lock that we hold when streaming files from the internet, in order to prevent the
     // device from shutting off the Wifi radio
@@ -176,7 +176,7 @@ public class PushService extends Service {
                 final boolean isConnected = NetworkUtils.isConnected(this);
                 Log.d(TAG, "CONNECTIVITY_CHANGED received isConnected = " + isConnected + ", mPushRunnable.getState() = " + mPushRunnable.getState());
                 if (mLastConnectionStatus == isConnected) {
-                    if (isConnected && mPushRunnable.getState() != PushRunnable.State.Connected &&
+                    if (isConnected && mPushRunnable.getState() == PushRunnable.State.Stopped &&
                             !StringUtils.isEmptyString(mPushInterfaceServerAddress)) {
                         Log.d(TAG, "mLastConnectionStatus == isConnected.. and network is connected. But push service is not connected. re=connect");
                         mHandler.removeMessages(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE);
