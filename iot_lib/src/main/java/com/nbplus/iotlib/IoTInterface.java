@@ -1280,7 +1280,7 @@ public class IoTInterface {
         if (mEmergencyDeviceList.size() > 0) {
             // 긴급호출데이터 수집 및 초기화 시작
             long currTimeMs = System.currentTimeMillis();
-            if (currTimeMs - mLastEmergencyDeviceFoundTimeMs > 1 * 60 * 1000) {
+            //if (currTimeMs - mLastEmergencyDeviceFoundTimeMs > 1 * 60 * 1000) {
                 mIsEmergencyDataCollecting = true;
 
                 // 모든 조회가 완료되기 전까지 스캐닝 자체를 중지시킨다.
@@ -1290,11 +1290,11 @@ public class IoTInterface {
 
                 mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                 sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT_ALL, null);
-            } else {
-                Log.d(TAG, ">>> Already emergency device retrive.. before = " + (currTimeMs - mLastEmergencyDeviceFoundTimeMs));
-                mIsEmergencyDataCollecting = false;
-                mEmergencyDeviceList.clear();
-            }
+//            } else {
+//                Log.d(TAG, ">>> Already emergency device retrive.. before = " + (currTimeMs - mLastEmergencyDeviceFoundTimeMs));
+//                mIsEmergencyDataCollecting = false;
+//                mEmergencyDeviceList.clear();
+//            }
         }
 
         if (mForceRescanCallback == null) {
