@@ -2188,7 +2188,7 @@ public class IoTInterface {
 
                         while (iter.hasNext()) {
                             String key = iter.next();
-                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7(), measurement.isDI6());
+                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7(), measurement.isDI6(), measurement.isDI5());
                         }
                     }
                 }
