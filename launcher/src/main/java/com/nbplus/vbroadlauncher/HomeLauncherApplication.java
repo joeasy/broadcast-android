@@ -86,7 +86,7 @@ public class HomeLauncherApplication extends Application  {
     SmartSensorNotification mSmartSensorNotificationCallback = new SmartSensorNotification() {
         @Override
         public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened, boolean isDoorOpened2) {
-            Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened);
+            Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened + ", door opened2 = " + isDoorOpened2);
             boolean isOutdoor = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
             long currTime = System.currentTimeMillis();
             if (mLastInOutdoorMotionReportTime == 0L) {
@@ -109,7 +109,7 @@ public class HomeLauncherApplication extends Application  {
                         Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_motion, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                         toast.show();
-                    } else if (isDoorOpened) {
+                    } else if (isDoorOpened || isDoorOpened2) {
                         Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_door_open, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                         toast.show();
