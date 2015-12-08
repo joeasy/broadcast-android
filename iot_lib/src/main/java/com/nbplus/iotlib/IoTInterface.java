@@ -2167,17 +2167,17 @@ public class IoTInterface {
                         String value = String.format("%.2f,%.2f", measurement.getTemperature(), measurement.getHumidity());
                         iotData.setValue(value);
 
-//                        Log.d(TAG, "device id = " + address + " ===================================");
-//                        Log.d(TAG, "SmartSensor : Temp and Humidity = " + value);
-//                        Log.d(TAG, "SmartSensor : AIO0 = " + measurement.getAIO0());
-//                        Log.d(TAG, "SmartSensor : AIO1 = " + measurement.getAIO1());
-//                        Log.d(TAG, "SmartSensor : AIO2 = " + measurement.getAIO2());
-//                        Log.d(TAG, "SmartSensor : DI4 = " + measurement.isDI4());
-//                        Log.d(TAG, "SmartSensor : DI5 = " + measurement.isDI5());
-//                        Log.d(TAG, "SmartSensor : DI6 = " + measurement.isDI6());
-//                        Log.d(TAG, "SmartSensor : DI7 = " + measurement.isDI7());
-//                        Log.d(TAG, "SmartSensor : DI9 = " + measurement.isDI9());
-//                        Log.d(TAG, "=========================================================");
+                        Log.d(TAG, "device id = " + address + " ===================================");
+                        Log.d(TAG, "SmartSensor : Temp and Humidity = " + value);
+                        Log.d(TAG, "SmartSensor : AIO0 = " + measurement.getAIO0());
+                        Log.d(TAG, "SmartSensor : AIO1 = " + measurement.getAIO1());
+                        Log.d(TAG, "SmartSensor : AIO2 = " + measurement.getAIO2());
+                        Log.d(TAG, "SmartSensor : DI4 = " + measurement.isDI4());
+                        Log.d(TAG, "SmartSensor : DI5 = " + measurement.isDI5());
+                        Log.d(TAG, "SmartSensor : DI6 = " + measurement.isDI6());
+                        Log.d(TAG, "SmartSensor : DI7 = " + measurement.isDI7());
+                        Log.d(TAG, "SmartSensor : DI9 = " + measurement.isDI9());
+                        Log.d(TAG, "=========================================================");
 
                         mCollectedData.removeIoTData(iotData.getIotDeviceId());
                         mCollectedData.addIoTData(iotData);
