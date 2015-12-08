@@ -1305,11 +1305,11 @@ public class IoTInterface {
         if (responseCallback != null) {
             Bundle extras = new Bundle();
             ArrayList<IoTDevice> devicesList = null;
-            if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
-                devicesList = new ArrayList<>(mBondedWithServerList.values());
-            } else {
+            //if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
+            //    devicesList = new ArrayList<>(mBondedWithServerList.values());
+            //} else {
                 devicesList = new ArrayList<>();
-            }
+            //}
 
             // 중복제거
             ArrayList<String> deviceIdList = new ArrayList<>();
