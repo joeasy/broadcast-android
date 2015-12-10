@@ -144,6 +144,8 @@ public class IoTInterface {
      * 10초동안 검색된 device list 를 저장해 두는 공간
      */
     private HashMap<String, IoTDevice> mBondedWithServerList = new HashMap<>();
+    private int mBondedKnownDeviceNumbers = 0;
+
     private HashMap<String, IoTDevice> mKeepAliveDeviceList = new HashMap<>();
     private long mLastSendCollectedDataToServer = 0L;
 
@@ -267,8 +269,14 @@ public class IoTInterface {
 
                 while (iter.hasNext()) {
                     String key = iter.next();
+                    IoTDevice device = mBondedWithServerList.get(key);
+
                     mBondedWithServerList.get(key).setIsKnownDevice(isKnownScenarioDevice(mBondedWithServerList.get(key).getDeviceTypeId(),
                             mBondedWithServerList.get(key).getUuids(), mBondedWithServerList.get(key).getUuidLen()));
+                    if (mBondedWithServerList.get(key).isKnownDevice() || isKeepAliveDevice(mBondedWithServerList.get(key)) ||
+                            isEmergencyCallDevice(device.getDeviceTypeId(), device.getUuids(), device.getUuidLen())) {
+                        mBondedKnownDeviceNumbers++;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -378,7 +386,7 @@ public class IoTInterface {
                 }
                 mServiceStatus = serviceStatus;
                 if (mServiceStatus == IoTServiceStatus.RUNNING) {
-                    if (mBondedWithServerList.size() > 0) {
+                    if (mBondedWithServerList.size() > 0 && mBondedKnownDeviceNumbers > 0) {
                         Bundle extras = new Bundle();
                         extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
                         sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
@@ -602,7 +610,7 @@ public class IoTInterface {
                 if (resultCode != null && resultCode.equals(IoTResultCodes.SUCCESS)) {
                     // success
                     Log.d(TAG, ">> IoT Register service success...");
-                    if (mBondedWithServerList.size() > 0) {
+                    if (mBondedWithServerList.size() > 0 && mBondedKnownDeviceNumbers > 0) {
                         Bundle extras = new Bundle();
                         extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
                         sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
@@ -1133,7 +1141,7 @@ public class IoTInterface {
             mCurrentRetrieveIndex = -1;
             mCurrentRetrieveDevice = null;
 
-            if (mBondedWithServerList.size() > 0) {
+            if (mBondedWithServerList.size() > 0 && mBondedKnownDeviceNumbers > 0) {
                 Bundle b = new Bundle();
                 b.putBoolean(IoTServiceCommand.KEY_DATA, true);
                 sendMessageToService(IoTServiceCommand.SCANNING_START, b);
@@ -1748,6 +1756,7 @@ public class IoTInterface {
                     Bundle extras = new Bundle();
                     IoTHandleData data = new IoTHandleData();
                     data.setDeviceId(key);
+                    data.setIsKeepAliveDevice(true);
 
                     data.setDeviceTypeId(device.getDeviceTypeId());
 
@@ -1758,6 +1767,24 @@ public class IoTInterface {
         }
 
         mBondedWithServerList = bondedHashMap;
+        mBondedKnownDeviceNumbers = 0;
+        // 알려진 디바이스 타입은 변경이 될수 있으므로
+        // 저장된 데이터를 로드하는 시점에 다시 설정해준다.
+        Iterator<String> iter = mBondedWithServerList.keySet().iterator();
+
+        while (iter.hasNext()) {
+            String key = iter.next();
+            IoTDevice device = mBondedWithServerList.get(key);
+
+            mBondedWithServerList.get(key).setIsBondedWithServer(true);
+            mBondedWithServerList.get(key).setIsKnownDevice(isKnownScenarioDevice(mBondedWithServerList.get(key).getDeviceTypeId(),
+                    mBondedWithServerList.get(key).getUuids(), mBondedWithServerList.get(key).getUuidLen()));
+
+            if (mBondedWithServerList.get(key).isKnownDevice() || isKeepAliveDevice(mBondedWithServerList.get(key)) ||
+                    isEmergencyCallDevice(device.getDeviceTypeId(), device.getUuids(), device.getUuidLen())) {
+                mBondedKnownDeviceNumbers++;
+            }
+        }
 
 //        for (int i = 0; i < bondedList.size(); i++) {
 //            IoTDevice newBondedDevice = bondedList.get(i);
@@ -1771,7 +1798,7 @@ public class IoTInterface {
 //            mBondedWithServerList.put(newBondedDevice.getDeviceId(), newBondedDevice);
 //        }
 
-        if (mBondedWithServerList.size() > 0) {
+        if (mBondedWithServerList.size() > 0 && mBondedKnownDeviceNumbers > 0) {
             Bundle extras = new Bundle();
             extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
             sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
@@ -2500,7 +2527,7 @@ public class IoTInterface {
     }
 
     private void sendCollectedDataToServer() {
-        if (mBondedWithServerList.size() > 0) {
+        if (mBondedWithServerList.size() > 0 && mBondedKnownDeviceNumbers > 0) {
             Bundle b = new Bundle();
             b.putBoolean(IoTServiceCommand.KEY_DATA, true);
             sendMessageToService(IoTServiceCommand.SCANNING_START, b);

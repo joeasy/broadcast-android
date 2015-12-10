@@ -173,7 +173,7 @@ public class IoTService extends Service {
                 } else {
                     if (mBluetoothLeService != null && mServiceStatus == IoTServiceStatus.RUNNING) {
                         mIsBleScanPeriodic = false;
-                        mBluetoothLeService.scanLeDevicePeriodically(false);
+                        mBluetoothLeService.scanLeDevicePeriodically(false, false);
                     }
                 }
                 break;
@@ -358,12 +358,6 @@ public class IoTService extends Service {
                         return;
                     }
 
-                    if (mRequestHandleMap.get(ioTHandleData.getDeviceId()) != null) {
-                        Log.d(TAG, "Already previous command deviceid = " + ioTHandleData.getDeviceId() + ", command = " + ioTHandleData.getRequestCommand());
-                        sendResultToApplication(clientMessenger, msgId, ioTHandleData.getDeviceId(), msg.what, IoTResultCodes.FAILED);
-                        return;
-                    }
-
                     if (ioTHandleData.isKeepAliveDevice()) {
                         if (mKeepAliveConnectionDeviceList.contains(ioTHandleData.getDeviceId())) {
                             Log.d(TAG, "Keep alive device is already connected.. id = " + ioTHandleData.getDeviceId());
@@ -445,12 +439,6 @@ public class IoTService extends Service {
                     if (ioTHandleData.getDeviceTypeId() != IoTDevice.DEVICE_TYPE_ID_BT) {
                         sendResultToApplication(clientMessenger, msgId, ioTHandleData.getDeviceId(), msg.what, IoTResultCodes.FAILED);
                         Log.w(TAG, "case IoTServiceCommand.DEVICE_DISCONNECT : is not bt device... mUseIoTGateway == false");
-                        return;
-                    }
-
-                    if (mRequestHandleMap.get(ioTHandleData.getDeviceId()) != null) {
-                        Log.d(TAG, "Already previous command deviceid = " + ioTHandleData.getDeviceId() + ", command = " + ioTHandleData.getRequestCommand());
-                        sendResultToApplication(clientMessenger, msgId, ioTHandleData.getDeviceId(), msg.what, IoTResultCodes.FAILED);
                         return;
                     }
 

@@ -907,7 +907,11 @@ public class BluetoothLeService extends Service {
      * @param enable
      */
     public void scanLeDevicePeriodically(final boolean enable) {
-        scanLeDevicePeriodically(enable, true);
+        if (!enable) {
+            scanLeDevicePeriodically(enable, false);
+        } else {
+            scanLeDevicePeriodically(enable, true);
+        }
     }
 
     /**
