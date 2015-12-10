@@ -498,7 +498,7 @@ public class IoTInterface {
             case IoTServiceCommand.DEVICE_READ_DATA_RESULT:
             case IoTServiceCommand.DEVICE_NOTIFICATION_DATA: {
                 // read 인지 notification 인지 구분해야 한다.
-                Log.d(TAG, "IoTServiceCommand.DEVICE_NOTIFICATION_DATA received");
+                //Log.d(TAG, "IoTServiceCommand.DEVICE_NOTIFICATION_DATA received");
 
                 try {
                     Bundle b = msg.getData();

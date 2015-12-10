@@ -735,7 +735,7 @@ public class IoTService extends Service {
                 sendNotificationToApplication(msg);
                 mRequestHandleMap.remove(address);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                Log.d(TAG, "ACTION_DATA_AVAILABLE received.");
+                //Log.d(TAG, "ACTION_DATA_AVAILABLE received.");
                 intent.setExtrasClassLoader(IoTHandleData.class.getClassLoader());
                 IoTHandleData resultData = intent.getParcelableExtra(IoTServiceCommand.KEY_DATA);
 
