@@ -139,6 +139,12 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
                 ((BaseActivity) getActivity()).showProgressDialog();
 
                 IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragmentStatus.this, true);
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((BaseActivity) getActivity()).dismissProgressDialog();
+                    }
+                }, 6000);
             }
         });
 
@@ -210,6 +216,12 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
         IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, this, true);
 
         ((BaseActivity) getActivity()).showProgressDialog();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ((BaseActivity) getActivity()).dismissProgressDialog();
+            }
+        }, 6000);
     }
 
     @Override
@@ -408,6 +420,12 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
                 } else {
                     ((BaseActivity) getActivity()).showProgressDialog();
                     IoTInterface.getInstance().getDevicesList(DeviceTypes.ALL, LoadIoTDevicesDialogFragmentStatus.this);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((BaseActivity) getActivity()).dismissProgressDialog();
+                        }
+                    }, 6000);
                 }
                 break;
         }
