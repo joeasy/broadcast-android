@@ -149,6 +149,8 @@ public class StickyGridHeadersIoTDevicesAdapter extends BaseAdapter implements
 
         IoTDevice item = getItem(position);
         holder.textView.setText(item.getDeviceName());
+        holder.isChecked = true;
+        holder.device = item;
 
         convertView.setClickable(false);
         return convertView;
@@ -172,7 +174,9 @@ public class StickyGridHeadersIoTDevicesAdapter extends BaseAdapter implements
         public TextView textView;
     }
 
-    protected class ViewHolder {
+    public class ViewHolder {
         public TextView textView;
+        public boolean isChecked;
+        public IoTDevice device;
     }
 }

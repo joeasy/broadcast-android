@@ -85,15 +85,15 @@ public class HomeLauncherApplication extends Application  {
 
     SmartSensorNotification mSmartSensorNotificationCallback = new SmartSensorNotification() {
         @Override
-        public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened) {
-            Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened);
+        public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened, boolean isDoorOpened2) {
+            //Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened + ", door opened2 = " + isDoorOpened2);
             boolean isOutdoor = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
             long currTime = System.currentTimeMillis();
             if (mLastInOutdoorMotionReportTime == 0L) {
                 mLastInOutdoorMotionReportTime = currTime;
             }
             
-            if (isOutdoor && (isMotionActive || isDoorOpened)) {
+            if (isOutdoor && (isMotionActive || isDoorOpened || isDoorOpened2)) {
                 // 외출모드 설정 중인데 모션이 감지되었다.
                 // 외출모드는 마지막 보고시점을 별도로 기록하지 않고 움직임이 발생할때마다 전달한다.
                 Log.d(TAG, "currTime - mLastInOutdoorMotionReportTime = " + (currTime - mLastInOutdoorMotionReportTime));
@@ -109,13 +109,13 @@ public class HomeLauncherApplication extends Application  {
                         Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_motion, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                         toast.show();
-                    } else if (isDoorOpened) {
+                    } else if (isDoorOpened || isDoorOpened2) {
                         Toast toast = Toast.makeText(HomeLauncherApplication.this, R.string.outdoor_mode_door_open, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                         toast.show();
                     }
                 }
-            } else if (isOutdoor && (!isMotionActive && !isDoorOpened)) {
+            } else if (isOutdoor && (!isMotionActive && !isDoorOpened && !isDoorOpened2)) {
                 // 일정시간이 지나면 false 가한번씩 올라와서... 여기선 아무것도하지말자.
                 //if (currTime - mLastInOutdoorMotionReportTime < OUTDOOR_MOTION_CHECK_START_TERM) {
                     //mLastInOutdoorMotionReportTime = currTime;

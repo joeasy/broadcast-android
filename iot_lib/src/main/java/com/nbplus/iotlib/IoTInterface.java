@@ -1280,7 +1280,7 @@ public class IoTInterface {
         if (mEmergencyDeviceList.size() > 0) {
             // 긴급호출데이터 수집 및 초기화 시작
             long currTimeMs = System.currentTimeMillis();
-            if (currTimeMs - mLastEmergencyDeviceFoundTimeMs > 1 * 60 * 1000) {
+            //if (currTimeMs - mLastEmergencyDeviceFoundTimeMs > 1 * 60 * 1000) {
                 mIsEmergencyDataCollecting = true;
 
                 // 모든 조회가 완료되기 전까지 스캐닝 자체를 중지시킨다.
@@ -1290,11 +1290,11 @@ public class IoTInterface {
 
                 mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                 sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT_ALL, null);
-            } else {
-                Log.d(TAG, ">>> Already emergency device retrive.. before = " + (currTimeMs - mLastEmergencyDeviceFoundTimeMs));
-                mIsEmergencyDataCollecting = false;
-                mEmergencyDeviceList.clear();
-            }
+//            } else {
+//                Log.d(TAG, ">>> Already emergency device retrive.. before = " + (currTimeMs - mLastEmergencyDeviceFoundTimeMs));
+//                mIsEmergencyDataCollecting = false;
+//                mEmergencyDeviceList.clear();
+//            }
         }
 
         if (mForceRescanCallback == null) {
@@ -1305,8 +1305,17 @@ public class IoTInterface {
         if (responseCallback != null) {
             Bundle extras = new Bundle();
             ArrayList<IoTDevice> devicesList = null;
-            if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
-                devicesList = new ArrayList<>(mBondedWithServerList.values());
+            // 2015.12.09
+            // 항상연결되는 타입의 BT 장치 추가.
+            // 기존에 연결되어있었던 장치들이 있더라도 현재 검색되지 않는다면 무시한다.
+
+            //if (mBondedWithServerList != null && mBondedWithServerList.size() > 0) {
+            //    devicesList = new ArrayList<>(mBondedWithServerList.values());
+            //} else {
+            //    devicesList = new ArrayList<>();
+            //}
+            if (mKeepAliveDeviceList != null && mKeepAliveDeviceList.size() > 0) {
+                devicesList = new ArrayList<>(mKeepAliveDeviceList.values());
             } else {
                 devicesList = new ArrayList<>();
             }
@@ -1712,18 +1721,55 @@ public class IoTInterface {
         }
     }
 
+    /**
+     * 서버와 동기화된 목록으로 갱신한다.
+     * @param bondedList
+     */
     public void updateBondedWithServerDeviceList(ArrayList<IoTDevice> bondedList) {
-        for (int i = 0; i < bondedList.size(); i++) {
-            IoTDevice newBondedDevice = bondedList.get(i);
-            if (StringUtils.isEmptyString(newBondedDevice.getDeviceId())) {
-                Log.d(TAG, "updateBondedWithServerDeviceList() : Device id not found...");
-                continue;
+        // 기존에 있던 목록을 유지하고 새로운 것만 받아들이는것
+        // 에서 서버와 마지막 동기화된 리스트만 유지하는 것으로 바꾼다.
+        // 이때 항상연결된 상태로 유지되는 디바이스가  bondedList 에 없다면 연결을 해제한다.
+        HashMap<String, IoTDevice> bondedHashMap = new HashMap<>();
+
+        if (bondedList != null) {
+            for (int i = 0; i < bondedList.size(); i++) {
+                bondedHashMap.put(bondedList.get(i).getDeviceId(), bondedList.get(i));
             }
-            newBondedDevice.setIsBondedWithServer(true);
-            newBondedDevice.setIsKnownDevice(isKnownScenarioDevice(newBondedDevice.getDeviceTypeId(),
-                    newBondedDevice.getUuids(), newBondedDevice.getUuidLen()));
-            mBondedWithServerList.put(newBondedDevice.getDeviceId(), newBondedDevice);
         }
+
+        if (mKeepAliveDeviceList.size() > 0) {
+            Iterator<String> iter = mKeepAliveDeviceList.keySet().iterator();
+
+            while (iter.hasNext()) {
+                String key = iter.next();
+                IoTDevice device = mKeepAliveDeviceList.get(key);
+
+                if (bondedHashMap.get(device.getDeviceId()) == null) {
+                    Bundle extras = new Bundle();
+                    IoTHandleData data = new IoTHandleData();
+                    data.setDeviceId(key);
+
+                    data.setDeviceTypeId(device.getDeviceTypeId());
+
+                    extras.putParcelable(IoTServiceCommand.KEY_DATA, data);
+                    sendMessageToService(IoTServiceCommand.DEVICE_DISCONNECT, extras);
+                }
+            }
+        }
+
+        mBondedWithServerList = bondedHashMap;
+
+//        for (int i = 0; i < bondedList.size(); i++) {
+//            IoTDevice newBondedDevice = bondedList.get(i);
+//            if (StringUtils.isEmptyString(newBondedDevice.getDeviceId())) {
+//                Log.d(TAG, "updateBondedWithServerDeviceList() : Device id not found...");
+//                continue;
+//            }
+//            newBondedDevice.setIsBondedWithServer(true);
+//            newBondedDevice.setIsKnownDevice(isKnownScenarioDevice(newBondedDevice.getDeviceTypeId(),
+//                    newBondedDevice.getUuids(), newBondedDevice.getUuidLen()));
+//            mBondedWithServerList.put(newBondedDevice.getDeviceId(), newBondedDevice);
+//        }
 
         if (mBondedWithServerList.size() > 0) {
             Bundle extras = new Bundle();
@@ -2150,12 +2196,12 @@ public class IoTInterface {
             }
             case IoTServiceCommand.DEVICE_NOTIFICATION_DATA: {
                 // 한시간에 한번만 받는다. 데이터를 받으면 연결종료하고 다음 시간에 받는다.
-                Log.d(TAG, "handleSmartSensor() : IoTServiceCommand.DEVICE_NOTIFICATION_DATA received.");
+                //Log.d(TAG, "handleSmartSensor() : IoTServiceCommand.DEVICE_NOTIFICATION_DATA received.");
                 String address = data.getDeviceId();
                 String characUuid = data.getCharacteristicUuid();
                 ArrayList<SmartSensor> measurements = SmartSensor.parseSmartSensorMeasurement(address, characUuid, values);
 
-                Log.d(TAG, "handleSmartSensor() : values = " + DataParser.getHexString(values));
+                //Log.d(TAG, "handleSmartSensor() : values = " + DataParser.getHexString(values));
                 for (SmartSensor measurement : measurements) {
                     if (measurement != null) {
                         IoTCollectedData.IoTData iotData = new IoTCollectedData.IoTData();
@@ -2188,7 +2234,7 @@ public class IoTInterface {
 
                         while (iter.hasNext()) {
                             String key = iter.next();
-                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7(), measurement.isDI6());
+                            mSensorNotificationCallbacks.get(key).notifyMotionSensor(mBondedWithServerList.get(iotData.getIotDeviceId()), measurement.isDI7(), measurement.isDI6(), measurement.isDI5());
                         }
                     }
                 }

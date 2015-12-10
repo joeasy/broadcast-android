@@ -23,12 +23,16 @@ import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -36,6 +40,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -60,10 +65,11 @@ import java.util.ArrayList;
 /**
  * Created by basagee on 2015. 6. 23..
  */
-public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implements DialogInterface.OnKeyListener, IoTServiceStatusNotification {
+public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implements DialogInterface.OnKeyListener, IoTServiceStatusNotification, AdapterView.OnItemClickListener {
     private static final String TAG = LoadIoTDevicesDialogFragmentStatus.class.getSimpleName();
 
     private ArrayList<IoTDevice> mIoTDevicesList = new ArrayList<>();
+    private ArrayList<IoTDevice> mDisabledDeviceList = new ArrayList<>();
 
     // button control
     ImageButton mCloseButton;
@@ -71,6 +77,7 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
     Button mSendButton;
     GridView mGridView;
     StickyGridHeadersIoTDevicesAdapter mGridAdapter;
+    int originalOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
 
     Handler mHandler = new Handler();
 
@@ -88,6 +95,9 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        setRetainInstance(true);
+        originalOrientation = getActivity().getRequestedOrientation();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         // fullscreen without statusbar
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -141,6 +151,8 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
                 showSyncAlertDialog();
             }
         });
+
+        mGridView.setOnItemClickListener(this);
 
         return dialog;
     }
@@ -205,6 +217,7 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
         super.onDetach();
         Log.d(TAG, "dialog onDetach");
 //        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+        getActivity().setRequestedOrientation(originalOrientation);
     }
 
     public void showSyncAlertDialog() {
@@ -338,6 +351,7 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
         } else {
             mIoTDevicesList = new ArrayList<>();
         }
+        mDisabledDeviceList.clear();
 
         if (mGridAdapter == null) {
             mGridAdapter = new StickyGridHeadersIoTDevicesAdapter(getActivity(),
@@ -398,4 +412,65 @@ public class LoadIoTDevicesDialogFragmentStatus extends DialogFragment implement
                 break;
         }
     }
+
+    /**
+     * Remove dialog.
+     */
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance()) {
+            getDialog().setDismissMessage(null);
+        }
+        super.onDestroyView();
+    }
+
+    /**
+     * Callback method to be invoked when an item in this AdapterView has
+     * been clicked.
+     * <p/>
+     * Implementers can call getItemAtPosition(position) if they need
+     * to access the data associated with the selected item.
+     *
+     * @param parent   The AdapterView where the click happened.
+     * @param view     The view within the AdapterView that was clicked (this
+     *                 will be a view provided by the adapter)
+     * @param position The position of the view in the adapter.
+     * @param id       The row id of the item that was clicked.
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG, "onItemClick postion = " + position);
+        StickyGridHeadersIoTDevicesAdapter.ViewHolder viewHolder = (StickyGridHeadersIoTDevicesAdapter.ViewHolder)view.getTag();
+        if (viewHolder instanceof StickyGridHeadersIoTDevicesAdapter.ViewHolder) {
+            if (viewHolder.isChecked) {
+                viewHolder.isChecked = false;
+                if (mIoTDevicesList.contains(viewHolder.device)) {
+                    mIoTDevicesList.remove(viewHolder.device);
+                    Log.d(TAG, "remove from mIoTDevicesList and add mDisabledDeviceList");
+                }
+                mDisabledDeviceList.add(viewHolder.device);
+                viewHolder.textView.setBackgroundColor(getResources().getColor(R.color.iot_devices_unselected));
+
+                if (mIoTDevicesList.size() == 0) {
+                    mSendButton.setEnabled(false);
+                }
+            } else {
+                viewHolder.isChecked = true;
+                if (mDisabledDeviceList.contains(viewHolder.device)) {
+                    mDisabledDeviceList.remove(viewHolder.device);
+                    Log.d(TAG, "remove from mDisabledDeviceList and add mIoTDevicesList");
+                }
+                mIoTDevicesList.add(viewHolder.device);
+                viewHolder.textView.setBackgroundColor(getResources().getColor(R.color.iot_devices_selected));
+
+                if (mIoTDevicesList.size() > 0) {
+                    mSendButton.setEnabled(true);
+                }
+            }
+        } else {
+            Log.d(TAG, "is not a view holder....");
+        }
+    }
+
+
 }

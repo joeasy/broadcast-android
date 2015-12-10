@@ -8,7 +8,7 @@
           android:paddingTop="10dp"
           android:paddingEnd="10dp"
           android:orientation="vertical"
-          android:background="@drawable/ic_radio_channel_selector"
+          android:background="@color/iot_devices_selected"
           android:textSize="@dimen/radio_channel_button_font_size"
           android:textColor="@color/white"
           android:textStyle="bold"

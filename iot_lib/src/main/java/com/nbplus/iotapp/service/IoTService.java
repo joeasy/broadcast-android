@@ -76,6 +76,7 @@ public class IoTService extends Service {
     boolean mLastConnectionStatus = false;          // network status
     private BluetoothLeService mBluetoothLeService;
     boolean mUseIoTGateway = false;
+    boolean mIsBleScanPeriodic = false;
 
     private IoTServiceHandler mHandler = new IoTServiceHandler(this);
     Messenger mServiceMessenger = null;
@@ -153,6 +154,7 @@ public class IoTService extends Service {
 
                 } else {
                     if (mBluetoothLeService != null && mServiceStatus == IoTServiceStatus.RUNNING) {
+                        mIsBleScanPeriodic = isPeriodic;
                         mBluetoothLeService.scanLeDevicePeriodically(true, isPeriodic);
                     }
                 }
@@ -164,13 +166,14 @@ public class IoTService extends Service {
                     Log.w(TAG, "Scanning bundle data is not found !!!");
                     return;
                 }
-                boolean isPeriodic = extras.getBoolean(IoTServiceCommand.KEY_DATA);
-                Log.d(TAG, "IoTServiceCommand.SCANNING_STOP called. periodic = " + isPeriodic);
+                //boolean isPeriodic = extras.getBoolean(IoTServiceCommand.KEY_DATA);
+                Log.d(TAG, "IoTServiceCommand.SCANNING_STOP called.");
                 if (mUseIoTGateway) {
 
                 } else {
                     if (mBluetoothLeService != null && mServiceStatus == IoTServiceStatus.RUNNING) {
-                        mBluetoothLeService.scanLeDevicePeriodically(false, isPeriodic);
+                        mIsBleScanPeriodic = false;
+                        mBluetoothLeService.scanLeDevicePeriodically(false);
                     }
                 }
                 break;
@@ -288,7 +291,7 @@ public class IoTService extends Service {
                     // TODO
                 } else {
                     mBluetoothLeService.scanLeDevice(false);
-                    mBluetoothLeService.scanLeDevice(true);
+                    mBluetoothLeService.scanLeDevicePeriodically(true, mIsBleScanPeriodic);
                 }
                 break;
             }
