@@ -86,7 +86,7 @@ public class HomeLauncherApplication extends Application  {
     SmartSensorNotification mSmartSensorNotificationCallback = new SmartSensorNotification() {
         @Override
         public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened, boolean isDoorOpened2) {
-            Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened + ", door opened2 = " + isDoorOpened2);
+            //Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened + ", door opened2 = " + isDoorOpened2);
             boolean isOutdoor = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
             long currTime = System.currentTimeMillis();
             if (mLastInOutdoorMotionReportTime == 0L) {
