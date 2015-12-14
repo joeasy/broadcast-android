@@ -204,6 +204,7 @@ public class IoTInterface {
             return mErrorCodes;
         }
         mInitialized = true;
+        initializeVariablesWhenStop();
 
         mGson = new Gson();
         // load scenarios
@@ -391,7 +392,20 @@ public class IoTInterface {
                     return;
                 }
                 mServiceStatus = serviceStatus;
-                if (mServiceStatus == IoTServiceStatus.RUNNING) {
+
+                Intent intent = new Intent(IoTConstants.ACTION_IOT_SERVICE_STATUS_CHANGED);
+                intent.putExtra(IoTConstants.EXTRA_SERVICE_STATUS, (mServiceStatus == IoTServiceStatus.RUNNING));
+                LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+
+                b.setClassLoader(IoTResultCodes.class.getClassLoader());
+                mErrorCodes = (IoTResultCodes)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE);
+                Log.d(TAG, "IoTServiceCommand.SERVICE_STATUS_NOTIFICATION : status = " + mServiceStatus + ", errCode = " + mErrorCodes);
+
+                if (mServiceStatus == IoTServiceStatus.STOPPED) {
+                    Log.d(TAG, "initializeVariablesWhenStop() called");
+                    initializeVariablesWhenStop();
+                } else if (mServiceStatus == IoTServiceStatus.RUNNING) {
+                    Log.d(TAG, "restart device scanning and retrives device data");
                     if (mBondedWithServerList.size() > 0 && (mBondedEmergencyDeviceNumbers > 0 || mBondedKeepaliveDeviceNumbers > 0)) {
                         Bundle extras = new Bundle();
                         extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
@@ -404,34 +418,7 @@ public class IoTInterface {
                     // IoT 디바이스 상태를 조회한다.
                     mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
                     mHandler.sendEmptyMessageDelayed(HANDLER_RETRIEVE_IOT_DEVICES, 10 * 1000);
-                } else {
-                    mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
-                    mHandler.removeMessages(HANDLER_COMMAND_NOT_RESPOND);
-                    mCurrentRetrieveIndex = -1;
-                    mCurrentRetrieveDevice = null;
-
-                    if (mIsEmergencyDataCollecting) {
-                        mEmergencyDeviceList.clear();
-                        mIsEmergencyDataCollecting = false;
-
-                        if (mIsWaitingForceDataSync) {
-                            mIsWaitingForceDataSync = false;
-                            Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
-                            LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
-                        }
-                    } else {
-                        Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
-                        LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
-                    }
                 }
-
-                Intent intent = new Intent(IoTConstants.ACTION_IOT_SERVICE_STATUS_CHANGED);
-                intent.putExtra(IoTConstants.EXTRA_SERVICE_STATUS, (mServiceStatus == IoTServiceStatus.RUNNING));
-                LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
-
-                b.setClassLoader(IoTResultCodes.class.getClassLoader());
-                mErrorCodes = (IoTResultCodes)b.getSerializable(IoTServiceCommand.KEY_SERVICE_STATUS_CODE);
-                Log.d(TAG, "IoTServiceCommand.SERVICE_STATUS_NOTIFICATION : status = " + mServiceStatus + ", errCode = " + mErrorCodes);
                 break;
             }
             case IoTServiceCommand.DEVICE_LIST_NOTIFICATION: {
@@ -1728,6 +1715,14 @@ public class IoTInterface {
             if (mBondedWithServerList.get(deviceUuid) != null) {
                 mBondedKeepaliveDeviceNumbers++;
             }
+
+            // keep alive 장비가 있으므로 다시 활성화되는 시점을 파악하기 위해서
+            // 주기적으로 스캐닝을 진행한다.
+            if (mBondedKeepaliveDeviceNumbers > 0) {
+                Bundle extras = new Bundle();
+                extras.putBoolean(IoTServiceCommand.KEY_DATA, true);
+                sendMessageToService(IoTServiceCommand.SCANNING_START, extras);
+            }
             return;
         }
 
@@ -2639,5 +2634,48 @@ public class IoTInterface {
 
     public void setSmartSensorNotificationCallback(String className, SmartSensorNotification notificationCallback) {
         mSensorNotificationCallbacks.put(className, notificationCallback);
+    }
+
+    private void initializeVariablesWhenStop() {
+        if (mForceRescanCallback != null) {
+            final IoTServiceStatusNotification responseCallback = mForceRescanCallback.get();
+            if (responseCallback != null) {
+                responseCallback.onResult(IoTServiceCommand.GET_DEVICE_LIST, mServiceStatus, mErrorCodes, null);
+            }
+            mForceRescanCallback = null;
+        }
+
+        mBondedKeepaliveDeviceNumbers += mKeepAliveDeviceList.size();
+
+        mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
+        mHandler.removeMessages(HANDLER_COMMAND_NOT_RESPOND);
+        mCurrentRetrieveIndex = -1;
+        mCurrentRetrieveDevice = null;
+
+        if (mIsEmergencyDataCollecting) {
+            if (mIsWaitingForceDataSync) {
+                mIsWaitingForceDataSync = false;
+                Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+                LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+            }
+        } else {
+            Intent intent = new Intent(IoTConstants.ACTION_IOT_DATA_SYNC_COMPLETED);
+            LocalBroadcastManager.getInstance(mCtx).sendBroadcast(intent);
+        }
+        // 긴급호출 디바이스 수집 목록
+        mEmergencyDeviceList.clear();
+        mIsEmergencyDataCollecting = false;
+        mIsWaitingForceDataSync = false;
+
+        // 데이터 수집중인 디바이스 정보
+        mCurrentRetrieveIndex = -1;
+        mCurrentRetrieveDevice = null;
+
+        // 데이터 수집 재시도 정보
+        mConnectionRetryCount = 0;
+        mCommandRetryCount = 0;
+
+        mHandler.removeMessages(HANDLER_RETRIEVE_IOT_DEVICES);
+        mHandler.removeMessages(HANDLER_COMMAND_NOT_RESPOND);
     }
 }
