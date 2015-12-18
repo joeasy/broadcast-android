@@ -127,6 +127,19 @@ public class DeviceUtils {
 
     private static String convertToHex(byte[] data) {
         StringBuffer buf = new StringBuffer();
+
+        /**
+         * 2015.12.18
+         * gw 용과맞춘다.
+         */
+        char hexDigits[] = { '0', '1', '2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
+
+        for (int hashByte = 0; hashByte < data.length; hashByte++) {
+            buf.append(hexDigits[(data[hashByte] >> 4) & 0xf]);
+            buf.append(hexDigits[data[hashByte] & 0xf]);
+        }
+
+        /**
         for (int i = 0; i < data.length; i++) {
             int halfByte = (data[i] >>> 4) & 0x0F;
             int twoHalfs = 0;
@@ -138,6 +151,7 @@ public class DeviceUtils {
                 halfByte = data[i] & 0x0F;
             } while(twoHalfs++ < 1);
         }
+         */
         return buf.toString();
     }
 

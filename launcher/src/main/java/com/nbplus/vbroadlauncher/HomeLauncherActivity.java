@@ -93,6 +93,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.vov.vitamio.LibsChecker;
+import io.vov.vitamio.utils.Device;
 
 public class HomeLauncherActivity extends BaseActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -375,11 +376,7 @@ public class HomeLauncherActivity extends BaseActivity
 
             LauncherSettings.getInstance(this).setPreferredUserLocation(defaultLocation);
         }
-
-        Log.d(TAG, "getMacAddress = " + NetworkUtils.getMacAddress(this));
-        Log.d(TAG, "getMacAddressFromNetworkInterface = " + NetworkUtils.getMacAddressFromNetworkInterface(this));
-        Log.d(TAG, "SET Device ID = " + LauncherSettings.getInstance(this).getDeviceID());
-
+        
         // First we need to check availability of play services
         mResultReceiver = new AddressResultReceiver(mActivityHandler);
         // Set defaults, then update using values stored in the Bundle.
