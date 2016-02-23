@@ -314,6 +314,11 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        // 2016.02.23
+        // 홈키를눌러서 백그라운드로 갈때... 종료시켜주자.
+        if (mWebViewClient != null) {
+            mWebViewClient.onBackPressed();
+        }
     }
 
     @Override

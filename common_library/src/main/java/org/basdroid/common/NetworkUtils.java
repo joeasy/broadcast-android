@@ -370,27 +370,36 @@ public class NetworkUtils {
         return "";
     }
 
-    public static String getDefaultWifiGatewayAddress(Context context) {
-        if (!isConnectedWifi(context)) {
-            return null;
-        }
 
+
+    private static byte[] convert2Bytes(int hostAddress) {
+        byte[] addressBytes = { (byte)(0xff & hostAddress),
+                (byte)(0xff & (hostAddress >> 8)),
+                (byte)(0xff & (hostAddress >> 16)),
+                (byte)(0xff & (hostAddress >> 24)) };
+        return addressBytes;
+    }
+
+    public static String getApIpAddr(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (wifiManager != null) {
-            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
-            if (dhcpInfo != null) {
-                return convertIntegerToStringIpAddress(dhcpInfo.gateway);
-            }
+        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+        byte[] ipAddress = convert2Bytes(dhcpInfo.serverAddress);
+        try {
+            String apIpAddr = InetAddress.getByAddress(ipAddress).getHostAddress();
+            return apIpAddr;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-
         return null;
     }
 
-    private static String convertIntegerToStringIpAddress(int i) {
-        return ((i >> 24 ) & 0xFF ) + "." +
-                ((i >> 16 ) & 0xFF) + "." +
-                ((i >> 8 ) & 0xFF) + "." +
-                ( i & 0xFF) ;
+    public static String getApSSID(Context context) {
+        try {
+            return getCurrentWifiInfo(context).getSSID();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
