@@ -1561,9 +1561,9 @@ public class WeatherView extends LinearLayout {
                 if (lastMaxCelsius != 0f) {
                     if (lastMaxCelsius > maxCelsius) {
                         maxCelsius = lastMaxCelsius;
-                    } else {
+                    } /*else {
                         maxCelsius += 2;            // yahoo 보정
-                    }
+                    }*/
                 }
                 mTodayMaxCelsius.setText(getContext().getString(R.string.celsius,  "" + (int)Math.ceil(maxCelsius)));
             } catch (NumberFormatException e) {
@@ -1591,7 +1591,7 @@ public class WeatherView extends LinearLayout {
 
             //보정
             float temp = Float.parseFloat(data.high);
-            temp += 2;
+            //temp += 2;
 
             mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 
@@ -1615,7 +1615,7 @@ public class WeatherView extends LinearLayout {
 
             //보정
             float temp = Float.parseFloat(data.high);
-            temp += 2;
+            //temp += 2;
 
             mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 

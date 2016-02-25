@@ -17,8 +17,11 @@
 
 package org.basdroid.common;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,9 +33,12 @@ import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Created by basagee on 2015. 5. 15..
@@ -96,46 +102,71 @@ public class PackageUtils {
         if (context == null || StringUtils.isEmptyString(packageName)) {
             return false;
         }
-        String[] activePackages;
+        String activePackageName;
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
-            activePackages = getActivePackages(context);
+            activePackageName = getActivePackageName(context);
         } else {
-            activePackages = getActivePackagesCompat(context);
+            activePackageName = getActivePackageNameCompat(context);
         }
-        if (activePackages != null) {
-            for (String activePackage : activePackages) {
-                if (activePackage.equals(packageName)) {
-                    return true;
-                }
-            }
+        if (activePackageName != null && activePackageName.equals(packageName)) {
+            return true;
         }
         return false;
     }
 
-    public static String[] getActivePackagesCompat(Context context) {
-        final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        final List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
-        final ComponentName componentName = taskInfo.get(0).topActivity;
-        final String[] activePackages = new String[1];
-        activePackages[0] = componentName.getPackageName();
-        return activePackages;
+    public static String getActivePackage(Context context) {
+        String activePackageName;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            activePackageName = getActivePackageName(context);
+        } else {
+            activePackageName = getActivePackageNameCompat(context);
+        }
+        return activePackageName;
     }
 
-
-    public static String[] getActivePackages(Context context) {
+    private static String getActivePackageNameCompat(Context context) {
         final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        final Set<String> activePackages = new HashSet<String>();
+        final List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+        if (taskInfo != null && taskInfo.size() > 0) {
+            final ComponentName componentName = taskInfo.get(0).topActivity;
+            return componentName.getPackageName();
+        } else {
+            return null;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static String getActivePackageName(Context context) {
+//        final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+//        final Set<String> activePackages = new HashSet<String>();
 
 //        final List<ActivityManager.AppTask> tasks = activityManager.getAppTasks();
 //        for (ActivityManager.AppTask task : tasks) {
 //            activePackages.add(task.getTaskInfo().baseIntent.getComponent().getPackageName());
 //        }
-        final List<ActivityManager.RunningAppProcessInfo> processInfos = activityManager.getRunningAppProcesses();
-        for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
-            if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                activePackages.addAll(Arrays.asList(processInfo.pkgList));
+        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+        long time = System.currentTimeMillis();
+        List<UsageStats> appList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time);
+        if (appList != null && appList.size() > 0) {
+            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<Long, UsageStats>();
+            for (UsageStats usageStats : appList) {
+                mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+            }
+            if (mySortedMap != null && !mySortedMap.isEmpty()) {
+                return mySortedMap.get(mySortedMap.lastKey()).getPackageName();
             }
         }
-        return activePackages.toArray(new String[activePackages.size()]);
+        return null;
+
+//        final List<ActivityManager.RunningAppProcessInfo> processInfos = activityManager.getRunningAppProcesses();
+//        for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
+//            if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+//                activePackages.addAll(Arrays.asList(processInfo.pkgList));
+//            }
+//        }
+//        if (activePackages.size() == 0) {
+//            return null;
+//        }
+//        return activePackages.toArray(new String[activePackages.size()]);
     }
 }

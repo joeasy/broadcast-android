@@ -203,6 +203,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+            this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_broadcast_webview);
 
@@ -316,9 +319,9 @@ public class BroadcastWebViewActivity extends BaseActivity {
         super.onPause();
         // 2016.02.23
         // 홈키를눌러서 백그라운드로 갈때... 종료시켜주자.
-        if (mWebViewClient != null) {
-            mWebViewClient.onBackPressed();
-        }
+//        if (mWebViewClient != null) {
+//            mWebViewClient.onBackPressed();
+//        }
     }
 
     @Override
@@ -330,6 +333,10 @@ public class BroadcastWebViewActivity extends BaseActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "BroadcastWebViewActivity onConfigurationChanged()");
+        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+            this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            return;
+        }
         setContentViewByOrientation();
     }
 

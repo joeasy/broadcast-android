@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.Build;
@@ -350,6 +351,9 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+            this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
 
         mSettingsContentObserver = new SettingsContentObserver(this,new Handler());
         getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver );

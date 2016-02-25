@@ -56,6 +56,13 @@ public class LauncherSettings {
     boolean isCheckedTTSEngine;
 
     boolean isOutdoorMode = false;
+    boolean isSmartPhone = false;
+    public boolean isSmartPhone() {
+        return isSmartPhone;
+    }
+    public void setIsSmartPhone(boolean isSmartPhone) {
+        this.isSmartPhone = isSmartPhone;
+    }
 
     // 서버정보
     @SerializedName("svc_domain")

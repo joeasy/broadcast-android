@@ -33,6 +33,7 @@ import android.os.Build;
 import android.provider.Browser;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -111,9 +112,12 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                 case Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST :
                 case Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST :
                 case Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST :
+                    TelephonyManager telephonyManager =(TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+                    int callState = telephonyManager.getCallState();
+
                     boolean isOutdoor = LauncherSettings.getInstance(context).isOutdoorMode();
                     playNotificationAlarm(context, R.string.notification_broadcast_push);
-                    if (isOutdoor) {        // 외출모드에서는 재생하지 않음.
+                    if (isOutdoor || callState == TelephonyManager.CALL_STATE_OFFHOOK) {        // 외출모드에서는 재생하지 않음.
                         Log.d(TAG, "Broadcast notification.. isOutdoor mode... ");
                         pi = new Intent();
                         pi.setAction(action);
@@ -122,78 +126,115 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
 
                         return;
-                    } else {
-                        // 크롬브라우저가 실행중이며. 마을 방송 Domain url 이라면 실행하지 않는다.
-                        if (PackageUtils.isActivePackage(context, Constants.GOOGLE_CHROME_PACKAGE_NAME)) {
-                            Log.d(TAG, "chrome browser is active....");
-                            // get the last visited URL from the Browser.BOOKMARKS_URI database
-                            String url = "";
-                            Uri chromeUri = Uri.parse("content://com.android.chrome.browser/bookmarks");
-                            Cursor cur = context.getContentResolver().query(chromeUri/*Browser.BOOKMARKS_URI*/,
-                                    new String[] { Browser.BookmarkColumns.URL }, null, null,
-                                    Browser.BookmarkColumns.DATE + " DESC");
-                            if (cur != null && cur.getCount() > 0) {
-                                cur.moveToFirst();
-                                url = cur.getString(cur.getColumnIndex(Browser.BookmarkColumns.URL));
-                                cur.close();
-                            } else {
-                                if (cur != null) {
-                                    cur.close();
-                                }
-                            }
+                    }
 
-                            Log.d(TAG, "Last activated url = " + url);
-                            if (!StringUtils.isEmptyString(url) && url.startsWith(Constants.VBROAD_HTTP_DOMAIN)) {
-                                Log.w(TAG, ">> Village broadcast is running... do not show!!!!");
+                    if (Constants.OPEN_BETA_PHONE) {
+                        String activePackageName = PackageUtils.getActivePackage(context);
+                        if (activePackageName != null && !StringUtils.isEmptyString(activePackageName)) {
+                            if (Constants.VBROAD_SEND_APP_PACKAGE.equals(activePackageName)) {
+                                Log.d(TAG, Constants.VBROAD_SEND_APP_PACKAGE + " is top running application....");
                                 pi = new Intent();
                                 pi.setAction(action);
                                 pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
                                 pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+
                                 return;
                             }
                         }
+                    }
 
-                        // android version check.
-                        if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type) || Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(type)) {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                                Log.d(TAG, ">> This device version code = " + Build.VERSION.SDK_INT + ", not supported version !!");
-                                Toast.makeText(context, R.string.notification_broadcast_not_support, Toast.LENGTH_SHORT);
-                                pi = new Intent();
-                                pi.setAction(action);
-                                pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
-                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
-                                LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
-                                break;
+                    // 크롬브라우저가 실행중이며. 마을 방송 Domain url 이라면 실행하지 않는다.
+                    if (PackageUtils.isActivePackage(context, Constants.GOOGLE_CHROME_PACKAGE_NAME)) {
+                        Log.d(TAG, "chrome browser is active....");
+                        // get the last visited URL from the Browser.BOOKMARKS_URI database
+                        String url = "";
+                        Uri chromeUri = Uri.parse("content://com.android.chrome.browser/bookmarks");
+                        Cursor cur = context.getContentResolver().query(chromeUri/*Browser.BOOKMARKS_URI*/,
+                                new String[] { Browser.BookmarkColumns.URL }, null, null,
+                                Browser.BookmarkColumns.DATE + " DESC");
+                        if (cur != null && cur.getCount() > 0) {
+                            cur.moveToFirst();
+                            url = cur.getString(cur.getColumnIndex(Browser.BookmarkColumns.URL));
+                            cur.close();
+                        } else {
+                            if (cur != null) {
+                                cur.close();
                             }
                         }
-                        /*boolean useServiceChatHead = false;
 
-                        if (useServiceChatHead) {
-                            i = new Intent(context, RealtimeBroadcastProxyActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            i.setAction(action);
-                            i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
-                            context.startActivity(i);
-                        } else*/
+                        Log.d(TAG, "Last activated url = " + url);
+                        if (!StringUtils.isEmptyString(url) && url.startsWith(Constants.VBROAD_HTTP_DOMAIN)) {
+                            Log.w(TAG, ">> Village broadcast is running... do not show!!!!");
+                            pi = new Intent();
+                            pi.setAction(action);
+                            pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+                            pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+                            return;
+                        }
+                    }
 
-                        String playingType = LauncherSettings.getInstance(context).getCurrentPlayingBroadcastType();
+                    // android version check.
+                    if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type) || Constants.PUSH_PAYLOAD_TYPE_NORMAL_BROADCAST.equals(type)) {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                            Log.d(TAG, ">> This device version code = " + Build.VERSION.SDK_INT + ", not supported version !!");
+                            Toast.makeText(context, R.string.notification_broadcast_not_support, Toast.LENGTH_SHORT);
+                            pi = new Intent();
+                            pi.setAction(action);
+                            pi.putExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, intent.getIntExtra(PushConstants.EXTRA_PUSH_STATUS_VALUE, PushConstants.PUSH_STATUS_VALUE_DISCONNECTED));
+                            pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+                            break;
+                        }
+                    }
+                    /*boolean useServiceChatHead = false;
 
-                        if (StringUtils.isEmptyString(playingType) ||
-                                !Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType)) {
-                            // 재생중인것이 없거나... 실시간이 아닌경우. 나중에받은것이 실행
+                    if (useServiceChatHead) {
+                        i = new Intent(context, RealtimeBroadcastProxyActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        i.setAction(action);
+                        i.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                        context.startActivity(i);
+                    } else*/
+
+                    String playingType = LauncherSettings.getInstance(context).getCurrentPlayingBroadcastType();
+
+                    if (StringUtils.isEmptyString(playingType) ||
+                            !Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType)) {
+                        // 재생중인것이 없거나... 실시간이 아닌경우. 나중에받은것이 실행
+                        pi = new Intent(context, RealtimeBroadcastActivity.class);
+                        pi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        pi.setAction(action);
+                        pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
+                        pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
+
+                        Log.d(TAG, "1. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
+                        // 서버에서 몇십ms  단위로거의 동일 시간에 전달되는 경우 먼저온 푸시의 액티비티가 생성되기도전에
+                        // broadcast 만전달될 수있다.
+                        // 액티비티가 생성된 이후에 던지자.
+                        //LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
+
+                        try {
+                            //Thread.sleep(30);
+                            context.startActivity(pi);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // 재생중인 방송이 실시간인데... 새로운 요청도 실시간이면.. 새로운 요청이 우선.
+                        if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType) && Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type)) {
                             pi = new Intent(context, RealtimeBroadcastActivity.class);
                             pi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             pi.setAction(action);
                             pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
                             pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
 
-                            Log.d(TAG, "1. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
+                            Log.d(TAG, "2. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
                             // 서버에서 몇십ms  단위로거의 동일 시간에 전달되는 경우 먼저온 푸시의 액티비티가 생성되기도전에
                             // broadcast 만전달될 수있다.
                             // 액티비티가 생성된 이후에 던지자.
                             //LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
-
                             try {
                                 //Thread.sleep(30);
                                 context.startActivity(pi);
@@ -201,33 +242,11 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                                 e.printStackTrace();
                             }
                         } else {
-                            // 재생중인 방송이 실시간인데... 새로운 요청도 실시간이면.. 새로운 요청이 우선.
-                            if (Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(playingType) && Constants.PUSH_PAYLOAD_TYPE_REALTIME_BROADCAST.equals(type)) {
-                                pi = new Intent(context, RealtimeBroadcastActivity.class);
-                                pi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                pi.setAction(action);
-                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_DATA, payloadData);
-                                pi.putExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, System.currentTimeMillis());
-
-                                Log.d(TAG, "2. sendBroadcast() >> ACTION_PUSH_MESSAGE_RECEIVED : idx = " + pi.getLongExtra(Constants.EXTRA_BROADCAST_PAYLOAD_INDEX, -1));
-                                // 서버에서 몇십ms  단위로거의 동일 시간에 전달되는 경우 먼저온 푸시의 액티비티가 생성되기도전에
-                                // broadcast 만전달될 수있다.
-                                // 액티비티가 생성된 이후에 던지자.
-                                //LocalBroadcastManager.getInstance(context).sendBroadcast(pi);
-                                try {
-                                    //Thread.sleep(30);
-                                    context.startActivity(pi);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                // 이미 우선순위높은 방송이 재생중이다.
-                                Log.d(TAG, "이미 우선순위높은 방송이 재생중이다.");
-                                Toast.makeText(context, payloadData.getAlertMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            // 이미 우선순위높은 방송이 재생중이다.
+                            Log.d(TAG, "이미 우선순위높은 방송이 재생중이다.");
+                            Toast.makeText(context, payloadData.getAlertMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
-
                     break;
                 // 긴급호출메시지
                 case Constants.PUSH_PAYLOAD_TYPE_EMERGENCY_CALL :

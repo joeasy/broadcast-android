@@ -27,7 +27,7 @@ public class YahooQueryGeocodeResult {
     }
 
     public static class GeocodeResultWrapper {
-        @SerializedName("Result")
+        @SerializedName("place")
         public GeocodeData data;
     }
 }

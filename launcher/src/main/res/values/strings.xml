@@ -23,6 +23,7 @@
     <string name="alert_server_info_message">Server information is incorrect.</string>
     <string name="alert_network_btn_check_wifi">Check Wi-Fi</string>
     <string name="alert_wrong_page_url">Invalid web page url. Plese check your administrator.</string>
+    <string name="alert_action_usage_access_settings">Please enable usage access.</string>
     <string name="alert_tts_message">TTS Engine is not available. Check your TTS settings.</string>
     <string name="alert_tts_btn_settings">Settings</string>
 

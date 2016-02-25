@@ -21,12 +21,14 @@ package com.nbplus.vbroadlauncher;
  * Created by basagee on 2015. 5. 15..
  */
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.Message;
@@ -277,6 +279,8 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boolean isTablet = DisplayUtils.isTabletDevice(this);
+        LauncherSettings.getInstance(this).setIsSmartPhone(!isTablet);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_home_launcher);
 
@@ -308,7 +312,6 @@ public class HomeLauncherActivity extends BaseActivity
             Log.d(TAG, "Screen density = " + density);
         }
 
-        boolean isTablet = DisplayUtils.isTabletDevice(this);
         if (isTablet) {
             //is tablet
             Log.d(TAG, "Tablet");
@@ -321,37 +324,41 @@ public class HomeLauncherActivity extends BaseActivity
                 // 6.5inch device or bigger
                 Log.d(TAG, "DisplayUtils.getDisplayInches() bigger than 6.5");
             } else {
-                // smaller device
-                Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                alert.setMessage(R.string.alert_phone_message);
-                alert.show();
+                if (!Constants.OPEN_BETA_PHONE) {
+                    // smaller device
+                    Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
+                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                    alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
+                    alert.setMessage(R.string.alert_phone_message);
+                    alert.show();
 
-                return;
+                    return;
+                }
             }
         }
 
-        if (isMyLauncherDefault()) {
-            Log.d(TAG, "isMyLauncherDefault() == true");
-            // fake home key event.
-            Intent fakeIntent = new Intent();
-            fakeIntent.setAction(Intent.ACTION_MAIN);
-            fakeIntent.addCategory(Intent.CATEGORY_HOME);
-            fakeIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                    | Intent.FLAG_ACTIVITY_FORWARD_RESULT
-                    | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
-                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            startActivity(fakeIntent);
-        } else {
-            Log.d(TAG, "isMyLauncherDefault() == false");
-            //resetPreferredLauncherAndOpenChooser();
+        if (!Constants.OPEN_BETA_PHONE || !LauncherSettings.getInstance(this).isSmartPhone()) {
+            if (isMyLauncherDefault()) {
+                Log.d(TAG, "isMyLauncherDefault() == true");
+                // fake home key event.
+                Intent fakeIntent = new Intent();
+                fakeIntent.setAction(Intent.ACTION_MAIN);
+                fakeIntent.addCategory(Intent.CATEGORY_HOME);
+                fakeIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                        | Intent.FLAG_ACTIVITY_FORWARD_RESULT
+                        | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP
+                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                startActivity(fakeIntent);
+            } else {
+                Log.d(TAG, "Constants.OPEN_BETA_PHONE == false || isMyLauncherDefault() == false");
+                //resetPreferredLauncherAndOpenChooser();
+            }
         }
 
         // 앱이 설치후 실행하면.. 런처설정시에 기존액티비티가 살아있는 상태로 새로운 액티비티가 실행된다.
@@ -550,10 +557,27 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
+        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
 
         Log.d(TAG, "onResume()");
         Intent intent = new Intent(Constants.ACTION_BROWSER_ACTIVITY_CLOSE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        if (!checkAccessedUsageStats()) {
+            new AlertDialog.Builder(this).setMessage(R.string.alert_action_usage_access_settings)
+                    //.setTitle(R.string.alert_network_title)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.alert_ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                                }
+                            })
+                    .show();
+            return;
+        }
 
         /**
          * 구글 플레이 서비스가 최신버전이 실행되고 있어야 GPS 정보등을 정상적으로 받아올 수 있다.
@@ -893,6 +917,10 @@ public class HomeLauncherActivity extends BaseActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged !!!");
+        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+            this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            return;
+        }
         setContentViewByOrientation();
     }
 
@@ -982,5 +1010,18 @@ public class HomeLauncherActivity extends BaseActivity
 //        startActivity(fakeIntent);
 
         packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+    }
+
+    protected boolean checkAccessedUsageStats() {
+        try {
+            PackageManager packageManager = getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            return (mode == AppOpsManager.MODE_ALLOWED);
+
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 }

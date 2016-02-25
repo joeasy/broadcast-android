@@ -11,8 +11,8 @@ import com.google.gson.annotations.SerializedName;
 public class GeocodeData implements Parcelable {
     @SerializedName("woeid")
     public String woeid;
-    @SerializedName("woetype")
-    public String woetype;
+//    @SerializedName("woetype")
+//    public String woetype;
 
     @Override
     public int describeContents() {
@@ -22,7 +22,7 @@ public class GeocodeData implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.woeid);
-        dest.writeString(this.woetype);
+//        dest.writeString(this.woetype);
     }
 
     public GeocodeData() {
@@ -30,7 +30,7 @@ public class GeocodeData implements Parcelable {
 
     protected GeocodeData(Parcel in) {
         this.woeid = in.readString();
-        this.woetype = in.readString();
+//        this.woetype = in.readString();
     }
 
     public static final Creator<GeocodeData> CREATOR = new Creator<GeocodeData>() {

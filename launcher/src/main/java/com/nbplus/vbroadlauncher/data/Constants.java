@@ -4,8 +4,10 @@ package com.nbplus.vbroadlauncher.data;
  * Created by basagee on 2015. 6. 1..
  */
 public class Constants {
+    public static final boolean OPEN_BETA_PHONE = true;
     //  서버정보
     public static final String VBROAD_HTTP_DOMAIN = "http://183.98.53.165:8080";
+    public static final String VBROAD_SEND_APP_PACKAGE = "com.nbplus.vbroadcreator";
     public static final String VBROAD_INITIAL_PAGE = VBROAD_HTTP_DOMAIN + "/common/selectServer.rcc";
     public static final String API_IOT_UPDATE_DEVICE_LIST = "/is/api/iot/RegistIOTDevice";
     public static final String API_COLLECTED_IOT_DATA_CONTEXT = "/is/api/iot/RegistIOTData";
@@ -88,12 +90,25 @@ public class Constants {
     public static final String RESULT_OK = "0000";
 
     // for yahoo weather
+    // 2016.02.24 야후도 weoid 가져오는 쿼리를 막았다.
+    /*
+        After much playing yesterday, I discovered that the geo.placefinder table returns nothing,
+        but the geo.places table does. So you can change your query to "select * from geo.places(1) where..."
+        Just be aware that the results are formatted slightly differently.
+
+        Also, I noticed that when passing in latitude and longitude,
+        be sure to include parentheses around it. E.g. text="(111.11111,222.22222)"
+
+        So, to repost your original query with the working places
+        (notice there is no more GFlags parameter and the parentheses around the lat/lng):
+
+        https://developer.yahoo.com/yql/console/?debug=true#h=select+*+from+geo.places(1)+where+text%3D%22(37.416275%2C-122.025092)%22
+     */
 //    public static final String YAHOO_APP_ID = "e1szeL7k";
 //    public static final String GEO_API = "http://where.yahooapis.com/geocode?location=%f,%f&flags=J&gflags=R&appid=" + YAHOO_APP_ID;
     public static final String YAHOO_WEATHER_API = "http://query.yahooapis.com/v1/public/yql?q=%s&format=json";
-    public static final String YAHOO_WOEID_QUERY = "select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"";
+    public static final String YAHOO_WOEID_QUERY = "select * from geo.places(1) where text=\"(%s,%s)\"";
     public static final String YAHOO_WEATHER_QUERY = "select * from weather.forecast where woeid=%s and u=\"c\"";
-
     public static final String YAHOO_QUERY_WOEID_RESULT = "Result";
     public static final String YAHOO_QUERY_WEATHER_RESULT = "channel";
 

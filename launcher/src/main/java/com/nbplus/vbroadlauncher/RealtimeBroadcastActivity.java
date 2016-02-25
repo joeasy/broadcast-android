@@ -32,6 +32,8 @@ import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -285,6 +287,12 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mStreamMusicVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC),  AudioManager.FLAG_PLAY_SOUND);
+
+        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+            StateListener phoneStateListener = new StateListener();
+            TelephonyManager telephonyManager =(TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+            telephonyManager.listen(phoneStateListener,PhoneStateListener.LISTEN_CALL_STATE);
+        }
     }
 
     /**
@@ -542,4 +550,21 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         }, 10000); // after 2 second (or 2000 miliseconds), the task will be active.
     }
 
+    class StateListener extends PhoneStateListener {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            super.onCallStateChanged(state, incomingNumber);
+            switch (state) {
+                case TelephonyManager.CALL_STATE_RINGING:
+                    break;
+                // that is dialing, active, or on hold, and no calls are ringing or waiting
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                    System.out.println("call Activity off hook");
+                    RealtimeBroadcastActivity.this.finishActivity();
+                    break;
+                case TelephonyManager.CALL_STATE_IDLE:
+                    break;
+            }
+        }
+    };
 }
