@@ -847,7 +847,10 @@ public class HomeLauncherActivity extends BaseActivity
      */
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
+        if (Constants.OPEN_BETA_PHONE) {
+            super.onBackPressed();
+            return;
+        }
         if (this.mActivityInteractionListener != null) {
             for (OnActivityInteractionListener listener : mActivityInteractionListener) {
                 listener.onBackPressed();

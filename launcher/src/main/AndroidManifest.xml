@@ -40,8 +40,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!-- The following two intent-filters are the key to set homescreen -->
-                <category android:name="android.intent.category.HOME" />
                 <!-- alpha/beta 에선 사용하지않음.
+                <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 -->
                 <category android:name="android.intent.category.LAUNCHER" />
