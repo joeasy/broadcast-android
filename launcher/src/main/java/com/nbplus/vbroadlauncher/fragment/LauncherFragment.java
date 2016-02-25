@@ -588,7 +588,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
              * right shortcut panel
              */
             ShortcutData data = mainShortcutDatas.get(i);
-            FrameLayout btnLayout = (FrameLayout)layoutInflater.inflate(R.layout.launcher_menu_item, mMainShortcutGridLayout, false);//new Button(getActivity());
+            FrameLayout btnLayout = (FrameLayout)layoutInflater.inflate(R.layout.launcher_menu_top_item, mMainShortcutGridLayout, false);//new Button(getActivity());
             mMainShortcutGridLayout.addView(btnLayout);
             if (data.getPushType() != null && data.getPushType().length > 0) {
                 data.setLauncherButton(btnLayout);

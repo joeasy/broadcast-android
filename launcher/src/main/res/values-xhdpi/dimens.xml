@@ -10,6 +10,12 @@
     <dimen name="launcher_ic_menu_main_shortcut_font_size">10.5468dp</dimen>
     <dimen name="launcher_ic_menu_main_shortcut_margin">5.86dp</dimen>
     <dimen name="launcher_ic_menu_shortcut_font_size">10.5468dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_icon_width">33.5dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_icon_height">33.5dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_icon_width">33.5dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_icon_height">25.5dp</dimen>
+    <dimen name="launcher_weather_current_icon_width">54.5dp</dimen>
+    <dimen name="launcher_weather_current_icon_height">44dp</dimen>
     <dimen name="launcher_panel_margin">30.468dp</dimen>
 
     <dimen name="clock_bottom_margin">8.79dp</dimen>

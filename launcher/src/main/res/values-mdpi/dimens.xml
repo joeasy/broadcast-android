@@ -11,6 +11,8 @@
     <dimen name="launcher_ic_menu_main_shortcut_margin">3dp</dimen>
     <dimen name="launcher_ic_menu_shortcut_font_size">14.0625dp</dimen>
     <dimen name="launcher_panel_margin">40.625dp</dimen>
+    <dimen name="launcher_weather_current_icon_width">82dp</dimen>
+    <dimen name="launcher_weather_current_icon_height">66dp</dimen>
 
     <dimen name="clock_bottom_margin">11.71875dp</dimen>
     <!-- weather -->

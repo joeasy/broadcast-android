@@ -8,8 +8,8 @@ android {
         applicationId "com.nbplus.vbroadlauncher"
         minSdkVersion 18
         targetSdkVersion 21
-        versionCode 97               // set push interface..
-        versionName "0.9.7"
+        versionCode 98               // set push interface..
+        versionName "0.9.8"
     }
     signingConfigs {
         debug {

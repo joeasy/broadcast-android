@@ -128,6 +128,7 @@ public class WeatherView extends LinearLayout {
     private TextView mCurrentTitle;
     private TextView mCurrentCelsius;
     private TextView mCurrentSkyStatus;
+    private ImageView mCurrentSkyStatusIcon;
 
     // today
     private TextView mTodayTitle;
@@ -247,6 +248,7 @@ public class WeatherView extends LinearLayout {
 
         mCurrentCelsius = (TextView) v.findViewById(R.id.current_celsius);
         mCurrentSkyStatus = (TextView) v.findViewById(R.id.current_sky_status);
+        mCurrentSkyStatusIcon = (ImageView) v.findViewById(R.id.current_sky_status_icon);
 
         // today
         mTodayTitle = (TextView) v.findViewById(R.id.today);
@@ -1031,7 +1033,8 @@ public class WeatherView extends LinearLayout {
                 mCurrentCelsius.setTag(item);
                 mCurrentCelsius.setText(getContext().getString(R.string.celsius, item.obsrValue));
                 TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
-                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
+//                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
+                mCurrentSkyStatusIcon.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
                 mCurrentSkyStatusValue = skyStatusValue;
 
                 setCurrentSkyStatusBackground(DisplayUtils.getScreenOrientation((AppCompatActivity) getContext()));

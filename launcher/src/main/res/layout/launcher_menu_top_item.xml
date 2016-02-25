@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/menu_item_image"
-            android:layout_width="@dimen/launcher_ic_menu_shortcut_icon_width"
-            android:layout_height="@dimen/launcher_ic_menu_shortcut_icon_height"
+            android:layout_width="@dimen/launcher_ic_menu_main_shortcut_icon_width"
+            android:layout_height="@dimen/launcher_ic_menu_main_shortcut_icon_height"
             android:layout_margin="5dp"
             android:scaleType="fitXY"
             android:layout_gravity="center"

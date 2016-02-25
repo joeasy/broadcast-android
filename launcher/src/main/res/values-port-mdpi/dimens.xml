@@ -11,6 +11,12 @@
     <dimen name="launcher_ic_menu_main_shortcut_height">110.9375dp</dimen>
     <dimen name="launcher_ic_menu_shortcut_width">122dp</dimen>
     <dimen name="launcher_ic_menu_shortcut_height">104.6875dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_icon_width">67dp</dimen>
+    <dimen name="launcher_ic_menu_main_shortcut_icon_height">67dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_icon_width">67dp</dimen>
+    <dimen name="launcher_ic_menu_shortcut_icon_height">51dp</dimen>
+    <dimen name="launcher_weather_current_icon_width">109dp</dimen>
+    <dimen name="launcher_weather_current_icon_height">88dp</dimen>
     <dimen name="gridview_vertical_cellspacing">0dp</dimen>
     <dimen name="gridview_horizontal_cellspacing">7.8125dp</dimen>
     <dimen name="weather_current_height">120dp</dimen>

@@ -48,6 +48,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -285,6 +286,8 @@ public class HomeLauncherActivity extends BaseActivity
         setContentView(R.layout.activity_home_launcher);
 
         DeviceUtils.showDeviceInformation();
+
+        Log.d(TAG, ">>>DisplayUtils.getScreenDensity(this) = " + DisplayUtils.getScreenDensity(this));
 
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {

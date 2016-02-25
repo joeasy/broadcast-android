@@ -51,21 +51,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/current_celsius"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="@dimen/weather_current_temp_font_size"
-            android:textAlignment="center"
-            android:textStyle="bold"
-            android:shadowColor="@color/weather_shadow_color"
-            android:shadowDx="3"
-            android:shadowDy="3"
-            android:shadowRadius="2"
-            android:drawableEnd="@drawable/ic_weather_01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:layout_gravity="center"
+                      android:gravity="center"
+            >
+            <TextView
+                android:id="@+id/current_celsius"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/weather_current_temp_font_size"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:shadowColor="@color/weather_shadow_color"
+                android:shadowDx="3"
+                android:shadowDy="3"
+                android:shadowRadius="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/current_sky_status_icon"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:scaleType="fitXY"
+                android:layout_width="@dimen/launcher_weather_current_icon_width"
+                android:layout_height="@dimen/launcher_weather_current_icon_height"/>
+
+
+        </LinearLayout>
 
     </LinearLayout>
     <LinearLayout
