@@ -385,17 +385,17 @@ public class PushService extends Service {
             mRequestBody = gson.toJson(reqBodyObj, new TypeToken<GetPushInterfaceRequestBody>(){}.getType());
         }
 
-        RequestQueue requestQueue = Volley.newRequestQueue(mContext, new HurlStack() {
-            @Override
-            protected HttpURLConnection createConnection(URL url) throws IOException {
-                HttpURLConnection connection = super.createConnection(url);
-                // Fix for bug in Android runtime(!!!):
-                // https://code.google.com/p/android/issues/detail?id=24672
-                connection.setRequestProperty("Accept-Encoding", "");
-
-                return connection;
-            }
-        });
+//        RequestQueue requestQueue = Volley.newRequestQueue(mContext, new HurlStack() {
+//            @Override
+//            protected HttpURLConnection createConnection(URL url) throws IOException {
+//                HttpURLConnection connection = super.createConnection(url);
+//                // Fix for bug in Android runtime(!!!):
+//                // https://code.google.com/p/android/issues/detail?id=24672
+//                connection.setRequestProperty("Accept-Encoding", "");
+//
+//                return connection;
+//            }
+//        });
         final GsonRequest gsonRequest = new GsonRequest(Request.Method.POST, url, mRequestBody, PushInterfaceData.class, new Response.Listener<PushInterfaceData>() {
 
             @Override
@@ -424,8 +424,22 @@ public class PushService extends Service {
                 mHandler.sendEmptyMessageDelayed(PushConstants.HANDLER_MESSAGE_RETRY_MESSAGE, PushService.MILLISECONDS * PushService.mNextRetryPeriodTerm);
             }
         });
+
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(mContext, new HurlStack() {
+                @Override
+                protected HttpURLConnection createConnection(URL url) throws IOException {
+                    HttpURLConnection connection = super.createConnection(url);
+                    // Fix for bug in Android runtime(!!!):
+                    // https://code.google.com/p/android/issues/detail?id=24672
+                    connection.setRequestProperty("Accept-Encoding", "");
+
+                    return connection;
+                }
+            });
+        }
         gsonRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 3, 1.0f));
-        requestQueue.add(gsonRequest);
+        mRequestQueue.add(gsonRequest);
     }
 
     private void getPushGatewayInformationFromServer() {
