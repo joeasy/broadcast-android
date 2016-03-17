@@ -53,6 +53,9 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
     private int mDefaultWindowFlags = -1;
 
     public void showNetworkConnectionAlertDialog() {
+        showNetworkConnectionAlertDialog(false);
+    }
+    public void showNetworkConnectionAlertDialog(final boolean isFinishActivity) {
         new AlertDialog.Builder(this).setMessage(R.string.alert_network_message)
                 //.setTitle(R.string.alert_network_title)
                 .setCancelable(true)
@@ -65,7 +68,11 @@ public abstract class BaseActivity extends AppCompatActivity implements TextToSp
                 .setPositiveButton(R.string.alert_ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                dialog.dismiss();
+                                if (isFinishActivity) {
+                                    finish();
+                                } else {
+                                    dialog.dismiss();
+                                }
                             }
                         })
                 .show();

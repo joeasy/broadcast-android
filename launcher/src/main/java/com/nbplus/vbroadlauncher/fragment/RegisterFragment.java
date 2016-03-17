@@ -35,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.nbplus.vbroadlauncher.BaseActivity;
 import com.nbplus.vbroadlauncher.HomeLauncherActivity;
 import com.nbplus.vbroadlauncher.R;
 import com.nbplus.vbroadlauncher.callback.OnActivityInteractionListener;
@@ -43,6 +44,7 @@ import com.nbplus.vbroadlauncher.data.LauncherSettings;
 import com.nbplus.vbroadlauncher.hybrid.RegisterWebViewClient;
 
 import org.basdroid.common.DeviceUtils;
+import org.basdroid.common.NetworkUtils;
 import org.basdroid.common.StringUtils;
 
 
@@ -85,6 +87,10 @@ public class RegisterFragment extends Fragment implements OnActivityInteractionL
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         getActivity().setTitle("RegisterFragment");
 
+        if (!NetworkUtils.isConnected(getActivity())) {
+            ((BaseActivity)getActivity()).showNetworkConnectionAlertDialog();
+            return;
+        }
     }
 
     @Override
