@@ -440,10 +440,11 @@ public abstract class BasicWebViewClient extends WebViewClient {
                 });
                 builder.setMessage(R.string.webview_page_loading_error);
                 builder.show();
-        }
 
-        // Default behaviour
-        super.onReceivedError(view, errorCode, description, failingUrl);
+                dismissProgressDialog();
+                // Default behaviour
+                super.onReceivedError(view, errorCode, description, failingUrl);
+        }
     }
 
     ////////////////////////////////

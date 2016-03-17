@@ -164,7 +164,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         }
 
                         Log.d(TAG, "Last activated url = " + url);
-                        if (!StringUtils.isEmptyString(url) && url.startsWith(Constants.VBROAD_HTTP_DOMAIN)) {
+                        if (!StringUtils.isEmptyString(url) && (url.startsWith(Constants.VBROAD_HTTP_DOMAIN) || url.startsWith(Constants.VBROAD_HTTPS_DOMAIN))) {
                             Log.w(TAG, ">> Village broadcast is running... do not show!!!!");
                             pi = new Intent();
                             pi.setAction(action);
