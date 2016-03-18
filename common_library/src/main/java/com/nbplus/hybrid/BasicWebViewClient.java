@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.ContactsContract;
@@ -42,6 +43,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.MimeTypeMap;
 import android.webkit.PermissionRequest;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -316,6 +318,11 @@ public abstract class BasicWebViewClient extends WebViewClient {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        handler.proceed(); // SSL 에러가 발생해도 계속 진행!
     }
 
     @Override
