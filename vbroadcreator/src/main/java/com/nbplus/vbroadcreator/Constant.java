@@ -5,6 +5,6 @@ package com.nbplus.vbroadcreator;
  */
 public class Constant {
     public static final boolean USE_WEBVIEW = true;
-    public static final String BROADCAST_CREATOR_SELECT_SERVER = "http://" +
-            "smtown.ml:8080/login.snc";//"http://183.98.53.165:8080/common/selectServer.snc";
+    public static final String BROADCAST_CREATOR_SELECT_SERVER = "https://" +
+            "smtown.ml/login.snc";//"http://183.98.53.165:8080/common/selectServer.snc";
 }
