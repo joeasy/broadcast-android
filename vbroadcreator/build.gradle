@@ -8,7 +8,7 @@ android {
         applicationId "com.nbplus.vbroadcreator"
         minSdkVersion 11
         targetSdkVersion 22
-        versionCode 1
+        versionCode 100
         versionName "1.0.0"
     }
     signingConfigs {
