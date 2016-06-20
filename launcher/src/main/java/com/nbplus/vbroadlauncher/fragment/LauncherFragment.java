@@ -18,8 +18,6 @@
 package com.nbplus.vbroadlauncher.fragment;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
-import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,19 +27,14 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayout;
@@ -51,17 +44,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.nbplus.iotlib.IoTInterface;
 import com.nbplus.iotlib.data.IoTConstants;
 import com.nbplus.progress.ProgressDialogFragment;
@@ -655,6 +643,7 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         }
 
         setContentViewByOrientation();
+
         return v;
     }
 

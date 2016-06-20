@@ -14,9 +14,6 @@ android {
     signingConfigs {
         debug {
             storeFile file("../vbroadcast_debug.jks")
-//      storePassword "android"
-//      keyAlias "androiddebugkey"
-//      keyPassword "android"
         }
         release {
             storeFile file("../vbroadcast_release.jks")

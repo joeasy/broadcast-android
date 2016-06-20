@@ -7,7 +7,7 @@ public class Constants {
     public static final boolean OPEN_BETA_PHONE = true;
     //  서버정보
     public static final String VBROAD_HTTP_DOMAIN = "http://smtown.ml:8080";
-    public static final String VBROAD_HTTPS_DOMAIN = "http://smtown.ml";
+    public static final String VBROAD_HTTPS_DOMAIN = "https://smtown.ml";
     public static final String VBROAD_SEND_APP_PACKAGE = "com.nbplus.vbroadcreator";
     public static final String VBROAD_INITIAL_PAGE = VBROAD_HTTP_DOMAIN + "/common/selectServer.rcc";
     public static final String API_IOT_UPDATE_DEVICE_LIST = "/is/api/iot/RegistIOTDevice";
