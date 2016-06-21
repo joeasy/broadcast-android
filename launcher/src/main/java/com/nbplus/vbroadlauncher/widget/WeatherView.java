@@ -160,7 +160,9 @@ public class WeatherView extends LinearLayout {
                     }
 
                     // update weather and set next alarm
-                    updateForecastGrib(1);
+                    if (Constants.USE_WEATHER_OPEN_API) {
+                        updateForecastGrib(1);
+                    }
                     setNextForecastGribAlarm();
 
                     if (LauncherSettings.getInstance(getContext()).getGeocodeData() == null) {
@@ -188,7 +190,9 @@ public class WeatherView extends LinearLayout {
 
                     // update weather and set next alarm
                     // 실황예보
-                    updateForecastGrib(1);
+                    if (Constants.USE_WEATHER_OPEN_API) {
+                        updateForecastGrib(1);
+                    }
                     // 단기예보
                     // 데이터도 제대로 오지 않음... 아후거 쓰자.
                     //updateForecastSpaceData(1);
@@ -937,7 +941,7 @@ public class WeatherView extends LinearLayout {
             return;
         }
 
-        if (mForecastGribItems == null) {
+        if (mForecastGribItems == null || Constants.USE_WEATHER_OPEN_API == false) {
             return;
         }
 
@@ -1331,11 +1335,13 @@ public class WeatherView extends LinearLayout {
                 }
             }
 
-            // 3일 데이터가 필요하므로 이미있다면 다시 가져오지 않는다.
-            if (todayPos > 0 && mForecastData.item.weekCondition.size() - todayPos >= 2) {
-                Log.d(TAG, "updateYahooForecast() already data is loaded..");
-                updateYahooForecastView();
-                return;
+            if (Constants.USE_WEATHER_OPEN_API) {
+                // 3일 데이터가 필요하므로 이미있다면 다시 가져오지 않는다.
+                if (todayPos > 0 && mForecastData.item.weekCondition.size() - todayPos >= 2) {
+                    Log.d(TAG, "updateYahooForecast() already data is loaded..");
+                    updateYahooForecastView();
+                    return;
+                }
             }
         }
 
@@ -1513,27 +1519,28 @@ public class WeatherView extends LinearLayout {
         int skyStatusValue = 0;
 
         /**
-         * 야후 API가 약3도정도 오차가 있다. 약간은 보정해 줘야하나?
+         * 야후 API가 기상청데이터에 비해 약2도정도 오차가 있다. 약간은 보정해 줘야하나?
          */
+        if (!Constants.USE_WEATHER_OPEN_API) {
+            // condition 과 humidity 를 보여준다.
+            if (mForecastData.atmosphere != null && mForecastData.item.currentCondition != null) {
+                skyStatusValue = conditonCodeToSkyStatus(mForecastData.item.currentCondition.conditionCode);
 
-//        // condition 과 humidity 를 보여준다.
-//        if (mForecastData.atmosphere != null && mForecastData.item.currentCondition != null) {
-//            skyStatusValue = conditonCodeToSkyStatus(mForecastData.item.currentCondition.conditionCode);
-//
-//            String skyStatusString = skyStatusArray[skyStatusValue];
-//
-//            if (mCurrentSkyStatus != null) {
-//                mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status,
-//                        skyStatusString, "습도 " + mForecastData.atmosphere.humidity + "%"));
-//            }
-//
-//            //보정
-//            float temp = Float.parseFloat(mForecastData.item.currentCondition.temperature);
-//            temp += 3;
-//
-//            mCurrentCelsius.setText(getContext().getString(R.string.celsius, "" + ((int)temp)));
-//            mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
-//        }
+                String skyStatusString = skyStatusArray[skyStatusValue];
+
+                if (mCurrentSkyStatus != null) {
+                    mCurrentSkyStatus.setText(getContext().getString(R.string.sky_status,
+                            skyStatusString, "습도 " + mForecastData.atmosphere.humidity + "%"));
+                }
+
+                float temp = Float.parseFloat(mForecastData.item.currentCondition.temperature);
+                //보정
+                temp += 2;
+
+                mCurrentCelsius.setText(getContext().getString(R.string.celsius, "" + ((int) temp)));
+                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
+            }
+        }
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf;
@@ -1554,7 +1561,8 @@ public class WeatherView extends LinearLayout {
 
             try {
                 float maxCelsius = Float.parseFloat(data.high);
-                float minCelsius = Float.parseFloat(data.low);
+                maxCelsius += 2;            // yahoo 보정
+                //float minCelsius = Float.parseFloat(data.low);
 
                 float lastMaxCelsius = 0f;
                 if (mLastMaxTodayCelsius != null) {
@@ -1564,9 +1572,7 @@ public class WeatherView extends LinearLayout {
                 if (lastMaxCelsius != 0f) {
                     if (lastMaxCelsius > maxCelsius) {
                         maxCelsius = lastMaxCelsius;
-                    } /*else {
-                        maxCelsius += 2;            // yahoo 보정
-                    }*/
+                    }
                 }
                 mTodayMaxCelsius.setText(getContext().getString(R.string.celsius,  "" + (int)Math.ceil(maxCelsius)));
             } catch (NumberFormatException e) {
@@ -1594,7 +1600,7 @@ public class WeatherView extends LinearLayout {
 
             //보정
             float temp = Float.parseFloat(data.high);
-            //temp += 2;
+            temp += 2;
 
             mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 
@@ -1618,7 +1624,7 @@ public class WeatherView extends LinearLayout {
 
             //보정
             float temp = Float.parseFloat(data.high);
-            //temp += 2;
+            temp += 2;
 
             mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 

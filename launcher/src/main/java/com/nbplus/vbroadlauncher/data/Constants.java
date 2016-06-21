@@ -4,7 +4,8 @@ package com.nbplus.vbroadlauncher.data;
  * Created by basagee on 2015. 6. 1..
  */
 public class Constants {
-    public static final boolean OPEN_BETA_PHONE = true;
+    public static final boolean OPEN_BETA_PHONE = false;
+    public static final boolean USE_WEATHER_OPEN_API = false;
     //  서버정보
     public static final String VBROAD_HTTP_DOMAIN = "http://smtown.ml:8080";
     public static final String VBROAD_HTTPS_DOMAIN = "https://smtown.ml";
