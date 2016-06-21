@@ -17,6 +17,7 @@
 
 package com.nbplus.vbroadlauncher;
 
+import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,6 +38,8 @@ import android.telephony.TelephonyManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -208,6 +211,15 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         acquireCpuWakeLock();
 
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        km.inKeyguardRestrictedInputMode();
+        if (km.inKeyguardRestrictedInputMode()) {
+            Log.i(TAG, " 잠금상태?");
+            isKeyguardRestrictedInputMode = true;
+        } else {
+            Log.i(TAG, " 비 잠금 상태?");
+        }
+
         mLastNetworkStatus = NetworkUtils.isConnected(this);
         Intent intent = getIntent();
         if (intent == null || !PushConstants.ACTION_PUSH_MESSAGE_RECEIVED.equals(intent.getAction())) {
@@ -245,12 +257,33 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         registerReceiver(mBroadcastReceiver, intentFilter);
 
         hideSystemUI();
+        /*
+        final Window win = getWindow();
+        win.setFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                        | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        */
 
         if (Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST.equals(mBroadcastData.getServiceType())) {
             setContentView(R.layout.fragment_text_broadcast);
         } else {
             setContentView(R.layout.fragment_audio_broadcast);
         }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
 
         if (Constants.PUSH_PAYLOAD_TYPE_TEXT_BROADCAST.equals(mBroadcastData.getServiceType())) {
             mcheckText2SpeechLister = this;
@@ -329,6 +362,8 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         }
     }
 
+    private static boolean isKeyguardRestrictedInputMode = false;
+    private static int     keyguardRestrictedInputModePauseCount = 0;
     /**
      * Dispatch onPause() to fragments.
      */
@@ -337,13 +372,21 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         Log.d(TAG, "onPause()");
         super.onPause();
 
-        if (!mIsTTS) {
-            microphoneMute(false);
+        if (isKeyguardRestrictedInputMode) {
+            keyguardRestrictedInputModePauseCount++;
         }
-        // 2016.02.23
-        // 홈키를눌러서 백그라운드로 갈때... 종료시켜주자.
-        if (mWebViewClient != null) {
-            mWebViewClient.onBackPressed();
+
+        if (!isKeyguardRestrictedInputMode ||
+                (isKeyguardRestrictedInputMode && keyguardRestrictedInputModePauseCount > 1)) {
+
+            if (!mIsTTS) {
+                microphoneMute(false);
+            }
+            // 2016.02.23
+            // 홈키를눌러서 백그라운드로 갈때... 종료시켜주자.
+            if (mWebViewClient != null) {
+                mWebViewClient.onBackPressed();
+            }
         }
     }
 
