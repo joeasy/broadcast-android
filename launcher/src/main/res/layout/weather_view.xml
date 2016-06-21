@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"/>
             <ImageView
                 android:id="@+id/current_sky_status_icon"
-                android:layout_gravity="center"
+                android:layout_gravity="center_vertical|right"
                 android:gravity="center"
                 android:scaleType="fitXY"
                 android:layout_width="@dimen/launcher_weather_current_icon_width"

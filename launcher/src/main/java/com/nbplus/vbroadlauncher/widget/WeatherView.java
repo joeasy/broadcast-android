@@ -1513,7 +1513,7 @@ public class WeatherView extends LinearLayout {
 
         Resources res = getResources();
         String[] skyStatusArray = res.getStringArray(R.array.sky_status);
-        TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_sm_drawable);
+        TypedArray skyStatusSmallDrawable = getResources().obtainTypedArray(R.array.sky_status_sm_drawable);
         String[] weekStringArray = res.getStringArray(R.array.week_day);
 
         int skyStatusValue = 0;
@@ -1538,7 +1538,11 @@ public class WeatherView extends LinearLayout {
                 temp += 2;
 
                 mCurrentCelsius.setText(getContext().getString(R.string.celsius, "" + ((int) temp)));
-                mCurrentCelsius.setCompoundDrawablesWithIntrinsicBounds(0, 0, skyStatusDrawable.getResourceId(skyStatusValue, 0), 0);
+                TypedArray skyStatusDrawable = getResources().obtainTypedArray(R.array.sky_status_drawable);
+                mCurrentSkyStatusIcon.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+                mCurrentSkyStatusValue = skyStatusValue;
+
+                setCurrentSkyStatusBackground(DisplayUtils.getScreenOrientation((AppCompatActivity) getContext()));
             }
         }
 
@@ -1581,7 +1585,7 @@ public class WeatherView extends LinearLayout {
 
             //skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
             // 현재 시간 날씨 기준으로 맞춘다.
-            mTodaySkyStatus.setImageResource(skyStatusDrawable.getResourceId(mCurrentSkyStatusValue, 0));
+            mTodaySkyStatus.setImageResource(skyStatusSmallDrawable.getResourceId(mCurrentSkyStatusValue, 0));
         }
 
         // tomorrow
@@ -1605,7 +1609,7 @@ public class WeatherView extends LinearLayout {
             mTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
-            mTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+            mTomorrowSkyStatus.setImageResource(skyStatusSmallDrawable.getResourceId(skyStatusValue, 0));
         }
 
         // the day after tomorrow
@@ -1629,7 +1633,7 @@ public class WeatherView extends LinearLayout {
             mDayAfterTomorrowMaxCelsius.setText(getContext().getString(R.string.celsius, "" + (int)Math.ceil(temp)));
 
             skyStatusValue = conditonCodeToSkyStatus(data.conditionCode);
-            mDayAfterTomorrowSkyStatus.setImageResource(skyStatusDrawable.getResourceId(skyStatusValue, 0));
+            mDayAfterTomorrowSkyStatus.setImageResource(skyStatusSmallDrawable.getResourceId(skyStatusValue, 0));
         }
     }
 
