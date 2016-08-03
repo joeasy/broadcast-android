@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="sky_status">
+    <string-array name="sky_status" translatable="false">
         <item>맑음</item>
         <item>구름조금</item>
         <item>구름많음</item>
@@ -9,7 +9,7 @@
         <item>비/눈</item>
         <item>눈</item>
     </string-array>
-    <string-array name="sky_status_drawable">
+    <string-array name="sky_status_drawable" translatable="false">
         <item>@drawable/ic_weather_01</item>
         <item>@drawable/ic_weather_02</item>
         <item>@drawable/ic_weather_03</item>
@@ -18,7 +18,7 @@
         <item>@drawable/ic_weather_07</item>
         <item>@drawable/ic_weather_06</item>
     </string-array>
-    <string-array name="sky_status_sm_drawable">
+    <string-array name="sky_status_sm_drawable" translatable="false">
         <item>@drawable/ic_weather_sm_01</item>
         <item>@drawable/ic_weather_sm_02</item>
         <item>@drawable/ic_weather_sm_03</item>
@@ -27,7 +27,7 @@
         <item>@drawable/ic_weather_sm_07</item>
         <item>@drawable/ic_weather_sm_06</item>
     </string-array>
-    <string-array name="sky_status_bg_land_drawable">
+    <string-array name="sky_status_bg_land_drawable" translatable="false">
         <item>@drawable/ic_weather_bg_01</item>
         <item>@drawable/ic_weather_bg_02</item>
         <item>@drawable/ic_weather_bg_03</item>
@@ -36,7 +36,7 @@
         <item>@drawable/ic_weather_bg_07</item>
         <item>@drawable/ic_weather_bg_06</item>
     </string-array>
-    <string-array name="sky_status_bg_port_drawable">
+    <string-array name="sky_status_bg_port_drawable" translatable="false">
         <item>@drawable/ic_weather_bg_v_01</item>
         <item>@drawable/ic_weather_bg_v_02</item>
         <item>@drawable/ic_weather_bg_v_03</item>
@@ -45,7 +45,7 @@
         <item>@drawable/ic_weather_bg_v_07</item>
         <item>@drawable/ic_weather_bg_v_06</item>
     </string-array>
-    <string-array name="week_day">
+    <string-array name="week_day" translatable="false">
         <item>일</item>
         <item>월</item>
         <item>화</item>
@@ -54,7 +54,7 @@
         <item>금</item>
         <item>토</item>
     </string-array>
-    <string-array name="iot_device_type">
+    <string-array name="iot_device_type" translatable="false">
         <item>알 수 없는 장치</item>
         <item>IR 리모콘</item>
         <item>블루투스 장치</item>
