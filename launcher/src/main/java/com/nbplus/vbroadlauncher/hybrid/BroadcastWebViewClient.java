@@ -401,11 +401,23 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @Override
     public void loadWebUrl(String url) {
         if (url.indexOf("?") > 0) {
-            url += ("&UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
-            url += ("&APPID=" + mContext.getPackageName());
+            if (!url.contains("UUID=")) {
+                url += ("&UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            }
+            if (!url.contains("APPID=")) {
+                url += ("&APPID=" + mContext.getPackageName());
+            }
         } else {
-            url += ("?UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
-            url += ("&APPID=" + mContext.getPackageName());
+            if (!url.contains("UUID=")) {
+                url += ("?UUID=" + LauncherSettings.getInstance(mContext).getDeviceID());
+            }
+            if (!url.contains("APPID=")) {
+                if (!url.contains("UUID=")) {
+                    url += ("?APPID=" + mContext.getPackageName());
+                } else {
+                    url += ("&APPID=" + mContext.getPackageName());
+                }
+            }
         }
         mWebView.loadUrl(url);
     }

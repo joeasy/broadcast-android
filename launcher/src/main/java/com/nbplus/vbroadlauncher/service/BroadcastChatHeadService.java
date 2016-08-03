@@ -139,11 +139,23 @@ public class BroadcastChatHeadService extends Service implements TextToSpeech.On
 
             String url = mBroadcastData.getMessage();
             if (url.indexOf("?") > 0) {
-                url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-                url += ("&APPID=" + getApplicationContext().getPackageName());
+                if (!url.contains("UUID=")) {
+                    url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                }
+                if (!url.contains("APPID=")) {
+                    url += ("&APPID=" + getApplicationContext().getPackageName());
+                }
             } else {
-                url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-                url += ("&APPID=" + getApplicationContext().getPackageName());
+                if (!url.contains("UUID=")) {
+                    url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                }
+                if (!url.contains("APPID=")) {
+                    if (!url.contains("UUID=")) {
+                        url += ("?APPID=" + getApplicationContext().getPackageName());
+                    } else {
+                        url += ("&APPID=" + getApplicationContext().getPackageName());
+                    }
+                }
             }
             mWebViewClient.loadUrl(url);
         }

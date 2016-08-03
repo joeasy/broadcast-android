@@ -251,6 +251,8 @@ public abstract class BasicWebViewClient extends WebViewClient {
 
             }
         });
+
+        Log.d(TAG, ">> user agent = " + mWebView.getSettings().getUserAgentString());
     }
 
     public void setBackgroundResource(int resId) {
@@ -320,10 +322,14 @@ public abstract class BasicWebViewClient extends WebViewClient {
         return false;
     }
 
-    @Override
-    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-        handler.proceed(); // SSL 에러가 발생해도 계속 진행!
-    }
+    /*
+     * 2016.07.21 baagee@gmail.com
+     * 구글에서 보안정책 변경으로 마켓앱 검수에서 막히는듯하다.
+     */
+//    @Override
+//    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+//        handler.proceed(); // SSL 에러가 발생해도 계속 진행!
+//    }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {

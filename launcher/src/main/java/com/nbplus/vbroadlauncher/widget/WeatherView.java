@@ -1321,26 +1321,30 @@ public class WeatherView extends LinearLayout {
         /**
          * 이전에 조회한 야후 날씨 데이터를 참고해서 이미 오늘을 포함한 3일 데이터가 있다면
          * 다시 조회하지 않는다.
+         *
+         * 이부분은 정부 Open API를 사용하지않는경우에만 활성화된다.
          */
-        if (mForecastData != null && mForecastData.item != null && mForecastData.item.weekCondition != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-            Date date = new Date();
-            String today = sdf.format(date);
+        if (Constants.USE_WEATHER_OPEN_API) {
+            if (mForecastData != null && mForecastData.item != null && mForecastData.item.weekCondition != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+                Date date = new Date();
+                String today = sdf.format(date);
 
-            int todayPos = 0;
-            for (ForecastData.Forecast dayCondition : mForecastData.item.weekCondition) {
-                todayPos++;
-                if (today.equals(dayCondition.date)) {
-                    break;
+                int todayPos = 0;
+                for (ForecastData.Forecast dayCondition : mForecastData.item.weekCondition) {
+                    todayPos++;
+                    if (today.equals(dayCondition.date)) {
+                        break;
+                    }
                 }
-            }
 
-            if (Constants.USE_WEATHER_OPEN_API) {
-                // 3일 데이터가 필요하므로 이미있다면 다시 가져오지 않는다.
-                if (todayPos > 0 && mForecastData.item.weekCondition.size() - todayPos >= 2) {
-                    Log.d(TAG, "updateYahooForecast() already data is loaded..");
-                    updateYahooForecastView();
-                    return;
+                if (Constants.USE_WEATHER_OPEN_API) {
+                    // 3일 데이터가 필요하므로 이미있다면 다시 가져오지 않는다.
+                    if (todayPos > 0 && mForecastData.item.weekCondition.size() - todayPos >= 2) {
+                        Log.d(TAG, "updateYahooForecast() already data is loaded..");
+                        updateYahooForecastView();
+                        return;
+                    }
                 }
             }
         }
@@ -1402,9 +1406,9 @@ public class WeatherView extends LinearLayout {
     }
 
     final List<String> sunny = Arrays.asList("24", "25", "31", "32", "33", "34", "36");
-    final List<String> littleCloudy = Arrays.asList("19", "20", "21", "22", "23", "29", "30", "44");
-    final List<String> mostlyCloudy = Arrays.asList();
-    final List<String> overcast = Arrays.asList("26", "27", "28");
+    final List<String> littleCloudy = Arrays.asList("19", "20", "21", "22", "29", "30", "44");
+    final List<String> mostlyCloudy = Arrays.asList("23", "26");
+    final List<String> overcast = Arrays.asList("27", "28");
     final List<String> rainy = Arrays.asList("0", "1", "2", "3", "4", "11", "12", "37", "38", "39", "40", "45", "47");
     final List<String> rainyAndSnow = Arrays.asList("5", "6", "10", "35");
     final List<String> snow = Arrays.asList("7", "8", "9", "13", "14", "15", "16", "17", "18", "41", "42", "43", "46");

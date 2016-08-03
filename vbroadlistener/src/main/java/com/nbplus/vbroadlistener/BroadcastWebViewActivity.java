@@ -173,11 +173,23 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 url = LauncherSettings.getInstance(this).getRegisterAddress();
             }
             if (url.indexOf("?") > 0) {
-                url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-                url += ("&APPID=" + getApplicationContext().getPackageName());
+                if (!url.contains("UUID=")) {
+                    url += ("&UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                }
+                if (!url.contains("APPID=")) {
+                    url += ("&APPID=" + getApplicationContext().getPackageName());
+                }
             } else {
-                url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
-                url += ("&APPID=" + getApplicationContext().getPackageName());
+                if (!url.contains("UUID=")) {
+                    url += ("?UUID=" + LauncherSettings.getInstance(this).getDeviceID());
+                }
+                if (!url.contains("APPID=")) {
+                    if (!url.contains("UUID=")) {
+                        url += ("?APPID=" + getApplicationContext().getPackageName());
+                    } else {
+                        url += ("&APPID=" + getApplicationContext().getPackageName());
+                    }
+                }
             }
             isGoogleMapMode = false;
             loadWebView(url);
