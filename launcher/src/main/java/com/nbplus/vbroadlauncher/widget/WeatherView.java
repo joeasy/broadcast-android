@@ -963,7 +963,7 @@ public class WeatherView extends LinearLayout {
              */
 
             Resources res = getResources();
-            String[] skyStatusArray = res.getStringArray(R.array.sky_status);
+            String[] skyStatusArray = res.getStringArray(R.array.sky_status_array);
             skyStatusValue = Integer.parseInt(item.obsrValue) - 1;
             // 강수형태를 가져온다.
             item = getForecastItemCategory(mForecastGribItems, ForecastItem.PTY);
@@ -1516,7 +1516,7 @@ public class WeatherView extends LinearLayout {
         }
 
         Resources res = getResources();
-        String[] skyStatusArray = res.getStringArray(R.array.sky_status);
+        String[] skyStatusArray = res.getStringArray(R.array.sky_status_array);
         TypedArray skyStatusSmallDrawable = getResources().obtainTypedArray(R.array.sky_status_sm_drawable);
         String[] weekStringArray = res.getStringArray(R.array.week_day);
 

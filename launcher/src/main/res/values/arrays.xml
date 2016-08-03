@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="sky_status" translatable="false">
+    <string-array name="sky_status_array" translatable="false">
         <item>맑음</item>
         <item>구름조금</item>
         <item>구름많음</item>
