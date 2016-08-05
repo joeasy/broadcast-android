@@ -351,7 +351,7 @@ public class RadioActivity extends BaseActivity implements OnRadioFragmentIntera
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (!Constants.RUN_TABLET_LAUNCHER && LauncherSettings.getInstance(this).isSmartPhone()) {
             this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 

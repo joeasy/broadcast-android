@@ -366,16 +366,19 @@ public class LauncherSettings {
             serverInformation = new VBroadcastServer();
         }
         this.serverInformation = serverInformation;
-        String collectServerAddress = null;
-        if (this.serverInformation != null) {
-            String apiServer = this.serverInformation.getApiServer();
-            if (StringUtils.isEmptyString(apiServer)) {
-                collectServerAddress = null;
-            } else {
-                collectServerAddress = apiServer + Constants.API_COLLECTED_IOT_DATA_CONTEXT;
+
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            String collectServerAddress = null;
+            if (this.serverInformation != null) {
+                String apiServer = this.serverInformation.getApiServer();
+                if (StringUtils.isEmptyString(apiServer)) {
+                    collectServerAddress = null;
+                } else {
+                    collectServerAddress = apiServer + Constants.API_COLLECTED_IOT_DATA_CONTEXT;
+                }
             }
+            IoTInterface.getInstance().setCollectServerAddress(collectServerAddress);
         }
-        IoTInterface.getInstance().setCollectServerAddress(collectServerAddress);
         setPrefsJsonObject(KEY_VBROADCAST_SERVER_INFO, this.serverInformation);
     }
 

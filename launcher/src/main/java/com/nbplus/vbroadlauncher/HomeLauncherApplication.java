@@ -72,7 +72,10 @@ public class HomeLauncherApplication extends Application  {
         }
 
         mCurrentOutdoorMode = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
-        IoTInterface.getInstance().setSmartSensorNotificationCallback(HomeLauncherApplication.class.getSimpleName(), mSmartSensorNotificationCallback);
+
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            IoTInterface.getInstance().setSmartSensorNotificationCallback(HomeLauncherApplication.class.getSimpleName(), mSmartSensorNotificationCallback);
+        }
     }
 
     private boolean mCurrentOutdoorMode = false;
@@ -86,6 +89,9 @@ public class HomeLauncherApplication extends Application  {
     SmartSensorNotification mSmartSensorNotificationCallback = new SmartSensorNotification() {
         @Override
         public void notifyMotionSensor(IoTDevice device, boolean isMotionActive, boolean isDoorOpened, boolean isDoorOpened2) {
+            if (Constants.USE_INTERNAL_BLUETOOTH) {
+                return;
+            }
             //Log.d(TAG, "Smart Sensor id = " + device.getDeviceId() + ", motion detection = " + isMotionActive + ", door opened = " + isDoorOpened + ", door opened2 = " + isDoorOpened2);
             boolean isOutdoor = LauncherSettings.getInstance(HomeLauncherApplication.this).isOutdoorMode();
             long currTime = System.currentTimeMillis();
@@ -145,6 +151,9 @@ public class HomeLauncherApplication extends Application  {
     };
 
     public void outdoorModeChanged(boolean isOutdoor) {
+        if (!Constants.USE_INTERNAL_BLUETOOTH) {
+            return;
+        }
         Log.d(TAG, "outdoorModechanged() called....");
         if (mCurrentOutdoorMode != isOutdoor) {
             mCurrentOutdoorMode = isOutdoor;

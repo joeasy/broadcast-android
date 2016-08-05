@@ -334,7 +334,7 @@ public class RealtimeBroadcastActivity extends BaseActivity implements BaseActiv
         mStreamMusicVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC),  AudioManager.FLAG_PLAY_SOUND);
 
-        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (!Constants.RUN_TABLET_LAUNCHER && LauncherSettings.getInstance(this).isSmartPhone()) {
             StateListener phoneStateListener = new StateListener();
             TelephonyManager telephonyManager =(TelephonyManager)getSystemService(TELEPHONY_SERVICE);
             telephonyManager.listen(phoneStateListener,PhoneStateListener.LISTEN_CALL_STATE);

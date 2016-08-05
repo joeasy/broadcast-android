@@ -164,6 +164,7 @@ public class HomeLauncherActivity extends BaseActivity
     // smart band .. emergency call
     private long mLastDeviceEmergencyCallSent = 0L;
     private boolean mIsSendingEmergencyCall = false;
+    boolean nonSupportedDevice = false;
 
     // 핸들러 객체 만들기
     private static class HomeLauncherActivityHandler extends Handler {
@@ -280,7 +281,40 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         boolean isTablet = DisplayUtils.isTabletDevice(this);
+        if (isTablet) {
+            //is tablet
+            Log.d(TAG, "Tablet");
+        } else {
+            //is phone
+            Log.d(TAG, "isTabletDevice() returns Phone.. now check display inches");
+            double diagonalInches = DisplayUtils.getDisplayInches(this);
+            if (diagonalInches >= 6.4) {
+                // 800x400 인경우 portrait 에서 6.43 가량이 나온다.
+                // 6.5inch device or bigger
+                Log.d(TAG, "DisplayUtils.getDisplayInches() bigger than 6.5");
+            } else {
+                if (Constants.RUN_TABLET_LAUNCHER) {
+                    // smaller device
+                    Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
+                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                    alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
+                    alert.setMessage(R.string.alert_phone_message);
+                    alert.show();
+
+                    nonSupportedDevice = true;
+                    return;
+                }
+            }
+        }
+
         LauncherSettings.getInstance(this).setIsSmartPhone(!isTablet);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_home_launcher);
@@ -288,6 +322,17 @@ public class HomeLauncherActivity extends BaseActivity
         DeviceUtils.showDeviceInformation();
 
         Log.d(TAG, ">>>DisplayUtils.getScreenDensity(this) = " + DisplayUtils.getScreenDensity(this));
+
+        mCurrentLocale = getResources().getConfiguration().locale;
+        if (BuildConfig.DEBUG) {
+            Point p = DisplayUtils.getScreenSize(this);
+            Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
+            Point screen = p;
+            p = DisplayUtils.getScreenDp(this);
+            Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
+            int density = DisplayUtils.getScreenDensity(this);
+            Log.d(TAG, "Screen density = " + density);
+        }
 
         // vitamio library load
         if (!LibsChecker.checkVitamioLibs(this)) {
@@ -304,49 +349,7 @@ public class HomeLauncherActivity extends BaseActivity
             return;
         }
 
-        mCurrentLocale = getResources().getConfiguration().locale;
-        if (BuildConfig.DEBUG) {
-            Point p = DisplayUtils.getScreenSize(this);
-            Log.d(TAG, "Screen size px = " + p.x + ", py = " + p.y);
-            Point screen = p;
-            p = DisplayUtils.getScreenDp(this);
-            Log.d(TAG, "Screen dp x = " + p.x + ", y = " + p.y);
-            int density = DisplayUtils.getScreenDensity(this);
-            Log.d(TAG, "Screen density = " + density);
-        }
-
-        if (isTablet) {
-            //is tablet
-            Log.d(TAG, "Tablet");
-        } else {
-            //is phone
-            Log.d(TAG, "isTabletDevice() returns Phone.. now check display inches");
-            double diagonalInches = DisplayUtils.getDisplayInches(this);
-            if (diagonalInches >= 6.4) {
-                // 800x400 인경우 portrait 에서 6.43 가량이 나온다.
-                // 6.5inch device or bigger
-                Log.d(TAG, "DisplayUtils.getDisplayInches() bigger than 6.5");
-            } else {
-                if (!Constants.OPEN_BETA_PHONE) {
-                    // smaller device
-                    Log.d(TAG, "DisplayUtils.getDisplayInches() smaller than 6.5");
-                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                    alert.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            finish();
-                        }
-                    });
-                    alert.setMessage(R.string.alert_phone_message);
-                    alert.show();
-
-                    return;
-                }
-            }
-        }
-
-        if (!Constants.OPEN_BETA_PHONE || !LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (Constants.RUN_TABLET_LAUNCHER && !LauncherSettings.getInstance(this).isSmartPhone()) {
             if (isMyLauncherDefault()) {
                 Log.d(TAG, "isMyLauncherDefault() == true");
                 // fake home key event.
@@ -359,7 +362,7 @@ public class HomeLauncherActivity extends BaseActivity
                         | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 startActivity(fakeIntent);
             } else {
-                Log.d(TAG, "Constants.OPEN_BETA_PHONE == false || isMyLauncherDefault() == false");
+                Log.d(TAG, "Constants.RUN_TABLET_LAUNCHER == true || isMyLauncherDefault() == false");
                 //resetPreferredLauncherAndOpenChooser();
             }
         }
@@ -442,24 +445,26 @@ public class HomeLauncherActivity extends BaseActivity
         }
         fragmentTransaction.commit();
 
-        // initialize iot interface.
-        String collectServerAddress = null;
-        if (serverInfo != null) {
-            String apiServer = serverInfo.getApiServer();
-            if (StringUtils.isEmptyString(apiServer)) {
-                collectServerAddress = null;
-            } else {
-                collectServerAddress = apiServer + Constants.API_COLLECTED_IOT_DATA_CONTEXT;
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            // initialize iot interface.
+            String collectServerAddress = null;
+            if (serverInfo != null) {
+                String apiServer = serverInfo.getApiServer();
+                if (StringUtils.isEmptyString(apiServer)) {
+                    collectServerAddress = null;
+                } else {
+                    collectServerAddress = apiServer + Constants.API_COLLECTED_IOT_DATA_CONTEXT;
+                }
             }
-        }
-        IoTResultCodes resCode = IoTInterface.getInstance().initialize(this,
-                LauncherSettings.getInstance(this).getDeviceID(),
-                collectServerAddress);
-        if (!resCode.equals(IoTResultCodes.SUCCESS)) {
-            if (resCode.equals(IoTResultCodes.BIND_SERVICE_FAILED)) {
-                Toast.makeText(getApplicationContext(),
-                        "Bind IoT Service failed!!!", Toast.LENGTH_SHORT)
-                        .show();
+            IoTResultCodes resCode = IoTInterface.getInstance().initialize(this,
+                    LauncherSettings.getInstance(this).getDeviceID(),
+                    collectServerAddress);
+            if (!resCode.equals(IoTResultCodes.SUCCESS)) {
+                if (resCode.equals(IoTResultCodes.BIND_SERVICE_FAILED)) {
+                    Toast.makeText(getApplicationContext(),
+                            "Bind IoT Service failed!!!", Toast.LENGTH_SHORT)
+                            .show();
+                }
             }
         }
     }
@@ -560,7 +565,11 @@ public class HomeLauncherActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (nonSupportedDevice) {
+            return;
+        }
+
+        if (!Constants.RUN_TABLET_LAUNCHER && LauncherSettings.getInstance(this).isSmartPhone()) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
@@ -850,7 +859,7 @@ public class HomeLauncherActivity extends BaseActivity
      */
     @Override
     public void onBackPressed() {
-        if (Constants.OPEN_BETA_PHONE) {
+        if (!Constants.RUN_TABLET_LAUNCHER) {
             super.onBackPressed();
             return;
         }
@@ -923,7 +932,7 @@ public class HomeLauncherActivity extends BaseActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged !!!");
-        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (!Constants.RUN_TABLET_LAUNCHER && LauncherSettings.getInstance(this).isSmartPhone()) {
             this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             return;
         }

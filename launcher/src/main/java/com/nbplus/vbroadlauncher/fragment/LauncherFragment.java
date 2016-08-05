@@ -403,7 +403,9 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
             mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
             mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
 
-            IoTInterface.getInstance().forceDataSync();
+            if (Constants.USE_INTERNAL_BLUETOOTH) {
+                IoTInterface.getInstance().forceDataSync();
+            }
         }
     };
 
@@ -521,12 +523,17 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
                 }
             }
         });
+
         // 부가데이터 동기화
-        mIoTDataSync= (LinearLayout)v.findViewById(R.id.ic_iot_data_sync);
+        mIoTDataSync = (LinearLayout)v.findViewById(R.id.ic_iot_data_sync);
         mIoTDataSyncText = (TextView) v.findViewById(R.id.tv_iot_data_sync);
-        mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
-        mIoTDataSync.setClickable(true);
-        mIoTDataSync.setEnabled(true);
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
+            mIoTDataSync.setClickable(true);
+            mIoTDataSync.setEnabled(true);
+        } else {
+            mIoTDataSync.setVisibility(View.GONE);
+        }
 
         mTextClock = (TextClock)v.findViewById(R.id.text_clock);
         if (mTextClock != null) {
@@ -940,20 +947,25 @@ public class LauncherFragment extends Fragment implements OnActivityInteractionL
         if (mWeatherView != null) {
             mWeatherView.onResumed();
         }
-        if (IoTInterface.getInstance().isIoTServiceAvailable()) {
-            mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_white, 0, 0, 0);
-            mIoTDataSyncText.setTextColor(getResources().getColor(R.color.white));
 
-            mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
-            mIoTDataSync.setClickable(true);
-            mIoTDataSync.setEnabled(true);
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            if (IoTInterface.getInstance().isIoTServiceAvailable()) {
+                mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_white, 0, 0, 0);
+                mIoTDataSyncText.setTextColor(getResources().getColor(R.color.white));
+
+                mIoTDataSync.setOnClickListener(mIoTSyncClickListener);
+                mIoTDataSync.setClickable(true);
+                mIoTDataSync.setEnabled(true);
+            } else {
+                mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
+                mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
+
+                mIoTDataSync.setOnClickListener(null);
+                mIoTDataSync.setClickable(false);
+                mIoTDataSync.setEnabled(false);
+            }
         } else {
-            mIoTDataSyncText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cached_grey600, 0, 0, 0);
-            mIoTDataSyncText.setTextColor(getResources().getColor(R.color.btn_color_absentia_off));
-
-            mIoTDataSync.setOnClickListener(null);
-            mIoTDataSync.setClickable(false);
-            mIoTDataSync.setEnabled(false);
+            mIoTDataSync.setVisibility(View.GONE);
         }
     }
 

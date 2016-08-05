@@ -307,7 +307,9 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
             mIsClosingByWebApp = true;
         }
         dismissProgressDialog();
-        dismissUpdateIoTDevicesDialog();
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            dismissUpdateIoTDevicesDialog();
+        }
         ((BroadcastWebViewActivity)mContext).finishActivity();
     }
 
@@ -333,17 +335,28 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     @JavascriptInterface
     public void updateIoTDevices() {
         Log.d(TAG, "call updateIoTDevices()");
-        mContext.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIoTDiscoveringUrl = mWebView.getUrl();
-//                if (com.nbplus.iotlib.data.Constants.USE_IOT_GATEWAY) {
+        if (Constants.USE_INTERNAL_BLUETOOTH) {
+            mContext.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mIoTDiscoveringUrl = mWebView.getUrl();
                     showUpdateIoTDevicesDialog();
-//                } else {
-//                    ((BroadcastWebViewActivity)mContext).checkBluetoothEnabled();
-//                }
-            }
-        });
+                }
+            });
+        } else {
+            Log.d(TAG, "Not yet implemented....");
+            mContext.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mIoTDiscoveringUrl = mWebView.getUrl();
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Constants.ACTION_IOT_DEVICE_LIST);
+                    sendIntent.putExtra(Constants.EXTRA_IOT_DEVICE_CANCELED, false);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(sendIntent);
+                }
+            });
+        }
     }
 
     ////////////////////////////////
@@ -494,30 +507,13 @@ public class BroadcastWebViewClient extends BasicWebViewClient implements TextTo
     }
 
     public void showUpdateIoTDevicesDialog() {
-//        if (com.nbplus.iotlib.data.Constants.USE_IOT_GATEWAY) {
-//            final boolean wifiEnabled = NetworkUtils.isWifiEnabled(mContext);
-//            if (wifiEnabled) {
-                try {
-                    dismissProgressDialog();
-                    mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragmentStatus.newInstance(null);
-                    mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-//            } else {
-//                onUpdateIoTDevices("0997");
-//                showNetworkConnectionAlertDialog();
-//            }
-//        } else {
-//            try {
-//                dismissProgressDialog();
-//                mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragment.newInstance(null);
-//                mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-
+        try {
+            dismissProgressDialog();
+            mLoadIoTDevicesDialogFragment = LoadIoTDevicesDialogFragmentStatus.newInstance(null);
+            mLoadIoTDevicesDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "load_iot_devices_dialog");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public void dismissUpdateIoTDevicesDialog() {
         try {

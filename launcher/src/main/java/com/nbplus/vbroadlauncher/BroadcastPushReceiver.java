@@ -128,7 +128,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                         return;
                     }
 
-                    if (Constants.OPEN_BETA_PHONE) {
+                    if (!Constants.RUN_TABLET_LAUNCHER) {
                         String activePackageName = PackageUtils.getActivePackage(context);
                         if (activePackageName != null && !StringUtils.isEmptyString(activePackageName)) {
                             if (Constants.VBROAD_SEND_APP_PACKAGE.equals(activePackageName)) {
@@ -269,7 +269,11 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                 // IOT DEVICE 제어(스마트홈 서비스)
                 case Constants.PUSH_PAYLOAD_TYPE_IOT_DEVICE_CONTROL :
                     Log.d(TAG, "startService >> ACTION_SEND_IOT_COMMAND");
-                    IoTInterface.getInstance().controlDevice(payloadData.getIotControlDeviceId(), payloadData.getMessage());
+                    if (Constants.USE_INTERNAL_BLUETOOTH) {
+                        IoTInterface.getInstance().controlDevice(payloadData.getIotControlDeviceId(), payloadData.getMessage());
+                    } else {
+                        Log.d(TAG, "Not yet implemented... ");
+                    }
                     break;
                 // PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION
                 case Constants.PUSH_PAYLOAD_TYPE_PUSH_NOTIFICATION :
@@ -281,7 +285,7 @@ public class BroadcastPushReceiver extends BroadcastReceiver {
                     showNotification(context, Constants.SYSTEM_ADMIN_NOTIFICATION_ID, PackageUtils.getApplicationName(context),
                             payloadData.getAlertMessage(), PackageUtils.getApplicationName(context), payloadData.getMessage(), null, null, null);
                     break;
-                // IOT DEVICE 제어(스마트홈 서비스)
+
                 case Constants.PUSH_PAYLOAD_TYPE_FIND_PASSWORD :
                     pi = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(payloadData.getMessage()));
                     showNotification(context, Constants.PW_FIND_NOTIFICATION_ID, PackageUtils.getApplicationName(context), payloadData.getAlertMessage(), null, pi);

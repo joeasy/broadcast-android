@@ -131,8 +131,10 @@ public class BroadcastWebViewActivity extends BaseActivity {
                 if (result != null) {
                     if (!StringUtils.isEmptyString(result.getResultCode())) {
                         Bundle b = (Bundle)result.getObject();
-                        IoTDevicesData data = b.getParcelable("data");
-                        IoTInterface.getInstance().updateBondedWithServerDeviceList(data.getIotDevices());
+                        if (Constants.USE_INTERNAL_BLUETOOTH) {
+                            IoTDevicesData data = b.getParcelable("data");
+                            IoTInterface.getInstance().updateBondedWithServerDeviceList(data.getIotDevices());
+                        }
                         mWebViewClient.onUpdateIoTDevices(result.getResultCode());
                     } else {
                         mWebViewClient.onUpdateIoTDevices("1000");      // Open API 코드참조.
@@ -176,6 +178,12 @@ public class BroadcastWebViewActivity extends BaseActivity {
 
                     if (iotDevicesList.size() == 0) {
                         Log.d(TAG, "No device found.. Do not anything...");
+                        Message msg = new Message();
+                        msg.what = Constants.HANDLER_MESSAGE_SEND_IOT_DEVICE_LIST_COMPLETE_TASK;
+                        BaseApiResult result = new BaseApiResult();
+                        result.setResultCode("1000");
+                        msg.obj = result;
+                        mHandler.sendMessage(msg);
                         return;
                     }
 
@@ -203,7 +211,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (!Constants.RUN_TABLET_LAUNCHER && LauncherSettings.getInstance(this).isSmartPhone()) {
             this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -333,7 +341,7 @@ public class BroadcastWebViewActivity extends BaseActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "BroadcastWebViewActivity onConfigurationChanged()");
-        if (Constants.OPEN_BETA_PHONE && LauncherSettings.getInstance(this).isSmartPhone()) {
+        if (!Constants.RUN_TABLET_LAUNCHER && LauncherSettings.getInstance(this).isSmartPhone()) {
             this.setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             return;
         }
